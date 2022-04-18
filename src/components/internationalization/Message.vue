@@ -87,7 +87,6 @@
           :label='$t("MSG_SUBMIT")'
           @click='onBatchSubmit'
         />
-        <div>{{ loadedFile }}</div>
       </div>
     </template>
   </q-table>
@@ -240,7 +239,6 @@ const onExport = () => {
   saveAs(blob, filename)
 }
 
-const loadedFile = ref(undefined as unknown as string)
 const loadFileButton = ref<HTMLInputElement>()
 
 const onLoadFile = () => {

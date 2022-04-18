@@ -235,6 +235,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '批量管理',
+        caption: '批量导入导出授权',
+        icon: 'format_list_numbered',
+        target: '/auth/batch',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
