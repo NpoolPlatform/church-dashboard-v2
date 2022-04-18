@@ -80,4 +80,5 @@ const onAppSelected = (app: Application) => {
 <style lang='sass' scoped>
 .select
   border-bottom: solid 1px $primary
+  max-height: 100%
 </style>
