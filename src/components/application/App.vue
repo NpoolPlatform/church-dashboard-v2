@@ -62,7 +62,8 @@ import {
   App,
   Application,
   AppControl,
-  RecaptchaMethods
+  RecaptchaMethods,
+  useLoginedUserStore
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 
@@ -70,10 +71,14 @@ const app = useApplicationsStore()
 const apps = computed(() => Array.from(app.Applications).map((el) => el.App))
 const appLoading = ref(false)
 
+const logined = useLoginedUserStore()
+
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  App: {} as unknown as App,
+  App: {
+    CreatedBy: logined.LoginedUser?.User.ID
+  } as unknown as App,
   Ctrl: {} as unknown as AppControl
 } as unknown as Application)
 
@@ -95,7 +100,9 @@ onMounted(() => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    App: {} as unknown as App,
+    App: {
+      CreatedBy: logined.LoginedUser?.User.ID
+    } as unknown as App,
     Ctrl: {} as unknown as AppControl
   } as unknown as Application
 }
