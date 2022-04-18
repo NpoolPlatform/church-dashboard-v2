@@ -45,15 +45,20 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useTemplateStore, Contact, ContactTypes, MessageUsedFors } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { NotificationType, Contact, ContactTypes, MessageUsedFors, useChurchTemplateStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 
-const templates = useTemplateStore()
-const contacts = computed(() => templates.Contacts)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const templates = useChurchTemplateStore()
+const contacts = computed(() => templates.Contacts.get(appID.value) ? templates.Contacts.get(appID.value) : [])
 const contactLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
   templates.getContacts({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_CONTACTS',
@@ -65,6 +70,14 @@ onMounted(() => {
   }, () => {
     contactLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 const showing = ref(false)
@@ -108,6 +121,7 @@ const onSubmit = () => {
   }
 
   templates.createContact({
+    TargetAppID: appID.value,
     Info: target.value,
     Message: {
       Error: {
