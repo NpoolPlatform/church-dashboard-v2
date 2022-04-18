@@ -1,6 +1,15 @@
 <template>
   <q-table
-    :title='$t("MSG_APP_RESOURCES")'
+    :title='$t("MSG_ROLES")'
+    dense
+    :rows='roles'
+    row-key='ID'
+    :rows-per-page-options='[5]'
+    selection='single'
+    v-model:selected='selectedRole'
+  />
+  <q-table
+    :title='$t("MSG_ROLE_RESOURCES")'
     dense
     :rows='auths'
     row-key='ID'
@@ -33,19 +42,50 @@
           class='btn flat'
           :label='$t("MSG_AUTHORIZE")'
           @click='onCreateAuthClick'
-          :disable='selectedApi.length === 0'
+          :disable='selectedApi.length === 0 || selectedUser.length === 0'
         />
       </div>
     </template>
   </q-table>
+  <q-table
+    :title='$t("MSG_ROLE_USERS")'
+    dense
+    :rows='displayUsers'
+    row-key='ID'
+    :rows-per-page-options='[5]'
+  />
 </template>
 
 <script setup lang='ts'>
-import { useAPIStore, NotificationType, ExpandAPI, useAuthStore } from 'npool-cli-v2'
+import {
+  useAPIStore,
+  NotificationType,
+  ExpandAPI,
+  useAuthStore,
+  useChurchUsersStore,
+  UserInfo,
+  AppUser,
+  useChurchRolesStore,
+  AppRole
+} from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const role = useChurchRolesStore()
+const roles = computed(() => role.Roles.get(appID.value))
+const selectedRole = ref([] as Array<AppRole>)
+
+const user = useChurchUsersStore()
+const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const displayUsers = computed(() => Array.from(users.value.filter((user) => {
+  const index = user.Roles?.findIndex((el) => el.ID === selectedRole.value[0]?.ID)
+  return index !== undefined && index >= 0
+}).map((user) => user.User)))
+const selectedUser = ref([] as Array<AppUser>)
+const userLoading = ref(true)
 
 const api = useAPIStore()
 const apis = computed(() => api.APIs)
@@ -54,7 +94,56 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = useAuthStore()
-const auths = computed(() => auth.AppAuths.get(app.AppID) ? auth.AppAuths.get(app.AppID) : [])
+const auths = computed(() => auth.AppAuths.get(appID.value) ? auth.AppAuths.get(appID.value) : [])
+
+const prepare = () => {
+  auth.getAuths({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  userLoading.value = true
+  user.getUsers({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_USERS',
+        Message: 'MSG_GET_APP_USERS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    userLoading.value = false
+  })
+
+  role.getRoles({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_ROLES',
+        Message: 'MSG_GET_APP_ROLES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
+
+watch(appID, () => {
+  prepare()
+})
 
 onMounted(() => {
   api.getAPIs({
@@ -70,26 +159,16 @@ onMounted(() => {
     // TODO
   })
 
-  auth.getAuths({
-    TargetAppID: app.AppID,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_AUTHS',
-        Message: 'MSG_GET_APP_AUTHS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  prepare()
 })
 
 const onCreateAuthClick = () => {
-  auth.createAppAuth({
-    TargetAppID: app.AppID,
+  auth.createAppUserAuth({
+    TargetAppID: appID.value,
+    TargetUserID: selectedUser.value[0]?.ID as string,
     Info: {
-      AppID: app.AppID,
+      AppID: appID.value,
+      UserID: selectedUser.value[0]?.ID as string,
       Resource: selectedApi.value[0].Path,
       Method: selectedApi.value[0].Method
     },

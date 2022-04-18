@@ -74,7 +74,9 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = useAuthStore()
-const auths = computed(() => auth.AppAuths.get(appID.value) ? auth.AppAuths.get(appID.value) : [])
+const auths = computed(() => {
+  return auth.UserAuths.get(selectedUser.value[0]?.ID as string) ? auth.AppAuths.get(selectedUser.value[0]?.ID as string) : []
+})
 
 const prepare = () => {
   auth.getAuths({

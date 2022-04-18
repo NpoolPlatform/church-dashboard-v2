@@ -43,9 +43,10 @@
 <script setup lang='ts'>
 import { useAPIStore, NotificationType, ExpandAPI, useAuthStore } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 const api = useAPIStore()
 const apis = computed(() => api.APIs)
@@ -54,7 +55,27 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = useAuthStore()
-const auths = computed(() => auth.AppAuths.get(app.AppID) ? auth.AppAuths.get(app.AppID) : [])
+const auths = computed(() => auth.AppAuths.get(appID.value) ? auth.AppAuths.get(appID.value) : [])
+
+const prepare = () => {
+  auth.getAuths({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
+
+watch(appID, () => {
+  prepare()
+})
 
 onMounted(() => {
   api.getAPIs({
@@ -70,26 +91,14 @@ onMounted(() => {
     // TODO
   })
 
-  auth.getAuths({
-    TargetAppID: app.AppID,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_AUTHS',
-        Message: 'MSG_GET_APP_AUTHS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  prepare()
 })
 
 const onCreateAuthClick = () => {
   auth.createAppAuth({
-    TargetAppID: app.AppID,
+    TargetAppID: appID.value,
     Info: {
-      AppID: app.AppID,
+      AppID: appID.value,
       Resource: selectedApi.value[0].Path,
       Method: selectedApi.value[0].Method
     },
