@@ -57,7 +57,7 @@
           dense
           flat
           class='btn flat'
-          :label='$t("MSG_EXPORT")'
+          :label='$t("MSG_SUBMIT")'
           @click='onSubmitLoaded'
         />
       </div>
