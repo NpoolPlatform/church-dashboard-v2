@@ -49,17 +49,22 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useTemplateStore, SMSTemplate, Language, MessageUsedFors } from 'npool-cli-v2'
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { NotificationType, SMSTemplate, Language, MessageUsedFors, useChurchTemplateStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 
 const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/LangSwitcher.vue'))
 
-const templates = useTemplateStore()
-const smss = computed(() => templates.SMSTemplates)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const templates = useChurchTemplateStore()
+const smss = computed(() => templates.SMSTemplates.get(appID.value) ? templates.SMSTemplates.get(appID.value) : [])
 const smsLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
   templates.getSMSTemplates({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_SMS_TEMPLATES',
@@ -71,6 +76,14 @@ onMounted(() => {
   }, () => {
     smsLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 const showing = ref(false)
@@ -116,6 +129,7 @@ const onSubmit = () => {
   }
 
   templates.createSMSTemplate({
+    TargetAppID: appID.value,
     TargetLangID: language.value.ID,
     Info: target.value,
     Message: {

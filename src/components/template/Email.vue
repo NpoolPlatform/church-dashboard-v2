@@ -53,17 +53,22 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useTemplateStore, EmailTemplate, Language, MessageUsedFors } from 'npool-cli-v2'
+import { NotificationType, EmailTemplate, Language, MessageUsedFors, useChurchTemplateStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 
 const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/LangSwitcher.vue'))
 
-const templates = useTemplateStore()
-const emails = computed(() => templates.EmailTemplates)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const templates = useChurchTemplateStore()
+const emails = computed(() => templates.EmailTemplates.get(app.AppID) ? templates.EmailTemplates.get(app.AppID) : [])
 const emailLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
   templates.getEmailTemplates({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_EMAIL_TEMPLATES',
@@ -75,6 +80,14 @@ onMounted(() => {
   }, () => {
     emailLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 const showing = ref(false)
@@ -132,6 +145,7 @@ const onSubmit = () => {
   }
 
   templates.createEmailTemplate({
+    TargetAppID: appID.value,
     TargetLangID: language.value.ID,
     Info: target.value,
     Message: {
