@@ -42,7 +42,7 @@
           class='btn flat'
           :label='$t("MSG_AUTHORIZE")'
           @click='onCreateAuthClick'
-          :disable='selectedApi.length === 0 || selectedUser.length === 0'
+          :disable='selectedApi.length === 0 || selectedRole.length === 0'
         />
       </div>
     </template>
@@ -64,7 +64,6 @@ import {
   useAuthStore,
   useChurchUsersStore,
   UserInfo,
-  AppUser,
   useChurchRolesStore,
   AppRole
 } from 'npool-cli-v2'
@@ -84,7 +83,6 @@ const displayUsers = computed(() => Array.from(users.value.filter((user) => {
   const index = user.Roles?.findIndex((el) => el.ID === selectedRole.value[0]?.ID)
   return index !== undefined && index >= 0
 }).map((user) => user.User)))
-const selectedUser = ref([] as Array<AppUser>)
 const userLoading = ref(true)
 
 const api = useAPIStore()
@@ -163,12 +161,11 @@ onMounted(() => {
 })
 
 const onCreateAuthClick = () => {
-  auth.createAppUserAuth({
+  auth.createAppRoleAuth({
     TargetAppID: appID.value,
-    TargetUserID: selectedUser.value[0]?.ID as string,
     Info: {
       AppID: appID.value,
-      UserID: selectedUser.value[0]?.ID as string,
+      RoleID: selectedRole.value[0]?.ID,
       Resource: selectedApi.value[0].Path,
       Method: selectedApi.value[0].Method
     },
