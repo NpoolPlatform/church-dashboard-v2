@@ -10,7 +10,7 @@
     :title='$t("MSG_APIS")'
     dense
     :rows='displayApis'
-    row-key='id'
+    row-key='ID'
     :rows-per-page-options='[20]'
     selection='single'
     v-model:selected='selectedApi'
