@@ -5,13 +5,13 @@
       flat
       :options='applications'
       :label='selectedApp ? selectedApp.App.Name : $t("MSG_SELECT_APPLICATION")'
-      class='select'
       auto-close
       no-caps
       v-if='logined'
     >
       <q-list>
         <q-item
+          dense
           v-for='app in applications'
           :key='app.App.ID'
           clickable
@@ -78,7 +78,4 @@ const onAppSelected = (app: Application) => {
 </script>
 
 <style lang='sass' scoped>
-.select
-  border-bottom: solid 1px $primary
-  max-height: 100%
 </style>

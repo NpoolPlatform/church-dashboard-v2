@@ -6,7 +6,7 @@
     :rows='countries'
     row-key='ID'
     :loading='countryLoading'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as Country)'
   >
     <template #top-right>
@@ -17,6 +17,48 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_EXPORT")'
+          @click='onExport'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_LOADED_COUNTRIES")'
+    :rows='countries'
+    row-key='ID'
+    :loading='countryLoading'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <input
+          ref='loadFileButton'
+          type='file'
+          style='display: none;'
+          @change='onFileLoaded'
+          accept='.json'
+        >
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_LOAD_FILE")'
+          @click='onLoadFile'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_SUBMIT")'
+          @click='onSubmitLoaded'
         />
       </div>
     </template>
@@ -45,17 +87,21 @@
 </template>
 
 <script setup lang='ts'>
+import { saveAs } from 'file-saver'
 import {
   NotificationType,
   useLangStore,
   Country,
-  useChurchLangStore
+  useChurchLangStore,
+  formatTime
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 
 const lang = useLangStore()
 const countries = computed(() => lang.Countries)
 const countryLoading = ref(true)
+
+const loadedCountries = ref([] as Array<Country>)
 
 const churchLang = useChurchLangStore()
 
@@ -114,6 +160,49 @@ const onSubmit = () => {
 
 const onCancel = () => {
   showing.value = false
+}
+
+const onExport = () => {
+  const blob = new Blob([JSON.stringify({
+    countries
+  })], { type: 'text/plain;charset=utf-8' })
+  const filename = 'countries-' +
+                   formatTime(new Date().getTime() / 1000) +
+                   '.json'
+  saveAs(blob, filename)
+}
+
+const loadFileButton = ref<HTMLInputElement>()
+const onLoadFile = () => {
+  loadFileButton.value?.click()
+}
+
+const onFileLoaded = (evt: Event) => {
+  const target = evt.target as unknown as HTMLInputElement
+  if (target.files) {
+    const filename = target.files[0]
+    const reader = new FileReader()
+    reader.onload = () => {
+      loadedCountries.value = JSON.parse(reader.result as string) as Array<Country>
+    }
+    reader.readAsText(filename)
+  }
+}
+
+const onSubmitLoaded = () => {
+  churchLang.createCountries({
+    Infos: loadedCountries.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_COUNTRIES',
+        Message: 'MSG_CREATE_COUNTRIES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 }
 
 </script>

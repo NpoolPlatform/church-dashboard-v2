@@ -122,7 +122,7 @@ const onExportClick = () => {
     Auths: auths.value
   })], { type: 'text/plain;charset=utf-8' })
   const filename = myApp.App.Name + '-' +
-                   myApp.App.ID + '-' +
+                   myApp.App.ID + '-auths-' +
                    formatTime(new Date().getTime() / 1000) +
                    '.json'
   saveAs(blob, filename)
