@@ -164,7 +164,7 @@ const MainDrawerMenus = [
   } as MenuItem, {
     menuId: uid(),
     label: '用户与角色',
-    caption: '管理用户、角色以及资源授权',
+    caption: '管理用户和角色',
     icon: 'reviews',
     target: '/users',
     level: 0,
@@ -194,6 +194,44 @@ const MainDrawerMenus = [
         caption: '管理角色用户',
         icon: 'format_list_numbered',
         target: '/roleusers',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  } as MenuItem, {
+    menuId: uid(),
+    label: '授权管理',
+    caption: '管理资源授权',
+    icon: 'reviews',
+    target: '/auth',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '授权给APP',
+        caption: '将资源授权给选定APP',
+        icon: 'format_list_numbered',
+        target: '/auth/app',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '授权给角色',
+        caption: '将资源授权给APP内角色',
+        icon: 'format_list_numbered',
+        target: '/auth/role',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '授权给用户',
+        caption: '将资源授权给APP内特定用户',
+        icon: 'format_list_numbered',
+        target: '/auth/user',
         level: 1,
         sectionBegin: false,
         children: []
