@@ -10,6 +10,15 @@ const MainDrawerMenus = [
     target: '/application',
     level: 0,
     sectionBegin: false,
+    children: []
+  } as MenuItem, {
+    menuId: uid(),
+    label: '模板',
+    caption: '管理应用模板',
+    icon: 'pending',
+    target: '/application',
+    level: 0,
+    sectionBegin: false,
     children: [
       {
         menuId: uid(),
