@@ -18,8 +18,8 @@ spec:
         - dashboard.xpool.top
       secretName: xpool-top-cert
     - hosts:
-        - procdashboard.xpool.top
-      secretName: xpool-top-cert
+        - dashboard.npool.top
+      secretName: npool-top-cert
   rules:
     - host: dashboard.xpool.top
       http: &http_rules
@@ -28,5 +28,5 @@ spec:
             backend:
               serviceName: church-dashboard-v2
               servicePort: 80
-    - host: procdashboard.xpool.top
+    - host: dashboard.npool.top
       http: *http_rules
