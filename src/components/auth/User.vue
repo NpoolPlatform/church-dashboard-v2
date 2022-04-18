@@ -12,10 +12,35 @@
   <q-table
     :title='$t("MSG_USER_RESOURCES")'
     dense
-    :rows='auths'
+    :rows='displayAuths'
     row-key='ID'
     :rows-per-page-options='[5]'
-  />
+    selection='single'
+    v-model:selected='selectedAuth'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <div v-if='selectedApi.length === 0' class='column justify-center'>
+          <span class='warning'>{{ $t('MSG_SELECT_AUTH') }}</span>
+        </div>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='authPath'
+          :label='$t("MSG_PATH")'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_UNAUTHORIZE")'
+          @click='onDeleteAuthClick'
+          :disable='selectedAuth.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-table
     :title='$t("MSG_APIS")'
     dense
@@ -51,7 +76,7 @@
 </template>
 
 <script setup lang='ts'>
-import { useAPIStore, NotificationType, ExpandAPI, useAuthStore, useChurchUsersStore, UserInfo, AppUser } from 'npool-cli-v2'
+import { useAPIStore, NotificationType, ExpandAPI, useAuthStore, useChurchUsersStore, UserInfo, AppUser, Auth } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -75,8 +100,13 @@ const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(
 
 const auth = useAuthStore()
 const auths = computed(() => {
-  return auth.UserAuths.get(selectedUser.value[0]?.ID as string) ? auth.AppAuths.get(selectedUser.value[0]?.ID as string) : []
+  return auth.UserAuths.get(appID.value) ? auth.UserAuths.get(appID.value)?.filter((auth) => {
+    return auth.UserID === selectedUser.value[0]?.ID
+  }) : []
 })
+const authPath = ref('')
+const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
+const selectedAuth = ref([] as Array<Auth>)
 
 const prepare = () => {
   auth.getAuths({
@@ -144,6 +174,22 @@ const onCreateAuthClick = () => {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
+
+const onDeleteAuthClick = () => {
+  auth.deleteAppUserAuth({
+    ID: selectedAuth.value[0]?.ID as string,
+    Message: {
+      Error: {
+        Title: 'MSG_DELETE_APP_USER_AUTH',
+        Message: 'MSG_DELETE_APP_USER_AUTH_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
