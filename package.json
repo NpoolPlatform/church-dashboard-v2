@@ -1,8 +1,8 @@
 {
-  "name": "procyon-dashboard-v2",
+  "name": "church-dashboard-v2",
   "version": "0.0.1",
   "description": "vue3 framework use quasar ui and pinia manage store",
-  "productName": "Procyon Dashboard V2",
+  "productName": "Church Dashboard V2",
   "author": "Entropy Pool Team <kikakkz@hotmail.com>",
   "private": true,
   "scripts": {

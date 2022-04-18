@@ -1,6 +1,6 @@
 commonLabels:
-  # app: procyon-dashboard-v2
+  # app: church-dashboard-v2
 
 resources:
-  - 01-procyon-dashboard-v2.yaml
+  - 01-church-dashboard-v2.yaml
   - 02-traefik-ingress.yaml
