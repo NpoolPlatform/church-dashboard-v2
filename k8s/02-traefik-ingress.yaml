@@ -15,18 +15,18 @@ metadata:
 spec:
   tls:
     - hosts:
-        - dashboard.procyon.vip
-      secretName: procyon-vip-cert
+        - dashboard.xpool.top
+      secretName: xpool-top-cert
     - hosts:
-        - procdashboard.npool.top
-      secretName: npool-top-cert
+        - procdashboard.xpool.top
+      secretName: xpool-top-cert
   rules:
-    - host: dashboard.procyon.vip
+    - host: dashboard.xpool.top
       http: &http_rules
         paths:
           - path: /
             backend:
               serviceName: church-dashboard-v2
               servicePort: 80
-    - host: procdashboard.npool.top
+    - host: procdashboard.xpool.top
       http: *http_rules

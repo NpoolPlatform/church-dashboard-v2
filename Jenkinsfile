@@ -26,6 +26,7 @@ pipeline {
           fi
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin yarn install --registry https://registry.npm.taobao.org/
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin quasar build
+          PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin quasar build
         '''.stripIndent())
       }
     }
@@ -172,6 +173,7 @@ pipeline {
             PATH=/usr/local/bin:$PATH yarn add global quasar-cli@latest
           fi
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin yarn install --registry https://registry.npm.taobao.org/
+          PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin quasar build
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin quasar build
           docker build -t $DOCKER_REGISTRY/entropypool/church-dashboard-v2:$tag .
         '''.stripIndent())
