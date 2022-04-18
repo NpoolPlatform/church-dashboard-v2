@@ -37,23 +37,47 @@
 </template>
 
 <script setup lang='ts'>
-import { Language, NotificationType, useAdminLangStore, useLangStore, useLocaleStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { Language, NotificationType, useAdminLangStore, useChurchLangStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 
-const lang = useAdminLangStore()
-const appLang = useLangStore()
-const locale = useLocaleStore()
+const alang = useAdminLangStore()
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const clang = useChurchLangStore()
 
 const langLoading = ref(true)
 const appLangLoading = ref(true)
 
-const langs = computed(() => lang.Languages)
-const appLangs = computed(() => locale.Languages)
+const langs = computed(() => alang.Languages)
+const appLangs = computed(() => clang.Languages.get(appID.value) ? clang.Languages.get(appID.value) : [])
 const selectedLang = ref([] as Array<Language>)
 const language = computed(() => selectedLang.value.length > 0 ? selectedLang.value[0] : undefined as unknown as Language)
 
+const prepare = () => {
+  clang.getLangs({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_LANGS',
+        Message: 'MSG_GET_LANGS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    appLangLoading.value = false
+  })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
 onMounted(() => {
-  appLang.getLangs({
+  alang.getLangs({
     Message: {
       Error: {
         Title: 'MSG_GET_LANGS',
@@ -66,18 +90,7 @@ onMounted(() => {
     langLoading.value = false
   })
 
-  appLang.getLangs({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_LANGS',
-        Message: 'MSG_GET_LANGS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    appLangLoading.value = false
-  })
+  prepare()
 })
 
 const onAdd = () => {
@@ -85,14 +98,15 @@ const onAdd = () => {
     return
   }
 
-  lang.createLang({
+  clang.createAppLang({
+    TargetAppID: appID.value,
     Info: {
       LangID: language.value.ID
     },
     Message: {
       Error: {
-        Title: 'MSG_GET_LANGS',
-        Message: 'MSG_GET_LANGS_FAIL',
+        Title: 'MSG_CREATE_APP_LANG',
+        Message: 'MSG_CREATE_APP_LANG_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }

@@ -92,13 +92,22 @@ const MainDrawerMenus = [
     label: '国际化',
     caption: '管理应用语言包',
     icon: 'perm_identity',
-    target: '/app/languages',
+    target: '/languages',
     level: 1,
     sectionBegin: false,
     children: [
       {
         menuId: uid(),
-        label: '语言设置',
+        label: '国际化语言列表',
+        caption: '管理全局国际化语言列表',
+        icon: 'perm_identity',
+        target: '/languages',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: 'APP语言设置',
         caption: '管理应用支持语言',
         icon: 'perm_identity',
         target: '/app/languages',
