@@ -6,7 +6,7 @@
     :rows='langs'
     row-key='ID'
     :loading='langLoading'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[10]'
     selection='single'
     v-model:selected='selectedLang'
   />
@@ -38,6 +38,7 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+          :disable='!language'
         />
       </div>
     </template>
@@ -54,7 +55,10 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_CONTACT') }}</span>
+        <span>{{ $t('MSG_CREATE_MESSAGE') }}</span>
+      </q-card-section>
+      <q-card-section>
+        <span>{{ $t('MSG_LANGUAGE') }}: {{ language.Name }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.MessageID' :label='$t("MSG_MESSAGE_ID")' />
