@@ -39,54 +39,6 @@
           :label='$t("MSG_CREATE")'
           @click='onCreate'
         />
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_EXPORT")'
-          @click='onExport'
-        />
-      </div>
-    </template>
-  </q-table>
-  <q-table
-    dense
-    flat
-    :title='$t("MSG_LOADED_MESSAGES")'
-    :rows='displayLoadedMsgs'
-    row-key='MessageID'
-    :rows-per-page-options='[20]'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <q-input
-          dense
-          flat
-          class='small'
-          v-model='loadedMsgId'
-          :label='$t("MSG_USERNAME")'
-        />
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_LOAD_FILE")'
-          @click='onLoadFile'
-        />
-        <input
-          ref='loadFileButton'
-          type='file'
-          style='display: none;'
-          @change='onFileLoaded'
-          accept='.json'
-        >
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_SUBMIT")'
-          @click='onBatchSubmit'
-        />
       </div>
     </template>
   </q-table>
@@ -118,44 +70,59 @@
 
 <script setup lang='ts'>
 import {
-  formatTime,
   Language,
   Message,
   NotificationType,
   useAdminLangStore,
-  useApplicationStore,
-  useLangStore,
-  useLocaleStore
+  useChurchLangStore
 } from 'npool-cli-v2'
 import { computed, onMounted, ref, watch } from 'vue'
-import { saveAs } from 'file-saver'
-import { AppID } from 'src/const/const'
+import { useLocalApplicationStore } from 'src/localstore'
 
-const lang = useLangStore()
-const adminLang = useAdminLangStore()
-const locale = useLocaleStore()
-const application = useApplicationStore()
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const clang = useChurchLangStore()
+const alang = useAdminLangStore()
 
 const langLoading = ref(true)
-const messageLoading = ref(true)
+const messageLoading = ref(false)
 
-const langs = computed(() => locale.Languages)
+const langs = computed(() => alang.Languages)
 
 const selectedLang = ref([] as Array<Language>)
 const language = computed(() => selectedLang.value.length > 0 ? selectedLang.value[0] : undefined as unknown as Language)
-const messages = computed(() => locale.getLangMessages(language.value?.ID))
+const messages = computed(() => {
+  return clang.Messages.get(appID.value)?.get(language.value?.ID) ? clang.Messages.get(appID.value)?.get(language?.value.ID) : []
+})
 const appMsgId = ref('')
 const displayAppMsgs = computed(() => messages.value ? messages.value.filter((msg) => msg.MessageID.includes(appMsgId.value)) : [])
 
-const loadedLanguage = ref(undefined as unknown as Language)
-const loadedMessages = ref([] as Array<Message>)
-const loadedMsgId = ref('')
-const displayLoadedMsgs = computed(() => loadedMessages.value.filter((msg) => msg.MessageID.includes(loadedMsgId.value)))
+const prepare = () => {
+  alang.getLangs({
+    Message: {
+      Error: {
+        Title: 'MSG_GET_LANGS',
+        Message: 'MSG_GET_LANGS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    langLoading.value = false
+    getMessages()
+  })
+}
 
-watch(language, () => {
+const getMessages = () => {
+  if (!language.value) {
+    return
+  }
+
   messageLoading.value = true
 
-  lang.getLangMessages({
+  clang.getMessages({
+    TargetAppID: appID.value,
     TargetLangID: language.value.ID,
     LangID: language.value.ID,
     Message: {
@@ -169,6 +136,14 @@ watch(language, () => {
   }, () => {
     messageLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+watch(language, () => {
+  getMessages()
 })
 
 const showing = ref(false)
@@ -176,32 +151,7 @@ const updating = ref(false)
 const target = ref({} as unknown as Message)
 
 onMounted(() => {
-  application.getApplication({
-    ID: AppID,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP',
-        Message: 'MSG_GET_APP_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  lang.getLangs({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_LANGS',
-        Message: 'MSG_GET_LANGS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    langLoading.value = false
-  })
+  prepare()
 })
 
 const onCreate = () => {
@@ -216,69 +166,6 @@ const onRowClick = (message: Message) => {
   updating.value = true
 }
 
-interface SavedMessages {
-  Languages: Array<Language>
-  Language: Language
-  Messages: Array<Message>
-}
-
-const onExport = () => {
-  if (!language.value) {
-    return
-  }
-
-  const blob = new Blob([JSON.stringify({
-    Languages: locale.Languages,
-    Language: language.value,
-    Messages: messages.value
-  })], { type: 'text/plain;charset=utf-8' })
-  const filename = application.Application.App.Name + '-' +
-                   language.value.Name + '-' +
-                   formatTime(new Date().getTime() / 1000) +
-                   '.json'
-  saveAs(blob, filename)
-}
-
-const loadFileButton = ref<HTMLInputElement>()
-
-const onLoadFile = () => {
-  loadFileButton.value?.click()
-}
-
-const onFileLoaded = (evt: Event) => {
-  const target = evt.target as unknown as HTMLInputElement
-  if (target.files) {
-    const filename = target.files[0]
-    const reader = new FileReader()
-    reader.onload = () => {
-      const loaded = JSON.parse(reader.result as string) as SavedMessages
-      const index = locale.Languages.findIndex((el) => el.ID === loaded.Language.ID)
-      locale.Languages.splice(index, index < 0 ? 0 : 1, loaded.Language)
-      selectedLang.value = [loaded.Language]
-      loadedLanguage.value = loaded.Language
-      loadedMessages.value = loaded.Messages
-    }
-    reader.readAsText(filename)
-  }
-}
-
-const onBatchSubmit = () => {
-  adminLang.createMessages({
-    TargetLangID: loadedLanguage.value.ID,
-    Infos: loadedMessages.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_MESSAGES',
-        Message: 'MSG_CREATE_MESSAGES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
 const onMenuHide = () => {
   showing.value = false
 }
@@ -287,7 +174,7 @@ const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    adminLang.updateMessage({
+    alang.updateMessage({
       Info: target.value,
       Message: {
         Error: {
@@ -303,7 +190,8 @@ const onSubmit = () => {
     return
   }
 
-  adminLang.createMessage({
+  clang.createMessage({
+    TargetAppID: appID.value,
     TargetLangID: language.value.ID,
     Info: target.value,
     Message: {
