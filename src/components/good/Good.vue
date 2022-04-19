@@ -77,23 +77,34 @@
 </template>
 
 <script setup lang='ts'>
-import { AppGood, buildGoods, NotificationType, useAdminGoodStore, useCoinStore, useGoodStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import {
+  AppGood,
+  buildGoods,
+  NotificationType,
+  useAdminGoodStore,
+  useChurchGoodStore,
+  useCoinStore
+} from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
 const coin = useCoinStore()
 const coins = computed(() => coin.Coins)
 const coinLoading = ref(true)
 
-const good = useGoodStore()
+const good = useChurchGoodStore()
 const adminGood = useAdminGoodStore()
 const goods = computed(() => buildGoods(adminGood.Goods))
 const goodLoading = ref(true)
 
-const appGoods = computed(() => good.AppGoods)
+const appGoods = computed(() => good.AppGoods.get(appID.value) ? good.AppGoods.get(appID.value) : [])
 const appGoodLoading = ref(true)
 const selectedAppGood = ref([] as Array<AppGood>)
 const appGood = computed(() => selectedAppGood.value.length > 0 ? selectedAppGood.value[0] : undefined as unknown as AppGood)
@@ -118,6 +129,27 @@ const options = computed(() => [
     value: false
   }
 ] as Array<Option>)
+
+const prepare = () => {
+  appGoodLoading.value = true
+  good.getAppGoods({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_GOODS',
+        Message: 'MSG_GET_APP_GOODS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    appGoodLoading.value = false
+  })
+}
+
+watch(appID, () => {
+  prepare()
+})
 
 onMounted(() => {
   coin.getCoins({
@@ -146,22 +178,12 @@ onMounted(() => {
     goodLoading.value = false
   })
 
-  good.getAppGoods({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_GOODS',
-        Message: 'MSG_GET_APP_GOODS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    appGoodLoading.value = false
-  })
+  prepare()
 })
 
 const onSetPriceClick = () => {
-  adminGood.setGoodPrice({
+  good.setGoodPrice({
+    TargetAppID: appID.value,
     Info: appGood.value,
     Message: {
       Error: {
@@ -178,7 +200,8 @@ const onSetPriceClick = () => {
 
 const onOnlineChange = (online: boolean) => {
   if (online) {
-    adminGood.onlineGood({
+    good.onlineGood({
+      TargetAppID: appID.value,
       Info: appGood.value,
       Message: {
         Error: {
@@ -194,7 +217,8 @@ const onOnlineChange = (online: boolean) => {
     return
   }
 
-  adminGood.offlineGood({
+  good.offlineGood({
+    TargetAppID: appID.value,
     Info: appGood.value,
     Message: {
       Error: {
