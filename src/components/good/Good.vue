@@ -16,7 +16,25 @@
     row-key='ID'
     :loading='goodLoading'
     :rows-per-page-options='[10]'
-  />
+    selection='single'
+    v-model:selected='selectedGood'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <div v-if='selectedGood.length === 0' class='column justify-center'>
+          <span class='warning'>{{ $t('MSG_SELECT_GOOD') }}</span>
+        </div>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_AUTHORIZE")'
+          @click='onAuthorizeClick'
+          :disable='selectedGood.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-table
     dense
     flat
@@ -80,6 +98,8 @@
 import {
   AppGood,
   buildGoods,
+  GoodBase,
+  InitAreaStrategy,
   NotificationType,
   useAdminGoodStore,
   useChurchGoodStore,
@@ -101,10 +121,16 @@ const coinLoading = ref(true)
 
 const good = useChurchGoodStore()
 const adminGood = useAdminGoodStore()
-const goods = computed(() => buildGoods(adminGood.Goods))
+
+const appGoods = computed(() => good.AppGoods.get(appID.value) ? good.AppGoods.get(appID.value) as Array<AppGood> : [])
+const goods = computed(() => {
+  return buildGoods(adminGood.Goods).filter((good) => {
+    return appGoods.value.findIndex((ag) => ag.GoodID === good.ID) < 0
+  })
+})
+const selectedGood = ref([] as Array<GoodBase>)
 const goodLoading = ref(true)
 
-const appGoods = computed(() => good.AppGoods.get(appID.value) ? good.AppGoods.get(appID.value) : [])
 const appGoodLoading = ref(true)
 const selectedAppGood = ref([] as Array<AppGood>)
 const appGood = computed(() => selectedAppGood.value.length > 0 ? selectedAppGood.value[0] : undefined as unknown as AppGood)
@@ -230,6 +256,29 @@ const onOnlineChange = (online: boolean) => {
     }
   }, () => {
     appGood.value.Online = online
+  })
+}
+
+const onAuthorizeClick = () => {
+  good.authorizeGood({
+    TargetAppID: appID.value,
+    Info: {
+      GoodID: selectedGood.value[0].ID as string,
+      Price: 0,
+      Online: false,
+      InitAreaStrategy: InitAreaStrategy.All,
+      DisplayIndex: 0
+    },
+    Message: {
+      Error: {
+        Title: 'MSG_AUTHORIZE_GOOD',
+        Message: 'MSG_AUTHORIZE_GOOD_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
   })
 }
 
