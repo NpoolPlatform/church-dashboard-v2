@@ -337,7 +337,7 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'coin/description',
+        path: 'coin/descriptions',
         component: () => import('pages/coin/Description.vue'),
         meta: {
           ShowHeaderAnnouncement: true,

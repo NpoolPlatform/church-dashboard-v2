@@ -4,6 +4,7 @@
     flat
     :rows='coins'
     row-key='ID'
+    :title='$t("MSG_COINS")'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as Coin)'
   >
@@ -98,6 +99,8 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
+  showing.value = false
+
   if (updating.value) {
     ccoin.updateCoin({
       ID: target.value.ID as string,

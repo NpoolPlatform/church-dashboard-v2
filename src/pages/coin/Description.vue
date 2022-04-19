@@ -1,11 +1,11 @@
 <template>
-  <CoinInfo />
+  <Description />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const CoinInfo = defineAsyncComponent(() => import('src/components/coin/CoinInfo.vue'))
+const Description = defineAsyncComponent(() => import('src/components/coin/Description.vue'))
 
 </script>
 
