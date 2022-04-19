@@ -30,6 +30,16 @@
         <span>{{ $t('MSG_CREATE_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
+        <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
+        <q-input v-model='target.Total' :label='$t("MSG_TOTAL")' />
+        <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
+        <q-input v-model='target.UnitPower' :label='$t("MSG_UNIT_POWER")' type='number' min='1' />
+        <q-input v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
+        <q-input v-model='deliveryAt' :label='$t("MSG_DELIVERY_AT")' type='date' />
+        <q-input v-model='startAt' :label='$t("MSG_START_AT")' type='date' />
+      </q-card-section>
+      <q-card-section>
         <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
         <q-select :options='devices' v-model='selectedDevice' :label='$t("MSG_DEVICE_TYPE")' />
         <q-select :options='locations' v-model='selectedLocation' :label='$t("MSG_VENDOR_LOCATION")' />
@@ -60,16 +70,6 @@
         <div>
           <q-toggle dense v-model='target.SeparateFee' :label='$t("MSG_SEPARATE_FEE")' />
         </div>
-      </q-card-section>
-      <q-card-section>
-        <q-input v-model='deliveryAt' :label='$t("MSG_DELIVERY_AT")' type='date' />
-        <q-input v-model='startAt' :label='$t("MSG_START_AT")' type='date' />
-        <q-input v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
-        <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
-        <q-input v-model='target.Total' :label='$t("MSG_TOTAL")' />
-        <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
-        <q-input v-model='target.UnitPower' :label='$t("MSG_UNIT_POWER")' type='number' min='1' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -103,7 +103,9 @@ import {
   useFeeStore,
   useGoodStore,
   Fee,
-  BenefitTypes
+  BenefitTypes,
+  InvalidID,
+  formatTime
 } from 'npool-cli-v2'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -184,7 +186,8 @@ const fees = computed(() => Array.from(fee.Fees).map((el) => {
 
 const target = ref({
   SupportCoinTypeIDs: [],
-  FeeIDs: []
+  FeeIDs: [],
+  InheritFromGoodID: InvalidID
 } as unknown as GoodInfo)
 
 const deliveryAt = ref('')
@@ -239,7 +242,7 @@ const selectedDevice = computed({
     } as MyDevice
   },
   set: (val) => {
-    target.value.CoinInfoID = val.value.ID as string
+    target.value.DeviceInfoID = val.value.ID as string
   }
 })
 const selectedLocation = computed({
@@ -409,14 +412,17 @@ const onRowClick = (lgood: GoodBase) => {
   target.value.CoinInfoID = myGood.Main?.ID as string
   target.value.SupportCoinTypeIDs =
     Array.from(myGood.SupportCoins ? myGood.SupportCoins : []).map((el) => el.ID) as Array<string>
-  target.value.FeeIDs = Array.from(myGood.Good.Fees).map((el) => el.ID) as Array<string>
+  target.value.FeeIDs = Array.from(myGood.Good.Fees).map((el) => el.Fee.ID) as Array<string>
+
+  deliveryAt.value = formatTime(target.value.DeliveryAt, true)
+  startAt.value = formatTime(target.value.StartAt, true)
 }
 
 const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    cgood.createGood({
+    cgood.updateGood({
       Info: target.value,
       Message: {
         Error: {
@@ -427,12 +433,23 @@ const onSubmit = () => {
         }
       }
     }, () => {
-      // TODO
+      good.getAllGoods({
+        Message: {
+          Error: {
+            Title: t('MSG_GET_GOODS'),
+            Message: t('MSG_GET_GOODS_FAIL'),
+            Popup: true,
+            Type: NotificationType.Error
+          }
+        }
+      }, () => {
+        // TODO
+      })
     })
     return
   }
 
-  cgood.updateGood({
+  cgood.createGood({
     Info: target.value,
     Message: {
       Error: {
@@ -443,7 +460,18 @@ const onSubmit = () => {
       }
     }
   }, () => {
-    // TODO
+    good.getAllGoods({
+      Message: {
+        Error: {
+          Title: t('MSG_GET_GOODS'),
+          Message: t('MSG_GET_GOODS_FAIL'),
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
   })
 }
 
@@ -455,7 +483,8 @@ const onMenuHide = () => {
   showing.value = false
   target.value = {
     SupportCoinTypeIDs: [],
-    FeeIDs: []
+    FeeIDs: [],
+    InheritFromGoodID: InvalidID
   } as unknown as GoodInfo
 }
 

@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useDeviceStore, DeviceInfo } from 'npool-cli-v2'
+import { NotificationType, useDeviceStore, DeviceInfo, formatTime } from 'npool-cli-v2'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -92,6 +92,7 @@ const onRowClick = (device: DeviceInfo) => {
   updating.value = true
   showing.value = true
   target.value = device
+  shipmentAt.value = formatTime(target.value.ShipmentAt)
 }
 
 const onSubmit = () => {
