@@ -6,7 +6,7 @@
     :rows='payments'
     row-key='ID'
     :loading='paymentLoading'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[10]'
   />
   <q-table
     dense
@@ -15,27 +15,35 @@
     :rows='balances'
     row-key='ID'
     :loading='balanceLoading'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[10]'
   />
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useBillingStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { NotificationType, useChurchBillingStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const billing = useBillingStore()
-const payments = computed(() => billing.Payments)
-const balances = computed(() => billing.PaymentBalances)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const billing = useChurchBillingStore()
+const payments = computed(() => billing.Payments.get(appID.value))
+const balances = computed(() => billing.PaymentBalances.get(appID.value))
 
 const paymentLoading = ref(false)
 const balanceLoading = ref(false)
 
-onMounted(() => {
+const prepare = () => {
+  paymentLoading.value = true
+  balanceLoading.value = true
+
   billing.getPayments({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_PAYMENTS'),
@@ -49,6 +57,7 @@ onMounted(() => {
   })
 
   billing.getPaymentBalances({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_PAYMENT_BALANCES'),
@@ -60,6 +69,14 @@ onMounted(() => {
   }, () => {
     balanceLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 </script>
