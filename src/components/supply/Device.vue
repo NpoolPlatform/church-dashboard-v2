@@ -32,7 +32,7 @@
       <q-card-section>
         <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
         <q-input type='number' v-model='target.Consumption' :label='$t("MSG_CONSUMPTION")' suffix='W' />
-        <q-input type='date' v-model='target.ShipmentAt' :label='$t("MSG_SHIPMENT_AT")' />
+        <q-input type='date' v-model='shipmentAt' :label='$t("MSG_SHIPMENT_AT")' />
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
       </q-card-section>
       <q-item class='row'>
@@ -50,7 +50,7 @@
 
 <script setup lang='ts'>
 import { NotificationType, useDeviceStore, DeviceInfo } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -60,6 +60,10 @@ const device = useDeviceStore()
 const devices = computed(() => device.Devices)
 
 const target = ref({} as unknown as DeviceInfo)
+const shipmentAt = ref('')
+watch(shipmentAt, () => {
+  target.value.ShipmentAt = new Date(shipmentAt.value).getTime() / 1000
+})
 
 onMounted(() => {
   device.getDevices({

@@ -48,6 +48,28 @@
           v-model='selectedFees'
           :label='$t("MSG_FEES")'
         />
+        <q-select :options='BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
+      </q-card-section>
+      <q-card-section>
+        <div>
+          <q-toggle dense v-model='target.Actuals' :label='$t("MSG_GOOD_ACTUALS")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Classic' :label='$t("MSG_GOOD_CLASSIC")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.SeparateFee' :label='$t("MSG_SEPARATE_FEE")' />
+        </div>
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model='deliveryAt' :label='$t("MSG_DELIVERY_AT")' type='date' />
+        <q-input v-model='startAt' :label='$t("MSG_START_AT")' type='date' />
+        <q-input v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
+        <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
+        <q-input v-model='target.Total' :label='$t("MSG_TOTAL")' />
+        <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
+        <q-input v-model='target.UnitPower' :label='$t("MSG_UNIT_POWER")' type='number' min='1' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -80,9 +102,10 @@ import {
   PriceCoinName,
   useFeeStore,
   useGoodStore,
-  Fee
+  Fee,
+  BenefitTypes
 } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -163,6 +186,16 @@ const target = ref({
   SupportCoinTypeIDs: [],
   FeeIDs: []
 } as unknown as GoodInfo)
+
+const deliveryAt = ref('')
+watch(deliveryAt, () => {
+  target.value.DeliveryAt = new Date(deliveryAt.value).getTime() / 1000
+})
+const startAt = ref('')
+watch(startAt, () => {
+  target.value.StartAt = new Date(startAt.value).getTime() / 1000
+})
+
 const selectedCoin = computed({
   get: () => {
     const myCoin = coin.getCoinByID(target.value.CoinInfoID)
@@ -427,3 +460,6 @@ const onMenuHide = () => {
 }
 
 </script>
+
+<style lang='sass' scoped>
+</style>
