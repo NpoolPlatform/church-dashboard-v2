@@ -40,6 +40,7 @@
           v-model='supportCoins'
           :label='$t("MSG_SUPPORT_COIN_TYPE")'
         />
+        <q-select :options='currencies' v-model='selectedCurrency' :label='$t("MSG_PRICE_CURRENCY")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -67,7 +68,9 @@ import {
   useDeviceStore,
   DeviceInfo,
   useVendorLocationStore,
-  VendorLocation
+  VendorLocation,
+  PriceCurrency,
+  PriceCoinName
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -115,6 +118,19 @@ const locations = computed(() => Array.from(location.VendorLocations).map((el) =
     value: el
   } as MyLocation
 }))
+
+interface MyPriceCurrency {
+  label: string
+  value: PriceCurrency
+}
+const currencies = computed(() => Array.from(cgood.PriceCurrencies.filter((p) => {
+  return p.Unit.toLocaleLowerCase().includes(PriceCoinName.toLocaleLowerCase())
+}).map((el) => {
+  return {
+    label: el.Unit,
+    value: el
+  } as MyPriceCurrency
+})))
 
 const target = ref({
   SupportCoinTypeIDs: [],
@@ -181,6 +197,18 @@ const selectedLocation = computed({
     target.value.VendorLocationID = val.value.ID as string
   }
 })
+const selectedCurrency = computed({
+  get: () => {
+    const myCurrency = cgood.getPriceCurrencyByID(target.value.PriceCurrency)
+    return {
+      label: myCurrency?.Unit,
+      value: myCurrency
+    } as MyPriceCurrency
+  },
+  set: (val) => {
+    target.value.PriceCurrency = val.value.ID as string
+  }
+})
 
 onMounted(() => {
   good.getAllGoods({
@@ -227,6 +255,19 @@ onMounted(() => {
       Error: {
         Title: t('MSG_GET_VENDOR_LOCATIONS'),
         Message: t('MSG_GET_VENDOR_LOCATIONS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  cgood.getPriceCurrencies({
+    Message: {
+      Error: {
+        Title: t('MSG_GET_PRICE_CURRENCIES'),
+        Message: t('MSG_GET_PRICE_CURRENCIES_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
