@@ -230,6 +230,35 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
+    label: '服务费',
+    caption: '管理商品服务费',
+    icon: 'perm_identity',
+    target: '/fee',
+    level: 1,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '费用类型',
+        caption: '管理费用类型',
+        icon: 'perm_identity',
+        target: '/fee/feetypes',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '费用',
+        caption: '定义具体费用',
+        icon: 'perm_identity',
+        target: '/fee/fees',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  } as MenuItem, {
+    menuId: uid(),
     label: '审核',
     caption: '管理审核项目',
     icon: 'reviews',
