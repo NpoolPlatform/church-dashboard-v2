@@ -32,9 +32,8 @@
     dense
     flat
     :title='$t("MSG_LOADED_COUNTRIES")'
-    :rows='countries'
+    :rows='loadedCountries'
     row-key='ID'
-    :loading='countryLoading'
     :rows-per-page-options='[10]'
   >
     <template #top-right>
@@ -142,6 +141,23 @@ const onCreate = () => {
 
 const onSubmit = () => {
   showing.value = false
+
+  if (updating.value) {
+    churchLang.updateCountry({
+      Info: target.value,
+      Message: {
+        Error: {
+          Title: 'MSG_CREATE_COUNTRY',
+          Message: 'MSG_CREATE_COUNTRY_FAIL',
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+    return
+  }
 
   churchLang.createCountry({
     Info: target.value,
