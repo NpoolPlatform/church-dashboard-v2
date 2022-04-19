@@ -38,9 +38,16 @@
           use-chips
           :options='coins'
           v-model='supportCoins'
-          :label='$t("MSG_SUPPORT_COIN_TYPE")'
+          :label='$t("MSG_SUPPORT_COIN_TYPES")'
         />
         <q-select :options='currencies' v-model='selectedCurrency' :label='$t("MSG_PRICE_CURRENCY")' />
+        <q-select
+          multiple
+          use-chips
+          :options='fees'
+          v-model='selectedFees'
+          :label='$t("MSG_FEES")'
+        />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -70,7 +77,10 @@ import {
   useVendorLocationStore,
   VendorLocation,
   PriceCurrency,
-  PriceCoinName
+  PriceCoinName,
+  useFeeStore,
+  useGoodStore,
+  Fee
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -82,9 +92,11 @@ const good = useAdminGoodStore()
 const goods = computed(() => buildGoods(good.Goods))
 
 const cgood = useChurchGoodStore()
+const fgood = useGoodStore()
 const coin = useCoinStore()
 const device = useDeviceStore()
 const location = useVendorLocationStore()
+const fee = useFeeStore()
 
 interface MyCoin {
   label: string
@@ -131,6 +143,21 @@ const currencies = computed(() => Array.from(cgood.PriceCurrencies.filter((p) =>
     value: el
   } as MyPriceCurrency
 })))
+
+interface MyFee {
+  label: string
+  value: Fee
+}
+const fees = computed(() => Array.from(fee.Fees).map((el) => {
+  const feetype = fgood.getFeeTypeByID(el.FeeTypeID)
+  if (!feetype) {
+    return undefined as unknown as MyFee
+  }
+  return {
+    label: feetype.FeeType + '/' + feetype.PayType + '/' + el.Value.toString(),
+    value: el
+  } as MyFee
+}))
 
 const target = ref({
   SupportCoinTypeIDs: [],
@@ -209,6 +236,34 @@ const selectedCurrency = computed({
     target.value.PriceCurrency = val.value.ID as string
   }
 })
+const selectedFees = computed({
+  get: () => {
+    const myFees = [] as Array<MyFee>
+    target.value.FeeIDs.forEach((feeID) => {
+      const myFee = fee.getFeeByID(feeID)
+      if (!myFee) {
+        return
+      }
+
+      const feetype = fgood.getFeeTypeByID(myFee.FeeTypeID)
+      if (!feetype) {
+        return
+      }
+
+      myFees.push({
+        label: feetype.FeeType + '/' + feetype.PayType + '/' + myFee.Value.toString(),
+        value: myFee
+      } as MyFee)
+    })
+    return myFees
+  },
+  set: (vals) => {
+    target.value.FeeIDs = []
+    vals.forEach((val) => {
+      target.value.FeeIDs.push(val.value.ID as string)
+    })
+  }
+})
 
 onMounted(() => {
   good.getAllGoods({
@@ -274,6 +329,30 @@ onMounted(() => {
     }
   }, () => {
     // TODO
+  })
+
+  fee.getFees({
+    Message: {
+      Error: {
+        Title: t('MSG_GET_FEES'),
+        Message: t('MSG_GET_FEES_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  fgood.getFeeTypes({
+    Message: {
+      Error: {
+        Title: t('MSG_GET_FEE_TYPES'),
+        Message: t('MSG_GET_FEE_TYPES_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
   })
 })
 
