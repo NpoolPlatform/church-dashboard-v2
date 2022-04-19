@@ -1,11 +1,11 @@
 <template>
-  <Good />
+  <AppGood />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const Good = defineAsyncComponent(() => import('src/components/good/Good.vue'))
+const AppGood = defineAsyncComponent(() => import('src/components/good/AppGood.vue'))
 
 </script>
 

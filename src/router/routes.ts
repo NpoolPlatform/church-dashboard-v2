@@ -110,7 +110,7 @@ const routes: RouteRecordRaw[] = [
         }
       }, {
         path: 'app/goods',
-        component: () => import('pages/good/Good.vue'),
+        component: () => import('src/pages/good/AppGood.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

@@ -144,8 +144,8 @@ const MainDrawerMenus = [
     sectionBegin: false,
     children: [{
       menuId: uid(),
-      label: '上下架',
-      caption: '价格与上下架管理',
+      label: '商品管理',
+      caption: '授权、价格与上下架管理',
       icon: 'perm_identity',
       target: '/app/goods',
       level: 1,
