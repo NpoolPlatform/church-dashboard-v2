@@ -16,15 +16,22 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useUsersStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { NotificationType, useChurchUsersStore, UserInfo } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 
-const user = useUsersStore()
-const users = computed(() => Array.from(user.Users).map((user) => user.User))
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const user = useChurchUsersStore()
+const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const users = computed(() => Array.from(appUsers.value).map((user) => user.User))
 const userLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
+  userLoading.value = true
   user.getUsers({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_USERS',
@@ -36,6 +43,14 @@ onMounted(() => {
   }, () => {
     userLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 </script>

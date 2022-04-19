@@ -16,15 +16,21 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useRoleStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { NotificationType, useChurchRolesStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 
-const role = useRoleStore()
-const roles = computed(() => role.Roles)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const role = useChurchRolesStore()
+const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
 const roleLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
+  roleLoading.value = true
   role.getRoles({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_ROLES',
@@ -36,6 +42,14 @@ onMounted(() => {
   }, () => {
     roleLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 </script>

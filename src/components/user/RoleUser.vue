@@ -77,16 +77,31 @@
 </template>
 
 <script setup lang='ts'>
-import { AppRole, AppUser, NotificationType, useRoleStore, useUsersStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import {
+  AppRole,
+  AppRoleUser,
+  AppUser,
+  NotificationType,
+  useChurchRolesStore,
+  useChurchUsersStore,
+  UserInfo,
+  useRoleStore
+} from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 
-const role = useRoleStore()
-const roles = computed(() => role.Roles)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const arole = useRoleStore()
+const role = useChurchRolesStore()
+const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
 const roleLoading = ref(true)
 const selectedRole = ref([] as Array<AppRole>)
 
-const user = useUsersStore()
-const users = computed(() => Array.from(user.Users.filter((user) => {
+const user = useChurchUsersStore()
+const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const users = computed(() => Array.from(appUsers.value.filter((user: UserInfo) => {
   if (!user.Roles) {
     return true
   }
@@ -98,20 +113,26 @@ const users = computed(() => Array.from(user.Users.filter((user) => {
 const userLoading = ref(true)
 const selectedUser = ref([] as Array<AppUser>)
 
+const appRoleUsers = computed(() => role.RoleUsers.get(appID.value) ? role.RoleUsers.get(appID.value) as Array<AppRoleUser> : [])
+
 const roleUsers = computed(() => {
   if (selectedRole.value.length === 0) {
     return [] as Array<AppUser>
   }
-  const curUsers = role.RoleUsers.filter((roleUser) => roleUser.RoleID === selectedRole.value[0].ID)
-  return Array.from(user.Users.filter((user) => curUsers.findIndex((u) => u.UserID === user.User.ID) >= 0)).map((el) => el.User)
+  const curUsers = appRoleUsers.value.filter((roleUser) => roleUser.RoleID === selectedRole.value[0].ID)
+  return Array.from(appUsers.value.filter((user) => curUsers.findIndex((u) => u.UserID === user.User.ID) >= 0)).map((el) => el.User)
 })
 const selectedRoleUser = ref([] as Array<AppUser>)
 
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
 
-onMounted(() => {
+const prepare = () => {
+  roleLoading.value = true
+  userLoading.value = true
+
   role.getRoles({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_ROLES',
@@ -125,6 +146,7 @@ onMounted(() => {
   })
 
   user.getUsers({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_USERS',
@@ -138,6 +160,7 @@ onMounted(() => {
   })
 
   role.getRoleUsers({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_ROLE_USERS',
@@ -149,6 +172,14 @@ onMounted(() => {
   }, () => {
     // TODO
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 const onAddRoleUser = () => {
@@ -156,8 +187,10 @@ const onAddRoleUser = () => {
     return
   }
   role.createRoleUser({
+    TargetAppID: appID.value,
     TargetUserID: selectedUser.value[0].ID as string,
     Info: {
+      AppID: appID.value,
       RoleID: selectedRole.value[0].ID,
       UserID: selectedUser.value[0].ID
     },
@@ -179,13 +212,13 @@ const onDeleteRoleUser = () => {
     return
   }
 
-  const index = role.RoleUsers.findIndex((el) => el.UserID === selectedRoleUser.value[0].ID)
+  const index = appRoleUsers.value.findIndex((el) => el.UserID === selectedRoleUser.value[0].ID)
   if (index < 0) {
     return
   }
 
-  role.deleteRoleUser({
-    ID: role.RoleUsers[index].ID as string,
+  arole.deleteRoleUser({
+    ID: appRoleUsers.value[index].ID as string,
     Message: {
       Error: {
         Title: 'MSG_DELETE_ROLE_USER',
