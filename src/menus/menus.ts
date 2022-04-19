@@ -174,6 +174,15 @@ const MainDrawerMenus = [
     children: [{
       menuId: uid(),
       label: '商品管理',
+      caption: '添加与编辑商品',
+      icon: 'perm_identity',
+      target: '/goods',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'APP商品管理',
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',
       target: '/app/goods',
