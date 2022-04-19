@@ -201,6 +201,26 @@ const MainDrawerMenus = [
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
+    label: '供应链',
+    caption: '管理商品供应链关系',
+    icon: 'perm_identity',
+    target: '/supply',
+    level: 1,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '设备',
+        caption: '管理设备型号',
+        icon: 'perm_identity',
+        target: '/supply/devices',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  } as MenuItem, {
+    menuId: uid(),
     label: '审核',
     caption: '管理审核项目',
     icon: 'reviews',

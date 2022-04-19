@@ -123,13 +123,13 @@ const onRowClick = (desc: Description) => {
 const onCreateDescription = () => {
   showing.value = true
   updating.value = false
+  target.value = {
+    CoinTypeID: selectedCoin.value[0].ID
+  } as unknown as Description
 }
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {
-    coinTypeID: selectedCoin.value[0]?.ID
-  } as unknown as Description
 }
 
 const onSubmit = () => {
