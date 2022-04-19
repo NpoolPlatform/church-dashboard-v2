@@ -80,7 +80,7 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '出入金地址',
+    label: '出入金地址 *',
     caption: '管理购买、提现出入金地址',
     icon: 'pending',
     target: '/account',
@@ -154,7 +154,7 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '公告与通知',
+    label: '公告与通知 *',
     caption: '管理公告与通知',
     icon: 'pending',
     target: '/notification',
@@ -474,7 +474,7 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '激励体系',
+    label: '激励体系 *',
     caption: '管理邀请码、代金券',
     icon: 'format_list_numbered',
     target: '/inspire/invitation/code',
@@ -501,7 +501,7 @@ const MainDrawerMenus = [
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
-    label: '报表和账单',
+    label: '报表和账单 *',
     caption: '收入、支出统计',
     icon: 'format_list_numbered',
     target: '/billing',
