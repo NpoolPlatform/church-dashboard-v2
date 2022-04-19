@@ -33,6 +33,13 @@
         <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
         <q-select :options='devices' v-model='selectedDevice' :label='$t("MSG_DEVICE_TYPE")' />
         <q-select :options='locations' v-model='selectedLocation' :label='$t("MSG_VENDOR_LOCATION")' />
+        <q-select
+          multiple
+          use-chips
+          :options='coins'
+          v-model='supportCoins'
+          :label='$t("MSG_SUPPORT_COIN_TYPE")'
+        />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -109,7 +116,10 @@ const locations = computed(() => Array.from(location.VendorLocations).map((el) =
   } as MyLocation
 }))
 
-const target = ref({} as unknown as GoodInfo)
+const target = ref({
+  SupportCoinTypeIDs: [],
+  FeeIDs: []
+} as unknown as GoodInfo)
 const selectedCoin = computed({
   get: () => {
     const myCoin = coin.getCoinByID(target.value.CoinInfoID)
@@ -120,6 +130,28 @@ const selectedCoin = computed({
   },
   set: (val) => {
     target.value.CoinInfoID = val.value.ID as string
+  }
+})
+const supportCoins = computed({
+  get: () => {
+    const myCoins = [] as Array<MyCoin>
+    target.value.SupportCoinTypeIDs.forEach((coinTypeID) => {
+      const myCoin = coin.getCoinByID(coinTypeID)
+      if (!myCoin) {
+        return
+      }
+      myCoins.push({
+        label: myCoin.Name,
+        value: myCoin
+      } as MyCoin)
+    })
+    return myCoins
+  },
+  set: (vals) => {
+    target.value.SupportCoinTypeIDs = []
+    vals.forEach((val) => {
+      target.value.SupportCoinTypeIDs.push(val.value.ID as string)
+    })
   }
 })
 const selectedDevice = computed({
@@ -268,7 +300,10 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as unknown as GoodInfo
+  target.value = {
+    SupportCoinTypeIDs: [],
+    FeeIDs: []
+  } as unknown as GoodInfo
 }
 
 </script>
