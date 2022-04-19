@@ -217,6 +217,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '场地',
+        caption: '管理托管场地',
+        icon: 'perm_identity',
+        target: '/supply/vendorlocations',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {

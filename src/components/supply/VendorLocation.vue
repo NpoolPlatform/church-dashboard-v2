@@ -2,11 +2,11 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_DEVICES")'
-    :rows='devices'
+    :title='$t("MSG_VENDOR_LOCATIONS")'
+    :rows='locations'
     row-key='ID'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as DeviceInfo)'
+    @row-click='(evt, row, index) => onRowClick(row as VendorLocation)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -27,13 +27,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_DEVICE') }}</span>
+        <span>{{ $t('MSG_CREATE_VENDOR_LOCATION') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
-        <q-input type='number' v-model='target.Consumption' :label='$t("MSG_CONSUMPTION")' suffix='W' />
-        <q-input type='date' v-model='target.ShipmentAt' :label='$t("MSG_SHIPMENT_AT")' />
-        <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
+        <q-input v-model='target.Country' :label='$t("MSG_COUNTRY")' />
+        <q-input v-model='target.Province' :label='$t("MSG_PROVINCE")' />
+        <q-input v-model='target.City' :label='$t("MSG_CITY")' />
+        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -49,24 +49,24 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useDeviceStore, DeviceInfo } from 'npool-cli-v2'
+import { NotificationType, VendorLocation, useVendorLocationStore } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const device = useDeviceStore()
-const devices = computed(() => device.Devices)
+const location = useVendorLocationStore()
+const locations = computed(() => location.VendorLocations)
 
-const target = ref({} as unknown as DeviceInfo)
+const target = ref({} as unknown as VendorLocation)
 
 onMounted(() => {
-  device.getDevices({
+  location.getVendorLocations({
     Message: {
       Error: {
-        Title: t('MSG_GET_DEVICES'),
-        Message: t('MSG_GET_DEVICES_FAIL'),
+        Title: t('MSG_GET_VENCOR_LOCATIONS'),
+        Message: t('MSG_GET_VENCOR_LOCATIONS_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
@@ -84,22 +84,22 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (device: DeviceInfo) => {
+const onRowClick = (location: VendorLocation) => {
   updating.value = true
   showing.value = true
-  target.value = device
+  target.value = location
 }
 
 const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    device.updateDevice({
+    location.updateVendorLocation({
       Info: target.value,
       Message: {
         Error: {
-          Title: t('MSG_UPDATE_DEVICES'),
-          Message: t('MSG_UPDATE_DEVICES_FAIL'),
+          Title: t('MSG_UPDATE_VENCOR_LOCATIONS'),
+          Message: t('MSG_UPDATE_VENCOR_LOCATIONS_FAIL'),
           Popup: true,
           Type: NotificationType.Error
         }
@@ -110,12 +110,12 @@ const onSubmit = () => {
     return
   }
 
-  device.createDevice({
+  location.createVendorLocation({
     Info: target.value,
     Message: {
       Error: {
-        Title: t('MSG_UPDATE_DEVICES'),
-        Message: t('MSG_UPDATE_DEVICES_FAIL'),
+        Title: t('MSG_UPDATE_VENCOR_LOCATIONS'),
+        Message: t('MSG_UPDATE_VENCOR_LOCATIONS_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
@@ -130,7 +130,7 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as unknown as DeviceInfo
+  target.value = {} as unknown as VendorLocation
 }
 
 </script>
