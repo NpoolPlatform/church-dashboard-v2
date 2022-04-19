@@ -29,7 +29,7 @@
 
 <script setup lang='ts'>
 import { useApplicationsStore, useLoginedUserStore, useMailboxStore, Application, NotificationType } from 'npool-cli-v2'
-import { defineAsyncComponent, computed, onMounted } from 'vue'
+import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
 import { useLocalApplicationStore } from 'src/localstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
@@ -56,7 +56,14 @@ const selectedApp = computed({
 const mailbox = useMailboxStore()
 const bellIcon = computed(() => mailbox.Notifications.length > 0 ? bellMsg : bellNoMsg)
 
-onMounted(() => {
+const onAppSelected = (app: Application) => {
+  selectedApp.value = app
+}
+
+watch(logined, () => {
+  if (!logined.value) {
+    return
+  }
   application.getApplications({
     Message: {
       Error: {
@@ -71,9 +78,23 @@ onMounted(() => {
   })
 })
 
-const onAppSelected = (app: Application) => {
-  selectedApp.value = app
-}
+onMounted(() => {
+  if (!logined.value) {
+    return
+  }
+  application.getApplications({
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APPLICATIONS',
+        Message: 'MSG_GET_APPLICATIONS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+})
 
 </script>
 

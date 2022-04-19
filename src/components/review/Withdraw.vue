@@ -53,27 +53,44 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useReviewStore, ReviewState, WithdrawReview, useCoinStore, useLocaleStore, useLoginedUserStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import {
+  NotificationType,
+  useReviewStore,
+  ReviewState,
+  WithdrawReview,
+  useCoinStore,
+  useLocaleStore,
+  useLoginedUserStore,
+  useChurchReviewStore
+} from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const review = useReviewStore()
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const review = useChurchReviewStore()
+const areview = useReviewStore()
 const coins = useCoinStore()
 const locale = useLocaleStore()
 const logined = useLoginedUserStore()
 
-const reviews = computed(() => review.WithdrawReviews)
-const displayReviews = computed(() => Array.from(review.WithdrawReviews).map((el) => el.Review))
+const reviews = computed(() => {
+  return review.WithdrawReviews.get(appID.value) ? review.WithdrawReviews.get(appID.value) as Array<WithdrawReview> : []
+})
+const displayReviews = computed(() => Array.from(reviews.value).map((el) => el.Review))
 const reviewLoading = ref(true)
 
 const displayCoins = computed(() => coins.Coins)
 const coinLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
   review.getWithdrawReviews({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_WITHDRAW_REVIEWS'),
@@ -85,6 +102,14 @@ onMounted(() => {
   }, () => {
     reviewLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 
   coins.getCoins({
     Message: {
@@ -116,7 +141,7 @@ const onRowClick = (index: number) => {
 const updateReview = () => {
   target.value.Review.ReviewerID = logined.LoginedUser?.User?.ID
 
-  review.updateWithdrawReview({
+  areview.updateWithdrawReview({
     TargetLangID: locale.CurLang?.ID as string,
     Info: target.value.Review,
     Message: {
