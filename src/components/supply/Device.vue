@@ -92,7 +92,7 @@ const onRowClick = (device: DeviceInfo) => {
   updating.value = true
   showing.value = true
   target.value = device
-  shipmentAt.value = formatTime(target.value.ShipmentAt)
+  shipmentAt.value = formatTime(target.value.ShipmentAt).replace(/\//g, '-')
 }
 
 const onSubmit = () => {

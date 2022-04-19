@@ -414,8 +414,8 @@ const onRowClick = (lgood: GoodBase) => {
     Array.from(myGood.SupportCoins ? myGood.SupportCoins : []).map((el) => el.ID) as Array<string>
   target.value.FeeIDs = Array.from(myGood.Good.Fees).map((el) => el.Fee.ID) as Array<string>
 
-  deliveryAt.value = formatTime(target.value.DeliveryAt, true)
-  startAt.value = formatTime(target.value.StartAt, true)
+  deliveryAt.value = formatTime(target.value.DeliveryAt, true).replace(/\//g, '-')
+  startAt.value = formatTime(target.value.StartAt, true).replace(/\//g, '-')
 }
 
 const onSubmit = () => {
