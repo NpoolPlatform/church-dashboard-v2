@@ -56,26 +56,41 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useReviewStore, ReviewState, WithdrawAddressReview, useCoinStore, formatTime, useLoginedUserStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import {
+  NotificationType,
+  useReviewStore,
+  ReviewState,
+  WithdrawAddressReview,
+  useCoinStore,
+  formatTime,
+  useLoginedUserStore,
+  useChurchReviewStore
+} from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const review = useReviewStore()
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const review = useChurchReviewStore()
+const areview = useReviewStore()
 const coins = useCoinStore()
 const logined = useLoginedUserStore()
 
-const reviews = computed(() => review.WithdrawAddressReviews)
-const displayReviews = computed(() => Array.from(review.WithdrawAddressReviews).map((el) => el.Review))
+const reviews = computed(() => review.WithdrawAddressReviews.get(appID.value))
+const displayReviews = computed(() => Array.from(reviews.value ? reviews.value : []).map((el) => el.Review))
 const reviewLoading = ref(true)
 
 const displayCoins = computed(() => coins.Coins)
 const coinLoading = ref(true)
 
-onMounted(() => {
+const prepare = () => {
   review.getWithdrawAddressReviews({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_WITHDRAW_ADDRESS_REVIEWS'),
@@ -87,6 +102,14 @@ onMounted(() => {
   }, () => {
     reviewLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 
   coins.getCoins({
     Message: {
@@ -111,14 +134,14 @@ const onMenuHide = () => {
 }
 
 const onRowClick = (index: number) => {
-  target.value = reviews.value[index]
+  target.value = reviews.value ? reviews.value[index] : {} as unknown as WithdrawAddressReview
   showing.value = true
 }
 
 const updateReview = () => {
   target.value.Review.ReviewerID = logined.LoginedUser?.User?.ID
 
-  review.updateReview({
+  areview.updateReview({
     Info: target.value.Review,
     Message: {
       Error: {
