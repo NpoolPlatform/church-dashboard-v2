@@ -32,6 +32,7 @@
       <q-card-section>
         <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
         <q-select :options='devices' v-model='selectedDevice' :label='$t("MSG_DEVICE_TYPE")' />
+        <q-select :options='locations' v-model='selectedLocation' :label='$t("MSG_VENDOR_LOCATION")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -57,7 +58,9 @@ import {
   useCoinStore,
   Coin,
   useDeviceStore,
-  DeviceInfo
+  DeviceInfo,
+  useVendorLocationStore,
+  VendorLocation
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -71,6 +74,7 @@ const goods = computed(() => buildGoods(good.Goods))
 const cgood = useChurchGoodStore()
 const coin = useCoinStore()
 const device = useDeviceStore()
+const location = useVendorLocationStore()
 
 interface MyCoin {
   label: string
@@ -94,12 +98,23 @@ const devices = computed(() => Array.from(device.Devices).map((el) => {
   } as MyDevice
 }))
 
+interface MyLocation {
+  label: string
+  value: VendorLocation
+}
+const locations = computed(() => Array.from(location.VendorLocations).map((el) => {
+  return {
+    label: el.Country + ' ' + el.Province + ' ' + el.City + ' ' + el.Address,
+    value: el
+  } as MyLocation
+}))
+
 const target = ref({} as unknown as GoodInfo)
 const selectedCoin = computed({
   get: () => {
     const myCoin = coin.getCoinByID(target.value.CoinInfoID)
     return {
-      label: myCoin.Name,
+      label: myCoin?.Name,
       value: myCoin
     } as MyCoin
   },
@@ -111,12 +126,27 @@ const selectedDevice = computed({
   get: () => {
     const myDevice = device.getDeviceByID(target.value.DeviceInfoID)
     return {
-      label: myDevice.Type,
+      label: myDevice?.Type,
       value: myDevice
     } as MyDevice
   },
   set: (val) => {
     target.value.CoinInfoID = val.value.ID as string
+  }
+})
+const selectedLocation = computed({
+  get: () => {
+    const myLocation = location.getVendorLocationByID(target.value.VendorLocationID)
+    if (!myLocation) {
+      return undefined as unknown as MyLocation
+    }
+    return {
+      label: myLocation?.Country + ' ' + myLocation?.Province + ' ' + myLocation?.City + ' ' + myLocation?.Address,
+      value: myLocation
+    } as MyLocation
+  },
+  set: (val) => {
+    target.value.VendorLocationID = val.value.ID as string
   }
 })
 
@@ -152,6 +182,19 @@ onMounted(() => {
       Error: {
         Title: t('MSG_GET_DEVICES'),
         Message: t('MSG_GET_DEVICES_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  location.getVendorLocations({
+    Message: {
+      Error: {
+        Title: t('MSG_GET_VENDOR_LOCATIONS'),
+        Message: t('MSG_GET_VENDOR_LOCATIONS_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
