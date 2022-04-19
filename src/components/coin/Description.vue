@@ -75,6 +75,22 @@ const descriptions = computed(() => {
 
 const ccoin = useChurchCoinStore()
 
+watch(coinTypeID, () => {
+  coin.getCoinDescriptions({
+    CoinTypeID: coinTypeID.value as string,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_COIN_DESCRIPTIONS',
+        Message: 'MSG_GET_COIN_DESCRIPTIONS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+})
+
 onMounted(() => {
   coin.getCoins({
     Message: {
