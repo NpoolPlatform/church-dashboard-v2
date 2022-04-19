@@ -31,6 +31,7 @@
       </q-card-section>
       <q-card-section>
         <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
+        <q-select :options='devices' v-model='selectedDevice' :label='$t("MSG_DEVICE_TYPE")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -54,7 +55,9 @@ import {
   GoodInfo,
   useChurchGoodStore,
   useCoinStore,
-  Coin
+  Coin,
+  useDeviceStore,
+  DeviceInfo
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -67,6 +70,7 @@ const goods = computed(() => buildGoods(good.Goods))
 
 const cgood = useChurchGoodStore()
 const coin = useCoinStore()
+const device = useDeviceStore()
 
 interface MyCoin {
   label: string
@@ -79,6 +83,17 @@ const coins = computed(() => Array.from(coin.Coins).map((el) => {
   } as MyCoin
 }))
 
+interface MyDevice {
+  label: string
+  value: DeviceInfo
+}
+const devices = computed(() => Array.from(device.Devices).map((el) => {
+  return {
+    label: el.Type,
+    value: el
+  } as MyDevice
+}))
+
 const target = ref({} as unknown as GoodInfo)
 const selectedCoin = computed({
   get: () => {
@@ -87,6 +102,18 @@ const selectedCoin = computed({
       label: myCoin.Name,
       value: myCoin
     } as MyCoin
+  },
+  set: (val) => {
+    target.value.CoinInfoID = val.value.ID as string
+  }
+})
+const selectedDevice = computed({
+  get: () => {
+    const myDevice = device.getDeviceByID(target.value.DeviceInfoID)
+    return {
+      label: myDevice.Type,
+      value: myDevice
+    } as MyDevice
   },
   set: (val) => {
     target.value.CoinInfoID = val.value.ID as string
@@ -112,6 +139,19 @@ onMounted(() => {
       Error: {
         Title: t('MSG_GET_COINS'),
         Message: t('MSG_GET_COINS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  device.getDevices({
+    Message: {
+      Error: {
+        Title: t('MSG_GET_DEVICES'),
+        Message: t('MSG_GET_DEVICES_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
