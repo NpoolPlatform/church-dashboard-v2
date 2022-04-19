@@ -80,6 +80,80 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
+    label: '出入金地址',
+    caption: '管理购买、提现出入金地址',
+    icon: 'pending',
+    target: '/account',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '平台收益地址',
+        caption: '管理平台收益地址',
+        icon: 'perm_identity',
+        target: '/account/benefit',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '平台冷钱包',
+        caption: '平台收益冷钱包',
+        icon: 'perm_identity',
+        target: '/account/platform',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '用户冷钱包',
+        caption: '用户收益冷钱包',
+        icon: 'perm_identity',
+        target: '/account/usercold',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '用户热钱包',
+        caption: '用户收益热钱包',
+        icon: 'perm_identity',
+        target: '/account/userwarm',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '支付资金地址',
+        caption: '支付金额资金管理地址',
+        icon: 'perm_identity',
+        target: '/account/incoming',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '支付地址',
+        caption: '购买支付转账地址',
+        icon: 'perm_identity',
+        target: '/account/payment',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '提现地址',
+        caption: '用户提现地址',
+        icon: 'perm_identity',
+        target: '/account/withdraw',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  } as MenuItem, {
+    menuId: uid(),
     label: '公告与通知',
     caption: '管理公告与通知',
     icon: 'pending',
@@ -421,6 +495,51 @@ const MainDrawerMenus = [
       caption: '管理邀请和购买佣金',
       icon: 'format_list_numbered',
       target: '/inspire/commission',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem]
+  } as MenuItem, {
+    menuId: uid(),
+    label: '报表和账单',
+    caption: '收入、支出统计',
+    icon: 'format_list_numbered',
+    target: '/billing',
+    level: 0,
+    sectionBegin: false,
+    children: [{
+      menuId: uid(),
+      label: '商品收益',
+      caption: '管理用户邀请码',
+      icon: 'format_list_numbered',
+      target: '/billing/incoming',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '销售收入',
+      caption: '用户购买支付收入',
+      icon: 'format_list_numbered',
+      target: '/billing/payment',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '提现支出',
+      caption: '用户提现支出',
+      icon: 'format_list_numbered',
+      target: '/billing/withdraw',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '采购支出',
+      caption: '算力采购支出',
+      icon: 'format_list_numbered',
+      target: '/billing/purchase',
       level: 1,
       sectionBegin: false,
       children: []
