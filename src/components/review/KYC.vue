@@ -53,25 +53,42 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useReviewStore, KYCReview, useKYCsStore, ImageType, DocumentType, useLocaleStore, ReviewState, useLoginedUserStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import {
+  NotificationType,
+  KYCReview,
+  useKYCsStore,
+  ImageType,
+  DocumentType,
+  useLocaleStore,
+  ReviewState,
+  useLoginedUserStore,
+  useChurchReviewStore,
+  useReviewStore
+} from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const review = useReviewStore()
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const review = useChurchReviewStore()
+const areview = useReviewStore()
 const locale = useLocaleStore()
 const logined = useLoginedUserStore()
 
-const reviews = computed(() => review.KYCReviews)
-const displayReviews = computed(() => Array.from(review.KYCReviews).map((el) => el.Review))
+const reviews = computed(() => review.KYCReviews.get(appID.value) ? review.KYCReviews.get(appID.value) as Array<KYCReview> : [])
+const displayReviews = computed(() => Array.from(reviews.value).map((el) => el.Review))
 const reviewLoading = ref(true)
 
 const kyc = useKYCsStore()
 
-onMounted(() => {
+const prepare = () => {
   review.getKYCReviews({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_KYC_REVIEWS'),
@@ -83,6 +100,14 @@ onMounted(() => {
   }, () => {
     reviewLoading.value = false
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 const showing = ref(false)
@@ -144,7 +169,7 @@ const onRowClick = (index: number) => {
 const updateReview = () => {
   target.value.Review.ReviewerID = logined.LoginedUser?.User?.ID
 
-  review.updateKYCReview({
+  areview.updateKYCReview({
     TargetLangID: locale.CurLang?.ID as string,
     Info: target.value.Review,
     Message: {
