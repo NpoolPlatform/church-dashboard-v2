@@ -59,7 +59,8 @@ import {
   GoodBenefit,
   useGoodSettingStore,
   useAdminGoodStore,
-  GoodBase
+  GoodBase,
+  useCoinSettingStore
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 
@@ -67,6 +68,7 @@ const account = useChurchAccountStore()
 const coin = useCoinStore()
 const setting = useGoodSettingStore()
 const good = useAdminGoodStore()
+const csetting = useCoinSettingStore()
 
 interface MyBenefit extends GoodBenefit {
   CoinName: string
@@ -102,8 +104,22 @@ interface MyAccount {
 }
 
 const accounts = computed(() => account.Accounts.filter((el) => {
-  const index = benefits.value.findIndex((gb) => gb.BenefitAccountID === el.ID)
-  return el.CoinTypeID === selectedCoin.value?.value.ID && index < 0 && el.PlatformHoldPrivateKey
+  let index = csetting.CoinSettings.findIndex((cs) => {
+    return cs.PlatformOfflineAccountID === el.ID ||
+           cs.UserOfflineAccountID === el.ID ||
+           cs.UserOnlineAccountID === el.ID ||
+           cs.GoodIncomingAccountID === el.ID
+  })
+  if (index >= 0) {
+    return false
+  }
+  index = benefits.value.findIndex((gs) => {
+    return gs.BenefitAccountID === el.ID
+  })
+  if (index >= 0) {
+    return false
+  }
+  return el.CoinTypeID === selectedCoin.value?.value.ID && el.PlatformHoldPrivateKey
 }).map((el) => {
   return {
     label: selectedCoin.value?.value.Name as string + ' | ' + el.Address,
@@ -188,6 +204,19 @@ onMounted(() => {
       Error: {
         Title: 'MSG_GET_GOOD_BENEFITS',
         Message: 'MSG_GET_GOOD_BENEFITS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  csetting.getGCoinSettings({
+    Message: {
+      Error: {
+        Title: 'MSG_GET_COIN_SETTINGS',
+        Message: 'MSG_GET_COIN_SETTINGS_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }

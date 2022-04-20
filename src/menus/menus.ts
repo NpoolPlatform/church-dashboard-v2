@@ -116,8 +116,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '平台冷钱包',
-        caption: '平台收益冷钱包',
+        label: '平台账户',
+        caption: '平台收益管理账户',
         icon: 'perm_identity',
         target: '/account/platform',
         level: 1,
