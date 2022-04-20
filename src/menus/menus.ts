@@ -154,7 +154,7 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '公告与通知 *',
+    label: '公告与通知',
     caption: '管理公告与通知',
     icon: 'pending',
     target: '/notification',
