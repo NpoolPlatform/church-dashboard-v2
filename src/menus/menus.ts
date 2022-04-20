@@ -107,8 +107,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '平台收益账户',
-        caption: '管理平台收益账户',
+        label: '商品收益账户',
+        caption: '管理商品收益账户',
         icon: 'perm_identity',
         target: '/account/benefit',
         level: 1,
