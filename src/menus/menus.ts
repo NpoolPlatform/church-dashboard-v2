@@ -117,36 +117,9 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '平台账户',
-        caption: '平台收益管理账户',
+        caption: '管理平台收益账户',
         icon: 'perm_identity',
         target: '/account/platform',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '用户冷钱包',
-        caption: '用户收益冷钱包',
-        icon: 'perm_identity',
-        target: '/account/usercold',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '用户热钱包',
-        caption: '用户收益热钱包',
-        icon: 'perm_identity',
-        target: '/account/userwarm',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '支付资金账户',
-        caption: '支付金额资金管理账户',
-        icon: 'perm_identity',
-        target: '/account/incoming',
         level: 1,
         sectionBegin: false,
         children: []

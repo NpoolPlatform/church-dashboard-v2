@@ -30,10 +30,10 @@
       </q-card-section>
       <q-card-section>
         <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
-        <q-select :options='accounts' v-model='selectedIncomingAccount' :label='$t("MSG_GOOD_INCOMING_ACCOUNT")' />
-        <q-select :options='accounts' v-model='selectedPlatformOfflineAccount' :label='$t("MSG_PLATFORM_OFFLINE_ACCOUNT")' />
-        <q-select :options='accounts' v-model='selectedUserOfflineAccount' :label='$t("MSG_USER_OFFLINE_ACCOUNT")' />
-        <q-select :options='accounts' v-model='selectedUserOnlineAccount' :label='$t("MSG_USER_ONLINE_ACCOUNT")' />
+        <q-select :options='userAccounts' v-model='selectedIncomingAccount' :label='$t("MSG_GOOD_INCOMING_ACCOUNT")' />
+        <q-select :options='userAccounts' v-model='selectedPlatformOfflineAccount' :label='$t("MSG_PLATFORM_OFFLINE_ACCOUNT")' />
+        <q-select :options='userAccounts' v-model='selectedUserOfflineAccount' :label='$t("MSG_USER_OFFLINE_ACCOUNT")' />
+        <q-select :options='platformAccounts' v-model='selectedUserOnlineAccount' :label='$t("MSG_USER_ONLINE_ACCOUNT")' />
         <q-input
           type='number'
           v-model='target.WarmAccountCoinAmount'
@@ -137,13 +137,16 @@ const accounts = computed(() => account.Accounts.filter((el) => {
   if (index >= 0) {
     return false
   }
-  return el.CoinTypeID === selectedCoin.value?.value?.ID && el.PlatformHoldPrivateKey
+  return el.CoinTypeID === selectedCoin.value?.value?.ID
 }).map((el) => {
   return {
     label: selectedCoin.value?.value?.Name as string + ' | ' + el.Address,
     value: el
   } as MyAccount
 }))
+
+const platformAccounts = computed(() => accounts.value.filter((el) => el.value.PlatformHoldPrivateKey))
+const userAccounts = computed(() => accounts.value.filter((el) => !el.value.PlatformHoldPrivateKey))
 
 const constructAccount = (id: string): MyAccount => {
   const ac = account.getAccountByID(id)
