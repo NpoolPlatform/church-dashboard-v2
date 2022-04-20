@@ -54,7 +54,7 @@ import {
   useAdminGoodStore,
   GoodBase
 } from 'npool-cli-v2'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const account = useChurchAccountStore()
 const coin = useCoinStore()
@@ -96,14 +96,29 @@ interface MyAccount {
 
 const accounts = computed(() => account.Accounts.filter((el) => {
   const index = benefits.value.findIndex((gb) => gb.BenefitAccountID === el.ID)
-  return el.CoinTypeID === selectedCoin.value?.value.ID && index < 0
+  return el.CoinTypeID === selectedCoin.value?.value.ID && index < 0 && el.PlatformHoldPrivateKey
 }).map((el) => {
   return {
     label: selectedCoin.value?.value.Name as string + ' | ' + el.Address,
     value: el
   } as MyAccount
 }))
-const selectedAccount = ref(undefined as unknown as MyAccount)
+const selectedAccount = computed({
+  get: () => {
+    const ac = account.getAccountByID(target.value.BenefitAccountID)
+    if (!ac) {
+      return undefined as unknown as MyAccount
+    }
+    const cc = coin.getCoinByID(ac?.CoinTypeID)
+    return {
+      label: cc?.Name as string + ' | ' + ac?.Address,
+      value: ac
+    } as MyAccount
+  },
+  set: (val) => {
+    target.value.BenefitAccountID = val.value.ID as string
+  }
+})
 
 interface MyGood {
   label: string
@@ -118,17 +133,21 @@ const goods = computed(() => Array.from(good.Goods.filter((g) => {
     value: el.Good.Good
   } as MyGood
 }))
-const selectedGood = ref(undefined as unknown as MyGood)
+const selectedGood = computed({
+  get: () => {
+    return {
+      label: good.getGoodByID(target.value.GoodID)?.Good.Good.Title,
+      value: good.getGoodByID(target.value.GoodID)?.Good.Good
+    } as MyGood
+  },
+  set: (val) => {
+    target.value.GoodID = val.value.ID as string
+  }
+})
 
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as unknown as GoodBenefit)
-watch(selectedAccount, () => {
-  target.value.BenefitAccountID = selectedAccount.value.value.ID as string
-})
-watch(selectedGood, () => {
-  target.value.GoodID = selectedGood.value.value.ID as string
-})
 
 onMounted(() => {
   coin.getCoins({
@@ -194,10 +213,15 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (account: GoodBenefit) => {
-  target.value = account
+const onRowClick = (acc: GoodBenefit) => {
+  target.value = acc
   showing.value = true
   updating.value = false
+  const ac = account.getAccountByID(target.value.BenefitAccountID)
+  selectedCoin.value = {
+    label: coin.getCoinByID(ac.CoinTypeID).Name as string,
+    value: coin.getCoinByID(ac.CoinTypeID)
+  }
 }
 
 const onSubmit = () => {
