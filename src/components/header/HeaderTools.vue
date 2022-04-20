@@ -22,6 +22,8 @@
       </q-list>
     </q-btn-dropdown>
     <HeaderToolBtn :icon='bellIcon' />
+    <HeaderToolBtn class='tracing' :icon='tracing' @click='onJeagerClick' />
+    <HeaderToolBtn :icon='github' @click='onGithubClick' />
     <LangSwitcher />
     <AvatarDropdown v-if='logined' />
   </div>
@@ -34,6 +36,9 @@ import { useLocalApplicationStore } from 'src/localstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
 import bellMsg from '../../assets/bell-msg.svg'
+
+const tracing = 'https://www.jaegertracing.io/img/jaeger-icon-reverse-color.svg'
+const github = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png'
 
 const AvatarDropdown = defineAsyncComponent(() => import('src/components/avatar/AvatarDropdown.vue'))
 const HeaderToolBtn = defineAsyncComponent(() => import('src/components/header/HeaderToolBtn.vue'))
@@ -96,7 +101,17 @@ onMounted(() => {
   })
 })
 
+const onJeagerClick = () => {
+  window.open('https://www.jaegertracing.io/')
+}
+
+const onGithubClick = () => {
+  window.open('https://github.com/NpoolPlatform')
+}
+
 </script>
 
 <style lang='sass' scoped>
+.tracing
+  background-color: white
 </style>

@@ -2,7 +2,6 @@
   <q-btn
     flat
     dense
-    round
     :icon='icon'
     @click='onClick'
   />
