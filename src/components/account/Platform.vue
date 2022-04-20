@@ -272,6 +272,15 @@ const onRowClick = (acc: CoinSetting) => {
 const onSubmit = () => {
   showing.value = false
 
+  const accs = new Map<string, number>()
+  accs.set(target.value.GoodIncomingAccountID as string, 1)
+  accs.set(target.value.PlatformOfflineAccountID as string, 1)
+  accs.set(target.value.UserOfflineAccountID as string, 1)
+  accs.set(target.value.UserOfflineAccountID as string, 1)
+  if (accs.size > 1) {
+    return
+  }
+
   if (!selectedCoin.value) {
     return
   }
