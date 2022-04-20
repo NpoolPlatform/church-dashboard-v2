@@ -65,9 +65,14 @@ import {
   useAdminGoodStore,
   useCoinSettingStore,
   CoinSetting,
-  useGoodSettingStore
+  useGoodSettingStore,
+  WithdrawAddress
 } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 const account = useChurchAccountStore()
 const coin = useCoinStore()
@@ -137,6 +142,19 @@ const accounts = computed(() => account.Accounts.filter((el) => {
   if (index >= 0) {
     return false
   }
+  index = account.GoodPayments.findIndex((gp) => {
+    return gp.AccountID === el.ID
+  })
+  if (index >= 0) {
+    return false
+  }
+  const addresses = account.WithdrawAddresses.get(appID.value) ? account.WithdrawAddresses.get(appID.value) as Array<WithdrawAddress> : []
+  index = addresses.findIndex((wa) => {
+    return wa.AccountID === el.ID
+  })
+  if (index >= 0) {
+    return false
+  }
   return el.CoinTypeID === selectedCoin.value?.value?.ID
 }).map((el) => {
   return {
@@ -188,6 +206,22 @@ const selectedUserOnlineAccount = computed({
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as unknown as CoinSetting)
+
+watch(appID, () => {
+  account.getWithdrawAddresses({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
+        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+})
 
 onMounted(() => {
   coin.getCoins({
@@ -254,6 +288,19 @@ onMounted(() => {
   }, () => {
     // TODO
   })
+
+  account.getGoodPayments({
+    Message: {
+      Error: {
+        Title: 'MSG_GET_GOOD_PAYMENTS',
+        Message: 'MSG_GET_GOOD_PAYMENTS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 })
 
 const onMenuHide = () => {
@@ -280,7 +327,7 @@ const onSubmit = () => {
   accs.set(target.value.PlatformOfflineAccountID as string, 1)
   accs.set(target.value.UserOfflineAccountID as string, 1)
   accs.set(target.value.UserOfflineAccountID as string, 1)
-  if (accs.size > 1) {
+  if (accs.size < 4) {
     return
   }
 

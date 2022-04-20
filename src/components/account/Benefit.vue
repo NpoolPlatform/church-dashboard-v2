@@ -60,9 +60,14 @@ import {
   useGoodSettingStore,
   useAdminGoodStore,
   GoodBase,
-  useCoinSettingStore
+  useCoinSettingStore,
+  WithdrawAddress
 } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 const account = useChurchAccountStore()
 const coin = useCoinStore()
@@ -119,6 +124,19 @@ const accounts = computed(() => account.Accounts.filter((el) => {
   if (index >= 0) {
     return false
   }
+  index = account.GoodPayments.findIndex((gp) => {
+    return gp.AccountID === el.ID
+  })
+  if (index >= 0) {
+    return false
+  }
+  const addresses = account.WithdrawAddresses.get(appID.value) ? account.WithdrawAddresses.get(appID.value) as Array<WithdrawAddress> : []
+  index = addresses.findIndex((wa) => {
+    return wa.AccountID === el.ID
+  })
+  if (index >= 0) {
+    return false
+  }
   return el.CoinTypeID === selectedCoin.value?.value.ID && el.PlatformHoldPrivateKey
 }).map((el) => {
   return {
@@ -171,6 +189,22 @@ const selectedGood = computed({
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as unknown as GoodBenefit)
+
+watch(appID, () => {
+  account.getWithdrawAddresses({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
+        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+})
 
 onMounted(() => {
   coin.getCoins({
@@ -230,6 +264,20 @@ onMounted(() => {
       Error: {
         Title: 'MSG_GET_GOODS',
         Message: 'MSG_GET_GOODS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  account.getWithdrawAddresses({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
+        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
