@@ -80,8 +80,8 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '出入金地址 *',
-    caption: '管理购买、提现出入金地址',
+    label: '账户管理',
+    caption: '管理购买、提现出入金账户',
     icon: 'pending',
     target: '/account',
     level: 0,
@@ -89,8 +89,26 @@ const MainDrawerMenus = [
     children: [
       {
         menuId: uid(),
-        label: '平台收益地址',
-        caption: '管理平台收益地址',
+        label: '平台托管账户',
+        caption: '管理平台托管账户',
+        icon: 'perm_identity',
+        target: '/account/platform/hold',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '用户账户',
+        caption: '管理用户账户',
+        icon: 'perm_identity',
+        target: '/account/user/hold',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '平台收益账户',
+        caption: '管理平台收益账户',
         icon: 'perm_identity',
         target: '/account/benefit',
         level: 1,
@@ -125,8 +143,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '支付资金地址',
-        caption: '支付金额资金管理地址',
+        label: '支付资金账户',
+        caption: '支付金额资金管理账户',
         icon: 'perm_identity',
         target: '/account/incoming',
         level: 1,
@@ -134,8 +152,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '支付地址',
-        caption: '购买支付转账地址',
+        label: '支付账户',
+        caption: '购买支付转账账户',
         icon: 'perm_identity',
         target: '/account/payment',
         level: 1,
