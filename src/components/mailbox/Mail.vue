@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchMailboxStore, NotificationType, Mail, useChurchUsersStore, AppUser } from 'npool-cli-v2'
+import { useChurchMailboxStore, NotificationType, Mail, useChurchUsersStore, AppUser, UserInfo } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
@@ -65,9 +65,10 @@ interface MyUser {
   value: AppUser
 }
 
-const users = computed(() => Array.from(user.Users.get(appID.value)).map((el) => {
+const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const users = computed(() => Array.from(appUsers.value).map((el) => {
   return {
-    label: el.User.EmailAddress.length ? el.User.EmailAddress : el.User.PhoneNO,
+    label: el.User.EmailAddress?.length ? el.User.EmailAddress : el.User.PhoneNO,
     value: el.User
   } as MyUser
 }))
@@ -102,10 +103,10 @@ onMounted(() => {
 const showing = ref(false)
 const target = ref({} as unknown as Mail)
 watch(selectedFromUser, () => {
-  target.value.FromUserID = selectedFromUser.value.value.ID
+  target.value.FromUserID = selectedFromUser.value.value.ID as string
 })
 watch(selectedToUser, () => {
-  target.value.ToUserID = selectedToUser.value.value.ID
+  target.value.ToUserID = selectedToUser.value.value.ID as string
 })
 
 const onCreate = () => {
