@@ -2,79 +2,53 @@
   <q-table
     dense
     flat
+    :title='$t("MSG_WITHDRAW_ADDRESSES")'
     :rows='accounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as Account)'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_CREATE")'
-          @click='onCreate'
-        />
-      </div>
-    </template>
-  </q-table>
-  <q-dialog
-    v-model='showing'
-    @hide='onMenuHide'
-    position='right'
-  >
-    <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
-      </q-card-section>
-      <q-card-section>
-        <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
-        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
-      </q-card-section>
-      <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
-      </q-item>
-    </q-card>
-  </q-dialog>
+  />
 </template>
 
 <script setup lang='ts'>
-import { Account, useChurchAccountStore, useCoinStore, NotificationType, Coin } from 'npool-cli-v2'
-import { computed, onMounted, ref, watch } from 'vue'
+import { useChurchAccountStore, useCoinStore, NotificationType, WithdrawAddress } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, watch } from 'vue'
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 const account = useChurchAccountStore()
 const coin = useCoinStore()
 
-interface MyAccount extends Account {
+interface MyAccount extends WithdrawAddress {
   CoinName: string
+  Address: string
 }
 
-const accounts = computed(() => Array.from(account.Accounts.filter((ac) => !ac.PlatformHoldPrivateKey)).map((el) => {
+const appAccounts = computed(() => {
+  return account.WithdrawAddresses.get(appID.value) ? account.WithdrawAddresses.get(appID.value) as Array<WithdrawAddress> : []
+})
+const accounts = computed(() => Array.from(appAccounts.value).map((el) => {
   const ac = el as MyAccount
-  ac.CoinName = coin.getCoinByID(ac.CoinTypeID)?.Name as string
+  ac.Address = account.getAccountByID(ac.AccountID)?.Address
+  ac.CoinName = coin.getCoinByID(account.getAccountByID(ac.AccountID)?.CoinTypeID)?.Name as string
   return ac
 }))
 
-interface MyCoin {
-  label: string
-  value: Coin
-}
-
-const coins = computed(() => Array.from(coin.Coins).map((el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-const selectedCoin = ref(undefined as unknown as MyCoin)
-
-const showing = ref(false)
-const updating = ref(false)
-const target = ref({} as unknown as Account)
-watch(selectedCoin, () => {
-  target.value.CoinTypeID = selectedCoin.value.value.ID as string
+watch(appID, () => {
+  account.getWithdrawAddresses({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
+        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 })
 
 onMounted(() => {
@@ -103,42 +77,13 @@ onMounted(() => {
   }, () => {
     // TODO
   })
-})
 
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {} as unknown as Account
-}
-
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (account: Account) => {
-  target.value = account
-  showing.value = true
-  updating.value = false
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  if (!selectedCoin.value) {
-    return
-  }
-
-  if (updating.value) {
-    // TODO
-    return
-  }
-
-  account.createUserAccount({
-    Info: target.value,
+  account.getWithdrawAddresses({
+    TargetAppID: appID.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_ACCOUNT',
-        Message: 'MSG_CREATE_ACCOUNT_FAIL',
+        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
+        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
@@ -146,10 +91,6 @@ const onSubmit = () => {
   }, () => {
     // TODO
   })
-}
-
-const onCancel = () => {
-  onMenuHide()
-}
+})
 
 </script>
