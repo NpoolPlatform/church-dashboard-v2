@@ -492,6 +492,30 @@ const routes: RouteRecordRaw[] = [
           ShowTopTip: false,
           NeedLogined: true
         }
+      }, {
+        path: 'account/payment',
+        component: () => import('pages/account/Payment.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'account/withdraw',
+        component: () => import('pages/account/Withdraw.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
       }
     ]
   },
