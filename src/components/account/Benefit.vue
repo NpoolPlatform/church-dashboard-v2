@@ -32,7 +32,14 @@
         <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
         <q-select :options='accounts' v-model='selectedAccount' :label='$t("MSG_ACCOUNT")' />
         <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
-        <q-input v-model='target.BenefitIntervalHours' :label='$t("MSG_ADDRESS")' />
+        <q-input
+          type='number'
+          min='1'
+          max='24'
+          v-model='target.BenefitIntervalHours'
+          :label='$t("MSG_ADDRESS")'
+          :suffix='$t("MSG_HOUR")'
+        />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
