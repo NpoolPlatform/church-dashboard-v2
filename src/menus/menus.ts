@@ -183,7 +183,7 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '限额设置 *',
+    label: '限额设置',
     caption: '管理公告与通知',
     icon: 'pending',
     target: '/limits',
@@ -192,26 +192,17 @@ const MainDrawerMenus = [
     children: [
       {
         menuId: uid(),
-        label: '用户热钱包限额',
-        caption: '管理用户出金地址限额',
+        label: '平台限额(USD)',
+        caption: '管理热钱包、支付划转和自动审核限额',
         icon: 'perm_identity',
-        target: '/limits/userwarm',
+        target: '/limits/platform',
         level: 1,
         sectionBegin: false,
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '支付划转限额',
-        caption: '设置支付地址划转限额',
-        icon: 'perm_identity',
-        target: '/limits/payment',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '提现自动审核限额',
-        caption: '管理应用站内信',
+        label: '提现自动审核限额(币)',
+        caption: '设置提现自动审核币额度',
         icon: 'perm_identity',
         target: '/limits/withdraw',
         level: 1,
