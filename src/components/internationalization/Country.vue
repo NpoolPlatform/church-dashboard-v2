@@ -179,9 +179,9 @@ const onCancel = () => {
 }
 
 const onExport = () => {
-  const blob = new Blob([JSON.stringify({
-    countries
-  })], { type: 'text/plain;charset=utf-8' })
+  const blob = new Blob([JSON.stringify(
+    countries.value
+  )], { type: 'text/plain;charset=utf-8' })
   const filename = 'countries-' +
                    formatTime(new Date().getTime() / 1000) +
                    '.json'
