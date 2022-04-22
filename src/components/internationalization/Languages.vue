@@ -101,6 +101,7 @@ const onRowClick = (language: Language) => {
 }
 
 const onSubmit = () => {
+  showing.value = false
   if (updating.value) {
     clang.updateLang({
       Info: target.value,

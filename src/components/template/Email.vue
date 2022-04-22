@@ -127,6 +127,8 @@ const onCreate = () => {
 const onSubmit = () => {
   showing.value = false
 
+  target.value.LangID = language.value.ID
+
   if (updating.value) {
     templates.updateEmailTemplate({
       Info: target.value,
