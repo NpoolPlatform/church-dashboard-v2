@@ -2,12 +2,12 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_ANNOUNCEMENTS")'
-    :rows='announcements'
+    :title='$t("MSG_ACTIVITYS")'
+    :rows='activities'
     row-key='ID'
     :loading='loading'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as Announcement)'
+    @row-click='(evt, row, index) => onRowClick(row as Activity)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -28,11 +28,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_COUNTRY') }}</span>
+        <span>{{ $t('MSG_CREATE_ACTIVITY') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
-        <q-input v-model='target.Content' :label='$t("MSG_CONTENT")' />
+        <q-input v-model='target.Name' :label='$t("MSG_ACTIVITY_NAME")' />
+        <q-input type='date' v-model='start' :label='$t("MSG_START")' />
+        <q-input type='date' v-model='end' :label='$t("MSG_END")' />
+        <q-toggle v-model='target.SystemActivity' :label='$t("MSG_SYSTEM_ACTIVITY")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -43,7 +45,7 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchMailboxStore, NotificationType, Announcement, useAdminMailboxStore } from 'npool-cli-v2'
+import { NotificationType, Activity, useChurchActivityStore, useAdminActivityStore, useLoginedUserStore, formatTime } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
@@ -54,19 +56,21 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const mailbox = useChurchMailboxStore()
-const amailbox = useAdminMailboxStore()
-const announcements = computed(() => mailbox.Announcements.get(appID.value) ? mailbox.Announcements.get(appID.value) : [])
+const activity = useChurchActivityStore()
+const aactivity = useAdminActivityStore()
+const activities = computed(() => activity.Activities.get(appID.value) ? activity.Activities.get(appID.value) : [])
 const loading = ref(true)
+
+const logined = useLoginedUserStore()
 
 const prepare = () => {
   loading.value = true
-  mailbox.getAnnouncements({
+  activity.getActivities({
     TargetAppID: appID.value,
     Message: {
       Error: {
-        Title: t('MSG_GET_ANNOUNCEMENTS'),
-        Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
+        Title: t('MSG_GET_ACTIVITIES'),
+        Message: t('MSG_GET_ACTIVITIES_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
@@ -86,34 +90,48 @@ onMounted(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as unknown as Announcement)
+const target = ref({
+  CreatedBy: logined.LoginedUser?.User.ID
+} as unknown as Activity)
+const start = computed({
+  get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
+  set: (val) => {
+    target.value.Start = new Date(val).getTime() / 1000
+  }
+})
+const end = computed({
+  get: () => formatTime(target.value.End, true)?.replace(/\//g, '-'),
+  set: (val) => {
+    target.value.End = new Date(val).getTime() / 1000
+  }
+})
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (announcement: Announcement) => {
+const onRowClick = (activity: Activity) => {
   showing.value = true
   updating.value = true
-  target.value = announcement
+  target.value = activity
 }
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as unknown as Announcement
+  target.value = {} as unknown as Activity
 }
 
 const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    amailbox.updateAnnouncement({
+    aactivity.updateActivity({
       Info: target.value,
       Message: {
         Error: {
-          Title: 'MSG_UPDATE_ANNOUNCEMENT',
-          Message: 'MSG_UPDATE_ANNOUNCEMENT_FAIL',
+          Title: 'MSG_UPDATE_ACTIVITY',
+          Message: 'MSG_UPDATE_ACTIVITY_FAIL',
           Popup: true,
           Type: NotificationType.Error
         }
@@ -124,13 +142,13 @@ const onSubmit = () => {
     return
   }
 
-  mailbox.createAnnouncement({
+  activity.createActivity({
     TargetAppID: appID.value,
     Info: target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_ANNOUNCEMENT',
-        Message: 'MSG_CREATE_ANNOUNCEMENT_FAIL',
+        Title: 'MSG_CREATE_ACTIVITY',
+        Message: 'MSG_CREATE_ACTIVITY_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
