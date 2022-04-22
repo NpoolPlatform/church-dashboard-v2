@@ -108,6 +108,8 @@ const onSubmit = () => {
       Logo: target.value.Logo,
       ReservedAmount: target.value.ReservedAmount,
       ForPay: target.value.ForPay,
+      HomePage: target.value.HomePage,
+      Specs: target.value.Specs,
       Message: {
         Error: {
           Title: 'MSG_UPDATE_COIN',
