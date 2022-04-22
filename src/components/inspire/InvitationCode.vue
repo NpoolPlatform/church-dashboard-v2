@@ -40,36 +40,50 @@
 </template>
 
 <script setup lang='ts'>
-import { useAdminInspireStore, NotificationType, UserInvitationCode, useUsersStore, AppUser } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { NotificationType, AppUser, useChurchInvitationStore, InvitationCode, useChurchUsersStore, UserInfo } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const inspire = useAdminInspireStore()
-const codes = computed(() => inspire.InvitationCodes)
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const invitation = useChurchInvitationStore()
+const codes = computed(() => {
+  return invitation.InvitationCodes.get(appID.value) ? invitation.InvitationCodes.get(appID.value) as Array<InvitationCode> : []
+})
 const codeLoading = ref(true)
 
-interface Code extends UserInvitationCode {
+interface Code extends InvitationCode {
   EmailAddress: string
   PhoneNO: string
 }
 
-const user = useUsersStore()
-const ecodes = computed(() => Array.from(codes.value).map((code: UserInvitationCode) => {
+const user = useChurchUsersStore()
+const ecodes = computed(() => Array.from(codes.value).map((code: InvitationCode) => {
   const myCode = code as unknown as Code
-  myCode.EmailAddress = user.getUserByID(code.UserID)?.User.EmailAddress as string
-  myCode.PhoneNO = user.getUserByID(code.UserID)?.User.PhoneNO as string
+  myCode.EmailAddress = user.getUserByAppUserID(appID.value, code.UserID as string)?.User.EmailAddress as string
+  myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID as string)?.User.PhoneNO as string
   return myCode
 }))
-const users = computed(() => Array.from(user.Users.filter((el) => codes.value.findIndex((code) => el.User.ID === code.UserID) < 0).map((el) => el.User)))
+const appUsers = computed(() => {
+  return user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : []
+})
+const users = computed(() => {
+  return Array.from(appUsers.value.filter((el) => codes.value.findIndex((code) => el.User.ID === code.UserID) < 0).map((el) => el.User))
+})
 const selectedUser = ref([] as Array<AppUser>)
 const username = ref('')
-const displayUsers = computed(() => users.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
+const displayUsers = computed(() => {
+  return users.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value))
+})
 
-onMounted(() => {
-  inspire.getInvitationCodes({
+const prepare = () => {
+  invitation.getInvitationCodes({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_INVITATION_CODES'),
@@ -83,6 +97,7 @@ onMounted(() => {
   })
 
   user.getUsers({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_USERS'),
@@ -94,13 +109,22 @@ onMounted(() => {
   }, () => {
     // TODO
   })
+}
+
+onMounted(() => {
+  prepare()
+})
+
+watch(appID, () => {
+  prepare()
 })
 
 const onCreateInvitationCodeClick = () => {
   if (selectedUser.value.length === 0) {
     return
   }
-  inspire.createInvitationCode({
+  invitation.createInvitationCode({
+    TargetAppID: appID.value,
     TargetUserID: selectedUser.value[0].ID as string,
     Info: {
       UserID: selectedUser.value[0].ID as string
