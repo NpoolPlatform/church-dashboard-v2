@@ -18,7 +18,7 @@
 <script setup lang='ts'>
 import { useChurchCommissionStore, CommissionTypes, CommissionSetting, NotificationType } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -36,7 +36,7 @@ const setting = computed({
   }
 })
 
-onMounted(() => {
+const prepare = () => {
   commission.getCommissionSetting({
     TargetAppID: appID.value,
     Message: {
@@ -50,6 +50,14 @@ onMounted(() => {
   }, () => {
     // TODO
   })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
 })
 
 const onSubmit = () => {
