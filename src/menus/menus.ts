@@ -494,7 +494,7 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '激励体系 *',
+    label: '激励体系',
     caption: '管理邀请码、代金券',
     icon: 'format_list_numbered',
     target: '/inspire/invitation/code',
@@ -511,10 +511,55 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: '佣金设置',
-      caption: '管理邀请和购买佣金',
+      label: 'APP佣金设置',
+      caption: '管理APP内佣金设置',
       icon: 'format_list_numbered',
       target: '/inspire/commission',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '购买额阶梯',
+      caption: '管理用户购买额阶梯指标',
+      icon: 'format_list_numbered',
+      target: '/inspire/purchase/amount',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '活动',
+      caption: '管理APP活动',
+      icon: 'format_list_numbered',
+      target: '/inspire/activity',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '定额券',
+      caption: '管理定额代金券',
+      icon: 'format_list_numbered',
+      target: '/inspire/fixamount',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '折扣券',
+      caption: '管理折扣代金券',
+      icon: 'format_list_numbered',
+      target: '/inspire/discount',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '用户定向券',
+      caption: '管理定向用户代金券',
+      icon: 'format_list_numbered',
+      target: '/inspire/special/offer',
       level: 1,
       sectionBegin: false,
       children: []
