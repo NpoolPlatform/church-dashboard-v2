@@ -95,13 +95,17 @@ const showing = ref(false)
 const updating = ref(false)
 
 const target = ref({} as unknown as EmailTemplate)
-const replyTos = ref(target.value?.ReplyTos?.join(','))
-watch(replyTos, () => {
-  target.value.ReplyTos = replyTos.value.split(',')
+const replyTos = computed({
+  get: () => target.value?.ReplyTos?.join(','),
+  set: (val) => {
+    target.value.ReplyTos = val.split(',')
+  }
 })
-const ccTos = ref(target.value?.CCTos?.join(','))
-watch(replyTos, () => {
-  target.value.CCTos = ccTos.value.split(',')
+const ccTos = computed({
+  get: () => target.value?.CCTos?.join(','),
+  set: (val) => {
+    target.value.CCTos = val.split(',')
+  }
 })
 
 const language = ref(undefined as unknown as Language)

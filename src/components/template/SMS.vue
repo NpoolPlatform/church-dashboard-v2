@@ -63,6 +63,7 @@ const smss = computed(() => templates.SMSTemplates.get(appID.value) ? templates.
 const smsLoading = ref(true)
 
 const prepare = () => {
+  smsLoading.value = true
   templates.getSMSTemplates({
     TargetAppID: appID.value,
     Message: {
