@@ -40,6 +40,49 @@
           @click='onCreate'
           :disable='!language'
         />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_EXPORT")'
+          @click='onExport'
+          :disable='!language'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_LOADED_MESSAGES")'
+    :rows='loadedMessages'
+    row-key='MessageID'
+    :rows-per-page-options='[20]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_LOAD_FILE")'
+          @click='onLoadFile'
+        />
+        <input
+          ref='loadFileButton'
+          type='file'
+          style='display: none;'
+          @change='onFileLoaded'
+          accept='.json'
+        >
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_SUBMIT")'
+          @click='onBatchSubmit'
+        />
+        <div>{{ loadedFile }}</div>
       </div>
     </template>
   </q-table>
@@ -74,20 +117,26 @@
 
 <script setup lang='ts'>
 import {
+  formatTime,
   Language,
   Message,
   NotificationType,
   useAdminLangStore,
-  useChurchLangStore
+  useApplicationsStore,
+  useChurchLangStore,
+  useLocaleStore
 } from 'npool-cli-v2'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useLocalApplicationStore } from 'src/localstore'
+import { saveAs } from 'file-saver'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
+const application = useApplicationsStore()
 const clang = useChurchLangStore()
 const alang = useAdminLangStore()
+const locale = useLocaleStore()
 
 const langLoading = ref(true)
 const messageLoading = ref(false)
@@ -214,6 +263,74 @@ const onSubmit = () => {
 const onCancel = () => {
   showing.value = false
   onMenuHide()
+}
+
+interface SavedMessages {
+  Languages: Array<Language>
+  Language: Language
+  Messages: Array<Message>
+}
+
+const onExport = () => {
+  if (!language.value) {
+    return
+  }
+
+  const blob = new Blob([JSON.stringify({
+    Languages: locale.Languages,
+    Language: language.value,
+    Messages: messages.value
+  })], { type: 'text/plain;charset=utf-8' })
+  const filename = application.getApplicationByID(appID.value)?.App.Name + '-' +
+                   language.value.Name + '-' +
+                   formatTime(new Date().getTime() / 1000) +
+                   '.json'
+  saveAs(blob, filename)
+}
+
+const loadedFile = ref(undefined as unknown as string)
+const loadFileButton = ref<HTMLInputElement>()
+
+const loadedLanguage = ref(undefined as unknown as Language)
+const loadedMessages = ref([] as Array<Message>)
+
+const onLoadFile = () => {
+  loadFileButton.value?.click()
+}
+
+const onFileLoaded = (evt: Event) => {
+  const target = evt.target as unknown as HTMLInputElement
+  if (target.files) {
+    const filename = target.files[0]
+    const reader = new FileReader()
+    reader.onload = () => {
+      const loaded = JSON.parse(reader.result as string) as SavedMessages
+      const index = locale.Languages.findIndex((el) => el.ID === loaded.Language.ID)
+      locale.Languages.splice(index, index < 0 ? 0 : 1, loaded.Language)
+      selectedLang.value = [loaded.Language]
+      loadedLanguage.value = loaded.Language
+      loadedMessages.value = loaded.Messages
+    }
+    reader.readAsText(filename)
+  }
+}
+
+const onBatchSubmit = () => {
+  clang.createMessages({
+    TargetAppID: appID.value,
+    TargetLangID: loadedLanguage.value.ID,
+    Infos: loadedMessages.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_MESSAGES',
+        Message: 'MSG_CREATE_MESSAGES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 }
 
 </script>
