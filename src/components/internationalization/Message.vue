@@ -210,6 +210,7 @@ onMounted(() => {
 
 const onCreate = () => {
   target.value = {} as unknown as Message
+  target.value.LangID = language.value?.ID
   showing.value = true
   updating.value = false
 }
