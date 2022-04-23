@@ -593,7 +593,7 @@ const MainDrawerMenus = [
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
-    label: '报表和账单 *',
+    label: '报表和账单',
     caption: '收入、支出统计',
     icon: 'format_list_numbered',
     target: '/billing',
@@ -602,18 +602,18 @@ const MainDrawerMenus = [
     children: [{
       menuId: uid(),
       label: '商品收益',
-      caption: '管理用户邀请码',
+      caption: '查看商品收益统计',
       icon: 'format_list_numbered',
-      target: '/billing/incoming',
+      target: '/billing/benefit',
       level: 1,
       sectionBegin: false,
       children: []
     } as MenuItem, {
       menuId: uid(),
       label: '销售收入',
-      caption: '用户购买支付收入',
+      caption: '查看用户购买支付收入',
       icon: 'format_list_numbered',
-      target: '/billing/payment',
+      target: '/billing/incoming',
       level: 1,
       sectionBegin: false,
       children: []

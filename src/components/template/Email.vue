@@ -67,6 +67,7 @@ const emails = computed(() => templates.EmailTemplates.get(app.AppID) ? template
 const emailLoading = ref(true)
 
 const prepare = () => {
+  emailLoading.value = true
   templates.getEmailTemplates({
     TargetAppID: appID.value,
     Message: {
