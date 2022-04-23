@@ -39,8 +39,8 @@
         <q-input v-model='target.DefaultToUsername' :label='$t("MSG_DEFAULT_TO_USERNAME")' />
         <q-select :options='MessageUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
         <q-input v-model='target.Sender' :label='$t("MSG_SENDER")' />
-        <q-input v-model='replyTos' :label='$t("MSG_REPLY_TOS_COMMA")' />
-        <q-input v-model='ccTos' :label='$t("MSG_CC_TOS_COMMA")' />
+        <!-- q-input v-model='replyTos' :label='$t("MSG_REPLY_TOS_COMMA")' / -->
+        <!-- q-input v-model='ccTos' :label='$t("MSG_CC_TOS_COMMA")' / -->
         <q-input v-model='target.Subject' :label='$t("MSG_SUBJECT")' />
         <q-input v-model='target.Body' :label='$t("MSG_BODY")' type='textarea' />
       </q-card-section>
