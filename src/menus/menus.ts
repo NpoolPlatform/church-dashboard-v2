@@ -635,6 +635,24 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '用户分成',
+      caption: '用户每日分成记录',
+      icon: 'format_list_numbered',
+      target: '/billing/user/benefit',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '转账',
+      caption: '平台内转账记录',
+      icon: 'format_list_numbered',
+      target: '/billing/transaction',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem
 ] as Array<MenuItem>

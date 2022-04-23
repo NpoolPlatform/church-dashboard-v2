@@ -2,8 +2,8 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_GOOD_WITHDRAWS")'
-    :rows='withdraws'
+    :title='$t("MSG_GOOD_TRANSACTIONS")'
+    :rows='transactions'
     row-key='ID'
     :rows-per-page-options='[10]'
   />
@@ -18,15 +18,15 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const billing = useChurchBillingStore()
-const withdraws = computed(() => billing.Withdraws.get(appID.value) ? billing.Withdraws.get(appID.value) : [])
+const transactions = computed(() => billing.Transactions.get(appID.value) ? billing.Transactions.get(appID.value) : [])
 
 const prepare = () => {
-  billing.getWithdraws({
+  billing.getTransactions({
     TargetAppID: appID.value,
     Message: {
       Error: {
-        Title: 'MSG_GET_WITHDRAWS',
-        Message: 'MSG_GET_WITHDRAWS_FAIL',
+        Title: 'MSG_GET_TRANSACTIONS',
+        Message: 'MSG_GET_TRANSACTIONS_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
