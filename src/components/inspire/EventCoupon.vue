@@ -32,8 +32,8 @@
       </q-card-section>
       <q-card-section>
         <q-select :options='activities' v-model='selectedActivity' :label='$t("MSG_ACTIVITY")' />
-        <q-select :options='EventCouponTypes' v-model='target.Type' :label='$t("MSG_COUPON_TYPE")' />
         <q-select :options='CouponEvents' v-model='target.Event' :label='$t("MSG_COUPON_EVENT")' />
+        <q-select :options='EventCouponTypes' v-model='target.Type' :label='$t("MSG_COUPON_TYPE")' />
         <q-select
           v-if='target.Type === CouponType.FixAmount'
           :options='fixAmounts'
