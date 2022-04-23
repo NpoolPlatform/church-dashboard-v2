@@ -63,7 +63,7 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const templates = useChurchTemplateStore()
-const emails = computed(() => templates.EmailTemplates.get(app.AppID) ? templates.EmailTemplates.get(app.AppID) : [])
+const emails = computed(() => templates.EmailTemplates.get(appID.value) ? templates.EmailTemplates.get(appID.value) : [])
 const emailLoading = ref(true)
 
 const prepare = () => {
@@ -95,6 +95,7 @@ const showing = ref(false)
 const updating = ref(false)
 
 const target = ref({} as unknown as EmailTemplate)
+/*
 const replyTos = computed({
   get: () => target.value?.ReplyTos?.join(','),
   set: (val) => {
@@ -107,6 +108,7 @@ const ccTos = computed({
     target.value.CCTos = val.split(',')
   }
 })
+*/
 
 const language = ref(undefined as unknown as Language)
 watch(language, () => {
