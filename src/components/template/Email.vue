@@ -112,7 +112,7 @@ const ccTos = computed({
 
 const language = ref(undefined as unknown as Language)
 watch(language, () => {
-  target.value.LangID = language.value.ID
+  target.value.LangID = language.value?.ID
 })
 
 const onMenuHide = () => {
