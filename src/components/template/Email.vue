@@ -39,8 +39,8 @@
         <q-input v-model='target.DefaultToUsername' :label='$t("MSG_DEFAULT_TO_USERNAME")' />
         <q-select :options='MessageUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
         <q-input v-model='target.Sender' :label='$t("MSG_SENDER")' />
-        <!-- q-input v-model='replyTos' :label='$t("MSG_REPLY_TOS_COMMA")' / -->
-        <!-- q-input v-model='ccTos' :label='$t("MSG_CC_TOS_COMMA")' / -->
+        <q-input v-model='replyTos' :label='$t("MSG_REPLY_TOS_COMMA")' />
+        <q-input v-model='ccTos' :label='$t("MSG_CC_TOS_COMMA")' />
         <q-input v-model='target.Subject' :label='$t("MSG_SUBJECT")' />
         <q-input v-model='target.Body' :label='$t("MSG_BODY")' type='textarea' />
       </q-card-section>
@@ -68,7 +68,7 @@ const emailLoading = ref(true)
 
 const prepare = () => {
   emailLoading.value = true
-/*
+  console.log('start get email template')
   templates.getEmailTemplates({
     TargetAppID: appID.value,
     Message: {
@@ -81,8 +81,8 @@ const prepare = () => {
     }
   }, () => {
     emailLoading.value = false
+    console.log('done get email template')
   })
-*/
 }
 
 watch(appID, () => {
@@ -97,7 +97,6 @@ const showing = ref(false)
 const updating = ref(false)
 
 const target = ref({} as unknown as EmailTemplate)
-/*
 const replyTos = computed({
   get: () => target.value?.ReplyTos?.join(','),
   set: (val) => {
@@ -110,7 +109,6 @@ const ccTos = computed({
     target.value.CCTos = val.split(',')
   }
 })
-*/
 
 const language = ref(undefined as unknown as Language)
 watch(language, () => {
