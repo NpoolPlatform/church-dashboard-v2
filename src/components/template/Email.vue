@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='emailLoading'
     :rows-per-page-options='[20]'
-    @row-click='(evt, row, index) => onRowClick(row as EmailTemplate)'
+    @row-click='(evt, row, index) => onRowClick(row as MyEmailTemplate)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -62,13 +62,39 @@ const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/Lang
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
+interface MyEmailTemplate {
+  ID: string
+  LangID: string
+  DefaultToUsername: string
+  UsedFor: string
+  Sender: string
+  ReplyTos: string
+  CCTos: string
+  Subject: string
+  Body: string
+}
+
 const templates = useChurchTemplateStore()
-const emails = computed(() => templates.EmailTemplates.get(appID.value) ? templates.EmailTemplates.get(appID.value) : [])
+const appEmails = computed(() => {
+  return templates.EmailTemplates.get(appID.value) ? templates.EmailTemplates.get(appID.value) as Array<EmailTemplate> : []
+})
+const emails = computed(() => Array.from(appEmails.value).map((el) => {
+  return {
+    ID: el.ID,
+    LangID: el.LangID,
+    DefaultToUsername: el.DefaultToUsername,
+    UsedFor: el.UsedFor,
+    Sender: el.Sender,
+    ReplyTos: el.ReplyTos.join(','),
+    CCTos: el.CCTos.join(','),
+    Subject: el.Subject,
+    Body: el.Body
+  } as MyEmailTemplate
+}))
 const emailLoading = ref(true)
 
 const prepare = () => {
   emailLoading.value = true
-  console.log('start get email template')
   templates.getEmailTemplates({
     TargetAppID: appID.value,
     Message: {
@@ -81,7 +107,6 @@ const prepare = () => {
     }
   }, () => {
     emailLoading.value = false
-    console.log('done get email template')
   })
 }
 
@@ -97,6 +122,21 @@ const showing = ref(false)
 const updating = ref(false)
 
 const target = ref({} as unknown as EmailTemplate)
+const myTarget = ref({} as unknown as MyEmailTemplate)
+watch(myTarget, () => {
+  target.value = {
+    ID: myTarget.value.ID,
+    LangID: myTarget.value.LangID,
+    DefaultToUsername: myTarget.value.DefaultToUsername,
+    UsedFor: myTarget.value.UsedFor,
+    Sender: myTarget.value.Sender,
+    ReplyTos: myTarget.value.ReplyTos.split(','),
+    CCTos: myTarget.value.CCTos.split(','),
+    Subject: myTarget.value.Subject,
+    Body: myTarget.value.Body
+  } as EmailTemplate
+})
+
 const replyTos = computed({
   get: () => target.value?.ReplyTos?.join(','),
   set: (val) => {
@@ -120,8 +160,8 @@ const onMenuHide = () => {
   target.value = {} as unknown as EmailTemplate
 }
 
-const onRowClick = (template: EmailTemplate) => {
-  target.value = template
+const onRowClick = (template: MyEmailTemplate) => {
+  myTarget.value = template
   showing.value = true
   updating.value = true
 }
