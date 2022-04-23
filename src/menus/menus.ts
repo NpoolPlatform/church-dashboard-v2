@@ -568,7 +568,7 @@ const MainDrawerMenus = [
       label: '事件',
       caption: '管理自动触发发券事件',
       icon: 'format_list_numbered',
-      target: '/inspire/event',
+      target: '/inspire/event/coupon',
       level: 1,
       sectionBegin: false,
       children: []
