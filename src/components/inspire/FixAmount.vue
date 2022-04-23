@@ -36,7 +36,7 @@
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
         <q-input type='number' v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' :suffix='$t("MSG_DAYS")' />
         <q-input type='number' v-model='target.Circulation' :label='$t("MSG_COUPON_CIRCULATION")' :suffix='PriceCoinName' />
-        <q-input type='number' v-model='target.Denomination' :label='$t("MSG_COUPON_CIRCULATION")' :suffix='PriceCoinName' />
+        <q-input type='number' v-model='target.Denomination' :label='$t("MSG_COUPON_DENOMINATION")' :suffix='PriceCoinName' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />

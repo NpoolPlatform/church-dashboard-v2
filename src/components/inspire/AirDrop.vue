@@ -66,7 +66,8 @@ import {
   DiscountCoupon,
   useChurchUsersStore,
   UserInfo,
-  AppUser
+  AppUser,
+  useChurchUserCouponStore
 } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
@@ -77,6 +78,8 @@ const { t } = useI18n({ useScope: 'global' })
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
+
+const coupon = useChurchUserCouponStore()
 
 const user = useChurchUsersStore()
 const users = computed(() => {
@@ -104,7 +107,7 @@ const fixAmounts = computed(() => Array.from(appFixAmounts.value).map((el) => {
     value: el
   } as MyFixAmount
 }))
-const selectedFixAmount = ref(undefined as unknown as FixAmountCoupon)
+const selectedFixAmount = ref(undefined as unknown as MyFixAmount)
 
 interface MyDiscount {
   label: string
@@ -121,11 +124,18 @@ const discounts = computed(() => Array.from(appDiscounts.value).map((el) => {
     value: el
   } as MyDiscount
 }))
-const selectedDiscount = ref(undefined as unknown as DiscountCoupon)
+const selectedDiscount = ref(undefined as unknown as MyDiscount)
 
 const loading = ref(true)
 const couponType = ref(undefined as unknown as CouponType)
 const airdropCount = ref(1)
+const couponID = ref(undefined as unknown as string)
+watch(selectedDiscount, () => {
+  couponID.value = selectedDiscount.value.value.ID as string
+})
+watch(selectedFixAmount, () => {
+  couponID.value = selectedFixAmount.value.value.ID as string
+})
 
 const prepare = () => {
   loading.value = true
@@ -191,6 +201,26 @@ const onMenuHide = () => {
 
 const onSubmit = () => {
   showing.value = false
+  selectedUsers.value.forEach((user) => {
+    coupon.createUserCoupon({
+      TargetAppID: appID.value,
+      TargetUserID: user.ID as string,
+      Info: {
+        Type: couponType.value,
+        CouponID: couponID.value
+      },
+      Message: {
+        Error: {
+          Title: t('MSG_CREATE_USER_COUPONS'),
+          Message: t('MSG_CREATE_USER_COUPONS_FAIL'),
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+  })
 }
 
 const onCancel = () => {
