@@ -195,13 +195,14 @@ watch(appID, () => {
   prepare()
 })
 
-watch(language, () => {
-  getMessages()
-})
-
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as unknown as Message)
+
+watch(language, () => {
+  getMessages()
+  target.value.LangID = language.value?.ID
+})
 
 onMounted(() => {
   prepare()
