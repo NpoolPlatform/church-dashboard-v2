@@ -68,6 +68,7 @@ const emailLoading = ref(true)
 
 const prepare = () => {
   emailLoading.value = true
+/*
   templates.getEmailTemplates({
     TargetAppID: appID.value,
     Message: {
@@ -81,6 +82,7 @@ const prepare = () => {
   }, () => {
     emailLoading.value = false
   })
+*/
 }
 
 watch(appID, () => {
