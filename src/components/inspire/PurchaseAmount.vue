@@ -24,7 +24,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_CREATE")'
-          @click='onCreatePurchaseAmountSettingClick'
+          @click='onCreate'
           :disable='selectedUser.length === 0'
         />
       </div>
@@ -209,7 +209,7 @@ const end = computed({
   }
 })
 
-const onCreatePurchaseAmountSettingClick = () => {
+const onCreate = () => {
   showing.value = true
 }
 

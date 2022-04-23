@@ -2,8 +2,38 @@
   <q-table
     dense
     flat
+    :title='$t("MSG_USERS")'
+    :rows='displayUsers'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+    selection='single'
+    v-model:selected='selectedUser'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_USERNAME")'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_CREATE")'
+          @click='onCreate'
+          :disable='selectedUser.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
     :title='$t("MSG_SPECIAL_OFFERS")'
-    :rows='coupons'
+    :rows='displayCoupons'
     row-key='ID'
     :loading='loading'
     :rows-per-page-options='[10]'
@@ -11,6 +41,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_USERNAME")'
+        />
         <q-btn
           dense
           flat
@@ -29,6 +66,11 @@
     <q-card class='popup-menu'>
       <q-card-section>
         <span>{{ $t('MSG_CREATE_SPECIAL_OFFER') }}</span>
+      </q-card-section>
+      <q-card-section>
+        <span>
+          {{ $t('MSG_USERNAME') }}: {{ selectedUser[0]?.EmailAddress?.length ? selectedUser[0]?.EmailAddress : selectedUser[0]?.PhoneNO }}
+        </span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
@@ -52,7 +94,10 @@ import {
   UserSpecialOffer,
   useChurchSpecialOfferStore,
   useSpecialOfferStore,
-  PriceCoinName
+  PriceCoinName,
+  useChurchUsersStore,
+  UserInfo,
+  AppUser
 } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
@@ -64,9 +109,35 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
+const user = useChurchUsersStore()
+const users = computed(() => {
+  const appUsers = user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : []
+  return Array.from(appUsers).map((el) => el.User)
+})
+const username = ref('')
+const displayUsers = computed(() => users.value.filter((el) => {
+  return el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)
+}))
+const selectedUser = ref([] as Array<AppUser>)
+const userID = computed(() => selectedUser.value.length ? selectedUser.value[0].ID : undefined as unknown as string)
+
+interface MyCoupon extends UserSpecialOffer {
+  EmailAddress: string
+  PhoneNO: string
+}
+
 const coupon = useChurchSpecialOfferStore()
 const acoupon = useSpecialOfferStore()
-const coupons = computed(() => coupon.SpecialOffers.get(appID.value) ? coupon.SpecialOffers.get(appID.value) : [])
+const appCoupons = computed(() => coupon.SpecialOffers.get(appID.value) ? coupon.SpecialOffers.get(appID.value) : [])
+const coupons = computed(() => Array.from(appCoupons.value as Array<UserSpecialOffer>).map((el) => {
+  const c = el as MyCoupon
+  c.EmailAddress = user.getUserByAppUserID(appID.value, c.UserID as string)?.User.EmailAddress as string
+  c.PhoneNO = user.getUserByAppUserID(appID.value, c.UserID as string)?.User.PhoneNO as string
+  return c
+}))
+const displayCoupons = computed(() => coupons.value.filter((el) => {
+  return el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)
+}))
 const loading = ref(true)
 
 const logined = useLoginedUserStore()
@@ -85,6 +156,20 @@ const prepare = () => {
     }
   }, () => {
     loading.value = false
+  })
+
+  user.getUsers({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: t('MSG_GET_USERS'),
+        Message: t('MSG_GET_USERS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
   })
 }
 
@@ -106,6 +191,9 @@ const start = computed({
   set: (val) => {
     target.value.Start = new Date(val).getTime() / 1000
   }
+})
+watch(userID, () => {
+  target.value.UserID = userID.value
 })
 
 const onCreate = () => {
@@ -148,6 +236,7 @@ const onSubmit = () => {
 
   coupon.createSpecialOffer({
     TargetAppID: appID.value,
+    TargetUserID: userID.value as string,
     Info: target.value,
     Message: {
       Error: {
