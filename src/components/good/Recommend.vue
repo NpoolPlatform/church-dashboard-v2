@@ -61,16 +61,21 @@
 </template>
 
 <script setup lang='ts'>
-import { buildGoods, NotificationType, useAdminGoodStore, useGoodStore, Recommend, GoodBase } from 'npool-cli-v2'
+import { buildGoods, NotificationType, useAdminGoodStore, useGoodStore, Recommend, GoodBase, useChurchGoodStore } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const good = useGoodStore()
 const adminGood = useAdminGoodStore()
-const goods = computed(() => buildGoods(good.Goods))
+const cgood = useChurchGoodStore()
+const goods = computed(() => buildGoods(adminGood.Goods))
 const goodLoading = ref(true)
 
 const recommends = computed(() => good.Recommends)
@@ -84,8 +89,28 @@ watch(selectedGoodID, () => {
   target.value.GoodID = selectedGoodID.value as string
 })
 
+const prepare = () => {
+  cgood.getRecommends({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: t('MSG_GET_GOOD_RECOMMENDS'),
+        Message: t('MSG_GET_GOOD_RECOMMENDS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    promotionLoading.value = false
+  })
+}
+
+watch(appID, () => {
+  prepare()
+})
+
 onMounted(() => {
-  good.getGoods({
+  adminGood.getAllGoods({
     Message: {
       Error: {
         Title: t('MSG_GET_GOODS'),
@@ -98,18 +123,7 @@ onMounted(() => {
     goodLoading.value = false
   })
 
-  adminGood.getRecommends({
-    Message: {
-      Error: {
-        Title: t('MSG_GET_GOOD_RECOMMENDS'),
-        Message: t('MSG_GET_GOOD_RECOMMENDS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    promotionLoading.value = false
-  })
+  prepare()
 })
 
 const showing = ref(false)
@@ -151,7 +165,8 @@ const onSubmit = () => {
     return
   }
 
-  adminGood.createRecommend({
+  cgood.createRecommend({
+    TargetAppID: appID.value,
     Info: target.value,
     Message: {
       Error: {
