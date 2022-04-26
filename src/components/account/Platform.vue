@@ -326,7 +326,7 @@ const onSubmit = () => {
   accs.set(target.value.GoodIncomingAccountID as string, 1)
   accs.set(target.value.PlatformOfflineAccountID as string, 1)
   accs.set(target.value.UserOfflineAccountID as string, 1)
-  accs.set(target.value.UserOfflineAccountID as string, 1)
+  accs.set(target.value.UserOnlineAccountID as string, 1)
   if (accs.size < 4) {
     return
   }
