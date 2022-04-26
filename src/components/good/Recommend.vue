@@ -61,7 +61,16 @@
 </template>
 
 <script setup lang='ts'>
-import { buildGoods, NotificationType, useAdminGoodStore, useGoodStore, Recommend, GoodBase, useChurchGoodStore } from 'npool-cli-v2'
+import {
+  buildGoods,
+  NotificationType,
+  useAdminGoodStore,
+  useGoodStore,
+  Recommend,
+  GoodBase,
+  useChurchGoodStore,
+  useLoginedUserStore
+} from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -78,11 +87,15 @@ const cgood = useChurchGoodStore()
 const goods = computed(() => buildGoods(adminGood.Goods))
 const goodLoading = ref(true)
 
-const recommends = computed(() => good.Recommends)
+const recommends = computed(() => cgood.Recommends.get(appID.value) ? cgood.Recommends.get(appID.value) : [])
 const promotionLoading = ref(true)
 const selectedGood = ref([] as Array<GoodBase>)
 
-const target = ref({} as unknown as Recommend)
+const logined = useLoginedUserStore()
+
+const target = ref({
+  RecommenderID: logined.LoginedUser?.User.ID
+} as unknown as Recommend)
 
 const selectedGoodID = computed(() => selectedGood.value[0]?.ID)
 watch(selectedGoodID, () => {
@@ -186,7 +199,10 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as unknown as Recommend
+  target.value = {
+    RecommenderID: logined.LoginedUser?.User.ID
+  } as unknown as Recommend
+  target.value.GoodID = selectedGoodID.value as string
 }
 
 </script>
