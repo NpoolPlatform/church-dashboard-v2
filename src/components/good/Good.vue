@@ -31,7 +31,6 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
-        <q-input v-model='target.Total' :label='$t("MSG_TOTAL")' />
         <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
         <q-input v-model='target.UnitPower' :label='$t("MSG_UNIT_POWER")' type='number' min='1' />
         <q-input v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />

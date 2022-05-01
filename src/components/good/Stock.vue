@@ -54,7 +54,8 @@ import {
   NotificationType,
   Stock,
   useAdminGoodStore,
-  useStockState
+  useChurchStockStore,
+  useStockStore
 } from 'npool-cli-v2'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -63,7 +64,8 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const adminGood = useAdminGoodStore()
-const stock = useStockState()
+const stock = useStockStore()
+const cstock = useChurchStockStore()
 
 interface MyStock extends Stock {
   GoodName: string
@@ -154,7 +156,7 @@ const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    stock.updateStock({
+    cstock.updateStock({
       Info: target.value,
       Message: {
         Error: {
@@ -170,7 +172,7 @@ const onSubmit = () => {
     return
   }
 
-  stock.createStock({
+  cstock.createStock({
     Info: target.value,
     Message: {
       Error: {
