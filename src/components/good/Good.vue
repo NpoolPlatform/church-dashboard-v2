@@ -425,8 +425,8 @@ const onSubmit = () => {
       Info: target.value,
       Message: {
         Error: {
-          Title: t('MSG_UPDATE_DEVICES'),
-          Message: t('MSG_UPDATE_DEVICES_FAIL'),
+          Title: t('MSG_UPDATE_GOOD'),
+          Message: t('MSG_UPDATE_GOOD_FAIL'),
           Popup: true,
           Type: NotificationType.Error
         }
