@@ -20,6 +20,27 @@
       </div>
     </template>
   </q-table>
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <span>{{ $t('MSG_CREATE_RECOMMEND') }}</span>
+      </q-card-section>
+      <q-card-section>
+        <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
+      </q-card-section>
+      <q-card-section>
+        <q-input type='number' v-model='target.Total' :label='$t("MSG_TOTAL")' :suffix='goodUnit' />
+      </q-card-section>
+      <q-item class='row'>
+        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
   <q-card>
     <q-card-section class='bg-primary text-white'>
       {{ $t('MSG_ADVERTISEMENT_POSITION') }}
@@ -29,12 +50,13 @@
 
 <script setup lang='ts'>
 import {
+  Good,
   NotificationType,
   Stock,
   useAdminGoodStore,
   useStockState
 } from 'npool-cli-v2'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -52,6 +74,31 @@ const stocks = computed(() => Array.from(stock.Stocks).map((el) => {
   s.GoodName = adminGood.getGoodByID(el.GoodID)?.Good.Good.Title
   return s
 }))
+
+interface MyGood {
+  label: string
+  value: Good
+}
+const goods = computed(() => Array.from(adminGood.Goods).map((el) => {
+  return {
+    label: el.Good.Good.Title,
+    value: el
+  } as MyGood
+}))
+const selectedGood = computed({
+  get: () => {
+    return {
+      label: adminGood.getGoodByID(target.value.GoodID)?.Good.Good.Title,
+      value: adminGood.getGoodByID(target.value.GoodID)
+    } as MyGood
+  },
+  set: (val) => {
+    target.value.GoodID = val.value.Good.Good.ID as string
+  }
+})
+const goodUnit = computed(() => {
+  return selectedGood.value?.value?.Good.Good.UnitPower.toString() + ' ' + selectedGood.value?.value?.Good.Good.Unit
+})
 
 onMounted(() => {
   adminGood.getAllGoods({
@@ -81,12 +128,63 @@ onMounted(() => {
   })
 })
 
+const showing = ref(false)
+const updating = ref(false)
+const target = ref({} as unknown as Stock)
+
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as unknown as Stock
+}
+
 const onCreate = () => {
-  // TODO
+  showing.value = true
+  updating.value = false
 }
 
 const onRowClick = (stock: Stock) => {
-  console.log(stock)
+  showing.value = true
+  updating.value = true
+  target.value = stock
+}
+
+const onSubmit = () => {
+  showing.value = false
+
+  if (updating.value) {
+    stock.updateStock({
+      Info: target.value,
+      Message: {
+        Error: {
+          Title: t('MSG_UPDATE_STOCK'),
+          Message: t('MSG_UPDATE_STOCK_FAIL'),
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+    return
+  }
+
+  stock.createStock({
+    Info: target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_CREATE_STOCK'),
+        Message: t('MSG_CREATE_STOCK_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
+
+const onCancel = () => {
+  onMenuHide()
 }
 
 </script>
