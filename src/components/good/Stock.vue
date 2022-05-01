@@ -79,7 +79,9 @@ interface MyGood {
   label: string
   value: Good
 }
-const goods = computed(() => Array.from(adminGood.Goods).map((el) => {
+const goods = computed(() => Array.from(adminGood.Goods.filter((good) => {
+  return stock.Stocks.findIndex((el) => el.GoodID === good.Good.Good.ID) < 0
+})).map((el) => {
   return {
     label: el.Good.Good.Title,
     value: el
