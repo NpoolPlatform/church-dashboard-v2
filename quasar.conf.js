@@ -87,7 +87,7 @@ module.exports = configure(function (ctx) {
     devServer: {
       proxy: {
         '/api': {
-          target: 'https://api.xpool.top',
+          target: 'https://api.npool.top:20402',
           pathRewrite: {
             '^/api': '/api'
           },

@@ -276,6 +276,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '库存',
+      caption: '管理与展示商品库存',
+      icon: 'perm_identity',
+      target: '/stock',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: 'APP商品管理',
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',

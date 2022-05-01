@@ -421,6 +421,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'stock',
+        component: () => import('pages/good/Stock.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'notification',
         component: () => import('pages/mailbox/Notification.vue'),
         meta: {
