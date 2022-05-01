@@ -520,6 +520,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '佣金结算币种',
+      caption: '设置佣金结算币种(USDT)',
+      icon: 'format_list_numbered',
+      target: '/inspire/commission/coin',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '购买额阶梯',
       caption: '管理用户购买额阶梯指标',
       icon: 'format_list_numbered',

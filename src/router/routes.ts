@@ -253,6 +253,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'inspire/commission/coin',
+        component: () => import('pages/inspire/CommissionCoin.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'auth/app',
         component: () => import('pages/auth/App.vue'),
         meta: {
