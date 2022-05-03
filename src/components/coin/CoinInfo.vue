@@ -130,8 +130,8 @@ const onSubmit = () => {
     ForPay: target.value.ForPay,
     Message: {
       Error: {
-        Title: 'MSG_UPDATE_COIN',
-        Message: 'MSG_UPDATE_COIN_FAIL',
+        Title: 'MSG_CREATE_COIN',
+        Message: 'MSG_CREATE_COIN_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }

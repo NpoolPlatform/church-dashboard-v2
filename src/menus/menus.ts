@@ -38,6 +38,15 @@ const MainDrawerMenus = [
         level: 0,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '收益估算',
+        caption: '设置估算收益(产出预言机)',
+        icon: 'pending',
+        target: '/coin/oracle/reward',
+        level: 0,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
