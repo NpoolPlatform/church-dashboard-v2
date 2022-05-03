@@ -681,6 +681,26 @@ const MainDrawerMenus = [
       sectionBegin: false,
       children: []
     } as MenuItem]
+  } as MenuItem, {
+    menuId: uid(),
+    label: '用户订阅',
+    caption: '查看用户订阅',
+    icon: 'reviews',
+    target: '/subscribe',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '邮件订阅',
+        caption: '查看邮件订阅用户',
+        icon: 'format_list_numbered',
+        target: '/subscribe/email',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
   } as MenuItem
 ] as Array<MenuItem>
 
