@@ -100,6 +100,8 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
+  showing.value = false
+
   if (updating.value) {
     role.updateRole({
       Info: target.value,
