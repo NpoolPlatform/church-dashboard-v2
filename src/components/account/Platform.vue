@@ -92,9 +92,9 @@ const settings = computed(() => Array.from(setting.CoinSettings).map((el) => {
   const cs = el as MySetting
   cs.CoinName = coin.getCoinByID(cs.CoinTypeID)?.Name as string
   cs.GoodIncomingAddress = account.getAccountByID(cs.GoodIncomingAccountID as string)?.Address
-  cs.PlatformOfflineAddress = account.getAccountByID(cs.PlatformOfflineAccountID as string).Address
-  cs.UserOfflineAddress = account.getAccountByID(cs.UserOfflineAccountID as string).Address
-  cs.UserOnlineAddress = account.getAccountByID(cs.UserOnlineAccountID as string).Address
+  cs.PlatformOfflineAddress = account.getAccountByID(cs.PlatformOfflineAccountID as string)?.Address
+  cs.UserOfflineAddress = account.getAccountByID(cs.UserOfflineAccountID as string)?.Address
+  cs.UserOnlineAddress = account.getAccountByID(cs.UserOnlineAccountID as string)?.Address
   return cs
 }))
 
