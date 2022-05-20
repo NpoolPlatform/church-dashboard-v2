@@ -300,7 +300,7 @@ const onCreate = () => {
 const onRowClick = (acc: GoodBenefit) => {
   target.value = acc
   showing.value = true
-  updating.value = false
+  updating.value = true
   const ac = account.getAccountByID(target.value.BenefitAccountID)
   selectedCoin.value = {
     label: coin.getCoinByID(ac.CoinTypeID).Name as string,
