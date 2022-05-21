@@ -42,7 +42,7 @@
 
 <script setup lang='ts'>
 import { Account, useChurchAccountStore, useCoinStore, NotificationType, Coin } from 'npool-cli-v2'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const account = useChurchAccountStore()
 const coin = useCoinStore()
@@ -68,13 +68,25 @@ const coins = computed(() => Array.from(coin.Coins).map((el) => {
     value: el
   } as MyCoin
 }))
-const selectedCoin = ref(undefined as unknown as MyCoin)
 
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as unknown as Account)
-watch(selectedCoin, () => {
-  target.value.CoinTypeID = selectedCoin.value.value.ID as string
+
+const selectedCoin = computed({
+  get: () => {
+    const myCoin = coin.getCoinByID(target.value.CoinTypeID)
+    if (!myCoin) {
+      return undefined as unknown as MyCoin
+    }
+    return {
+      label: myCoin.Name,
+      value: myCoin
+    } as MyCoin
+  },
+  set: (val) => {
+    target.value.CoinTypeID = val.value.ID as string
+  }
 })
 
 onMounted(() => {
