@@ -60,24 +60,23 @@
 
 <script setup lang='ts'>
 import { useCoinStore, NotificationType, Coin, CoinDescriptionUsedFors, useChurchCoinStore, Description } from 'npool-cli-v2'
+import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 const coin = useCoinStore()
 const coins = computed(() => coin.Coins)
 const selectedCoin = ref([] as Array<Coin>)
 const coinTypeID = computed(() => selectedCoin.value.length > 0 ? selectedCoin.value[0].ID : undefined as unknown as string)
 
-const descriptions = computed(() => {
-  const descs = coin.Descriptions.get(selectedCoin.value[0]?.ID as string) as Map<string, Description>
-  console.log(descs)
-  return descs ? Array.from(descs).map(([, val]) => val) : []
-})
-
 const ccoin = useChurchCoinStore()
+const descriptions = computed(() => ccoin.Descriptions.get(appID.value) as Array<Description>)
 
-watch(coinTypeID, () => {
-  coin.getCoinDescriptions({
-    CoinTypeID: coinTypeID.value as string,
+const prepare = () => {
+  ccoin.getDescriptions({
+    TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_COIN_DESCRIPTIONS',
@@ -89,6 +88,10 @@ watch(coinTypeID, () => {
   }, () => {
     // TODO
   })
+}
+
+watch(appID, () => {
+  prepare()
 })
 
 onMounted(() => {
@@ -104,6 +107,8 @@ onMounted(() => {
   }, () => {
     // TODO
   })
+
+  prepare()
 })
 
 const showing = ref(false)
@@ -124,6 +129,7 @@ const onCreateDescription = () => {
   showing.value = true
   updating.value = false
   target.value = {
+    AppID: appID.value,
     CoinTypeID: selectedCoin.value[0].ID
   } as unknown as Description
 }
@@ -137,12 +143,8 @@ const onSubmit = () => {
 
   if (updating.value) {
     ccoin.updateDescription({
-      ID: target.value.ID,
-      CoinTypeID: target.value.CoinTypeID,
-      Title: target.value.Title,
-      Message: target.value.Message,
-      UsedFor: target.value.UsedFor,
-      NotifyMessage: {
+      Info: target.value,
+      Message: {
         Error: {
           Title: 'MSG_UPDATE_DESCRIPTION',
           Message: 'MSG_UPDATE_DESCRIPTION_FAIL',
@@ -156,11 +158,9 @@ const onSubmit = () => {
     return
   }
   ccoin.createDescription({
-    CoinTypeID: target.value.CoinTypeID,
-    Title: target.value.Title,
-    Message: target.value.Message,
-    UsedFor: target.value.UsedFor,
-    NotifyMessage: {
+    TargetAppID: appID.value,
+    Info: target.value,
+    Message: {
       Error: {
         Title: 'MSG_CREATE_DESCRIPTION',
         Message: 'MSG_CREATE_DESCRIPTION_FAIL',
