@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='reviewLoading'
     :rows-per-page-options='[20]'
-    @row-click='(evt, row, index) => onRowClick(index)'
+    @row-click='(evt, row, index) => onRowClick(row)'
   />
   <q-dialog
     v-model='showing'
@@ -63,7 +63,8 @@ import {
   ReviewState,
   useLoginedUserStore,
   useChurchReviewStore,
-  useReviewStore
+  useReviewStore,
+  Review
 } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -118,7 +119,11 @@ const onMenuHide = () => {
   target.value = {} as unknown as KYCReview
 }
 
-const onRowClick = (index: number) => {
+const onRowClick = (kycReview: Review) => {
+  const index = reviews.value.findIndex((el) => el.Review.ID === kycReview.ID)
+  if (index < 0) {
+    return
+  }
   target.value = reviews.value[index]
   kyc.getKYCImage({
     ImageS3Key: target.value.Kyc?.FrontCardImg as string,
