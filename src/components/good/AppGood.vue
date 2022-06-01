@@ -255,7 +255,8 @@ const onSetPriceClick = () => {
 }
 
 const onVisibleChange = (visible: boolean) => {
-  adminGood.updateGood({
+  good.updateAppGood({
+    TargetAppID: appID.value,
     Info: {
       ID: appGood.value.ID,
       GoodID: appGood.value.GoodID,
@@ -274,7 +275,7 @@ const onVisibleChange = (visible: boolean) => {
       }
     }
   }, () => {
-    // TODO
+    appGood.value.Visible = visible
   })
 }
 
