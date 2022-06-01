@@ -77,8 +77,22 @@
             flat
             rounded
             class='toggle'
-            :options='options'
+            :options='saleOptions'
             v-model='online'
+            toggle-color='primary'
+            size='0.625em'
+            :disable='!appGood'
+          />
+        </div>
+        <div class='column'>
+          <q-space />
+          <q-btn-toggle
+            dense
+            flat
+            rounded
+            class='toggle'
+            :options='visibleOptions'
+            v-model='visible'
             toggle-color='primary'
             size='0.625em'
             :disable='!appGood'
@@ -140,18 +154,34 @@ const online = computed({
     onOnlineChange(val)
   }
 })
+const visible = computed({
+  get: () => appGood.value?.Visible ? appGood.value?.Visible : false,
+  set: (val: boolean) => {
+    onVisibleChange(val)
+  }
+})
 
 interface Option {
   label: string
   value: boolean
 }
 
-const options = computed(() => [
+const saleOptions = computed(() => [
   {
     label: t('MSG_ONSALE'),
     value: true
   }, {
     label: t('MSG_OFFSALE'),
+    value: false
+  }
+] as Array<Option>)
+
+const visibleOptions = computed(() => [
+  {
+    label: t('MSG_VISIBLE'),
+    value: true
+  }, {
+    label: t('MSG_HIDE'),
     value: false
   }
 ] as Array<Option>)
@@ -224,6 +254,30 @@ const onSetPriceClick = () => {
   })
 }
 
+const onVisibleChange = (visible: boolean) => {
+  adminGood.updateGood({
+    Info: {
+      ID: appGood.value.ID,
+      GoodID: appGood.value.GoodID,
+      Price: appGood.value.Price,
+      Online: appGood.value.Online,
+      InitAreaStrategy: appGood.value.InitAreaStrategy,
+      DisplayIndex: appGood.value.DisplayIndex,
+      Visible: visible
+    },
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_GOOD',
+        Message: 'MSG_UPDATE_GOOD_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
+
 const onOnlineChange = (online: boolean) => {
   if (online) {
     good.onlineGood({
@@ -267,7 +321,8 @@ const onAuthorizeClick = () => {
       Price: 0,
       Online: false,
       InitAreaStrategy: InitAreaStrategy.All,
-      DisplayIndex: 0
+      DisplayIndex: 0,
+      Visible: true
     },
     Message: {
       Error: {
