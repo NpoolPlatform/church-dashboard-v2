@@ -112,6 +112,7 @@ const onSubmit = () => {
       Specs: target.value.Specs,
       Name: target.value.Name,
       Unit: target.value.Unit,
+      ENV: target.value.ENV,
       Message: {
         Error: {
           Title: 'MSG_UPDATE_COIN',
@@ -132,6 +133,7 @@ const onSubmit = () => {
     ForPay: target.value.ForPay,
     Name: target.value.Name,
     Unit: target.value.Unit,
+    ENV: target.value.ENV,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
