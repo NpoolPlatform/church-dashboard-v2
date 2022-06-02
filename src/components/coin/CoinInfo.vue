@@ -110,6 +110,8 @@ const onSubmit = () => {
       ForPay: target.value.ForPay,
       HomePage: target.value.HomePage,
       Specs: target.value.Specs,
+      Name: target.value.Name,
+      Unit: target.value.Unit,
       Message: {
         Error: {
           Title: 'MSG_UPDATE_COIN',
@@ -129,6 +131,7 @@ const onSubmit = () => {
     ReservedAmount: target.value.ReservedAmount,
     ForPay: target.value.ForPay,
     Name: target.value.Name,
+    Unit: target.value.Unit,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
