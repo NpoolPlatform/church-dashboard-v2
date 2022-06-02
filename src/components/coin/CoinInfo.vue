@@ -128,6 +128,7 @@ const onSubmit = () => {
     Logo: target.value.Logo,
     ReservedAmount: target.value.ReservedAmount,
     ForPay: target.value.ForPay,
+    Name: target.value.Name,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
