@@ -44,13 +44,17 @@ import { Language, useLangStore, useLocaleStore } from 'npool-cli-v2'
 interface Props {
   language?: Language
   emitResult?: boolean
+  setLang?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   language: undefined,
-  emitResult: false
+  emitResult: false,
+  setLang: true
 })
 const emitResult = toRef(props, 'emitResult')
+const setLang = toRef(props, 'setLang')
+const language = toRef(props, 'language')
 
 const downArrow = ref('img: icons/DownArrow.svg')
 const internet = ref('img: icons/Internet.svg')
@@ -58,16 +62,22 @@ const internet = ref('img: icons/Internet.svg')
 const lang = useLangStore()
 const locale = useLocaleStore()
 const langs = computed(() => locale.Languages)
-const langLabel = computed(() => locale.CurLang?.Short !== '' ? locale.CurLang?.Short : locale.CurLang.Lang)
+const langLabel = computed(() => {
+  if (language.value) {
+    return language.value.Short
+  }
+  return locale.CurLang?.Short !== '' ? locale.CurLang?.Short : locale.CurLang.Lang
+})
 
 const emit = defineEmits<{(e: 'update:language', language: Language): void}>()
 
 const onLangItemClick = (language: Language) => {
   if (emitResult.value) {
     emit('update:language', language)
-    return
   }
-  lang.setLang(language)
+  if (setLang.value) {
+    lang.setLang(language)
+  }
 }
 
 onMounted(() => {

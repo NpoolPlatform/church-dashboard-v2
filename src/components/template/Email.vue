@@ -32,7 +32,7 @@
       </q-card-section>
       <q-card-section>
         <div class='dark-bg'>
-          <LangSwitcher v-model:language='language' :emit-result='true' />
+          <LangSwitcher v-model:language='language' :emit-result='true' :set-lang='false' />
         </div>
       </q-card-section>
       <q-card-section>
