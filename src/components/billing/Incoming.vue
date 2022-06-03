@@ -86,7 +86,8 @@ const displayPayments = computed(() => myPayments.value.filter((el) => {
   return el.EmailAddress?.toLowerCase()?.includes(searchStr.value) ||
         el.GoodName?.toLowerCase()?.includes(searchStr.value) ||
         el.State?.toLowerCase()?.includes(searchStr.value) ||
-        el.CoinName?.toLowerCase()?.includes(searchStr.value)
+        el.CoinName?.toLowerCase()?.includes(searchStr.value) ||
+        el.GoodID?.toLowerCase()?.includes(searchStr.value)
 }))
 
 const prepare = () => {
