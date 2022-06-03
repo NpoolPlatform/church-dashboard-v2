@@ -655,6 +655,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '订单',
+      caption: '查看订单列表',
+      icon: 'format_list_numbered',
+      target: '/billing/order',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '提现支出',
       caption: '用户提现支出',
       icon: 'format_list_numbered',
