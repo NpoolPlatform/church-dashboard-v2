@@ -27,7 +27,6 @@
         </div>
         <q-input
           dense
-          flat
           class='small'
           v-model='appMsgId'
           :label='$t("MSG_MESSAGE_ID")'
