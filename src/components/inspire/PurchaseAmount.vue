@@ -123,11 +123,7 @@ const users = computed(() => {
   if (!appUsers) {
     return [] as Array<AppUser>
   }
-  const myUsers = appUsers.filter((el) => {
-    const index = settings.value.findIndex((s) => s.UserID === el.User.ID)
-    return index < 0
-  })
-  return Array.from(myUsers).map((el) => el.User)
+  return appUsers as Array<AppUser>
 })
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => {
