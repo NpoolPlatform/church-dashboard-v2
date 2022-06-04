@@ -74,7 +74,7 @@ const myPayments = computed(() => Array.from(payments.value).map((el) => {
   }
   const goodIdx = good.Goods.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
   if (goodIdx >= 0) {
-    myPayment.GoodName = good.Goods[accountIdx].Good.Good.Title
+    myPayment.GoodName = good.Goods[goodIdx].Good.Good.Title
   }
   return myPayment
 }))
