@@ -64,11 +64,28 @@
         </div>
         <q-input
           dense
-          flat
           class='small'
           v-if='appGood'
           v-model='appGood.Price'
           :label='$t("MSG_PRICE")'
+        />
+        <div class='column'>
+          <q-space />
+          <q-btn
+            dense
+            flat
+            class='btn flat'
+            :label='$t("MSG_SET_PURCHASE_LIMIT")'
+            @click='onSetPurchaseLimitClick'
+            :disable='!appGood'
+          />
+        </div>
+        <q-input
+          dense
+          class='small'
+          v-if='appGood'
+          v-model='appGood.PurchaseLimit'
+          :label='$t("MSG_PURCHASE_LIMIT")'
         />
         <div class='column'>
           <q-space />
@@ -264,7 +281,8 @@ const onVisibleChange = (visible: boolean) => {
       Online: appGood.value.Online,
       InitAreaStrategy: appGood.value.InitAreaStrategy,
       DisplayIndex: appGood.value.DisplayIndex,
-      Visible: visible
+      Visible: visible,
+      PurchaseLimit: appGood.value.PurchaseLimit
     },
     Message: {
       Error: {
@@ -276,6 +294,23 @@ const onVisibleChange = (visible: boolean) => {
     }
   }, () => {
     appGood.value.Visible = visible
+  })
+}
+
+const onSetPurchaseLimitClick = () => {
+  good.updateAppGood({
+    TargetAppID: appID.value,
+    Info: appGood.value,
+    Message: {
+      Error: {
+        Title: 'MSG_SET_PURCHASE_LIMIT',
+        Message: 'MSG_SET_PURCHASE_LIMIT_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
   })
 }
 
@@ -323,7 +358,8 @@ const onAuthorizeClick = () => {
       Online: false,
       InitAreaStrategy: InitAreaStrategy.All,
       DisplayIndex: 0,
-      Visible: true
+      Visible: true,
+      PurchaseLimit: 0
     },
     Message: {
       Error: {
