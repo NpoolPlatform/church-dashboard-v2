@@ -27,7 +27,6 @@ import {
   useChurchAccountStore,
   useAdminGoodStore,
   useChurchOrderStore,
-  Order,
   UserInfo,
   useCoinStore
 } from 'npool-cli-v2'
@@ -46,7 +45,6 @@ const account = useChurchAccountStore()
 const coin = useCoinStore()
 
 const order = useChurchOrderStore()
-const orders = computed(() => order.Orders.get(appID.value) ? order.Orders.get(appID.value) as Array<Order> : [])
 
 const billing = useChurchBillingStore()
 const payments = computed(() => billing.Payments.get(appID.value) ? billing.Payments.get(appID.value) as Array<Payment> : [])
@@ -61,14 +59,10 @@ interface MyPayment extends Payment {
 
 const myPayments = computed(() => Array.from(payments.value).map((el) => {
   const myPayment = el as MyPayment
-  const orderIdx = orders.value.findIndex((oel) => oel.Order.Order.ID === el.OrderID)
-  if (orderIdx >= 0) {
-    myPayment.GoodName = orders.value[orderIdx].Good.Good.Good.Title
-    const userIdx = users.value.findIndex((uel) => uel.User.ID === orders.value[orderIdx].Order.Order.UserID)
-    if (userIdx >= 0) {
-      myPayment.EmailAddress = users.value[userIdx].User.EmailAddress as string
-      myPayment.PhoneNO = users.value[userIdx].User.PhoneNO as string
-    }
+  const userIdx = users.value.findIndex((uel) => uel.User.ID === el.UserID)
+  if (userIdx >= 0) {
+    myPayment.EmailAddress = users.value[userIdx].User.EmailAddress as string
+    myPayment.PhoneNO = users.value[userIdx].User.PhoneNO as string
   }
   const coinIdx = coin.Coins.findIndex((cel) => cel.ID === el.CoinInfoID)
   if (coinIdx >= 0) {
@@ -77,6 +71,10 @@ const myPayments = computed(() => Array.from(payments.value).map((el) => {
   const accountIdx = account.Accounts.findIndex((ael) => ael.ID === el.AccountID)
   if (accountIdx >= 0) {
     myPayment.Address = account.Accounts[accountIdx].Address
+  }
+  const goodIdx = good.Goods.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
+  if (goodIdx >= 0) {
+    myPayment.GoodName = good.Goods[accountIdx].Good.Good.Title
   }
   return myPayment
 }))
@@ -87,7 +85,9 @@ const displayPayments = computed(() => myPayments.value.filter((el) => {
         el.GoodName?.toLowerCase()?.includes(searchStr.value) ||
         el.State?.toLowerCase()?.includes(searchStr.value) ||
         el.CoinName?.toLowerCase()?.includes(searchStr.value) ||
-        el.GoodID?.toLowerCase()?.includes(searchStr.value)
+        el.GoodID?.toLowerCase()?.includes(searchStr.value) ||
+        el.UserID?.toLowerCase()?.includes(searchStr.value) ||
+        el.ID?.toLowerCase()?.includes(searchStr.value)
 }))
 
 const prepare = () => {
