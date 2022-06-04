@@ -14,7 +14,6 @@
       <div class='row indent flat'>
         <q-input
           dense
-          flat
           class='small'
           v-model='username'
           :label='$t("MSG_USERNAME")'
@@ -60,8 +59,6 @@
           type='number'
           v-model='target.Percent'
           :label='$t("MSG_PERCENT")'
-          min='0'
-          max='100'
         />
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
         <q-input type='date' v-model='end' :label='$t("MSG_END")' />
