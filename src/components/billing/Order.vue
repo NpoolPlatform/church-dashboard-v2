@@ -19,7 +19,7 @@ const appID = computed(() => app.AppID)
 
 const order = useChurchOrderStore()
 const orders = computed(() => {
-  const myOrders = order.Orders.get(appID.value)
+  const myOrders = order.BaseOrders.get(appID.value)
   if (!myOrders) {
     return [] as Array<OrderModel>
   }
