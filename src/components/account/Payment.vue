@@ -6,6 +6,8 @@
     :rows='displayAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
+    selection='single'
+    :selected='selectedAccount'
   >
     <template #top-right>
       <q-input
@@ -13,6 +15,20 @@
         class='small'
         v-model='searchStr'
         :label='$t("MSG_SEARCH")'
+      />
+      <q-btn
+        dense
+        flat
+        class='btn flat'
+        :label='$t("MSG_CREATE_PAYMENT_BALANCE")'
+        @click='onCreatePaymentBalance'
+      />
+      <q-btn
+        dense
+        flat
+        class='btn flat'
+        :label='$t("MSG_RESET_PAYMENT_ACCOUNT")'
+        @click='onResetPaymentAccount'
       />
     </template>
   </q-table>
@@ -26,7 +42,8 @@ import {
   GoodPayment,
   PaymentState,
   useChurchBillingStore,
-  InvalidID
+  InvalidID,
+  Payment
 } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -47,7 +64,7 @@ interface MyAccount extends GoodPayment {
 }
 
 const billing = useChurchBillingStore()
-const payments = computed(() => billing.Payments.get(appID.value)?.filter((el) => el.State === PaymentState.TIMEOUT))
+const payments = computed(() => billing.Payments.get(appID.value)?.filter((el) => el.State === PaymentState.TIMEOUT || el.State === PaymentState.CANCELED))
 const balances = computed(() => billing.PaymentBalances.get(appID.value))
 
 const accounts = computed(() => Array.from(account.GoodPayments).map((el) => {
@@ -78,6 +95,8 @@ const searchStr = ref('')
 const displayAccounts = computed(() => accounts.value.filter((el) => {
   return el.Address?.includes(searchStr.value)
 }))
+
+const selectedAccount = ref([] as Array<MyAccount>)
 
 const prepare = () => {
   billing.getPayments({
@@ -155,5 +174,68 @@ onMounted(() => {
 
   prepare()
 })
+
+const onCreatePaymentBalance = () => {
+  selectedAccount.value.forEach((account) => {
+    if (account.Idle) {
+      return
+    }
+    if (account.PaymentState !== PaymentState.TIMEOUT) {
+      return
+    }
+    if (account.UserPaymentBalanceID !== InvalidID) {
+      return
+    }
+
+    const index = payments.value?.findIndex((el) => el.AccountID === account.AccountID)
+    const payment = payments.value?.[index as number] as Payment
+    if (payment.FinishAmount <= payment.StartAmount) {
+      return
+    }
+
+    billing.createPaymentBalance({
+      TargetAppID: appID.value,
+      TargetUserID: payment.UserID,
+      Info: {
+        PaymentID: payment.ID,
+        Amount: payment.FinishAmount - payment.StartAmount,
+        UsedByPaymentID: InvalidID
+      },
+      Message: {
+        Error: {
+          Title: 'MSG_GET_GOOD_PAYMENTS',
+          Message: 'MSG_GET_GOOD_PAYMENTS_FAIL',
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+  })
+}
+
+const onResetPaymentAccount = () => {
+  selectedAccount.value.forEach((acc) => {
+    if (acc.Idle) {
+      return
+    }
+    acc.Idle = true
+    acc.OccupiedBy = ''
+    account.updateGoodPayment({
+      Info: acc,
+      Message: {
+        Error: {
+          Title: 'MSG_UPDATE_GOOD_PAYMENTS',
+          Message: 'MSG_UPDATE_GOOD_PAYMENTS_FAIL',
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+  })
+}
 
 </script>
