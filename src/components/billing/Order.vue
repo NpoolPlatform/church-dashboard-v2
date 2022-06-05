@@ -39,6 +39,9 @@
   <q-item>
     <span>{{ $t('MSG_PAYMENT_USDT_AMOUNT') }}: {{ paymentAmount }} {{ PriceCoinName }}</span>
   </q-item>
+  <q-item>
+    <span>{{ $t('MSG_ORDER_USER_COUNT') }}: {{ orderUsers }}</span>
+  </q-item>
 </template>
 
 <script setup lang='ts'>
@@ -111,6 +114,18 @@ const displayOrders = computed(() => orders.value.filter((el) => {
 const soldUnits = computed(() => displayOrders.value.filter((el) => el.PaymentState === PaymentState.DONE).reduce((sum, b) => sum + b.Units, 0))
 const paymentTimeouts = computed(() => displayOrders.value.filter((el) => el.PaymentState === PaymentState.TIMEOUT).length)
 const paymentAmount = computed(() => displayOrders.value.filter((el) => el.PaymentState === PaymentState.DONE).reduce((sum, b) => sum + b.Amount * b.CoinUSDCurrency, 0))
+const orderUsers = computed(() => {
+  const users = new Map<string, number>()
+  displayOrders.value.filter((el) => el.PaymentState === PaymentState.DONE).forEach((el) => {
+    let u = users.get(el.UserID)
+    if (!u) {
+      u = 0
+    }
+    u += el.Units
+    users.set(el.UserID, u)
+  })
+  return users.size
+})
 
 const prepare = () => {
   order.getBaseOrders({
