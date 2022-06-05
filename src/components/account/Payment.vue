@@ -7,7 +7,7 @@
     row-key='ID'
     :rows-per-page-options='[10]'
     selection='single'
-    :selected='selectedAccount'
+    v-model:selected='selectedAccount'
   >
     <template #top-right>
       <q-input
