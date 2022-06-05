@@ -73,6 +73,8 @@ const orders = computed(() => {
     o.PaymentState = 'MSG_NOT_AVAILABLE' as PaymentState
     o.GoodName = ''
     o.PaymentID = ''
+    o.Amount = 0
+    o.CoinUSDCurrency = 0
     if (payments.value) {
       const index = payments.value.findIndex((pel) => pel.OrderID === el.ID)
       if (index >= 0) {
