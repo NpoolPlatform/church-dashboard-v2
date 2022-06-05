@@ -123,7 +123,7 @@ const users = computed(() => {
   if (!appUsers) {
     return [] as Array<AppUser>
   }
-  return appUsers as Array<AppUser>
+  return Array.from(appUsers).map((el) => el.User)
 })
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => {
