@@ -3,10 +3,19 @@
     dense
     flat
     :title='$t("MSG_GOOD_PAYMENT_ADDRESSES")'
-    :rows='accounts'
+    :rows='displayAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-  />
+  >
+    <template #top-right>
+      <q-input
+        dense
+        class='small'
+        v-model='searchStr'
+        :label='$t("MSG_SEARCH")'
+      />
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
@@ -20,7 +29,7 @@ import {
   InvalidID
 } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -65,6 +74,11 @@ const accounts = computed(() => Array.from(account.GoodPayments).map((el) => {
   return ac
 }))
 
+const searchStr = ref('')
+const displayAccounts = computed(() => accounts.value.filter((el) => {
+  return el.Address.includes(searchStr.value)
+}))
+
 onMounted(() => {
   coin.getCoins({
     Message: {
@@ -97,6 +111,34 @@ onMounted(() => {
       Error: {
         Title: 'MSG_GET_GOOD_PAYMENTS',
         Message: 'MSG_GET_GOOD_PAYMENTS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  billing.getPayments({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_PAYMENTS',
+        Message: 'MSG_GET_PAYMENTS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  billing.getPaymentBalances({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USER_PAYMENT_BALANCES',
+        Message: 'MSG_GET_USER_PAYMENT_BALANCES_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
