@@ -29,7 +29,7 @@ import {
   InvalidID
 } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -76,8 +76,42 @@ const accounts = computed(() => Array.from(account.GoodPayments).map((el) => {
 
 const searchStr = ref('')
 const displayAccounts = computed(() => accounts.value.filter((el) => {
-  return el.Address.includes(searchStr.value)
+  return el.Address?.includes(searchStr.value)
 }))
+
+const prepare = () => {
+  billing.getPayments({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_PAYMENTS',
+        Message: 'MSG_GET_PAYMENTS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+
+  billing.getPaymentBalances({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USER_PAYMENT_BALANCES',
+        Message: 'MSG_GET_USER_PAYMENT_BALANCES_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
+
+watch(appID, () => {
+  prepare()
+})
 
 onMounted(() => {
   coin.getCoins({
@@ -119,33 +153,7 @@ onMounted(() => {
     // TODO
   })
 
-  billing.getPayments({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_PAYMENTS',
-        Message: 'MSG_GET_PAYMENTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  billing.getPaymentBalances({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_USER_PAYMENT_BALANCES',
-        Message: 'MSG_GET_USER_PAYMENT_BALANCES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  prepare()
 })
 
 </script>
