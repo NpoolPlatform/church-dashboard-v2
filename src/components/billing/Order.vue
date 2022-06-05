@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang='ts'>
-import { buildOrders, NotificationType, OrderGroup, OrderModel, useChurchOrderStore } from 'npool-cli-v2'
+import { NotificationType, OrderModel, useChurchOrderStore } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch } from 'vue'
 
@@ -23,11 +23,11 @@ const orders = computed(() => {
   if (!myOrders) {
     return [] as Array<OrderModel>
   }
-  return buildOrders(myOrders, OrderGroup.ALL)
+  return myOrders
 })
 
 const prepare = () => {
-  order.getOrders({
+  order.getBaseOrders({
     TargetAppID: appID.value,
     Message: {
       Error: {
