@@ -18,9 +18,9 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 interface MyOrder extends OrderBase {
+  GoodName: string
   PaymentState: PaymentState
   PaymentID: string
-  GoodName: string
 }
 
 const billing = useChurchBillingStore()
@@ -37,6 +37,8 @@ const orders = computed(() => {
   return Array.from(myOrders).map((el) => {
     const o = el as MyOrder
     o.PaymentState = 'MSG_NOT_AVAILABLE' as PaymentState
+    o.GoodName = ''
+    o.PaymentID = ''
     if (payments.value) {
       const index = payments.value.findIndex((pel) => pel.OrderID === el.ID)
       if (index >= 0) {
