@@ -3,16 +3,39 @@
     dense
     flat
     :title='$t("MSG_ORDERS")'
-    :rows='orders'
+    :rows='displayOrders'
     row-key='ID'
     :rows-per-page-options='[10]'
-  />
+  >
+    <template #top-right>
+      <q-input
+        dense
+        class='small'
+        v-model='goodId'
+        :label='$t("MSG_GOOD_ID")'
+      />
+      <q-input
+        dense
+        class='small'
+        type='date'
+        v-model='start'
+        :label='$t("MSG_START")'
+      />
+      <q-input
+        dense
+        class='small'
+        type='date'
+        v-model='end'
+        :label='$t("MSG_END")'
+      />
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
 import { NotificationType, OrderBase, PaymentState, useAdminGoodStore, useChurchBillingStore, useChurchOrderStore } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -54,6 +77,21 @@ const orders = computed(() => {
     return o
   })
 })
+
+const goodId = ref('')
+const start = ref('')
+const end = ref('')
+
+const displayOrders = computed(() => orders.value.filter((el) => {
+  let display = el.GoodID.includes(goodId.value)
+  if (start.value.length) {
+    display = display && (el.CreateAt >= new Date(start.value).getTime() / 1000)
+  }
+  if (end.value.length) {
+    display = display && (el.CreateAt <= new Date(end.value).getTime() / 1000)
+  }
+  return display
+}))
 
 const prepare = () => {
   order.getBaseOrders({
