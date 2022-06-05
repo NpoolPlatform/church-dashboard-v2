@@ -30,10 +30,19 @@
       />
     </template>
   </q-table>
+  <q-item>
+    <span>{{ $t('MSG_TOTAL_SOLD') }}: {{ soldUnits }}</span>
+  </q-item>
+  <q-item>
+    <span>{{ $t('MSG_PAYMENT_TIMEOUT') }}: {{ paymentTimeouts }}</span>
+  </q-item>
+  <q-item>
+    <span>{{ $t('MSG_PAYMENT_USDT_AMOUNT') }}: {{ paymentAmount }} {{ PriceCoinName }}</span>
+  </q-item>
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, OrderBase, PaymentState, useAdminGoodStore, useChurchBillingStore, useChurchOrderStore } from 'npool-cli-v2'
+import { NotificationType, OrderBase, PaymentState, useAdminGoodStore, useChurchBillingStore, useChurchOrderStore, PriceCoinName } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch, ref } from 'vue'
 
@@ -44,6 +53,8 @@ interface MyOrder extends OrderBase {
   GoodName: string
   PaymentState: PaymentState
   PaymentID: string
+  Amount: number
+  CoinUSDCurrency: number
 }
 
 const billing = useChurchBillingStore()
@@ -67,6 +78,8 @@ const orders = computed(() => {
       if (index >= 0) {
         o.PaymentState = payments.value[index].State as PaymentState
         o.PaymentID = payments.value[index].ID
+        o.Amount = payments.value[index].Amount
+        o.CoinUSDCurrency = payments.value[index].CoinUSDCurrency
       }
     }
 
@@ -92,6 +105,10 @@ const displayOrders = computed(() => orders.value.filter((el) => {
   }
   return display
 }))
+
+const soldUnits = computed(() => displayOrders.value.filter((el) => el.PaymentState === PaymentState.DONE).reduce((sum, b) => sum + b.Units, 0))
+const paymentTimeouts = computed(() => displayOrders.value.filter((el) => el.PaymentState === PaymentState.TIMEOUT).length)
+const paymentAmount = computed(() => displayOrders.value.filter((el) => el.PaymentState === PaymentState.DONE).reduce((sum, b) => sum + b.Amount * b.CoinUSDCurrency, 0))
 
 const prepare = () => {
   order.getBaseOrders({
