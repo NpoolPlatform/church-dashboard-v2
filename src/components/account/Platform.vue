@@ -34,6 +34,7 @@
         <q-select :options='userAccounts' v-model='selectedPlatformOfflineAccount' :label='$t("MSG_PLATFORM_OFFLINE_ACCOUNT")' />
         <q-select :options='userAccounts' v-model='selectedUserOfflineAccount' :label='$t("MSG_USER_OFFLINE_ACCOUNT")' />
         <q-select :options='platformAccounts' v-model='selectedUserOnlineAccount' :label='$t("MSG_USER_ONLINE_ACCOUNT")' />
+        <q-select :options='platformAccounts' v-model='selectedGasProviderAccount' :label='$t("MSG_GAS_PROVIDER_ACCOUNT")' />
         <q-input
           type='number'
           v-model='target.WarmAccountCoinAmount'
@@ -86,6 +87,7 @@ interface MySetting extends CoinSetting {
   PlatformOfflineAddress: string
   UserOfflineAddress: string
   UserOnlineAddress: string
+  GasProviderAddress: string
 }
 
 const settings = computed(() => Array.from(setting.CoinSettings).map((el) => {
@@ -95,6 +97,7 @@ const settings = computed(() => Array.from(setting.CoinSettings).map((el) => {
   cs.PlatformOfflineAddress = account.getAccountByID(cs.PlatformOfflineAccountID as string)?.Address
   cs.UserOfflineAddress = account.getAccountByID(cs.UserOfflineAccountID as string)?.Address
   cs.UserOnlineAddress = account.getAccountByID(cs.UserOnlineAccountID as string)?.Address
+  cs.GasProviderAddress = account.getAccountByID(cs.GasProvideAccountID as string)?.Address
   return cs
 }))
 
@@ -131,7 +134,8 @@ const accounts = computed(() => account.Accounts.filter((el) => {
     return cs.PlatformOfflineAccountID === el.ID ||
            cs.UserOfflineAccountID === el.ID ||
            cs.UserOnlineAccountID === el.ID ||
-           cs.GoodIncomingAccountID === el.ID
+           cs.GoodIncomingAccountID === el.ID ||
+           cs.GasProvideAccountID === el.ID
   })
   if (index >= 0) {
     return false
@@ -200,6 +204,12 @@ const selectedUserOnlineAccount = computed({
   get: () => constructAccount(target.value.UserOnlineAccountID as string),
   set: (val) => {
     target.value.UserOnlineAccountID = val.value.ID as string
+  }
+})
+const selectedGasProviderAccount = computed({
+  get: () => constructAccount(target.value.GasProvideAccountID as string),
+  set: (val) => {
+    target.value.GasProvideAccountID = val.value.ID as string
   }
 })
 
@@ -327,7 +337,8 @@ const onSubmit = () => {
   accs.set(target.value.PlatformOfflineAccountID as string, 1)
   accs.set(target.value.UserOfflineAccountID as string, 1)
   accs.set(target.value.UserOnlineAccountID as string, 1)
-  if (accs.size < 4) {
+  accs.set(target.value.GasProvideAccountID as string, 1)
+  if (accs.size < 5) {
     return
   }
 
