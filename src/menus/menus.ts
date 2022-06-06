@@ -56,6 +56,15 @@ const MainDrawerMenus = [
         level: 0,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '币种汇率',
+        caption: '设置周期汇率(价格预言机)',
+        icon: 'pending',
+        target: '/coin/oracle/currency',
+        level: 0,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
