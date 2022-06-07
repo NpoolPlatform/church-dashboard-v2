@@ -577,6 +577,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'account/gasfeeder',
+        component: () => import('pages/account/GasFeeder.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'limits/platform',
         component: () => import('pages/limit/PlatformUSD.vue'),
         meta: {

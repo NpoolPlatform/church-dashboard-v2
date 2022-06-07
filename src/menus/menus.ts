@@ -161,6 +161,15 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
+        label: '支付账户GAS充值',
+        caption: '向支付账户充值GAS',
+        icon: 'perm_identity',
+        target: '/account/gasfeeder',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
         label: '提现地址',
         caption: '用户提现地址',
         icon: 'perm_identity',
