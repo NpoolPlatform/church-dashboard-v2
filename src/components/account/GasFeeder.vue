@@ -6,6 +6,7 @@
     :rows='gases'
     row-key='ID'
     :rows-per-page-options='[10]'
+    @row-click='(evt, row, index) => onRowClick(row as CoinGas)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -43,13 +44,13 @@
           type='number'
           v-model='target.DepositThresholdLow'
           :label='$t("MSG_DEPOSIT_THRESHOLD_LOW")'
-          :suffix='selectedCoin?.value?.Unit'
+          :suffix='selectedGasCoin?.value?.Unit'
         />
         <q-input
           type='number'
           v-model='target.DepositAmount'
           :label='$t("MSG_DEPOSIT_AMOUNT")'
-          :suffix='selectedCoin?.value?.Unit'
+          :suffix='selectedGasCoin?.value?.Unit'
         />
       </q-card-section>
       <q-item class='row'>
@@ -119,13 +120,38 @@ const onMenuHide = () => {
   target.value = {} as unknown as CoinGas
 }
 
+const onRowClick = (gas: CoinGas) => {
+  showing.value = true
+  updating.value = true
+  target.value = gas
+}
+
 const onSubmit = () => {
+  showing.value = false
+
+  if (updating.value) {
+    feeder.updateCoinGas({
+      Info: target.value,
+      Message: {
+        Error: {
+          Title: 'MSG_UPDATE_COIN_GAS',
+          Message: 'MSG_UPDATE_COIN_GAS_FAIL',
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+    return
+  }
+
   feeder.createCoinGas({
     Info: target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_COIN_GASS',
-        Message: 'MSG_CREATE_COIN_GASS_FAIL',
+        Title: 'MSG_CREATE_COIN_GAS',
+        Message: 'MSG_CREATE_COIN_GAS_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
