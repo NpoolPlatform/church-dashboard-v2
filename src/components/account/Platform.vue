@@ -97,7 +97,7 @@ const settings = computed(() => Array.from(setting.CoinSettings).map((el) => {
   cs.PlatformOfflineAddress = account.getAccountByID(cs.PlatformOfflineAccountID as string)?.Address
   cs.UserOfflineAddress = account.getAccountByID(cs.UserOfflineAccountID as string)?.Address
   cs.UserOnlineAddress = account.getAccountByID(cs.UserOnlineAccountID as string)?.Address
-  cs.GasProviderAddress = account.getAccountByID(cs.GasProvideAccountID as string)?.Address
+  cs.GasProviderAddress = account.getAccountByID(cs.GasProviderAccountID as string)?.Address
   return cs
 }))
 
@@ -135,7 +135,7 @@ const accounts = computed(() => account.Accounts.filter((el) => {
            cs.UserOfflineAccountID === el.ID ||
            cs.UserOnlineAccountID === el.ID ||
            cs.GoodIncomingAccountID === el.ID ||
-           cs.GasProvideAccountID === el.ID
+           cs.GasProviderAccountID === el.ID
   })
   if (index >= 0) {
     return false
@@ -207,9 +207,9 @@ const selectedUserOnlineAccount = computed({
   }
 })
 const selectedGasProviderAccount = computed({
-  get: () => constructAccount(target.value.GasProvideAccountID as string),
+  get: () => constructAccount(target.value.GasProviderAccountID as string),
   set: (val) => {
-    target.value.GasProvideAccountID = val.value.ID as string
+    target.value.GasProviderAccountID = val.value.ID as string
   }
 })
 
@@ -337,7 +337,7 @@ const onSubmit = () => {
   accs.set(target.value.PlatformOfflineAccountID as string, 1)
   accs.set(target.value.UserOfflineAccountID as string, 1)
   accs.set(target.value.UserOnlineAccountID as string, 1)
-  accs.set(target.value.GasProvideAccountID as string, 1)
+  accs.set(target.value.GasProviderAccountID as string, 1)
   if (accs.size < 5) {
     return
   }
