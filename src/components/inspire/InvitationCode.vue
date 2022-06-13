@@ -32,11 +32,23 @@
     dense
     flat
     :title='$t("MSG_INVITATION_CODES")'
-    :rows='ecodes'
+    :rows='displayCodes'
     row-key='ID'
     :loading='codeLoading'
     :rows-per-page-options='[10]'
-  />
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='searchStr'
+          :label='$t("MSG_SEARCH")'
+        />
+      </div>
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
@@ -69,6 +81,12 @@ const ecodes = computed(() => Array.from(codes.value).map((code: InvitationCode)
   myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID as string)?.User.PhoneNO as string
   return myCode
 }))
+
+const searchStr = ref('')
+const displayCodes = computed(() => ecodes.value.filter((el) => {
+  return el.EmailAddress.includes(searchStr.value) || el.InvitationCode?.includes(searchStr.value) || el.PhoneNO.includes(searchStr.value)
+}))
+
 const appUsers = computed(() => {
   return user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : []
 })
