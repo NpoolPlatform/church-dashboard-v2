@@ -52,6 +52,11 @@
           :label='$t("MSG_DEPOSIT_AMOUNT")'
           :suffix='selectedGasCoin?.value?.Unit'
         />
+        <q-input
+          type='number'
+          v-model='target.OnlineScale'
+          :label='$t("MSG_ONLINE_SCALE")'
+        />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
