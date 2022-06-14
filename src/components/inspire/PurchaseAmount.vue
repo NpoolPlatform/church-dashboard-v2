@@ -36,6 +36,7 @@
     :rows='settings'
     row-key='ID'
     :rows-per-page-options='[10]'
+    @row-click='(evt, row, index) => onRowClick(row as PurchaseAmountSetting)'
   />
   <q-dialog
     v-model='showing'
@@ -185,7 +186,9 @@ onMounted(() => {
 })
 
 const showing = ref(false)
+const updating = ref(true)
 const target = ref({} as unknown as PurchaseAmountSetting)
+
 watch(userID, () => {
   target.value.UserID = userID.value as string
 })
@@ -204,6 +207,14 @@ const end = computed({
 
 const onCreate = () => {
   showing.value = true
+  updating.value = false
+  target.value = {} as unknown as PurchaseAmountSetting
+}
+
+const onRowClick = (setting: PurchaseAmountSetting) => {
+  showing.value = true
+  updating.value = true
+  target.value = setting
 }
 
 const onMenuHide = () => {
@@ -213,6 +224,24 @@ const onMenuHide = () => {
 
 const onSubmit = () => {
   showing.value = false
+
+  if (updating.value) {
+    setting.updatePurchaseAmountSetting({
+      Info: target.value,
+      Message: {
+        Error: {
+          Title: t('MSG_UPDATE_PURCHASE_AMOUNT_SETTING'),
+          Message: t('MSG_UPDATE_PURCHASE_AMOUNT_SETTING_FAIL'),
+          Popup: true,
+          Type: NotificationType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+    return
+  }
+
   if (csetting.value?.UniqueSetting) {
     setting.createPurchaseAmountSetting({
       TargetAppID: appID.value,
