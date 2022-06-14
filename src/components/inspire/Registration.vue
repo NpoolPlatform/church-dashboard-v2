@@ -117,10 +117,10 @@ const displayInvitations = computed(() => Array.from(invitations.value as Array<
   }
   return i
 }).filter((el) => {
-  return el.InviteeName.includes(searchStr.value) ||
-        el.InviterName.includes(searchStr.value) ||
-        el.InviteeID.includes(searchStr.value) ||
-        el.InviterID.includes(searchStr.value)
+  return el.InviteeName?.includes(searchStr.value) ||
+        el.InviterName?.includes(searchStr.value) ||
+        el.InviteeID?.includes(searchStr.value) ||
+        el.InviterID?.includes(searchStr.value)
 }))
 
 const prepare = () => {
@@ -137,6 +137,20 @@ const prepare = () => {
     }
   }, () => {
     loading.value = false
+  })
+
+  user.getUsers({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: t('MSG_GET_USERS'),
+        Message: t('MSG_GET_USERS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
   })
 }
 
