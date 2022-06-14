@@ -644,6 +644,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '邀请关系',
+      caption: '查看用户邀请关系',
+      icon: 'format_list_numbered',
+      target: '/inspire/registration',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
