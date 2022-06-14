@@ -101,6 +101,8 @@ const inviter = computed({
 const searchStr = ref('')
 const displayInvitations = computed(() => Array.from(invitations.value as Array<RegInvitation>).map((el) => {
   const i = el as MyInvitation
+  i.InviteeName = ''
+  i.InviterName = ''
   const inviter = users.value?.findIndex((uel) => uel.User.ID === el.InviterID)
   if (inviter !== undefined && inviter >= 0 && users.value?.length) {
     i.InviterName = users.value[inviter].User.EmailAddress as string
