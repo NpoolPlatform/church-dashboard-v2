@@ -16,7 +16,7 @@
     row-key='ID'
     :loading='reviewLoading'
     :rows-per-page-options='[20]'
-    @row-click='(evt, row, index) => onRowClick(index)'
+    @row-click='(evt, row, index) => onRowClick(row as Review)'
   />
   <q-dialog
     v-model='showing'
@@ -64,7 +64,8 @@ import {
   useCoinStore,
   formatTime,
   useLoginedUserStore,
-  useChurchReviewStore
+  useChurchReviewStore,
+  Review
 } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -133,8 +134,11 @@ const onMenuHide = () => {
   target.value = {} as unknown as WithdrawAddressReview
 }
 
-const onRowClick = (index: number) => {
-  target.value = reviews.value ? reviews.value[index] : {} as unknown as WithdrawAddressReview
+const onRowClick = (review: Review) => {
+  const index = reviews.value?.findIndex((el) => el.Review.ID === review.ID)
+  if (index !== undefined && index >= 0) {
+    target.value = reviews.value ? reviews.value[index] : {} as unknown as WithdrawAddressReview
+  }
   showing.value = true
 }
 
