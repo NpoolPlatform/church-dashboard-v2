@@ -31,7 +31,7 @@
         <span>{{ $t('MSG_CREATE_REGISTRATION_INVITATION') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.InviteeID' :label='$t("MSG_COUPON_NAME")' />
+        <q-select :options='myUsers' v-model='inviter' :label='$t("MSG_INVITER")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -46,7 +46,8 @@ import {
   NotificationType,
   RegInvitation,
   useChurchRegInvitationStore,
-  useChurchUsersStore
+  useChurchUsersStore,
+  UserInfo
 } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
@@ -67,8 +68,35 @@ const invitation = useChurchRegInvitationStore()
 const invitations = computed(() => invitation.RegInvitations.get(appID.value) ? invitation.RegInvitations.get(appID.value) : [])
 const loading = ref(true)
 
+interface MyUser {
+  label: string
+  value: UserInfo
+}
+
 const user = useChurchUsersStore()
 const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) : [])
+const myUsers = computed(() => Array.from(users.value as Array<UserInfo>).map((el) => {
+  return {
+    label: el.User.EmailAddress?.length ? el.User.EmailAddress : el.User.PhoneNO,
+    value: el
+  } as MyUser
+}))
+const inviter = computed({
+  get: () => {
+    const inviter = users.value?.findIndex((uel) => uel.User.ID === target.value.InviterID)
+    if (inviter !== undefined && inviter >= 0) {
+      const user = (users.value as Array<UserInfo>)[inviter]
+      return {
+        label: user.User.EmailAddress?.length ? user.User.EmailAddress : user.User.PhoneNO,
+        value: user
+      } as MyUser
+    }
+    return undefined as unknown as MyUser
+  },
+  set: (val) => {
+    target.value.InviterID = val.value.User.ID as string
+  }
+})
 
 const searchStr = ref('')
 const displayInvitations = computed(() => Array.from(invitations.value as Array<RegInvitation>).map((el) => {
