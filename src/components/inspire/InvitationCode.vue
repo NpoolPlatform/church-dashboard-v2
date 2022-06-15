@@ -84,7 +84,7 @@ const ecodes = computed(() => Array.from(codes.value).map((code: InvitationCode)
 
 const searchStr = ref('')
 const displayCodes = computed(() => ecodes.value.filter((el) => {
-  return el.EmailAddress.includes(searchStr.value) || el.InvitationCode?.includes(searchStr.value) || el.PhoneNO.includes(searchStr.value)
+  return el.EmailAddress?.includes(searchStr.value) || el.InvitationCode?.includes(searchStr.value) || el.PhoneNO?.includes(searchStr.value)
 }))
 
 const appUsers = computed(() => {
