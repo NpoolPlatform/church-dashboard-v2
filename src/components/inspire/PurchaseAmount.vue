@@ -53,6 +53,7 @@
         </span>
       </q-card-section>
       <q-card-section>
+        <q-select :options='myGoods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
         <q-input type='number' v-model='target.Amount' :label='$t("MSG_AMOUNT")' :suffix='PriceCoinName' />
         <q-input v-model='target.BadgeLarge' :label='$t("MSG_BADGE_LARGE")' />
         <q-input v-model='target.BadgeSmall' :label='$t("MSG_BADGE_SMALL")' />
@@ -83,7 +84,9 @@ import {
   useChurchCommissionStore,
   PriceCoinName,
   formatTime,
-  InvalidID
+  InvalidID,
+  useAdminGoodStore,
+  Good
 } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch, ref } from 'vue'
@@ -98,6 +101,7 @@ const appID = computed(() => app.AppID)
 interface MySetting extends PurchaseAmountSetting {
   EmailAddress: string
   PhoneNO: string
+  GoodName: string
 }
 
 const user = useChurchUsersStore()
@@ -116,6 +120,11 @@ const settings = computed(() => Array.from(appSettings.value).map((el) => {
   const s = el as MySetting
   s.EmailAddress = user.getUserByAppUserID(appID.value, s.UserID)?.User.EmailAddress as string
   s.PhoneNO = user.getUserByAppUserID(appID.value, s.UserID)?.User.PhoneNO as string
+  s.GoodName = ''
+  const index = goods.value.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
+  if (index >= 0) {
+    s.GoodName = goods.value[index].Good.Good.Title
+  }
   return s
 }))
 
@@ -177,12 +186,53 @@ const prepare = () => {
   })
 }
 
+const good = useAdminGoodStore()
+const goods = computed(() => good.Goods)
+
+interface MyGood {
+  label: string
+  value: Good
+}
+const myGoods = computed(() => Array.from(goods.value).map((el) => {
+  return {
+    label: el.Good.Good.Title + '(' + (el.Good.Good.ID as string) + ')',
+    value: el
+  } as MyGood
+}))
+const selectedGood = computed({
+  get: () => {
+    const index = goods.value.findIndex((el) => el.Good.Good.ID === target.value.GoodID)
+    if (index < 0) {
+      return undefined as unknown as MyGood
+    }
+    return {
+      label: goods.value[index].Good.Good.Title + '(' + (goods.value[index].Good.Good.ID as string) + ')',
+      value: goods.value[index]
+    } as MyGood
+  },
+  set: (val: MyGood) => {
+    target.value.GoodID = val.value.Good.Good.ID as string
+  }
+})
+
 watch(appID, () => {
   prepare()
 })
 
 onMounted(() => {
   prepare()
+  good.getAllGoods({
+    Message: {
+      Error: {
+        Title: t('MSG_GET_ALL_GOODS'),
+        Message: t('MSG_GET_ALL_GOODS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 })
 
 const showing = ref(false)
