@@ -118,8 +118,8 @@ const appSettings = computed(() => {
 })
 const settings = computed(() => Array.from(appSettings.value).map((el) => {
   const s = el as MySetting
-  s.EmailAddress = user.getUserByAppUserID(appID.value, s.UserID)?.User.EmailAddress as string
-  s.PhoneNO = user.getUserByAppUserID(appID.value, s.UserID)?.User.PhoneNO as string
+  s.EmailAddress = user.getUserByAppUserID(appID.value, s.UserID as string)?.User.EmailAddress as string
+  s.PhoneNO = user.getUserByAppUserID(appID.value, s.UserID as string)?.User.PhoneNO as string
   s.GoodName = ''
   const index = goods.value.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
   if (index >= 0) {
