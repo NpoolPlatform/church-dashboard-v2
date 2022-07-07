@@ -83,7 +83,7 @@ const forder = useOrderStore()
 const coin = useCoinStore()
 const payCoinID = computed(() => {
   const index = coin.Coins.findIndex((el) => {
-    return el.ENV === 'main' && (el.Name?.toLowerCase().replace(/ /, '') === 'usdttrc20' || el.Name?.toLowerCase().replace(/ /, '') === 'tethertrc20')
+    return (el.ENV === selectedGood.value?.value.Main?.ENV) && (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') || el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
   })
   if (index < 0) {
     return undefined as unknown as string
@@ -224,7 +224,6 @@ onMounted(() => {
 })
 
 const onSubmit = () => {
-  showing.value = false
   if (units.value > maxUnits.value) {
     console.log('purchase units', units.value, 'max units', maxUnits.value)
     return
@@ -237,7 +236,7 @@ const onSubmit = () => {
     console.log('please select user')
     return
   }
-  if (!payCoinID.value) {
+  if (!payCoinID.value || payCoinID.value.length === 0) {
     console.log('pay coin is missed')
     return
   }
@@ -272,7 +271,7 @@ const onSubmit = () => {
         }
       }
     }, () => {
-      // TODO
+      showing.value = false
     })
   })
 }
