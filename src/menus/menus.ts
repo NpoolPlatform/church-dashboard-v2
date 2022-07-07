@@ -746,6 +746,35 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
+  } as MenuItem, {
+    menuId: uid(),
+    label: '订单管理',
+    caption: '查看订单以及创建离线订单',
+    icon: 'reviews',
+    target: '/order',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '订单列表',
+        caption: '查看订单列表',
+        icon: 'format_list_numbered',
+        target: '/billing/order',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '离线订单',
+        caption: '创建离线订单',
+        icon: 'format_list_numbered',
+        target: '/order/offline',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
   } as MenuItem
 ] as Array<MenuItem>
 
