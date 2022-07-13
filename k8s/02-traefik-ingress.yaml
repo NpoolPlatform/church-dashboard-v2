@@ -4,6 +4,7 @@ metadata:
   name: church-dashboard-v2-treafik-ingress
   namespace: kube-system
   annotations:
+    cert-manager.io/cluster-issuer: alidns-npool-letsencrypt-issuer
     k8s.kuboard.cn/displayName: church-dashboard-v2-treafik
     k8s.kuboard.cn/workload: church-dashboard-v2-treafik
     kubernetes.io/ingress.class: "traefik-internet"
@@ -15,18 +16,14 @@ metadata:
 spec:
   tls:
     - hosts:
-        - dashboard.xpool.top
-      secretName: xpool-top-cert
-    - hosts:
-        - dashboard.npool.top
-      secretName: npool-top-cert
+        - '*.development.npool.top'
+        - development.npool.top
+      secretName: development-npool-top-tls
   rules:
-    - host: dashboard.xpool.top
+    - host: admin.development.npool.top
       http: &http_rules
         paths:
           - path: /
             backend:
               serviceName: church-dashboard-v2
               servicePort: 80
-    - host: dashboard.npool.top
-      http: *http_rules
