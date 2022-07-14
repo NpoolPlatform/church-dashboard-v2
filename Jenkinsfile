@@ -240,17 +240,6 @@ pipeline {
       }
     }
 
-    stage('Deploy https certificate') {
-      when {
-        expression { DEPLOY_TARGET == 'true' }
-      }
-      steps {
-        sh(returnStdout: false, script: '''
-          sed -i "s/development/$TARGET_ENV/g" k8s/02-traefik-ingress.yaml
-        '''.stripIndent())
-      }
-    }
-
     stage('Deploy for development') {
       when {
         expression { DEPLOY_TARGET == 'true' }
@@ -258,6 +247,7 @@ pipeline {
       }
       steps {
         sh 'sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml'
+        sh 'sed -i "s/development/$TARGET_ENV/g" k8s/02-traefik-ingress.yaml'
         sh 'kubectl apply -k k8s'
       }
     }
@@ -276,6 +266,7 @@ pipeline {
           git checkout $tag
           sed -i "s/church-dashboard-v2:latest/church-dashboard-v2:$tag/g" k8s/01-church-dashboard-v2.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml
+          sed -i "s/development/$TARGET_ENV/g" k8s/02-traefik-ingress.yaml
           kubectl apply -k k8s
         '''.stripIndent())
       }
@@ -301,6 +292,7 @@ pipeline {
           git checkout $tag
           sed -i "s/church-dashboard-v2:latest/church-dashboard-v2:$tag/g" k8s/01-church-dashboard-v2.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml
+          sed -i "s/development/$TARGET_ENV/g" k8s/02-traefik-ingress.yaml
           kubectl apply -k k8s
         '''.stripIndent())
       }
