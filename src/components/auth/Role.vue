@@ -92,7 +92,9 @@ import {
   Role,
   Auth,
   NotifyType,
-  useChurchUserStore
+  useChurchUserStore,
+  useChurchAuthingStore,
+  useChurchRoleStore
 } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -102,8 +104,12 @@ const appID = computed(() => app.AppID)
 
 const user = useChurchUserStore()
 const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
-const roles = computed(() => user.Roles.get(appID.value) ? user.Roles.get(appID.value) as Array<Role> : [])
-const auths = computed(() => user.Auths.get(appID.value) ? user.Auths.get(appID.value) as Array<Auth> : [])
+
+const role = useChurchRoleStore()
+const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) as Array<Role> : [])
+
+const auth = useChurchAuthingStore()
+const auths = computed(() => auth.Auths.get(appID.value) ? auth.Auths.get(appID.value) as Array<Auth> : [])
 
 const selectedRole = ref([] as Array<Role>)
 
@@ -128,7 +134,7 @@ const displayAuths = computed(() => auths.value?.filter((auth) => {
 const selectedAuth = ref([] as Array<Auth>)
 
 const getAuths = (offset: number, limit: number) => {
-  user.getAppAuths({
+  auth.getAppAuths({
     TargetAppID: appID.value,
     Offset: offset,
     Limit: limit,
@@ -151,7 +157,7 @@ const getAuths = (offset: number, limit: number) => {
 }
 
 const getRoles = (offset: number, limit: number) => {
-  user.getAppRoles({
+  role.getAppRoles({
     TargetAppID: appID.value,
     Offset: offset,
     Limit: limit,
@@ -230,11 +236,51 @@ onMounted(() => {
 })
 
 const onCreateAuthClick = () => {
-  // TODO
+  if (selectedApi.value.length === 0) {
+    return
+  }
+
+  if (selectedRole.value.length === 0) {
+    return
+  }
+
+  auth.createAppAuth({
+    TargetAppID: appID.value,
+    RoleID: selectedRole.value[0].ID,
+    Resource: selectedApi.value[0].Path,
+    Method: selectedApi.value[0].Method,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_APP_AUTH',
+        Message: 'MSG_CREATE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 }
 
 const onDeleteAuthClick = () => {
-  // TODO
+  if (selectedAuth.value.length === 0) {
+    return
+  }
+
+  auth.deleteAppAuth({
+    TargetAppID: appID.value,
+    ID: selectedAuth.value[0].ID,
+    Message: {
+      Error: {
+        Title: 'MSG_DELETEAPP_AUTH',
+        Message: 'MSG_DELETE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 }
 
 </script>
