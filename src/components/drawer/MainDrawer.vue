@@ -6,7 +6,7 @@
         flat dense round icon='swap_horiz'
         aria-label='Menu'
         class='drawer-toggle'
-        :disable='!logined.getLogined'
+        :disable='!logined'
         @click='toggleLeftDrawer'
       />
     </div>
@@ -15,7 +15,7 @@
         v-for='item in MainDrawerMenus'
         :key='item.label'
         :menu='item'
-        :disable='!logined.getLogined'
+        :disable='!logined'
         @click='onItemClick(item)'
         :mini='leftDrawerMini'
       />
@@ -23,18 +23,20 @@
   </q-drawer>
 </template>
 <script setup lang='ts'>
-import { ref, defineAsyncComponent } from 'vue'
-import { useLoginedUserStore } from 'npool-cli-v2'
+import { ref, defineAsyncComponent, computed } from 'vue'
+import { useLocalUserStore } from 'npool-cli-v4'
 import { MainDrawerMenus } from 'src/menus/menus'
 import { MenuItem, useMenuStore, HomePageBreadcrumbs } from 'src/localstore'
 
 const DrawerMenu = defineAsyncComponent(() => import('src/components/drawer/DrawerMenu.vue'))
 
-const logined = useLoginedUserStore()
+const user = useLocalUserStore()
+const logined = computed(() => user.logined)
+
 const menus = useMenuStore()
 
 const leftDrawerOpen = ref(true)
-const leftDrawerMini = ref(!logined.getLogined)
+const leftDrawerMini = ref(!logined.value)
 
 const toggleLeftDrawer = (): void => {
   leftDrawerMini.value = !leftDrawerMini.value
