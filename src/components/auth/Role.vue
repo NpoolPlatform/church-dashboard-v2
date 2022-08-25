@@ -85,31 +85,32 @@
 import {
   useAPIStore,
   NotificationType,
-  ExpandAPI,
-  useAuthStore,
-  useChurchUsersStore,
-  UserInfo,
-  useChurchRolesStore,
-  AppRole,
-  Auth
+  ExpandAPI
 } from 'npool-cli-v2'
+import {
+  User,
+  Role,
+  Auth,
+  NotifyType,
+  useChurchUserStore
+} from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const role = useChurchRolesStore()
-const roles = computed(() => role.Roles.get(appID.value))
-const selectedRole = ref([] as Array<AppRole>)
+const user = useChurchUserStore()
+const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
+const roles = computed(() => user.Roles.get(appID.value) ? user.Roles.get(appID.value) as Array<Role> : [])
+const auths = computed(() => user.Auths.get(appID.value) ? user.Auths.get(appID.value) as Array<Auth> : [])
 
-const user = useChurchUsersStore()
-const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const selectedRole = ref([] as Array<Role>)
+
 const displayUsers = computed(() => Array.from(users.value.filter((user) => {
-  const index = user.Roles?.findIndex((el) => el.ID === selectedRole.value[0]?.ID)
+  const index = user.Roles?.findIndex((role) => role === selectedRole.value[0]?.ID)
   return index !== undefined && index >= 0
-}).map((user) => user.User)))
-const userLoading = ref(true)
+})))
 
 const api = useAPIStore()
 const apis = computed(() => api.APIs)
@@ -117,59 +118,90 @@ const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
-const auth = useAuthStore()
-const auths = computed(() => {
-  return auth.RoleAuths.get(appID.value) ? auth.RoleAuths.get(appID.value)?.filter((auth) => {
-    return auth.RoleID === selectedRole.value[0]?.ID
-  }) : []
-})
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<Auth>)
 
-const prepare = () => {
-  auth.getAuths({
+const getAuths = (offset: number, limit: number) => {
+  user.getAppAuths({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (auths: Array<Auth>, error: boolean) => {
+    if (error) {
+      return
+    }
+    if (auths.length > 0) {
+      getAuths(offset + limit, limit)
+    }
   })
+}
 
-  userLoading.value = true
-  user.getUsers({
+const getRoles = (offset: number, limit: number) => {
+  user.getAppRoles({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
-        Title: 'MSG_GET_APP_USERS',
-        Message: 'MSG_GET_APP_USERS_FAIL',
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    userLoading.value = false
+  }, (roles: Array<Role>, error: boolean) => {
+    if (error) {
+      return
+    }
+    console.log(roles, user.Roles)
+    if (roles.length > 0) {
+      getRoles(offset + limit, limit)
+    }
   })
+}
 
-  role.getRoles({
+const getUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
-        Title: 'MSG_GET_APP_ROLES',
-        Message: 'MSG_GET_APP_ROLES_FAIL',
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (users: Array<User>, error: boolean) => {
+    if (error) {
+      return
+    }
+    if (users.length > 0) {
+      getUsers(offset + limit, limit)
+    }
   })
+}
+
+const prepare = () => {
+  if (!auths.value?.length) {
+    getAuths(0, 100)
+  }
+  if (!roles.value?.length) {
+    getRoles(0, 100)
+  }
+  if (!users.value?.length) {
+    getUsers(0, 100)
+  }
 }
 
 watch(appID, () => {
@@ -194,41 +226,11 @@ onMounted(() => {
 })
 
 const onCreateAuthClick = () => {
-  auth.createAppRoleAuth({
-    TargetAppID: appID.value,
-    Info: {
-      AppID: appID.value,
-      RoleID: selectedRole.value[0]?.ID,
-      Resource: selectedApi.value[0].Path,
-      Method: selectedApi.value[0].Method
-    },
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_AUTHS',
-        Message: 'MSG_GET_APP_AUTHS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  // TODO
 }
 
 const onDeleteAuthClick = () => {
-  auth.deleteAppRoleAuth({
-    ID: selectedAuth.value[0]?.ID as string,
-    Message: {
-      Error: {
-        Title: 'MSG_DELETE_APP_ROLE_AUTH',
-        Message: 'MSG_DELETE_APP_ROLE_AUTH_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  // TODO
 }
 
 </script>
