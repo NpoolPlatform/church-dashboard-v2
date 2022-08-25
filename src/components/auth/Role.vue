@@ -108,8 +108,11 @@ const auths = computed(() => user.Auths.get(appID.value) ? user.Auths.get(appID.
 const selectedRole = ref([] as Array<Role>)
 
 const displayUsers = computed(() => Array.from(users.value.filter((user) => {
-  const index = user.Roles?.findIndex((role) => role === selectedRole.value[0]?.ID)
-  return index !== undefined && index >= 0
+  if (selectedRole.value.length === 0) {
+    return true
+  }
+  const index = user.Roles?.findIndex((role) => role === selectedRole.value[0].Role)
+  return index >= 0
 })))
 
 const api = useAPIStore()
@@ -119,7 +122,9 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const authPath = ref('')
-const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
+const displayAuths = computed(() => auths.value?.filter((auth) => {
+  return auth.Resource.includes(authPath.value) && (selectedRole.value.length === 0 || auth.RoleID === selectedRole.value[0]?.ID)
+}))
 const selectedAuth = ref([] as Array<Auth>)
 
 const getAuths = (offset: number, limit: number) => {
@@ -162,7 +167,6 @@ const getRoles = (offset: number, limit: number) => {
     if (error) {
       return
     }
-    console.log(roles, user.Roles)
     if (roles.length > 0) {
       getRoles(offset + limit, limit)
     }
