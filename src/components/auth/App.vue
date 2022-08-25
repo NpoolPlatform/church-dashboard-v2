@@ -66,7 +66,8 @@
 </template>
 
 <script setup lang='ts'>
-import { useAPIStore, NotificationType, ExpandAPI, useAuthStore, Auth } from 'npool-cli-v2'
+import { useAPIStore, NotificationType, ExpandAPI } from 'npool-cli-v2'
+import { useChurchAuthingStore, NotifyType, Auth } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -79,26 +80,39 @@ const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
-const auth = useAuthStore()
-const auths = computed(() => auth.AppAuths.get(appID.value) ? auth.AppAuths.get(appID.value) : [])
+const auth = useChurchAuthingStore()
+const auths = computed(() => auth.Auths.get(appID.value) ? auth.Auths.get(appID.value) : [])
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<Auth>)
 
-const prepare = () => {
-  auth.getAuths({
+const getAuths = (offset: number, limit: number) => {
+  auth.getAppAuths({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (auths: Array<Auth>, error: boolean) => {
+    if (error) {
+      return
+    }
+    if (auths.length > 0) {
+      getAuths(offset + limit, limit)
+    }
   })
+}
+
+const prepare = () => {
+  if (!auths.value?.length) {
+    getAuths(0, 100)
+  }
 }
 
 watch(appID, () => {
@@ -123,19 +137,20 @@ onMounted(() => {
 })
 
 const onCreateAuthClick = () => {
+  if (selectedApi.value.length === 0) {
+    return
+  }
+
   auth.createAppAuth({
     TargetAppID: appID.value,
-    Info: {
-      AppID: appID.value,
-      Resource: selectedApi.value[0].Path,
-      Method: selectedApi.value[0].Method
-    },
+    Resource: selectedApi.value[0].Path,
+    Method: selectedApi.value[0].Method,
     Message: {
       Error: {
-        Title: 'MSG_GET_APP_AUTHS',
-        Message: 'MSG_GET_APP_AUTHS_FAIL',
+        Title: 'MSG_CREATE_APP_AUTH',
+        Message: 'MSG_CREATE_APP_AUTH_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
@@ -144,19 +159,23 @@ const onCreateAuthClick = () => {
 }
 
 const onDeleteAuthClick = () => {
+  if (selectedAuth.value.length === 0) {
+    return
+  }
+
   auth.deleteAppAuth({
-    ID: selectedAuth.value[0]?.ID as string,
+    TargetAppID: appID.value,
+    ID: selectedAuth.value[0].ID,
     Message: {
       Error: {
-        Title: 'MSG_DELETE_APP_AUTH',
+        Title: 'MSG_DELETEAPP_AUTH',
         Message: 'MSG_DELETE_APP_AUTH_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
     // TODO
   })
 }
-
 </script>
