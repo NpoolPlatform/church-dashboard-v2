@@ -96,6 +96,7 @@ import {
   useChurchUserStore,
   useChurchAuthingStore,
   useChurchRoleStore,
+  InvalidID,
   formatTime
 } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
@@ -111,39 +112,6 @@ const appID = computed(() => app.AppID)
 const user = useChurchUserStore()
 const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 
-const columns = computed(() => [
-  {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
-    field: (row: User) => row.AppID
-  },
-  {
-    name: 'UserID',
-    label: t('MSG_USER_ID'),
-    field: (row: User) => row.ID
-  },
-  {
-    name: 'EmailAddress',
-    label: t('MSG_EMAIL_ADDRESS'),
-    field: (row: User) => row.EmailAddress
-  },
-  {
-    name: 'PhoneNO',
-    label: t('MSG_PHONE_NO'),
-    field: (row: User) => row.PhoneNO
-  },
-  {
-    name: 'Roles',
-    label: t('MSG_ROLES'),
-    field: (row: User) => row.Roles.join(',')
-  },
-  {
-    name: 'CreatedAt',
-    label: t('MSG_CREATEDAT'),
-    field: (row: User) => formatTime(row.CreatedAt)
-  }
-])
-
 const role = useChurchRoleStore()
 const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) as Array<Role> : [])
 
@@ -152,13 +120,13 @@ const auths = computed(() => auth.Auths.get(appID.value) ? auth.Auths.get(appID.
 
 const selectedRole = ref([] as Array<Role>)
 
-const displayUsers = computed(() => Array.from(users.value.filter((user) => {
+const displayUsers = computed(() => users.value.filter((user) => {
   if (selectedRole.value.length === 0) {
     return true
   }
   const index = user.Roles?.findIndex((role) => role === selectedRole.value[0].Role)
   return index >= 0
-})))
+}))
 
 const api = useAPIStore()
 const apis = computed(() => api.APIs)
@@ -168,11 +136,14 @@ const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(
 
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => {
-  return auth.Resource.includes(authPath.value) && (selectedRole.value.length === 0 || auth.RoleID === selectedRole.value[0]?.ID)
+  return auth.UserID === InvalidID &&
+          auth.RoleID !== InvalidID &&
+          auth.Resource.includes(authPath.value) &&
+          (selectedRole.value.length === 0 || auth.RoleID === selectedRole.value[0]?.ID)
 }))
 const selectedAuth = ref([] as Array<Auth>)
 
-const getAuths = (offset: number, limit: number) => {
+const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
     TargetAppID: appID.value,
     Offset: offset,
@@ -185,17 +156,15 @@ const getAuths = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (auths: Array<Auth>, error: boolean) => {
-    if (error) {
+  }, (resp: Array<Auth>, error: boolean) => {
+    if (error || resp.length < limit) {
       return
     }
-    if (auths.length > 0) {
-      getAuths(offset + limit, limit)
-    }
+    getAppAuths(offset + limit, limit)
   })
 }
 
-const getRoles = (offset: number, limit: number) => {
+const getAppRoles = (offset: number, limit: number) => {
   role.getAppRoles({
     TargetAppID: appID.value,
     Offset: offset,
@@ -208,17 +177,15 @@ const getRoles = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (roles: Array<Role>, error: boolean) => {
-    if (error) {
+  }, (resp: Array<Role>, error: boolean) => {
+    if (error || resp.length < limit) {
       return
     }
-    if (roles.length > 0) {
-      getRoles(offset + limit, limit)
-    }
+    getAppRoles(offset + limit, limit)
   })
 }
 
-const getUsers = (offset: number, limit: number) => {
+const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
     TargetAppID: appID.value,
     Offset: offset,
@@ -231,25 +198,23 @@ const getUsers = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (users: Array<User>, error: boolean) => {
-    if (error) {
+  }, (resp: Array<User>, error: boolean) => {
+    if (error || resp.length < limit) {
       return
     }
-    if (users.length > 0) {
-      getUsers(offset + limit, limit)
-    }
+    getAppUsers(offset + limit, limit)
   })
 }
 
 const prepare = () => {
   if (!auths.value?.length) {
-    getAuths(0, 100)
+    getAppAuths(0, 100)
   }
   if (!roles.value?.length) {
-    getRoles(0, 100)
+    getAppRoles(0, 100)
   }
   if (!users.value?.length) {
-    getUsers(0, 100)
+    getAppUsers(0, 100)
   }
 }
 
@@ -321,5 +286,36 @@ const onDeleteAuthClick = () => {
     // TODO
   })
 }
-
+const columns = computed(() => [
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    field: (row: User) => row.AppID
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: User) => row.ID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: User) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: User) => row.PhoneNO
+  },
+  {
+    name: 'Roles',
+    label: t('MSG_ROLES'),
+    field: (row: User) => row.Roles.join(',')
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATEDAT'),
+    field: (row: User) => formatTime(row.CreatedAt)
+  }
+])
 </script>
