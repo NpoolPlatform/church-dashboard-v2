@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='roleLoading'
     :rows-per-page-options='[20]'
-    @row-click='(evt, row, index) => onRowClick(row as AppRole)'
+    @row-click='(evt, row, index) => onRowClick(row as Role)'
   >
     <template #top-right>
       <div class='row indent flat'>
