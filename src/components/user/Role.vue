@@ -49,24 +49,21 @@
 </template>
 
 <script setup lang='ts'>
-import { AppRole, NotificationType, useLoginedUserStore, useChurchRolesStore } from 'npool-cli-v2'
-import { NotifyType, Role, useChurchRoleStore } from 'npool-cli-v4'
+import { NotifyType, Role, useChurchRoleStore, useLocalUserStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const role = useChurchRolesStore()
-const roles = computed(() => churchRole.Roles.get(appID.value) ? churchRole.Roles.get(appID.value) : [])
+const role = useChurchRoleStore()
+const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
 const roleLoading = ref(false)
 
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 
-const churchRole = useChurchRoleStore()
-
-const getRoles = (offset: number, limit: number) => {
-  churchRole.getAppRoles({
+const getAppRoles = (offset: number, limit: number) => {
+  role.getAppRoles({
     TargetAppID: appID.value,
     Offset: offset,
     Limit: limit,
@@ -78,20 +75,20 @@ const getRoles = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (roles: Array<Role>, error: boolean) => {
-    if (error) {
+  }, (resp: Array<Role>, error: boolean) => {
+    if (error || resp.length < limit) {
+      roleLoading.value = false
       return
     }
-    if (roles.length >= limit) {
-      getRoles(offset + limit, limit)
-    }
-    roleLoading.value = false
+    getAppRoles(offset + limit, limit)
   })
 }
 
 const prepare = () => {
-  roleLoading.value = true
-  getRoles(0, 100)
+  if (!role.Roles.get(appID.value)) {
+    roleLoading.value = true
+    getAppRoles(0, 100)
+  }
 }
 
 watch(appID, () => {
@@ -106,8 +103,8 @@ const showing = ref(false)
 const updating = ref(false)
 const target = ref({
   AppID: appID,
-  CreatedBy: logined.LoginedUser?.User.ID as string
-} as unknown as AppRole)
+  CreatedBy: logined.User?.ID
+} as unknown as Role)
 
 const onCreate = () => {
   showing.value = true
@@ -117,24 +114,24 @@ const onCreate = () => {
 const onSubmit = () => {
   showing.value = false
 
-  if (updating.value) {
-    role.updateRole({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_ROLE',
-          Message: 'MSG_UPDATE_ROLE_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
+  if (updating.value) { // NEED UPDATE ROLE API
+    // role.updateRole({
+    //   Info: target.value,
+    //   Message: {
+    //     Error: {
+    //       Title: 'MSG_UPDATE_ROLE',
+    //       Message: 'MSG_UPDATE_ROLE_FAIL',
+    //       Popup: true,
+    //       Type: NotificationType.Error
+    //     }
+    //   }
+    // }, () => {
+    //   // TODO
+    // })
+    // return
   }
 
-  churchRole.createAppRole({
+  role.createAppRole({
     TargetAppID: appID.value,
     RoleName: target.value.Role,
     Default: target.value.Default,
@@ -152,7 +149,7 @@ const onSubmit = () => {
   })
 }
 
-const onRowClick = (role: AppRole) => {
+const onRowClick = (role: Role) => {
   showing.value = true
   updating.value = true
   target.value = role
@@ -162,8 +159,8 @@ const onMenuHide = () => {
   showing.value = false
   target.value = {
     AppID: appID,
-    CreatedBy: logined.LoginedUser?.User.ID as string
-  } as unknown as AppRole
+    CreatedBy: logined.User?.ID
+  } as unknown as Role
 }
 
 const onCancel = () => {
