@@ -77,6 +77,7 @@
 
 <script setup lang='ts'>
 import { useAPIStore, NotificationType, ExpandAPI, useAuthStore, useChurchUsersStore, UserInfo, AppUser, Auth } from 'npool-cli-v2'
+import { NotifyType, useChurchAuthingStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -100,29 +101,37 @@ const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(
 
 const auth = useAuthStore()
 const auths = computed(() => {
-  return auth.UserAuths.get(appID.value) ? auth.UserAuths.get(appID.value)?.filter((auth) => {
-    return auth.UserID === selectedUser.value[0]?.ID
+  return newAuth.Auths.get(appID.value) ? newAuth.Auths.get(appID.value)?.filter((al) => {
+    return al.UserID === selectedUser.value[0]?.ID
   }) : []
 })
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<Auth>)
 
-const prepare = () => {
-  auth.getAuths({
+const newAuth = useChurchAuthingStore()
+const getAppAuths = (offset: number, limit: number) => {
+  newAuth.getAppAuths({
+    Offset: offset,
+    Limit: limit,
     TargetAppID: appID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (resp: Array<Auth>, error: boolean) => {
+    if (error || resp.length < limit) {
+      return
+    }
+    getAppAuths(offset + limit, limit)
   })
+}
 
+const prepare = () => {
   userLoading.value = true
   user.getUsers({
     TargetAppID: appID.value,
@@ -137,6 +146,10 @@ const prepare = () => {
   }, () => {
     userLoading.value = false
   })
+
+  if (!newAuth.Auths.get(appID.value)) {
+    getAppAuths(0, 100)
+  }
 }
 
 watch(appID, () => {
