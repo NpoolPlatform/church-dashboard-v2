@@ -49,7 +49,8 @@
 </template>
 
 <script setup lang='ts'>
-import { AppRole, NotificationType, useChurchRolesStore, useLoginedUserStore } from 'npool-cli-v2'
+import { AppRole, NotificationType, useLoginedUserStore, useChurchRolesStore } from 'npool-cli-v2'
+import { NotifyType, Role, useChurchRoleStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -57,26 +58,40 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const role = useChurchRolesStore()
-const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
-const roleLoading = ref(true)
+const roles = computed(() => churchRole.Roles.get(appID.value) ? churchRole.Roles.get(appID.value) : [])
+const roleLoading = ref(false)
 
 const logined = useLoginedUserStore()
 
-const prepare = () => {
-  roleLoading.value = true
-  role.getRoles({
+const churchRole = useChurchRoleStore()
+
+const getRoles = (offset: number, limit: number) => {
+  churchRole.getAppRoles({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
-        Title: 'MSG_GET_ROLES',
-        Message: 'MSG_GET_ROLES_FAIL',
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
+  }, (roles: Array<Role>, error: boolean) => {
+    if (error) {
+      return
+    }
+    if (roles.length >= limit) {
+      getRoles(offset + limit, limit)
+    }
     roleLoading.value = false
   })
+}
+
+const prepare = () => {
+  roleLoading.value = true
+  getRoles(0, 100)
 }
 
 watch(appID, () => {
@@ -119,15 +134,17 @@ const onSubmit = () => {
     return
   }
 
-  role.createRole({
+  churchRole.createAppRole({
     TargetAppID: appID.value,
-    Info: target.value,
+    RoleName: target.value.Role,
+    Default: target.value.Default,
+    Description: target.value.Description,
     Message: {
       Error: {
         Title: 'MSG_CREATE_ROLE',
         Message: 'MSG_CREATE_ROLE_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
