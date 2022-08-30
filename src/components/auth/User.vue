@@ -188,7 +188,7 @@ onMounted(() => {
 const onCreateAuthClick = () => {
   newAuth.createAppAuth({
     TargetAppID: appID.value,
-    // TargetUserID: selectedUser.value[0]?.ID,
+    TargetUserID: selectedUser.value[0]?.ID,
     Resource: selectedApi.value[0].Path,
     Method: selectedApi.value[0].Method,
     Message: {
