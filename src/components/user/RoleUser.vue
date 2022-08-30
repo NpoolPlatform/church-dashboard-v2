@@ -87,6 +87,7 @@ import {
   UserInfo,
   useRoleStore
 } from 'npool-cli-v2'
+import { NotifyType, Role, useChurchRoleStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -95,8 +96,8 @@ const appID = computed(() => app.AppID)
 
 const arole = useRoleStore()
 const role = useChurchRolesStore()
-const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
-const roleLoading = ref(true)
+const roles = computed(() => churchRole.Roles.get(appID.value) ? churchRole.Roles.get(appID.value) : [])
+const roleLoading = ref(false)
 const selectedRole = ref([] as Array<AppRole>)
 
 const user = useChurchUsersStore()
@@ -127,24 +128,35 @@ const selectedRoleUser = ref([] as Array<AppUser>)
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
 
-const prepare = () => {
-  roleLoading.value = true
-  userLoading.value = true
-
-  role.getRoles({
+const churchRole = useChurchRoleStore()
+const getRoles = (offset: number, limit: number) => {
+  churchRole.getAppRoles({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
-        Title: 'MSG_GET_ROLES',
-        Message: 'MSG_GET_ROLES_FAIL',
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
+  }, (roles: Array<Role>, error: boolean) => {
+    if (error) {
+      return
+    }
+    if (roles.length >= limit) {
+      getRoles(offset + limit, limit)
+    }
     roleLoading.value = false
   })
-
+}
+const prepare = () => {
+  if (!churchRole.Roles.get(appID.value)) {
+    roleLoading.value = true
+    getRoles(0, 100)
+  }
   user.getUsers({
     TargetAppID: appID.value,
     Message: {
@@ -157,20 +169,6 @@ const prepare = () => {
     }
   }, () => {
     userLoading.value = false
-  })
-
-  role.getRoleUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_ROLE_USERS',
-        Message: 'MSG_GET_ROLE_USERS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
   })
 }
 
@@ -186,20 +184,16 @@ const onAddRoleUser = () => {
   if (selectedRole.value.length === 0 || selectedUser.value.length === 0) {
     return
   }
-  role.createRoleUser({
+  churchRole.createAppRoleUser({
     TargetAppID: appID.value,
     TargetUserID: selectedUser.value[0].ID as string,
-    Info: {
-      AppID: appID.value,
-      RoleID: selectedRole.value[0].ID as string,
-      UserID: selectedUser.value[0].ID
-    },
+    RoleID: selectedRole.value[0].ID as string,
     Message: {
       Error: {
         Title: 'MSG_ADD_ROLE_USER',
         Message: 'MSG_ADD_ROLE_USER_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
