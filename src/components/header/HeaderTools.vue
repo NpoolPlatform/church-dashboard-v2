@@ -4,7 +4,7 @@
       delse
       flat
       :options='applications'
-      :label='selectedApp ? selectedApp.App.Name : $t("MSG_SELECT_APPLICATION")'
+      :label='selectedApp ? selectedApp.Name : $t("MSG_SELECT_APPLICATION")'
       auto-close
       no-caps
       v-if='logined'
@@ -13,11 +13,11 @@
         <q-item
           dense
           v-for='app in applications'
-          :key='app.App.ID'
+          :key='app.ID'
           clickable
           @click='onAppSelected(app)'
         >
-          {{ app.App.Name }}
+          {{ app.Name }}
         </q-item>
       </q-list>
     </q-btn-dropdown>
@@ -30,13 +30,13 @@
 </template>
 
 <script setup lang='ts'>
-import { useApplicationsStore, useMailboxStore, Application, NotificationType } from 'npool-cli-v2'
+import { useMailboxStore } from 'npool-cli-v2'
 import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
 import { useLocalApplicationStore } from 'src/localstore'
+import { App, useChurchAppStore, useLocalUserStore, NotifyType } from 'npool-cli-v4'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
 import bellMsg from '../../assets/bell-msg.svg'
-import { useLocalUserStore } from 'npool-cli-v4'
 
 const tracing = 'https://www.jaegertracing.io/img/jaeger-icon-reverse-color.svg'
 const github = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png'
@@ -48,21 +48,21 @@ const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/Lang
 const loginedUser = useLocalUserStore()
 const logined = computed(() => loginedUser.logined)
 
-const application = useApplicationsStore()
+const application = useChurchAppStore()
 const localapplication = useLocalApplicationStore()
 
-const applications = computed(() => application.Applications)
+const applications = computed(() => application.Apps)
 const selectedApp = computed({
-  get: () => application.getApplicationByID(localapplication.AppID),
-  set: (val: Application) => {
-    localapplication.AppID = val.App.ID
+  get: () => applications.value.find((el) => el.ID === localapplication.AppID) as App,
+  set: (val: App) => {
+    localapplication.AppID = val.ID
   }
 })
 
 const mailbox = useMailboxStore()
 const bellIcon = computed(() => mailbox.Notifications.length > 0 ? bellMsg : bellNoMsg)
 
-const onAppSelected = (app: Application) => {
+const onAppSelected = (app: App) => {
   selectedApp.value = app
 }
 
@@ -70,13 +70,15 @@ watch(logined, () => {
   if (!logined.value) {
     return
   }
-  application.getApplications({
+  application.getApps({
+    Offset: 0,
+    Limit: 100,
     Message: {
       Error: {
         Title: 'MSG_GET_APPLICATIONS',
         Message: 'MSG_GET_APPLICATIONS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
@@ -88,13 +90,15 @@ onMounted(() => {
   if (!logined.value) {
     return
   }
-  application.getApplications({
+  application.getApps({
+    Offset: 0,
+    Limit: 100,
     Message: {
       Error: {
         Title: 'MSG_GET_APPLICATIONS',
         Message: 'MSG_GET_APPLICATIONS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
