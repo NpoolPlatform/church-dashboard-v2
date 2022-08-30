@@ -121,18 +121,18 @@ import {
   Message,
   NotificationType,
   useAdminLangStore,
-  useApplicationsStore,
   useChurchLangStore,
   useLocaleStore
 } from 'npool-cli-v2'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useLocalApplicationStore } from 'src/localstore'
 import { saveAs } from 'file-saver'
+import { useChurchAppStore } from 'npool-cli-v4'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const application = useApplicationsStore()
+const application = useChurchAppStore()
 const clang = useChurchLangStore()
 const alang = useAdminLangStore()
 const locale = useLocaleStore()
@@ -282,7 +282,7 @@ const onExport = () => {
     Language: language.value,
     Messages: messages.value
   })], { type: 'text/plain;charset=utf-8' })
-  const filename = application.getApplicationByID(appID.value)?.App.Name + '-' +
+  const filename = application.Apps.find((el) => el.ID === appID.value)?.Name as string + '-' +
                    language.value.Name + '-' +
                    formatTime(new Date().getTime() / 1000) +
                    '.json'

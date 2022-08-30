@@ -69,14 +69,14 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { Application, formatTime, NotificationType, useApplicationsStore, useAuthStore } from 'npool-cli-v2'
-import { NotifyType, useChurchAuthingStore, Auth } from 'npool-cli-v4'
+import { formatTime, NotificationType, useAuthStore } from 'npool-cli-v2'
+import { NotifyType, useChurchAuthingStore, Auth, useChurchAppStore, App } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
-const application = useApplicationsStore()
+const application = useChurchAppStore()
 
 const auth = useAuthStore()
 const auths = computed(() => newAuth.Auths.get(appID.value))
@@ -124,18 +124,18 @@ onMounted(() => {
 })
 
 interface SavedAuths {
-  Application: Application
+  Application: App
   Auths: Array<Auth>
 }
 
 const onExportClick = () => {
-  const myApp = application.getApplicationByID(appID.value)
+  const myApp = application.Apps.find((el) => el.ID === appID.value)
   const blob = new Blob([JSON.stringify({
     Application: myApp,
     Auths: auths.value
   })], { type: 'text/plain;charset=utf-8' })
-  const filename = myApp.App.Name + '-' +
-                   myApp.App.ID + '-auths-' +
+  const filename = (myApp?.Name as string) + '-' +
+                   (myApp?.ID as string) + '-auths-' +
                    formatTime(new Date().getTime() / 1000) +
                    '.json'
   saveAs(blob, filename)
@@ -154,9 +154,9 @@ const onFileLoaded = (evt: Event) => {
     const reader = new FileReader()
     reader.onload = () => {
       const loaded = JSON.parse(reader.result as string) as SavedAuths
-      const index = application.Applications.findIndex((el) => el.App.ID === loaded.Application.App.ID)
-      application.Applications.splice(index, index < 0 ? 0 : 1, loaded.Application)
-      app.AppID = loaded.Application.App.ID
+      const index = application.Apps.findIndex((el) => el.ID === loaded.Application.ID)
+      application.Apps.splice(index, index < 0 ? 0 : 1, loaded.Application)
+      app.AppID = loaded.Application.ID
       loadedAuths.value = loaded.Auths
     }
     reader.readAsText(filename)

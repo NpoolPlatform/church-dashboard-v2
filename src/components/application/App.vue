@@ -31,20 +31,20 @@
         <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.App.Name' :label='$t("MSG_APPLICATION_NAME")' />
-        <q-input v-model='target.App.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
-        <q-input v-model='target.App.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
-        <q-select :options='RecaptchaMethods' v-model='target.Ctrl.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
+        <q-input v-model='target.Name' :label='$t("MSG_APPLICATION_NAME")' />
+        <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
+        <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
+        <q-select :options='RecaptchaMethods' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
       </q-card-section>
       <q-card-section>
         <div>
-          <q-toggle dense v-model='target.Ctrl.KycEnable' :label='$t("MSG_ENABLE_KYC")' />
+          <q-toggle dense v-model='target.KycEnable' :label='$t("MSG_ENABLE_KYC")' />
         </div>
         <div>
-          <q-toggle dense v-model='target.Ctrl.SigninVerifyEnable' :label='$t("MSG_ENABLE_SIGNIN_VERIFY")' />
+          <q-toggle dense v-model='target.SigninVerifyEnable' :label='$t("MSG_ENABLE_SIGNIN_VERIFY")' />
         </div>
         <div>
-          <q-toggle dense v-model='target.Ctrl.InvitationCodeMust' :label='$t("MSG_INVITATION_CODE_MUST")' />
+          <q-toggle dense v-model='target.InvitationCodeMust' :label='$t("MSG_INVITATION_CODE_MUST")' />
         </div>
       </q-card-section>
       <q-item class='row'>
@@ -57,18 +57,18 @@
 
 <script setup lang='ts'>
 import {
-  NotificationType,
-  useApplicationsStore,
-  App,
-  Application,
-  AppControl,
   RecaptchaMethods,
   useLoginedUserStore
 } from 'npool-cli-v2'
+import {
+  useChurchAppStore,
+  NotifyType,
+  App
+} from 'npool-cli-v4'
 import { computed, onMounted, ref } from 'vue'
 
-const app = useApplicationsStore()
-const apps = computed(() => Array.from(app.Applications).map((el) => el.App))
+const app = useChurchAppStore()
+const apps = computed(() => app.Apps)
 const appLoading = ref(false)
 
 const logined = useLoginedUserStore()
@@ -76,42 +76,35 @@ const logined = useLoginedUserStore()
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  App: {
-    CreatedBy: logined.LoginedUser?.User.ID
-  } as unknown as App,
-  Ctrl: {} as unknown as AppControl
-} as unknown as Application)
+  CreatedBy: logined.LoginedUser?.User.ID
+} as unknown as App)
 
 onMounted(() => {
-  app.getApplications({
+  app.getApps({
+    Offset: 0,
+    Limit: 100,
     Message: {
       Error: {
-        Title: 'MSG_GET_COUNTRIES',
-        Message: 'MSG_GET_COUNTRIES_FAIL',
+        Title: 'MSG_GET_APPS',
+        Message: 'MSG_GET_APPS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
-    appLoading.value = false
+    // TODO
   })
 })
 
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    App: {
-      CreatedBy: logined.LoginedUser?.User.ID
-    } as unknown as App,
-    Ctrl: {} as unknown as AppControl
-  } as unknown as Application
+    CreatedBy: logined.LoginedUser?.User.ID
+  } as unknown as App
 }
 
 const onRowClick = (application: App) => {
-  target.value = app.getApplicationByID(application.ID)
-  if (!target.value.Ctrl) {
-    target.value.Ctrl = {} as unknown as AppControl
-  }
+  target.value = apps.value.find((el) => el.ID === application.ID) as App
   showing.value = true
   updating.value = true
 }
@@ -123,67 +116,7 @@ const onCreate = () => {
 
 const onSubmit = () => {
   showing.value = false
-
-  if (updating.value) {
-    app.updateApplication({
-      Info: target.value.App,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_APPLICATION',
-          Message: 'MSG_UPDATE_APPLICATION_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  } else {
-    app.createApplication({
-      Info: target.value.App,
-      Message: {
-        Error: {
-          Title: 'MSG_CREATE_APPLICATION',
-          Message: 'MSG_CREATE_APPLICATION_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  }
-
-  if (target.value.Ctrl?.ID?.length) {
-    app.updateAppCtrl({
-      Info: target.value.Ctrl,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_APPLICATION_CONTROL',
-          Message: 'MSG_UPDATE_APPLICATION_CONTROL_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  } else {
-    app.createAppCtrl({
-      TargetAppID: target.value.App.ID,
-      Info: target.value.Ctrl,
-      Message: {
-        Error: {
-          Title: 'MSG_CREATE_APPLICATION_CONTROL',
-          Message: 'MSG_CREATE_APPLICATION_CONTROL_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  }
+  // TODO: support to create and update app
 }
 
 const onCancel = () => {

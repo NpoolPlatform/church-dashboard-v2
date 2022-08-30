@@ -77,8 +77,8 @@
 </template>
 
 <script setup lang='ts'>
-import { useAPIStore, NotificationType, ExpandAPI, useAuthStore, useChurchUsersStore, UserInfo, AppUser, Auth } from 'npool-cli-v2'
-import { formatTime, NotifyType, useChurchAuthingStore, User } from 'npool-cli-v4'
+import { useAPIStore, NotificationType, ExpandAPI, Auth } from 'npool-cli-v2'
+import { formatTime, NotifyType, useChurchAuthingStore, User, useChurchUserStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -88,14 +88,12 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const user = useChurchUsersStore()
-const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const user = useChurchUserStore()
+const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 const username = ref('')
-const displayUsers = computed(() => Array.from(users.value.filter((user) => {
-  return user.User.EmailAddress?.includes(username.value) || user.User.PhoneNO?.includes(username.value)
-}).map((user) => user.User)))
-const selectedUser = ref([] as Array<AppUser>)
-const userLoading = ref(true)
+const displayUsers = computed(() => users.value.filter((el) => el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)))
+const selectedUser = ref([] as Array<User>)
+const userLoading = ref(false)
 
 const api = useAPIStore()
 const apis = computed(() => api.APIs)
@@ -103,7 +101,6 @@ const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
-const auth = useAuthStore()
 const auths = computed(() => {
   return newAuth.Auths.get(appID.value) ? newAuth.Auths.get(appID.value)?.filter((al) => {
     return al.UserID === selectedUser.value[0]?.ID
@@ -113,6 +110,27 @@ const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<Auth>)
 
+const getAppUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USERS',
+        Message: 'MSG_GET_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (resp: Array<User>, error: boolean) => {
+    if (error || resp.length < limit) {
+      userLoading.value = false
+      return
+    }
+    getAppUsers(offset + limit, limit)
+  })
+}
 const newAuth = useChurchAuthingStore()
 const getAppAuths = (offset: number, limit: number) => {
   newAuth.getAppAuths({
@@ -136,20 +154,10 @@ const getAppAuths = (offset: number, limit: number) => {
 }
 
 const prepare = () => {
-  userLoading.value = true
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_USERS',
-        Message: 'MSG_GET_APP_USERS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    userLoading.value = false
-  })
+  if (!user.Users.get(appID.value)) {
+    userLoading.value = true
+    getAppUsers(0, 500)
+  }
 
   if (!newAuth.Auths.get(appID.value)) {
     getAppAuths(0, 100)
@@ -178,21 +186,17 @@ onMounted(() => {
 })
 
 const onCreateAuthClick = () => {
-  auth.createAppUserAuth({
+  newAuth.createAppAuth({
     TargetAppID: appID.value,
-    TargetUserID: selectedUser.value[0]?.ID as string,
-    Info: {
-      AppID: appID.value,
-      UserID: selectedUser.value[0]?.ID as string,
-      Resource: selectedApi.value[0].Path,
-      Method: selectedApi.value[0].Method
-    },
+    // TargetUserID: selectedUser.value[0]?.ID,
+    Resource: selectedApi.value[0].Path,
+    Method: selectedApi.value[0].Method,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
@@ -201,14 +205,15 @@ const onCreateAuthClick = () => {
 }
 
 const onDeleteAuthClick = () => {
-  auth.deleteAppUserAuth({
-    ID: selectedAuth.value[0]?.ID as string,
+  newAuth.deleteAppAuth({
+    TargetAppID: appID.value,
+    ID: selectedAuth.value[0].ID as string,
     Message: {
       Error: {
         Title: 'MSG_DELETE_APP_USER_AUTH',
         Message: 'MSG_DELETE_APP_USER_AUTH_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {

@@ -76,10 +76,10 @@
     v-if='false'
     :title='$t("MSG_ROLE_USERS")'
     dense
+    :columns='columns'
     :rows='displayUsers'
     row-key='ID'
     :rows-per-page-options='[5]'
-    :columns='columns'
   />
 </template>
 
