@@ -78,100 +78,109 @@
 
 <script setup lang='ts'>
 import {
-  AppRole,
+  useChurchRoleStore,
+  NotifyType,
+  useChurchUserStore,
+  User,
   AppRoleUser,
-  AppUser,
-  NotificationType,
-  useChurchRolesStore,
-  useChurchUsersStore,
-  UserInfo,
-  useRoleStore
-} from 'npool-cli-v2'
+  Role
+} from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const arole = useRoleStore()
-const role = useChurchRolesStore()
+const role = useChurchRoleStore()
 const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
 const roleLoading = ref(true)
-const selectedRole = ref([] as Array<AppRole>)
+const selectedRole = ref([] as Array<Role>)
 
-const user = useChurchUsersStore()
-const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
-const users = computed(() => Array.from(appUsers.value.filter((user: UserInfo) => {
-  if (!user.Roles) {
-    return true
-  }
-  if (selectedRole.value.length === 0) {
-    return true
-  }
-  return user.Roles.findIndex((role) => role.ID === selectedRole.value[0].ID) < 0
-})).map((el) => el.User))
+const user = useChurchUserStore()
+const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 const userLoading = ref(true)
-const selectedUser = ref([] as Array<AppUser>)
+const selectedUser = ref([] as Array<User>)
 
-const appRoleUsers = computed(() => role.RoleUsers.get(appID.value) ? role.RoleUsers.get(appID.value) as Array<AppRoleUser> : [])
-
-const roleUsers = computed(() => {
-  if (selectedRole.value.length === 0) {
-    return [] as Array<AppUser>
-  }
-  const curUsers = appRoleUsers.value.filter((roleUser) => roleUser.RoleID === selectedRole.value[0].ID)
-  return Array.from(appUsers.value.filter((user) => curUsers.findIndex((u) => u.UserID === user.User.ID) >= 0)).map((el) => el.User)
-})
-const selectedRoleUser = ref([] as Array<AppUser>)
+const roleUsers = computed(() => role.AppRoleUsers.get(appID.value)?.filter((el) => el.Role === selectedRole.value[0]?.Role))
+const selectedRoleUser = ref([] as Array<User>)
 
 const username = ref('')
-const displayUsers = computed(() => users.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
+const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
+
+const getAppUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USERS',
+        Message: 'MSG_GET_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (users: Array<User>, error: boolean) => {
+    if (error) {
+      userLoading.value = false
+      return
+    }
+    if (users.length === 0) {
+      userLoading.value = false
+      return
+    }
+    getAppUsers(offset + limit, limit)
+  })
+}
+
+const getAppRoleUsers = (offset: number, limit: number) => {
+  role.getAppRoleUsers({
+    TargetAppID: appID.value,
+    RoleID: selectedRole.value[0]?.ID,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_ROLE_USERS',
+        Message: 'MSG_GET_ROLE_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (users: Array<AppRoleUser>, error: boolean) => {
+    if (error) {
+      return
+    }
+    if (users.length === 0) {
+      return
+    }
+    getAppRoleUsers(offset + limit, limit)
+  })
+}
 
 const prepare = () => {
   roleLoading.value = true
   userLoading.value = true
 
-  role.getRoles({
+  role.getAppRoles({
     TargetAppID: appID.value,
+    Offset: 0,
+    Limit: 100,
     Message: {
       Error: {
         Title: 'MSG_GET_ROLES',
         Message: 'MSG_GET_ROLES_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
     roleLoading.value = false
   })
 
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_USERS',
-        Message: 'MSG_GET_USERS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    userLoading.value = false
-  })
+  getAppUsers(0, 100)
 
-  role.getRoleUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_ROLE_USERS',
-        Message: 'MSG_GET_ROLE_USERS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  getAppRoleUsers(0, 100)
 }
 
 watch(appID, () => {
@@ -186,20 +195,16 @@ const onAddRoleUser = () => {
   if (selectedRole.value.length === 0 || selectedUser.value.length === 0) {
     return
   }
-  role.createRoleUser({
+  role.createAppRoleUser({
     TargetAppID: appID.value,
-    TargetUserID: selectedUser.value[0].ID as string,
-    Info: {
-      AppID: appID.value,
-      RoleID: selectedRole.value[0].ID as string,
-      UserID: selectedUser.value[0].ID
-    },
+    TargetUserID: selectedUser.value[0].ID,
+    RoleID: selectedRole.value[0].ID,
     Message: {
       Error: {
         Title: 'MSG_ADD_ROLE_USER',
         Message: 'MSG_ADD_ROLE_USER_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
@@ -212,19 +217,20 @@ const onDeleteRoleUser = () => {
     return
   }
 
-  const index = appRoleUsers.value.findIndex((el) => el.UserID === selectedRoleUser.value[0].ID)
-  if (index < 0) {
+  const index = roleUsers.value?.findIndex((el) => el.ID === selectedRoleUser.value[0].ID)
+  if (index === undefined || index < 0) {
     return
   }
 
-  arole.deleteRoleUser({
-    ID: appRoleUsers.value[index].ID as string,
+  role.deleteAppRoleUser({
+    TargetAppID: appID.value,
+    RoleUserID: roleUsers.value?.[index].ID as string,
     Message: {
       Error: {
         Title: 'MSG_DELETE_ROLE_USER',
         Message: 'MSG_DELETE_ROLE_USER_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {

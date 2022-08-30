@@ -49,14 +49,15 @@
 </template>
 
 <script setup lang='ts'>
-import { AppRole, NotificationType, useChurchRolesStore, useLoginedUserStore } from 'npool-cli-v2'
+import { AppRole, useLoginedUserStore } from 'npool-cli-v2'
+import { useChurchRoleStore, NotifyType } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const role = useChurchRolesStore()
+const role = useChurchRoleStore()
 const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
 const roleLoading = ref(true)
 
@@ -64,14 +65,16 @@ const logined = useLoginedUserStore()
 
 const prepare = () => {
   roleLoading.value = true
-  role.getRoles({
+  role.getAppRoles({
     TargetAppID: appID.value,
+    Offset: 0,
+    Limit: 100,
     Message: {
       Error: {
         Title: 'MSG_GET_ROLES',
         Message: 'MSG_GET_ROLES_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
@@ -101,38 +104,7 @@ const onCreate = () => {
 
 const onSubmit = () => {
   showing.value = false
-
-  if (updating.value) {
-    role.updateRole({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_ROLE',
-          Message: 'MSG_UPDATE_ROLE_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  role.createRole({
-    TargetAppID: appID.value,
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_ROLE',
-        Message: 'MSG_CREATE_ROLE_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  // TODO
 }
 
 const onRowClick = (role: AppRole) => {
