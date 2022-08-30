@@ -69,7 +69,8 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { Application, Auth, formatTime, NotificationType, useApplicationsStore, useAuthStore } from 'npool-cli-v2'
+import { Application, formatTime, NotificationType, useApplicationsStore, useAuthStore } from 'npool-cli-v2'
+import { NotifyType, useChurchAuthingStore, Auth } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -78,7 +79,7 @@ const appID = computed(() => app.AppID)
 const application = useApplicationsStore()
 
 const auth = useAuthStore()
-const auths = computed(() => auth.getAuthsByApp(appID.value))
+const auths = computed(() => newAuth.Auths.get(appID.value))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 
@@ -86,20 +87,32 @@ const loadedAuths = ref([] as Array<Auth>)
 const loadedPath = ref('')
 const displayLoadedAuths = computed(() => loadedAuths.value?.filter((auth) => auth.Resource.includes(loadedPath.value)))
 
-const prepare = () => {
-  auth.getAuths({
+const newAuth = useChurchAuthingStore()
+
+const getAppAuths = (offset: number, limit: number) => {
+  newAuth.getAppAuths({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (resp: Array<Auth>, error: boolean) => {
+    if (error || resp.length < limit) {
+      return
+    }
+    getAppAuths(offset + limit, limit)
   })
+}
+const prepare = () => {
+  if (!newAuth.Auths.get(appID.value)) {
+    getAppAuths(0, 100)
+  }
 }
 
 watch(appID, () => {
