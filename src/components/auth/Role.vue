@@ -73,7 +73,6 @@
     </template>
   </q-table>
   <q-table
-    v-if='false'
     :title='$t("MSG_ROLE_USERS")'
     dense
     :columns='columns'

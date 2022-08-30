@@ -102,7 +102,7 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auths = computed(() => {
-  return newAuth.Auths.get(appID.value) ? newAuth.Auths.get(appID.value)?.filter((al) => {
+  return auth.Auths.get(appID.value) ? auth.Auths.get(appID.value)?.filter((al) => {
     return al.UserID === selectedUser.value[0]?.ID
   }) : []
 })
@@ -131,9 +131,9 @@ const getAppUsers = (offset: number, limit: number) => {
     getAppUsers(offset + limit, limit)
   })
 }
-const newAuth = useChurchAuthingStore()
+const auth = useChurchAuthingStore()
 const getAppAuths = (offset: number, limit: number) => {
-  newAuth.getAppAuths({
+  auth.getAppAuths({
     Offset: offset,
     Limit: limit,
     TargetAppID: appID.value,
@@ -159,7 +159,7 @@ const prepare = () => {
     getAppUsers(0, 500)
   }
 
-  if (!newAuth.Auths.get(appID.value)) {
+  if (!auth.Auths.get(appID.value)) {
     getAppAuths(0, 100)
   }
 }
@@ -186,7 +186,7 @@ onMounted(() => {
 })
 
 const onCreateAuthClick = () => {
-  newAuth.createAppAuth({
+  auth.createAppAuth({
     TargetAppID: appID.value,
     TargetUserID: selectedUser.value[0]?.ID,
     Resource: selectedApi.value[0].Path,
@@ -205,7 +205,7 @@ const onCreateAuthClick = () => {
 }
 
 const onDeleteAuthClick = () => {
-  newAuth.deleteAppAuth({
+  auth.deleteAppAuth({
     TargetAppID: appID.value,
     ID: selectedAuth.value[0].ID as string,
     Message: {

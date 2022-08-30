@@ -69,7 +69,7 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { formatTime, NotificationType, useAuthStore } from 'npool-cli-v2'
+import { formatTime } from 'npool-cli-v2'
 import { NotifyType, useChurchAuthingStore, Auth, useChurchAppStore, App } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -78,8 +78,7 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 const application = useChurchAppStore()
 
-const auth = useAuthStore()
-const auths = computed(() => newAuth.Auths.get(appID.value))
+const auths = computed(() => auth.Auths.get(appID.value))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 
@@ -87,10 +86,10 @@ const loadedAuths = ref([] as Array<Auth>)
 const loadedPath = ref('')
 const displayLoadedAuths = computed(() => loadedAuths.value?.filter((auth) => auth.Resource.includes(loadedPath.value)))
 
-const newAuth = useChurchAuthingStore()
+const auth = useChurchAuthingStore()
 
 const getAppAuths = (offset: number, limit: number) => {
-  newAuth.getAppAuths({
+  auth.getAppAuths({
     TargetAppID: appID.value,
     Offset: offset,
     Limit: limit,
@@ -110,7 +109,7 @@ const getAppAuths = (offset: number, limit: number) => {
   })
 }
 const prepare = () => {
-  if (!newAuth.Auths.get(appID.value)) {
+  if (!auth.Auths.get(appID.value)) {
     getAppAuths(0, 100)
   }
 }
@@ -166,16 +165,17 @@ const onFileLoaded = (evt: Event) => {
 const onSubmitClick = () => {
   loadedAuths.value.forEach((a) => {
     if (a.UserID.length > 0) {
-      auth.createAppUserAuth({
+      auth.createAppAuth({
         TargetAppID: a.AppID,
         TargetUserID: a.UserID,
-        Info: a,
+        Resource: a.Resource,
+        Method: a.Method,
         Message: {
           Error: {
             Title: 'MSG_CREATE_APP_USER_AUTH',
             Message: 'MSG_CREATE_APP_USER_AUTH_FAIL',
             Popup: true,
-            Type: NotificationType.Error
+            Type: NotifyType.Error
           }
         }
       }, () => {
@@ -185,15 +185,17 @@ const onSubmitClick = () => {
     }
 
     if (a.RoleID.length > 0) {
-      auth.createAppRoleAuth({
+      auth.createAppAuth({
         TargetAppID: a.AppID,
-        Info: a,
+        RoleID: a.RoleID,
+        Resource: a.Resource,
+        Method: a.Method,
         Message: {
           Error: {
             Title: 'MSG_CREATE_APP_ROLE_AUTH',
             Message: 'MSG_CREATE_APP_ROLE_AUTH_FAIL',
             Popup: true,
-            Type: NotificationType.Error
+            Type: NotifyType.Error
           }
         }
       }, () => {
@@ -204,13 +206,15 @@ const onSubmitClick = () => {
 
     auth.createAppAuth({
       TargetAppID: a.AppID,
-      Info: a,
+      TargetUserID: a.UserID,
+      Resource: a.Resource,
+      Method: a.Method,
       Message: {
         Error: {
           Title: 'MSG_CREATE_APP_AUTH',
           Message: 'MSG_CREATE_APP_AUTH_FAIL',
           Popup: true,
-          Type: NotificationType.Error
+          Type: NotifyType.Error
         }
       }
     }, () => {
