@@ -86,7 +86,7 @@ const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<Auth>)
 
-const getAuths = (offset: number, limit: number) => {
+const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
     TargetAppID: appID.value,
     Offset: offset,
@@ -99,19 +99,17 @@ const getAuths = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (auths: Array<Auth>, error: boolean) => {
-    if (error) {
+  }, (resp: Array<Auth>, error: boolean) => {
+    if (error || resp.length < limit) {
       return
     }
-    if (auths.length > 0) {
-      getAuths(offset + limit, limit)
-    }
+    getAppAuths(offset + limit, limit)
   })
 }
 
 const prepare = () => {
   if (!auths.value?.length) {
-    getAuths(0, 100)
+    getAppAuths(0, 100)
   }
 }
 
