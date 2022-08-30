@@ -95,6 +95,7 @@ const role = useChurchRoleStore()
 const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
 const roleLoading = ref(true)
 const selectedRole = ref([] as Array<Role>)
+const selectedRoleID = computed(() => selectedRole.value[0]?.ID)
 
 const user = useChurchUserStore()
 const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
@@ -158,6 +159,10 @@ const getAppRoleUsers = (offset: number, limit: number) => {
   })
 }
 
+watch(selectedRoleID, () => {
+  getAppRoleUsers(0, 100)
+})
+
 const prepare = () => {
   roleLoading.value = true
   userLoading.value = true
@@ -179,8 +184,6 @@ const prepare = () => {
   })
 
   getAppUsers(0, 100)
-
-  getAppRoleUsers(0, 100)
 }
 
 watch(appID, () => {
