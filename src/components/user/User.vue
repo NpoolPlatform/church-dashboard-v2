@@ -54,8 +54,10 @@ const getAppUsers = (offset: number, limit: number) => {
 }
 
 const prepare = () => {
-  userLoading.value = true
-  getAppUsers(0, 100)
+  if (appUsers.value.length === 0) {
+    userLoading.value = true
+    getAppUsers(0, 500)
+  }
 }
 
 watch(appID, () => {
