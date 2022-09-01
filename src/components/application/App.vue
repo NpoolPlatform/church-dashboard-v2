@@ -8,6 +8,7 @@
     :loading='appLoading'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as App)'
+    :columns='columns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -67,6 +68,56 @@ import {
 } from 'npool-cli-v4'
 import { computed, onMounted, ref } from 'vue'
 
+import { useI18n } from 'vue-i18n'
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
+const columns = computed(() => [
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    field: (row: App) => row.ID
+  },
+  {
+    name: 'Name',
+    label: t('MSG_NAME'),
+    field: (row: App) => row.Name
+  },
+  {
+    name: 'Description',
+    label: t('MSG_DESCRIPTION'),
+    field: (row: App) => row.Description
+  },
+  {
+    name: 'InvitationCodeMust',
+    label: t('MSG_INVITATIONCODEMUST'),
+    field: (row: App) => row.InvitationCodeMust
+  },
+  {
+    name: 'KycEnable',
+    label: t('MSG_KYC_ENABLE'),
+    field: (row: App) => row.KycEnable
+  },
+  {
+    name: 'RecaptchaMethod',
+    label: t('MSG_RECAPTCHA_METHOD'),
+    field: (row: App) => row.RecaptchaMethod
+  },
+  {
+    name: 'SigninVerifyEnable',
+    label: t('MSG_SIGNIN_VERIFY_ENABLE'),
+    field: (row: App) => row.SigninVerifyEnable
+  },
+  {
+    name: 'CreatedBy',
+    label: t('MSG_CREATEDBY'),
+    field: (row: App) => row.CreatedBy
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATEDAT'),
+    field: (row: App) => row.CreatedAt
+  }
+])
 const app = useChurchAppStore()
 const apps = computed(() => app.Apps)
 const appLoading = ref(false)
