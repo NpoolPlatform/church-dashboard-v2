@@ -57,7 +57,7 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const role = useChurchRoleStore()
-const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
+const roles = computed(() => !role.Roles.get(appID.value) ? [] : role.Roles.get(appID.value))
 const roleLoading = ref(false)
 
 const logined = useLocalUserStore()
