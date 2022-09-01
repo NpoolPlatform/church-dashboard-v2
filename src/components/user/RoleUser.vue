@@ -7,6 +7,7 @@
     row-key='ID'
     :rows-per-page-options='[10]'
     selection='single'
+    :role-user-loading='roleUserLoading'
     v-model:selected='selectedRoleUser'
   >
     <template #top-right>
@@ -78,7 +79,7 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime, NotifyType, Role, useChurchRoleStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { AppRoleUser, formatTime, NotifyType, Role, useChurchRoleStore, useChurchUserStore, User } from 'npool-cli-v4'
 
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -99,7 +100,8 @@ const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(app
 const userLoading = ref(false)
 const selectedUser = ref([] as Array<User>)
 
-const roleUsers = computed(() => role.AppRoleUsers.get(appID.value)?.filter((el) => el.Role === selectedRole.value[0]?.Role))
+const roleUserLoading = ref(false)
+const roleUsers = computed(() => selectedRole.value.length > 0 ? role.AppRoleUsers.get(selectedRole.value[0].ID) : [] as Array<AppRoleUser>)
 const selectedRoleUser = ref([] as Array<User>)
 
 const username = ref('')
@@ -119,11 +121,7 @@ const getAppUsers = (offset: number, limit: number) => {
       }
     }
   }, (users: Array<User>, error: boolean) => {
-    if (error) {
-      userLoading.value = false
-      return
-    }
-    if (users.length === 0) {
+    if (error || users.length < limit) {
       userLoading.value = false
       return
     }
@@ -131,9 +129,8 @@ const getAppUsers = (offset: number, limit: number) => {
   })
 }
 
-const churchRole = useChurchRoleStore()
 const getAppRoles = (offset: number, limit: number) => {
-  churchRole.getAppRoles({
+  role.getAppRoles({
     TargetAppID: appID.value,
     Offset: offset,
     Limit: limit,
@@ -146,22 +143,21 @@ const getAppRoles = (offset: number, limit: number) => {
       }
     }
   }, (roles: Array<Role>, error: boolean) => {
-    if (error) {
+    if (error || roles.length < limit) {
+      roleLoading.value = false
       return
     }
-    if (roles.length >= limit) {
-      getAppRoles(offset + limit, limit)
-    }
-    roleLoading.value = false
+    getAppRoles(offset + limit, limit)
   })
 }
 const prepare = () => {
-  if (!churchRole.Roles.get(appID.value)) {
+  if (!role.Roles.get(appID.value)) {
     roleLoading.value = true
     getAppRoles(0, 100)
   }
   if (!user.Users.get(appID.value)) {
-    getAppUsers(0, 100)
+    userLoading.value = true
+    getAppUsers(0, 500)
   }
 }
 
@@ -169,6 +165,34 @@ watch(appID, () => {
   prepare()
 })
 
+const getAppRoleUsers = (offset: number, limit: number) => {
+  role.getAppRoleUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    RoleID: selectedRole.value[0]?.ID,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_ROLE_USERS',
+        Message: 'MSG_GET_ROLE_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (roleUsers: Array<AppRoleUser>, error: boolean) => {
+    if (error || roleUsers.length < limit) {
+      roleUserLoading.value = false
+      return
+    }
+    getAppRoleUsers(offset + limit, limit)
+  })
+}
+watch(selectedRole, () => {
+  if (selectedRole.value.length > 0 && !role.AppRoleUsers.get(selectedRole.value[0].ID)) {
+    roleUserLoading.value = true
+    getAppRoleUsers(0, 500)
+  }
+})
 onMounted(() => {
   prepare()
 })
