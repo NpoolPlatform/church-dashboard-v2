@@ -6,7 +6,7 @@
     :rows='accounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-    :columns='columns'
+    :columns='(columns as never)'
   />
 </template>
 
