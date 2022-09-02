@@ -76,17 +76,12 @@ interface Code extends InvitationCode {
   PhoneNO: string
 }
 
-const getUserByID = (userID:string) => {
-  return !appUsers.value.find((el) => el.ID === userID) ? {} as User : appUsers.value.find((el) => el.ID === userID)
-}
 const userLoading = ref(false)
 const user = useChurchUserStore()
 const ecodes = computed(() => Array.from(codes.value).map((code: InvitationCode) => {
-  const myCode = code as Code
-  if (code.UserID) {
-    myCode.EmailAddress = getUserByID(code.UserID)?.EmailAddress as string
-    myCode.PhoneNO = getUserByID(code.UserID)?.PhoneNO as string
-  }
+  const myCode = code as unknown as Code
+  myCode.EmailAddress = user.getUserByAppUserID(appID.value, code.UserID as string)?.EmailAddress
+  myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID as string)?.PhoneNO
   return myCode
 }))
 
