@@ -95,7 +95,6 @@ const columns = computed(() => [
     field: 'DeleteAt'
   }
 ])
-console.log(columns)
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
