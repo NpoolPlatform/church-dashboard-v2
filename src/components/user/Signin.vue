@@ -10,6 +10,7 @@
     </q-input>
     <q-input
       v-model='password'
+      type='password'
       :label='$t("MSG_PASSWORD")'
     >
       <template #prepend>
