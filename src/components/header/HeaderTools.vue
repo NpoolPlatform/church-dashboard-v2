@@ -92,7 +92,7 @@ onMounted(() => {
   }
   application.getApps({
     Offset: 0,
-    Limit: 100,
+    Limit: 1000,
     Message: {
       Error: {
         Title: 'MSG_GET_APPLICATIONS',

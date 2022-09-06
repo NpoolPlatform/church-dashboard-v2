@@ -7657,10 +7657,10 @@ npm-run-path@^4.0.0, npm-run-path@^4.0.1:
   dependencies:
     path-key "^3.0.0"
 
-npool-cli-v2@^0.2.245:
-  version "0.2.245"
-  resolved "https://registry.yarnpkg.com/npool-cli-v2/-/npool-cli-v2-0.2.245.tgz#9e81e9e417a5c6b4290dbdb3bf04e647940d2897"
-  integrity sha512-YZCKLXroHM83EL+pJ2LvF06dMlItlOytS/7FPsShj3knesKTZt+Y0WgNFgX0mYBPUSvVNu1rD77GyurBv97AzA==
+npool-cli-v2@^0.2.275:
+  version "0.2.283"
+  resolved "https://registry.yarnpkg.com/npool-cli-v2/-/npool-cli-v2-0.2.283.tgz#6f15f8959d3eabe87ffd9956b3d8b7a31f14d456"
+  integrity sha512-4unPONVurTYCRgJXeWix73BRMWzxuxPZU2Q27BSOSq/5sn9K1ZdmZAenyQzAtFHym5sRpz9HJd3SgEkC1uFDTA==
   dependencies:
     "@quasar/extras" "^1.0.0"
     "@typescript-eslint/eslint-plugin" "^5.17.0"
@@ -7705,6 +7705,7 @@ npool-cli-v2@^0.2.245:
     make-dir "^3.1.0"
     merge-stream "^2.0.0"
     minimatch "^3.1.2"
+    npool-cli-v2 "^0.2.275"
     once "^1.4.0"
     p-limit "^2.3.0"
     p-locate "^4.1.0"
@@ -7744,10 +7745,10 @@ npool-cli-v2@^0.2.245:
     wrappy "^1.0.2"
     yocto-queue "^0.1.0"
 
-npool-cli-v2@^0.2.275:
-  version "0.2.283"
-  resolved "https://registry.yarnpkg.com/npool-cli-v2/-/npool-cli-v2-0.2.283.tgz#6f15f8959d3eabe87ffd9956b3d8b7a31f14d456"
-  integrity sha512-4unPONVurTYCRgJXeWix73BRMWzxuxPZU2Q27BSOSq/5sn9K1ZdmZAenyQzAtFHym5sRpz9HJd3SgEkC1uFDTA==
+npool-cli-v2@^0.2.295:
+  version "0.2.295"
+  resolved "https://registry.yarnpkg.com/npool-cli-v2/-/npool-cli-v2-0.2.295.tgz#233fd220997f7ed1809c2a669436c0a5ee95d5c9"
+  integrity sha512-Cf5kASdAxZAzTnqBl7V2bpitPnVId0EGA9GpUKK4wvYvWD9tG+0sUlxiGnNyMCmarby8/jT5j9Rg9U8eLj2v9g==
   dependencies:
     "@quasar/extras" "^1.0.0"
     "@typescript-eslint/eslint-plugin" "^5.17.0"
