@@ -67,7 +67,7 @@ import {
   useLocalUserStore,
   RecaptchaType
 } from 'npool-cli-v4'
-import { UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
+import { CreateAppRequest, UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -149,13 +149,12 @@ const onMenuHide = () => {
 }
 
 const createApp = () => {
-  app.createApp({
+  const request = {
     CreatedBy: target.value.CreatedBy,
     Name: target.value.Name,
     Logo: target.value.Logo,
     Description: target.value.Description,
     SignupMethods: target.value.SignupMethods,
-    RecaptchaMethod: 'GoogleRecaptchaV3' as unknown as RecaptchaType,
     KycEnable: target.value.KycEnable,
     SigninVerifyEnable: target.value.SigninVerifyEnable,
     InvitationCodeMust: target.value.InvitationCodeMust,
@@ -167,7 +166,11 @@ const createApp = () => {
         Type: NotifyType.Error
       }
     }
-  }, (app: App, error: boolean) => {
+  } as CreateAppRequest
+  if (target.value.RecaptchaMethod) {
+    request.RecaptchaMethod = 'GoogleRecaptchaV3' as unknown as RecaptchaType.GoogleRecaptchaV3
+  }
+  app.createApp(request, (app: App, error: boolean) => {
     if (error) {
       return
     }
