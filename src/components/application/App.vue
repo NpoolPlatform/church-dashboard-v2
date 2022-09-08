@@ -169,10 +169,16 @@ const updateApp = () => {
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_APP',
-        Message: 'MSG_CREATE_APP_FAIL',
+        Title: 'MSG_UPDATE_APP',
+        Message: 'MSG_UPDATE_APP_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_APP',
+        Message: 'MSG_UPDATE_APP_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (app: App, error: boolean) => {
