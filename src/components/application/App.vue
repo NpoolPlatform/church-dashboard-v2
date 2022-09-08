@@ -64,8 +64,10 @@ import {
   useChurchAppStore,
   NotifyType,
   App,
-  useLocalUserStore
+  useLocalUserStore,
+  RecaptchaType
 } from 'npool-cli-v4'
+import { UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -148,7 +150,15 @@ const onMenuHide = () => {
 
 const createApp = () => {
   app.createApp({
-    ...target.value,
+    CreatedBy: target.value.CreatedBy,
+    Name: target.value.Name,
+    Logo: target.value.Logo,
+    Description: target.value.Description,
+    SignupMethods: target.value.SignupMethods,
+    RecaptchaMethod: 'GoogleRecaptchaV3' as unknown as RecaptchaType,
+    KycEnable: target.value.KycEnable,
+    SigninVerifyEnable: target.value.SigninVerifyEnable,
+    InvitationCodeMust: target.value.InvitationCodeMust,
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP',
@@ -164,9 +174,20 @@ const createApp = () => {
     onMenuHide()
   })
 }
+const getAppByID = (appID:string) => {
+  return app.Apps.Apps.find((el) => el.ID === appID)
+}
 const updateApp = () => {
-  app.updateApp({
-    ...target.value,
+  const request = {
+    ID: target.value.ID,
+    Logo: target.value.Logo,
+    Description: target.value.Description,
+    SignupMethods: target.value.SignupMethods,
+    ExtSigninMethods: target.value.ExtSigninMethods,
+    RecaptchaMethod: target.value.RecaptchaMethod,
+    KycEnable: target.value.KycEnable,
+    SigninVerifyEnable: target.value.SigninVerifyEnable,
+    InvitationCodeMust: target.value.InvitationCodeMust,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_APP',
@@ -181,7 +202,12 @@ const updateApp = () => {
         Type: NotifyType.Success
       }
     }
-  }, (app: App, error: boolean) => {
+  } as UpdateAppRequest
+  const origin = getAppByID(target.value.ID)
+  if (origin?.Name !== target.value.Name) {
+    request.Name = target.value.Name
+  }
+  app.updateApp(request, (app: App, error: boolean) => {
     if (error) {
       return
     }
