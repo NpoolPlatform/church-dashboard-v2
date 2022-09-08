@@ -282,7 +282,7 @@ const onExport = () => {
     Language: language.value,
     Messages: messages.value
   })], { type: 'text/plain;charset=utf-8' })
-  const filename = application.Apps.find((el) => el.ID === appID.value)?.Name as string + '-' +
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-' +
                    language.value.Name + '-' +
                    formatTime(new Date().getTime() / 1000) +
                    '.json'

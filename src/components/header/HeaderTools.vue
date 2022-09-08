@@ -51,7 +51,7 @@ const logined = computed(() => loginedUser.logined)
 const application = useChurchAppStore()
 const localapplication = useLocalApplicationStore()
 
-const applications = computed(() => application.Apps)
+const applications = computed(() => application.Apps.Apps)
 const selectedApp = computed({
   get: () => applications.value.find((el) => el.ID === localapplication.AppID) as App,
   set: (val: App) => {
