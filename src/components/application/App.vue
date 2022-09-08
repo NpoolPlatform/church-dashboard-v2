@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_APPS")'
-    :rows='apps'
+    :rows='(apps as never)'
     row-key='ID'
     :loading='appLoading'
     :rows-per-page-options='[10]'
@@ -58,19 +58,19 @@
 
 <script setup lang='ts'>
 import {
-  RecaptchaMethods,
-  useLoginedUserStore
+  RecaptchaMethods
 } from 'npool-cli-v2'
 import {
   useChurchAppStore,
   NotifyType,
-  App
+  App,
+  useLocalUserStore
 } from 'npool-cli-v4'
 import { computed, onMounted, ref } from 'vue'
-
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
 const columns = computed(() => [
   {
     name: 'AppID',
@@ -119,21 +119,82 @@ const columns = computed(() => [
   }
 ])
 const app = useChurchAppStore()
-const apps = computed(() => app.Apps)
+const apps = computed(() => app.Apps.Apps)
 const appLoading = ref(false)
 
-const logined = useLoginedUserStore()
-
+// dialog
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({
-  CreatedBy: logined.LoginedUser?.User.ID
-} as unknown as App)
 
-onMounted(() => {
+const logined = useLocalUserStore()
+
+const defaultAppValue = ref({ CreatedBy: logined.User?.ID } as App)
+const target = ref({ ...defaultAppValue.value })
+
+const onRowClick = (application: App) => {
+  showing.value = true
+  updating.value = true
+  target.value = { ...application }
+}
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+  target.value = { ...defaultAppValue.value }
+}
+const onMenuHide = () => {
+  showing.value = false
+  target.value = { ...defaultAppValue.value }
+}
+
+const createApp = () => {
+  app.createApp({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_APP',
+        Message: 'MSG_CREATE_APP_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (app: App, error: boolean) => {
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+const updateApp = () => {
+  app.updateApp({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_APP',
+        Message: 'MSG_CREATE_APP_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (app: App, error: boolean) => {
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+const onSubmit = () => {
+  updating.value ? updateApp() : createApp()
+}
+
+const onCancel = () => {
+  showing.value = false
+  updating.value = false
+}
+
+const getApps = (offset: number, limit: number) => {
   app.getApps({
-    Offset: 0,
-    Limit: 100,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
         Title: 'MSG_GET_APPS',
@@ -142,36 +203,19 @@ onMounted(() => {
         Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (apps: Array<App>, error: boolean) => {
+    if (error || apps.length < limit) {
+      appLoading.value = false
+      return
+    }
+    getApps(offset + limit, limit)
   })
+}
+onMounted(() => {
+  if (app.Apps.Apps.length === 0) {
+    appLoading.value = true
+    getApps(0, 500)
+  }
 })
-
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {
-    CreatedBy: logined.LoginedUser?.User.ID
-  } as unknown as App
-}
-
-const onRowClick = (application: App) => {
-  target.value = apps.value.find((el) => el.ID === application.ID) as App
-  showing.value = true
-  updating.value = true
-}
-
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onSubmit = () => {
-  showing.value = false
-  // TODO: support to create and update app
-}
-
-const onCancel = () => {
-  showing.value = false
-}
 
 </script>
