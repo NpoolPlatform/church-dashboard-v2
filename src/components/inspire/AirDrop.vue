@@ -152,7 +152,7 @@ const discounts = computed(() => Array.from(appDiscounts.value).map((el) => {
 }))
 const selectedDiscount = ref(undefined as unknown as MyDiscount)
 
-const loading = ref(true)
+const loading = ref(false)
 const couponType = ref(undefined as unknown as CouponType)
 const airdropCount = ref(1)
 const couponID = ref(undefined as unknown as string)
@@ -164,7 +164,6 @@ watch(selectedFixAmount, () => {
 })
 
 const prepare = () => {
-  loading.value = true
   fixAmount.getFixAmounts({
     TargetAppID: appID.value,
     Message: {

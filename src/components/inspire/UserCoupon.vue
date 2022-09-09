@@ -9,6 +9,7 @@
     :rows-per-page-options='[10]'
     selection='multiple'
     v-model:selected='selectedUsers'
+    :columns='columns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -92,17 +93,48 @@ import {
   CouponType,
   useChurchDiscountStore,
   DiscountCoupon,
-  AppUser,
   useChurchUserCouponStore,
   UserCoupon
 } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
-import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
+import { formatTime, NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+const columns = computed(() => [
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    field: (row: User) => row.AppID
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: User) => row.ID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: User) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: User) => row.PhoneNO
+  },
+  {
+    name: 'Roles',
+    label: t('MSG_ROLES'),
+    field: (row: User) => row.Roles.join(',')
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATEDAT'),
+    field: (row: User) => formatTime(row.CreatedAt)
+  }
+])
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -121,7 +153,7 @@ const coupons = computed(() => Array.from(appCoupons.value).map((el) => {
   return c
 }))
 const displayCoupons = computed(() => {
-  return coupons.value.filter((c) => c.EmailAddress.includes(username.value) || c.PhoneNO.includes(username.value))
+  return coupons.value.filter((c) => c.EmailAddress?.includes(username.value) || c.PhoneNO?.includes(username.value))
 })
 
 const user = useChurchUserStore()
@@ -130,7 +162,7 @@ const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => {
   return el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)
 }))
-const selectedUsers = ref([] as Array<AppUser>)
+const selectedUsers = ref([] as Array<User>)
 
 interface MyFixAmount {
   label: string
@@ -192,13 +224,13 @@ const getAppUsers = (offset: number, limit: number) => {
     }
   }, (resp: Array<User>, error: boolean) => {
     if (error || resp.length < limit) {
+      loading.value = false
       return
     }
     getAppUsers(offset + limit, limit)
   })
 }
 const prepare = () => {
-  loading.value = true
   fixAmount.getFixAmounts({
     TargetAppID: appID.value,
     Message: {
@@ -228,6 +260,7 @@ const prepare = () => {
   })
 
   if (!user.Users.get(appID.value)) {
+    loading.value = true
     getAppUsers(0, 500)
   }
 
@@ -265,10 +298,10 @@ const onMenuHide = () => {
 
 const onSubmit = () => {
   showing.value = false
-  selectedUsers.value.forEach((user) => {
+  selectedUsers.value.forEach((el) => {
     coupon.createUserCoupon({
       TargetAppID: appID.value,
-      TargetUserID: user.ID as string,
+      TargetUserID: el.ID,
       Info: {
         Type: couponType.value,
         CouponID: couponID.value
