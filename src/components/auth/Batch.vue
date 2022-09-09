@@ -128,7 +128,7 @@ interface SavedAuths {
 }
 
 const onExportClick = () => {
-  const myApp = application.Apps.find((el) => el.ID === appID.value)
+  const myApp = application.Apps.Apps.find((el) => el.ID === appID.value)
   const blob = new Blob([JSON.stringify({
     Application: myApp,
     Auths: auths.value
@@ -153,8 +153,8 @@ const onFileLoaded = (evt: Event) => {
     const reader = new FileReader()
     reader.onload = () => {
       const loaded = JSON.parse(reader.result as string) as SavedAuths
-      const index = application.Apps.findIndex((el) => el.ID === loaded.Application.ID)
-      application.Apps.splice(index, index < 0 ? 0 : 1, loaded.Application)
+      const index = application.Apps.Apps.findIndex((el) => el.ID === loaded.Application.ID)
+      application.Apps.Apps.splice(index, index < 0 ? 0 : 1, loaded.Application)
       app.AppID = loaded.Application.ID
       loadedAuths.value = loaded.Auths
     }

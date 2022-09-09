@@ -7,6 +7,7 @@
     row-key='ID'
     :rows-per-page-options='[10]'
     selection='single'
+    :loading='userLoading'
     v-model:selected='selectedUser'
   >
     <template #top-right>
@@ -52,7 +53,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, AppUser, useChurchInvitationStore, InvitationCode, useChurchUsersStore, UserInfo } from 'npool-cli-v2'
+import { NotificationType, useChurchInvitationStore, InvitationCode } from 'npool-cli-v2'
+import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -67,18 +69,19 @@ const invitation = useChurchInvitationStore()
 const codes = computed(() => {
   return invitation.InvitationCodes.get(appID.value) ? invitation.InvitationCodes.get(appID.value) as Array<InvitationCode> : []
 })
-const codeLoading = ref(true)
+const codeLoading = ref(false)
 
 interface Code extends InvitationCode {
   EmailAddress: string
   PhoneNO: string
 }
 
-const user = useChurchUsersStore()
+const userLoading = ref(false)
+const user = useChurchUserStore()
 const ecodes = computed(() => Array.from(codes.value).map((code: InvitationCode) => {
   const myCode = code as unknown as Code
-  myCode.EmailAddress = user.getUserByAppUserID(appID.value, code.UserID as string)?.User.EmailAddress as string
-  myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID as string)?.User.PhoneNO as string
+  myCode.EmailAddress = user.getUserByAppUserID(appID.value, code.UserID as string)?.EmailAddress
+  myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID as string)?.PhoneNO
   return myCode
 }))
 
@@ -88,17 +91,39 @@ const displayCodes = computed(() => ecodes.value.filter((el) => {
 }))
 
 const appUsers = computed(() => {
-  return user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : []
+  return user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : []
 })
 const users = computed(() => {
-  return Array.from(appUsers.value.filter((el) => codes.value.findIndex((code) => el.User.ID === code.UserID) < 0).map((el) => el.User))
+  return appUsers.value.filter((el) => codes.value.findIndex((code) => el.ID === code.UserID) < 0)
 })
-const selectedUser = ref([] as Array<AppUser>)
+
+const selectedUser = ref([] as Array<User>)
 const username = ref('')
 const displayUsers = computed(() => {
   return users.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value))
 })
 
+const getAppUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USERS',
+        Message: 'MSG_GET_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (resp: Array<User>, error: boolean) => {
+    if (error || resp.length < limit) {
+      userLoading.value = false
+      return
+    }
+    getAppUsers(offset + limit, limit)
+  })
+}
 const prepare = () => {
   invitation.getInvitationCodes({
     TargetAppID: appID.value,
@@ -114,19 +139,10 @@ const prepare = () => {
     codeLoading.value = false
   })
 
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_USERS'),
-        Message: t('MSG_GET_USERS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (!user.Users.get(appID.value)) {
+    userLoading.value = true
+    getAppUsers(0, 500)
+  }
 }
 
 onMounted(() => {
@@ -143,9 +159,9 @@ const onCreateInvitationCodeClick = () => {
   }
   invitation.createInvitationCode({
     TargetAppID: appID.value,
-    TargetUserID: selectedUser.value[0].ID as string,
+    TargetUserID: selectedUser.value[0].ID,
     Info: {
-      UserID: selectedUser.value[0].ID as string
+      UserID: selectedUser.value[0].ID
     },
     Message: {
       Error: {

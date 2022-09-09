@@ -95,13 +95,12 @@ import {
   useChurchSpecialOfferStore,
   useSpecialOfferStore,
   PriceCoinName,
-  useChurchUsersStore,
-  UserInfo,
   AppUser
 } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
+import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -109,11 +108,8 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const user = useChurchUsersStore()
-const users = computed(() => {
-  const appUsers = user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : []
-  return Array.from(appUsers).map((el) => el.User)
-})
+const user = useChurchUserStore()
+const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => {
   return el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)
@@ -131,8 +127,8 @@ const acoupon = useSpecialOfferStore()
 const appCoupons = computed(() => coupon.SpecialOffers.get(appID.value) ? coupon.SpecialOffers.get(appID.value) : [])
 const coupons = computed(() => Array.from(appCoupons.value as Array<UserSpecialOffer>).map((el) => {
   const c = el as MyCoupon
-  c.EmailAddress = user.getUserByAppUserID(appID.value, c.UserID as string)?.User.EmailAddress as string
-  c.PhoneNO = user.getUserByAppUserID(appID.value, c.UserID as string)?.User.PhoneNO as string
+  c.EmailAddress = user.getUserByAppUserID(appID.value, c.UserID as string)?.EmailAddress
+  c.PhoneNO = user.getUserByAppUserID(appID.value, c.UserID as string)?.PhoneNO
   return c
 }))
 const displayCoupons = computed(() => coupons.value.filter((el) => {
@@ -141,7 +137,26 @@ const displayCoupons = computed(() => coupons.value.filter((el) => {
 const loading = ref(true)
 
 const logined = useLoginedUserStore()
-
+const getAppUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USERS',
+        Message: 'MSG_GET_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (resp: Array<User>, error: boolean) => {
+    if (error || resp.length < limit) {
+      return
+    }
+    getAppUsers(offset + limit, limit)
+  })
+}
 const prepare = () => {
   loading.value = true
   coupon.getSpecialOffers({
@@ -158,19 +173,9 @@ const prepare = () => {
     loading.value = false
   })
 
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_USERS'),
-        Message: t('MSG_GET_USERS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (!user.Users.get(appID.value)) {
+    getAppUsers(0, 500)
+  }
 }
 
 watch(appID, () => {

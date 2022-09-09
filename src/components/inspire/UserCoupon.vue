@@ -92,8 +92,6 @@ import {
   CouponType,
   useChurchDiscountStore,
   DiscountCoupon,
-  useChurchUsersStore,
-  UserInfo,
   AppUser,
   useChurchUserCouponStore,
   UserCoupon
@@ -101,6 +99,7 @@ import {
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
+import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -117,19 +116,16 @@ const coupon = useChurchUserCouponStore()
 const appCoupons = computed(() => coupon.UserCoupons.get(appID.value) ? coupon.UserCoupons.get(appID.value) as Array<UserCoupon> : [])
 const coupons = computed(() => Array.from(appCoupons.value).map((el) => {
   const c = el as MyCoupon
-  c.EmailAddress = user.getUserByAppUserID(appID.value, c.UserID as string)?.User.EmailAddress as string
-  c.PhoneNO = user.getUserByAppUserID(appID.value, c.UserID as string)?.User.PhoneNO as string
+  c.EmailAddress = user.getUserByAppUserID(appID.value, c.UserID as string)?.EmailAddress
+  c.PhoneNO = user.getUserByAppUserID(appID.value, c.UserID as string)?.PhoneNO
   return c
 }))
 const displayCoupons = computed(() => {
   return coupons.value.filter((c) => c.EmailAddress.includes(username.value) || c.PhoneNO.includes(username.value))
 })
 
-const user = useChurchUsersStore()
-const users = computed(() => {
-  const appUsers = user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : []
-  return Array.from(appUsers).map((el) => el.User)
-})
+const user = useChurchUserStore()
+const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => {
   return el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)
@@ -181,6 +177,26 @@ watch(selectedFixAmount, () => {
   couponID.value = selectedFixAmount.value.value.ID as string
 })
 
+const getAppUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USERS',
+        Message: 'MSG_GET_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (resp: Array<User>, error: boolean) => {
+    if (error || resp.length < limit) {
+      return
+    }
+    getAppUsers(offset + limit, limit)
+  })
+}
 const prepare = () => {
   loading.value = true
   fixAmount.getFixAmounts({
@@ -211,19 +227,9 @@ const prepare = () => {
     // TODO
   })
 
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_USERS'),
-        Message: t('MSG_GET_USERS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    loading.value = false
-  })
+  if (!user.Users.get(appID.value)) {
+    getAppUsers(0, 500)
+  }
 
   coupon.getUserCoupons({
     TargetAppID: appID.value,

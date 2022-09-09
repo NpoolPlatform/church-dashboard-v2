@@ -51,7 +51,7 @@ const logined = computed(() => loginedUser.logined)
 const application = useChurchAppStore()
 const localapplication = useLocalApplicationStore()
 
-const applications = computed(() => application.Apps)
+const applications = computed(() => application.Apps.Apps)
 const selectedApp = computed({
   get: () => applications.value.find((el) => el.ID === localapplication.AppID) as App,
   set: (val: App) => {
@@ -70,41 +70,38 @@ watch(logined, () => {
   if (!logined.value) {
     return
   }
-  application.getApps({
-    Offset: 0,
-    Limit: 100,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APPLICATIONS',
-        Message: 'MSG_GET_APPLICATIONS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (application.Apps.Apps.length === 0) {
+    getApps(0, 500)
+  }
 })
 
 onMounted(() => {
   if (!logined.value) {
     return
   }
+  if (application.Apps.Apps.length === 0) {
+    getApps(0, 500)
+  }
+})
+const getApps = (offset: number, limit: number) => {
   application.getApps({
-    Offset: 0,
-    Limit: 100,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
-        Title: 'MSG_GET_APPLICATIONS',
-        Message: 'MSG_GET_APPLICATIONS_FAIL',
+        Title: 'MSG_GET_APPS',
+        Message: 'MSG_GET_APPS_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (apps: Array<App>, error: boolean) => {
+    if (error || apps.length < limit) {
+      return
+    }
+    getApps(offset + limit, limit)
   })
-})
+}
 
 const onJeagerClick = () => {
   window.open('https://www.jaegertracing.io/')
