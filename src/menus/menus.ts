@@ -775,6 +775,26 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
+  } as MenuItem, {
+    menuId: uid(),
+    label: '余额充值',
+    caption: '余额充值',
+    icon: 'reviews',
+    target: '/deposit',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '余额充值',
+        caption: '余额充值列表',
+        icon: 'format_list_numbered',
+        target: '/deposit/balance',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
   } as MenuItem
 ] as Array<MenuItem>
 

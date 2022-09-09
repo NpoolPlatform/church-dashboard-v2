@@ -828,6 +828,18 @@ const routes: RouteRecordRaw[] = [
           ShowTopTip: false,
           NeedLogined: true
         }
+      }, {
+        path: 'deposit/balance',
+        component: () => import('src/pages/deposit/DepositBalance.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
       }
     ]
   },
