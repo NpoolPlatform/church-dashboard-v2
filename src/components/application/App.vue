@@ -176,6 +176,7 @@ const createApp = () => {
   })
 }
 const updateApp = () => {
+  showing.value = false
   const request = {
     ID: target.value.ID,
     Logo: target.value.Logo,
