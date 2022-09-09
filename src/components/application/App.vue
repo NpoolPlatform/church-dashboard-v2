@@ -35,7 +35,7 @@
         <q-input v-model='target.Name' :label='$t("MSG_APPLICATION_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
-        <q-select :options='RecaptchaMethods' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
+        <q-select :options='recaptchaMethods' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
       </q-card-section>
       <q-card-section>
         <div>
@@ -58,17 +58,14 @@
 
 <script setup lang='ts'>
 import {
-  RecaptchaMethods
-} from 'npool-cli-v2'
-import {
   useChurchAppStore,
   NotifyType,
   App,
   useLocalUserStore,
   RecaptchaType
 } from 'npool-cli-v4'
-import { CreateAppRequest, UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
-import { computed, onMounted, ref } from 'vue'
+import { UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -120,6 +117,10 @@ const columns = computed(() => [
     field: (row: App) => row.CreatedAt
   }
 ])
+
+const recaptchaMethods = ref([
+  RecaptchaType.GoogleRecaptchaV3
+])
 const app = useChurchAppStore()
 const apps = computed(() => app.Apps.Apps)
 const appLoading = ref(false)
@@ -149,7 +150,7 @@ const onMenuHide = () => {
 }
 
 const createApp = () => {
-  const request = {
+  app.createApp({
     CreatedBy: target.value.CreatedBy,
     Name: target.value.Name,
     Logo: target.value.Logo,
@@ -158,6 +159,7 @@ const createApp = () => {
     KycEnable: target.value.KycEnable,
     SigninVerifyEnable: target.value.SigninVerifyEnable,
     InvitationCodeMust: target.value.InvitationCodeMust,
+    RecaptchaMethod: target.value.RecaptchaMethod,
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP',
@@ -166,19 +168,12 @@ const createApp = () => {
         Type: NotifyType.Error
       }
     }
-  } as CreateAppRequest
-  if (target.value.RecaptchaMethod) {
-    request.RecaptchaMethod = 'GoogleRecaptchaV3' as unknown as RecaptchaType.GoogleRecaptchaV3
-  }
-  app.createApp(request, (app: App, error: boolean) => {
+  }, (app: App, error: boolean) => {
     if (error) {
       return
     }
     onMenuHide()
   })
-}
-const getAppByID = (appID:string) => {
-  return app.Apps.Apps.find((el) => el.ID === appID)
 }
 const updateApp = () => {
   const request = {
@@ -206,8 +201,8 @@ const updateApp = () => {
       }
     }
   } as UpdateAppRequest
-  const origin = getAppByID(target.value.ID)
-  if (origin?.Name !== target.value.Name) {
+  const origin = app.getAppByID(target.value.ID)
+  if (origin?.Name !== target.value.Name) { // don't send app name if not change
     request.Name = target.value.Name
   }
   app.updateApp(request, (app: App, error: boolean) => {
@@ -225,32 +220,5 @@ const onCancel = () => {
   showing.value = false
   updating.value = false
 }
-
-const getApps = (offset: number, limit: number) => {
-  app.getApps({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APPS',
-        Message: 'MSG_GET_APPS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (apps: Array<App>, error: boolean) => {
-    if (error || apps.length < limit) {
-      appLoading.value = false
-      return
-    }
-    getApps(offset + limit, limit)
-  })
-}
-onMounted(() => {
-  if (app.Apps.Apps.length === 0) {
-    appLoading.value = true
-    getApps(0, 500)
-  }
-})
 
 </script>

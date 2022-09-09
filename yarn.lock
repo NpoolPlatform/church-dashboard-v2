@@ -7833,10 +7833,10 @@ npool-cli-v2@^0.2.295:
     wrappy "^1.0.2"
     yocto-queue "^0.1.0"
 
-npool-cli-v4@^0.3.169:
-  version "0.3.169"
-  resolved "https://registry.yarnpkg.com/npool-cli-v4/-/npool-cli-v4-0.3.169.tgz#b4e64df3035531b9e40e44e3ddd349c5a600d89a"
-  integrity sha512-Ue7+XLAUfV4o6m0GglCNAsBqaa1iW06qFtfAKWg5xspET4adjW6xQz0r/cZeQdcl3wa0rDSsLo9+hA0H5nTeeQ==
+npool-cli-v4@^0.3.177:
+  version "0.3.177"
+  resolved "https://registry.yarnpkg.com/npool-cli-v4/-/npool-cli-v4-0.3.177.tgz#718040a595ebc2e76aacf3ed67cf4aecde8531aa"
+  integrity sha512-G2YGezkdDslwBLDyEbgYtbiBD5q6dXtBNaS3032OBtTiYwJamCQAMbU9tYb8RITyBHQiWjQ5Y3fNrvbBgcg3ZQ==
   dependencies:
     "@quasar/extras" "^1.0.0"
     "@typescript-eslint/eslint-plugin" "^5.17.0"
