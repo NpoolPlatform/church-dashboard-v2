@@ -9,6 +9,7 @@
     :rows-per-page-options='[10]'
     selection='single'
     v-model:selected='selectedUser'
+    :columns='columns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -79,8 +80,6 @@ import {
   useChurchPurchaseAmountSettingStore,
   NotificationType,
   PurchaseAmountSetting,
-  useChurchUsersStore,
-  AppUser,
   useChurchCommissionStore,
   PriceCoinName,
   formatTime,
@@ -88,13 +87,45 @@ import {
   useAdminGoodStore,
   Good
 } from 'npool-cli-v2'
+import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
-
+const columns = computed(() => [
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    field: (row: User) => row.AppID
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: User) => row.ID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: User) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: User) => row.PhoneNO
+  },
+  {
+    name: 'Roles',
+    label: t('MSG_ROLES'),
+    field: (row: User) => row.Roles.join(',')
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATEDAT'),
+    field: (row: User) => formatTime(row.CreatedAt)
+  }
+])
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
@@ -104,7 +135,6 @@ interface MySetting extends PurchaseAmountSetting {
   GoodName: string
 }
 
-const user = useChurchUsersStore()
 const commission = useChurchCommissionStore()
 const csetting = computed(() => commission.CommissionSettings.get(appID.value))
 
@@ -118,8 +148,8 @@ const appSettings = computed(() => {
 })
 const settings = computed(() => Array.from(appSettings.value).map((el) => {
   const s = el as MySetting
-  s.EmailAddress = user.getUserByAppUserID(appID.value, s.UserID as string)?.User.EmailAddress as string
-  s.PhoneNO = user.getUserByAppUserID(appID.value, s.UserID as string)?.User.PhoneNO as string
+  s.EmailAddress = user.getUserByAppUserID(appID.value, s.UserID as string)?.EmailAddress
+  s.PhoneNO = user.getUserByAppUserID(appID.value, s.UserID as string)?.PhoneNO
   s.GoodName = ''
   const index = goods.value.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
   if (index >= 0) {
@@ -128,18 +158,13 @@ const settings = computed(() => Array.from(appSettings.value).map((el) => {
   return s
 }))
 
-const users = computed(() => {
-  const appUsers = user.Users.get(appID.value)
-  if (!appUsers) {
-    return [] as Array<AppUser>
-  }
-  return Array.from(appUsers).map((el) => el.User)
-})
+const user = useChurchUserStore()
+const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 const username = ref('')
-const displayUsers = computed(() => users.value.filter((el) => {
-  return el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)
-}))
-const selectedUser = ref([] as Array<AppUser>)
+const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
+
+const selectedUser = ref([] as Array<User>)
+
 const userID = computed(() => selectedUser.value.length > 0 ? selectedUser.value[0].ID : InvalidID)
 
 const prepare = () => {
@@ -157,19 +182,9 @@ const prepare = () => {
     // TODO
   })
 
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_USERS'),
-        Message: t('MSG_GET_USERS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (!user.Users.get(appID.value)) {
+    getAppUsers(0, 500)
+  }
 
   commission.getCommissionSetting({
     TargetAppID: appID.value,
@@ -185,7 +200,26 @@ const prepare = () => {
     // TODO
   })
 }
-
+const getAppUsers = (offset: number, limit: number) => {
+  user.getAppUsers({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_USERS',
+        Message: 'MSG_GET_USERS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (users: Array<User>, error: boolean) => {
+    if (error || users.length < limit) {
+      return
+    }
+    getAppUsers(offset + limit, limit)
+  })
+}
 const good = useAdminGoodStore()
 const goods = computed(() => good.Goods)
 
@@ -240,7 +274,7 @@ const updating = ref(true)
 const target = ref({} as unknown as PurchaseAmountSetting)
 
 watch(userID, () => {
-  target.value.UserID = userID.value as string
+  target.value.UserID = userID.value
 })
 const start = computed({
   get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
@@ -311,7 +345,7 @@ const onSubmit = () => {
   }
   setting.createUserPurchaseAmountSetting({
     TargetAppID: appID.value,
-    TargetUserID: userID.value as string,
+    TargetUserID: userID.value,
     Info: target.value,
     Message: {
       Error: {

@@ -8,6 +8,7 @@
     :rows-per-page-options='[10]'
     selection='single'
     v-model:selected='selectedUser'
+    :columns='columns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -104,6 +105,38 @@ import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+const columns = computed(() => [
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    field: (row: User) => row.AppID
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: User) => row.ID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: User) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: User) => row.PhoneNO
+  },
+  {
+    name: 'Roles',
+    label: t('MSG_ROLES'),
+    field: (row: User) => row.Roles.join(',')
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATEDAT'),
+    field: (row: User) => formatTime(row.CreatedAt)
+  }
+])
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
