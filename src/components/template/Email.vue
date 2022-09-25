@@ -94,7 +94,7 @@ const emails = computed(() => Array.from(appEmails.value).map((el) => {
     Body: el.Body
   } as MyEmailTemplate
 }))
-const emailLoading = ref(true)
+const emailLoading = ref(false)
 
 const prepare = () => {
   if (!templates.EmailTemplates.EmailTemplates.get(appID.value)) {
