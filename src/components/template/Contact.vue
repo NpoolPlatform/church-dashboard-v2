@@ -125,7 +125,23 @@ const getAppContacts = (offset: number, limit: number) => {
 }
 
 const updateAppContact = (done: () => void) => {
-  done()
+  templates.updateAppContact({
+    TargetAppID: appID.value,
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_CONTACT',
+        Message: 'MSG_UPDATE_CONTACT_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (template: Contact, error: boolean) => {
+    done()
+    if (!error) {
+      onCancel()
+    }
+  })
 }
 
 const createAppContact = (done: () => void) => {
