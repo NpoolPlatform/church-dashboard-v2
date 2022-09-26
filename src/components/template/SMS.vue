@@ -165,7 +165,6 @@ const updateAppSMSTemplate = (done: () => void) => {
       }
     }
   }, (template: SMSTemplate, error: boolean) => {
-    console.log(done)
     done()
     if (!error) {
       onCancel()

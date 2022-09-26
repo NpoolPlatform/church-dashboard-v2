@@ -83,7 +83,7 @@ const onMenuHide = () => {
 }
 
 const onRowClick = (template: Contact) => {
-  target.value = template
+  target.value = { ...template }
   showing.value = true
   updating.value = true
 }
