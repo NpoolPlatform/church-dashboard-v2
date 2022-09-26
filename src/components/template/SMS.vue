@@ -62,7 +62,7 @@ const appID = computed(() => app.AppID)
 
 const templates = useChurchSMSTemplateStore()
 const smss = computed(() => templates.SMSTemplates.SMSTemplates.get(appID.value) ? templates.SMSTemplates.SMSTemplates.get(appID.value) : [])
-const smsLoading = ref(true)
+const smsLoading = ref(false)
 
 const prepare = () => {
   if (!templates.SMSTemplates.SMSTemplates.get(appID.value)) {
@@ -90,7 +90,7 @@ const onMenuHide = () => {
 }
 
 const onRowClick = (template: SMSTemplate) => {
-  target.value = template
+  target.value = { ...template }
   showing.value = true
   updating.value = true
 }
@@ -151,6 +151,7 @@ const createAppSMSTemplate = (done: () => void) => {
     }
   })
 }
+
 const updateAppSMSTemplate = (done: () => void) => {
   templates.updateAppSMSTemplate({
     TargetAppID: appID.value,
@@ -164,6 +165,7 @@ const updateAppSMSTemplate = (done: () => void) => {
       }
     }
   }, (template: SMSTemplate, error: boolean) => {
+    console.log(done)
     done()
     if (!error) {
       onCancel()

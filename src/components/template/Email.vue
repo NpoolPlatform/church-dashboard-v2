@@ -153,7 +153,7 @@ const onMenuHide = () => {
 }
 
 const onRowClick = (template: MyEmailTemplate) => {
-  myTarget.value = template
+  myTarget.value = { ...template }
   showing.value = true
   updating.value = true
 }
