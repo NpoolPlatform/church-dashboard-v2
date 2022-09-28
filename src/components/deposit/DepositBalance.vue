@@ -222,13 +222,23 @@ const onSubmit = () => {
         Type: NotifyType.Success
       }
     }
-  }, (detail: Detail, error: boolean) => {
+  }, (resp: Detail, error: boolean) => {
     submitting.value = false
     if (error) {
       return
     }
+    reset()
     onMenuHide()
   })
+}
+
+const reset = () => {
+  general.$reset()
+  detail.$reset()
+  account.$reset()
+  getAppGenerals(0, 500)
+  getAppDetails(0, 500)
+  getAppDepositAccounts(0, 500)
 }
 const onCancel = () => {
   onMenuHide()
