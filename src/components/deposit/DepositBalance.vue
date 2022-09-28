@@ -2,15 +2,6 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_DEPOSIT_RECORDS")'
-    :rows='(depositRecords as never)'
-    row-key='ID'
-    :loading='depositRecordsLoading'
-    :rows-per-page-options='[10]'
-  />
-  <q-table
-    dense
-    flat
     :title='$t("MSG_USERS")'
     :rows='displayUsers'
     row-key='ID'
@@ -38,6 +29,69 @@
           :label='$t("MSG_DEPOSIT")'
           @click='onCreate'
           :disable='selectedUser.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_GENERALS")'
+    :rows='displayGenerals'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+    selection='single'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='generalUsername'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_DETAILS")'
+    :rows='displayDetails'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+    selection='single'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='detailUsername'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_DEPOSIT_ACCOUNTS")'
+    :rows='displayAccounts'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+    selection='single'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='accountUsername'
+          :label='$t("MSG_USERNAME")'
         />
       </div>
     </template>
@@ -73,7 +127,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { Detail, formatTime, NotifyType, useChurchDepositStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { Account, Detail, formatTime, General, NotifyType, useChurchAccountStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
 import { Coin, NotificationType, useCoinStore } from 'npool-cli-v2'
@@ -141,10 +195,6 @@ const coinBlacklist = (coinTypeID: string) => {
 }
 
 const deposit = useChurchDepositStore()
-const depositRecords = computed(() => deposit.DepositRecords.DepositRecords)
-
-const depositRecordsLoading = ref(false)
-
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
@@ -204,8 +254,16 @@ const userLoading = ref(false)
 
 const prepare = () => {
   if (!user.Users.get(appID.value)) {
-    userLoading.value = true
     getAppUsers(0, 500)
+  }
+  if (!detail.Details.Details.get(appID.value)) {
+    getAppDetails(0, 500)
+  }
+  if (!general.Generals.Generals.get(appID.value)) {
+    getAppGenerals(0, 500)
+  }
+  if (!account.Accounts.Accounts.get(appID.value)) {
+    getAppDepositAccounts(0, 100)
   }
 }
 
@@ -213,11 +271,26 @@ watch(appID, () => {
   prepare()
 })
 
+const detailUsername = ref('')
+const detail = useChurchDetailStore()
+const displayDetails = computed(() => !detail.Details.Details.get(appID.value) ? [] : detail.Details.Details.get(appID.value)?.filter((el) => {
+  return el.EmailAddress?.includes(detailUsername.value) || el.PhoneNO?.includes(detailUsername.value)
+}))
+
+const generalUsername = ref('')
+const general = useChurchGeneralStore()
+const displayGenerals = computed(() => !general.Generals.Generals.get(appID.value) ? [] : general.Generals.Generals.get(appID.value)?.filter((el) => {
+  return el.EmailAddress?.includes(generalUsername.value) || el.PhoneNO?.includes(generalUsername.value)
+}))
+
+const accountUsername = ref('')
+const account = useChurchAccountStore()
+const displayAccounts = computed(() => !account.Accounts.Accounts.get(appID.value) ? [] : account.Accounts.Accounts.get(appID.value)?.filter((el) => {
+  return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
+}))
+
 onMounted(() => {
-  if (!user.Users.get(appID.value)) {
-    userLoading.value = true
-    getAppUsers(0, 500)
-  }
+  prepare()
   if (coin.Coins.length === 0) {
     getCoins()
   }
@@ -238,7 +311,6 @@ const getAppUsers = (offset: number, limit: number) => {
     }
   }, (resp: Array<User>, error: boolean) => {
     if (error || resp.length < limit) {
-      userLoading.value = false
       return
     }
     getAppUsers(offset + limit, limit)
@@ -257,6 +329,50 @@ const getCoins = () => {
     }
   }, () => {
     // TODO
+  })
+}
+
+const getAppGenerals = (offset: number, limit: number) => {
+  general.getAppGenerals({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {}
+  }, (generals: Array<General>, error: boolean) => {
+    if (error || generals.length < limit) {
+      return
+    }
+    getAppGenerals(offset + limit, limit)
+  })
+}
+
+const getAppDetails = (offset: number, limit: number) => {
+  detail.getAppDetails({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {}
+    }
+  }, (details: Array<Detail>, error: boolean) => {
+    if (error || details.length < limit) {
+      return
+    }
+    getAppDetails(offset + limit, limit)
+  })
+}
+
+const getAppDepositAccounts = (offset: number, limit: number) => {
+  account.getAppDepositAccounts({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {}
+  }, (accounts: Array<Account>, error: boolean) => {
+    if (error || accounts.length < limit) {
+      return
+    }
+    getAppDepositAccounts(offset + limit, limit)
   })
 }
 </script>
