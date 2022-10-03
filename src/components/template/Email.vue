@@ -198,6 +198,7 @@ const getAppEmailTemplates = (offset: number, limit: number) => {
 const updateAppEmailTemplate = (done: () => void) => {
   templates.updateAppEmailTemplate({
     TargetAppID: appID.value,
+    TargetLangID: target.value.LangID,
     ...target.value,
     Message: {
       Error: {
@@ -218,6 +219,7 @@ const updateAppEmailTemplate = (done: () => void) => {
 const createAppEmailTemplate = (done: () => void) => {
   templates.createAppEmailTemplate({
     TargetAppID: appID.value,
+    TargetLangID: target.value.LangID,
     ...target.value,
     Message: {
       Error: {

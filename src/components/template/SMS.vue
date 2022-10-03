@@ -135,6 +135,7 @@ const getAppSMSTemplates = (offset: number, limit: number) => {
 const createAppSMSTemplate = (done: () => void) => {
   templates.createAppSMSTemplate({
     TargetAppID: appID.value,
+    TargetLangID: target.value.LangID,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -155,6 +156,7 @@ const createAppSMSTemplate = (done: () => void) => {
 const updateAppSMSTemplate = (done: () => void) => {
   templates.updateAppSMSTemplate({
     TargetAppID: appID.value,
+    TargetLangID: target.value.LangID,
     ...target.value,
     NotifyMessage: {
       Error: {
