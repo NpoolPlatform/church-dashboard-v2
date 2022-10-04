@@ -141,7 +141,7 @@ const coinBlacklist = (coinTypeID: string) => {
 }
 
 const deposit = useChurchDepositStore()
-const depositRecords = computed(() => deposit.DepositRecords.DepositRecords)
+const depositRecords = computed(() => deposit.Details.Details)
 
 const depositRecordsLoading = ref(false)
 

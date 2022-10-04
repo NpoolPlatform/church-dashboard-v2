@@ -37,7 +37,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.DefaultToUsername' :label='$t("MSG_DEFAULT_TO_USERNAME")' />
-        <q-select :options='MessageUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
+        <q-select :options='UsedFors' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_USED_FOR")' />
         <q-input v-model='target.Sender' :label='$t("MSG_SENDER")' />
         <q-input v-model='replyTos' :label='$t("MSG_REPLY_TOS_COMMA")' />
         <q-input v-model='ccTos' :label='$t("MSG_CC_TOS_COMMA")' />
@@ -45,7 +45,8 @@
         <q-input v-model='target.Body' :label='$t("MSG_BODY")' type='textarea' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <!-- <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' /> -->
+        <LoadingButton :loading='true' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -53,11 +54,13 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, EmailTemplate, Language, MessageUsedFors, useChurchTemplateStore } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
+import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType } from 'npool-cli-v4'
+import { Language } from 'npool-cli-v2'
 
 const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/LangSwitcher.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -74,9 +77,9 @@ interface MyEmailTemplate {
   Body: string
 }
 
-const templates = useChurchTemplateStore()
+const templates = useChurchEmailTemplateStore()
 const appEmails = computed(() => {
-  return templates.EmailTemplates.get(appID.value) ? templates.EmailTemplates.get(appID.value) as Array<EmailTemplate> : []
+  return templates.EmailTemplates.EmailTemplates.get(appID.value) ? templates.EmailTemplates.EmailTemplates.get(appID.value) as Array<EmailTemplate> : []
 })
 const emails = computed(() => Array.from(appEmails.value).map((el) => {
   return {
@@ -91,23 +94,12 @@ const emails = computed(() => Array.from(appEmails.value).map((el) => {
     Body: el.Body
   } as MyEmailTemplate
 }))
-const emailLoading = ref(true)
+const emailLoading = ref(false)
 
 const prepare = () => {
-  emailLoading.value = true
-  templates.getEmailTemplates({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_EMAIL_TEMPLATES',
-        Message: 'MSG_GET_EMAIL_TEMPLATES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    emailLoading.value = false
-  })
+  if (!templates.EmailTemplates.EmailTemplates.get(appID.value)) {
+    getAppEmailTemplates(0, 500)
+  }
 }
 
 watch(appID, () => {
@@ -161,7 +153,7 @@ const onMenuHide = () => {
 }
 
 const onRowClick = (template: MyEmailTemplate) => {
-  myTarget.value = template
+  myTarget.value = { ...template }
   showing.value = true
   updating.value = true
 }
@@ -171,43 +163,9 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onSubmit = () => {
-  showing.value = false
-
+const onSubmit = (done: () => void) => {
   target.value.LangID = language.value.ID
-
-  if (updating.value) {
-    templates.updateEmailTemplate({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_EMAIL_TEMPLATE',
-          Message: 'MSG_UPDATE_EMAIL_TEMPLATE_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  templates.createEmailTemplate({
-    TargetAppID: appID.value,
-    TargetLangID: language.value.ID,
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_EMAIL_TEMPLATE',
-        Message: 'MSG_CREATE_EMAIL_TEMPLATE_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  updating.value ? updateAppEmailTemplate(done) : createAppEmailTemplate(done)
 }
 
 const onCancel = () => {
@@ -215,4 +173,67 @@ const onCancel = () => {
   onMenuHide()
 }
 
+const getAppEmailTemplates = (offset: number, limit: number) => {
+  templates.getAppEmailTemplates({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_EMAIL_TEMPLATES',
+        Message: 'MSG_GET_EMAIL_TEMPLATES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (emailTemplates: Array<EmailTemplate>, error: boolean) => {
+    if (error || emailTemplates.length < limit) {
+      emailLoading.value = false
+      return
+    }
+    getAppEmailTemplates(offset + limit, limit)
+  })
+}
+
+const updateAppEmailTemplate = (done: () => void) => {
+  templates.updateAppEmailTemplate({
+    TargetAppID: appID.value,
+    TargetLangID: target.value.LangID,
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_EMAIL_TEMPLATE',
+        Message: 'MSG_UPDATE_EMAIL_TEMPLATE_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (template: EmailTemplate, error: boolean) => {
+    done()
+    if (!error) {
+      onCancel()
+    }
+  })
+}
+
+const createAppEmailTemplate = (done: () => void) => {
+  templates.createAppEmailTemplate({
+    TargetAppID: appID.value,
+    TargetLangID: target.value.LangID,
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_EMAIL_TEMPLATE',
+        Message: 'MSG_CREATE_EMAIL_TEMPLATE_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (template: EmailTemplate, error: boolean) => {
+    done()
+    if (!error) {
+      onCancel()
+    }
+  })
+}
 </script>

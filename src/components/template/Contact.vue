@@ -5,7 +5,7 @@
     :title='$t("MSG_CONTACTS")'
     :rows='contacts'
     row-key='ID'
-    :loading='contactLoading'
+    :loading='contactsLoading'
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as Contact)'
   >
@@ -31,13 +31,14 @@
         <span>{{ $t('MSG_CREATE_CONTACT') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='MessageUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
-        <q-select :options='ContactTypes' v-model='target.AccountType' :label='$t("MSG_CONTACT_TYPE")' />
+        <q-select :options='UsedFors' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_USED_FOR")' />
+        <q-select :options='SignMethodTypes' v-model='target.AccountType' :label='$t("MSG_CONTACT_TYPE")' />
         <q-input v-model='target.Account' :label='$t("MSG_ACCOUNT")' />
         <q-input v-model='target.Sender' :label='$t("MSG_SENDER")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <!-- <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' /> -->
+        <LoadingButton :loading='true' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -45,31 +46,23 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, Contact, ContactTypes, MessageUsedFors, useChurchTemplateStore } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { useChurchContactStore, Contact, NotifyType, UsedFors, SignMethodTypes } from 'npool-cli-v4'
+
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const templates = useChurchTemplateStore()
-const contacts = computed(() => templates.Contacts.get(appID.value) ? templates.Contacts.get(appID.value) : [])
-const contactLoading = ref(true)
+const templates = useChurchContactStore()
+const contacts = computed(() => templates.Contacts.Contacts.get(appID.value) ? templates.Contacts.Contacts.get(appID.value) : [])
+const contactsLoading = ref(false)
 
 const prepare = () => {
-  templates.getContacts({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_CONTACTS',
-        Message: 'MSG_GET_CONTACTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    contactLoading.value = false
-  })
+  if (!templates.Contacts.Contacts.get(appID.value)) {
+    getAppContacts(0, 500)
+  }
 }
 
 watch(appID, () => {
@@ -90,7 +83,7 @@ const onMenuHide = () => {
 }
 
 const onRowClick = (template: Contact) => {
-  target.value = template
+  target.value = { ...template }
   showing.value = true
   updating.value = true
 }
@@ -100,40 +93,8 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onSubmit = () => {
-  showing.value = false
-
-  if (updating.value) {
-    templates.updateContact({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_CONTACT',
-          Message: 'MSG_UPDATE_CONTACT_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  templates.createContact({
-    TargetAppID: appID.value,
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_CONTACT',
-        Message: 'MSG_CREATE_CONTACT_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+const onSubmit = (done: () => void) => {
+  updating.value ? updateAppContact(done) : createAppContact(done)
 }
 
 const onCancel = () => {
@@ -141,4 +102,65 @@ const onCancel = () => {
   onMenuHide()
 }
 
+const getAppContacts = (offset: number, limit: number) => {
+  templates.getAppContacts({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_CONTACTS',
+        Message: 'MSG_GET_CONTACTS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (contacts: Array<Contact>, error: boolean) => {
+    if (error || contacts.length < limit) {
+      contactsLoading.value = false
+      return
+    }
+    getAppContacts(offset + limit, limit)
+  })
+}
+
+const updateAppContact = (done: () => void) => {
+  templates.updateAppContact({
+    TargetAppID: appID.value,
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_CONTACT',
+        Message: 'MSG_UPDATE_CONTACT_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (template: Contact, error: boolean) => {
+    done()
+    if (!error) {
+      onCancel()
+    }
+  })
+}
+
+const createAppContact = (done: () => void) => {
+  templates.createAppContact({
+    TargetAppID: appID.value,
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_CONTACT',
+        Message: 'MSG_CREATE_CONTACT_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (template: Contact, error: boolean) => {
+    done()
+    if (!error) {
+      onCancel()
+    }
+  })
+}
 </script>
