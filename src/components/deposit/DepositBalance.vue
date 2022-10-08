@@ -40,7 +40,6 @@
     :rows='displayGenerals'
     row-key='ID'
     :rows-per-page-options='[10]'
-    selection='single'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -50,6 +49,13 @@
           class='small'
           v-model='generalUsername'
           :label='$t("MSG_USERNAME")'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_EXPORT")'
+          @click='generalsExport'
         />
       </div>
     </template>
@@ -61,7 +67,6 @@
     :rows='displayDetails'
     row-key='ID'
     :rows-per-page-options='[10]'
-    selection='single'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -71,6 +76,12 @@
           class='small'
           v-model='detailUsername'
           :label='$t("MSG_USERNAME")'
+        />
+        <q-btn
+          flat
+          class='btn flat'
+          :label='$t("MSG_EXPORT")'
+          @click='detailsExport'
         />
       </div>
     </template>
@@ -82,7 +93,6 @@
     :rows='displayAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-    selection='single'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -127,10 +137,11 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { Account, Detail, formatTime, General, NotifyType, useChurchAccountStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { Account, Detail, formatTime, General, NotifyType, useChurchAccountStore, useChurchAppStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
 import { Coin, NotificationType, useCoinStore } from 'npool-cli-v2'
+import saveAs from 'file-saver'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -298,6 +309,121 @@ const account = useChurchAccountStore()
 const displayAccounts = computed(() => !account.Accounts.Accounts.get(appID.value) ? [] : account.Accounts.Accounts.get(appID.value)?.filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
+
+const application = useChurchAppStore()
+const generalsExport = () => {
+  if (!displayGenerals.value || displayGenerals.value.length === 0) {
+    return
+  }
+  let orderStr = ''
+  let createdAtCol = 0
+  let paidAtCol = 0
+  let coinTypeID = 0
+  displayGenerals.value.forEach((el) => {
+    const obj = el as unknown as Record<string, unknown>
+    if (!orderStr.length) {
+      Object.keys(obj).forEach((k, col) => {
+        if (orderStr.length) {
+          orderStr += ','
+        }
+        if (k === 'CreatedAt') {
+          createdAtCol = col
+        }
+        if (k === 'PaidAt') {
+          paidAtCol = col
+        }
+        if (k === 'CoinTypeID') {
+          coinTypeID = col
+        }
+        orderStr += k
+      })
+    }
+    orderStr += '\n'
+    let lineStr = ''
+    Object.values(obj).forEach((v, col) => {
+      if (lineStr.length) {
+        lineStr += ','
+      }
+      if (col === coinTypeID) {
+        lineStr += obj.CoinTypeID
+        return
+      }
+      if (col === createdAtCol || col === paidAtCol) {
+        lineStr += formatTime(Number(v), false)
+        return
+      }
+      lineStr += v
+    })
+    orderStr += lineStr
+  })
+
+  const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Generals-' +
+                   formatTime(new Date().getTime() / 1000) +
+                   '.csv'
+  saveAs(blob, filename)
+}
+const detailsExport = () => {
+  if (!displayDetails.value || displayDetails.value.length === 0) {
+    return
+  }
+  let orderStr = ''
+  let createdAtCol = 0
+  let paidAtCol = 0
+  let ioExtra = 0
+  let coinTypeID = 0
+  displayDetails.value.forEach((el) => {
+    const obj = el as unknown as Record<string, unknown>
+    if (!orderStr.length) {
+      Object.keys(obj).forEach((k, col) => {
+        if (orderStr.length) {
+          orderStr += ','
+        }
+        if (k === 'CreatedAt') {
+          createdAtCol = col
+        }
+        if (k === 'PaidAt') {
+          paidAtCol = col
+        }
+        if (k === 'IOExtra') {
+          ioExtra = col
+        }
+        if (k === 'CoinTypeID') {
+          coinTypeID = col
+        }
+        orderStr += k
+      })
+    }
+    orderStr += '\n'
+    let lineStr = ''
+    Object.values(obj).forEach((v, col) => {
+      if (lineStr.length) {
+        lineStr += ','
+      }
+      if (col === coinTypeID) {
+        lineStr += obj.CoinTypeID
+        return
+      }
+      if (col === createdAtCol || col === paidAtCol) {
+        lineStr += formatTime(Number(v), false)
+        return
+      }
+      if (col === ioExtra) {
+        lineStr += (v as string).replace(/,/g, ';')
+        return
+      }
+
+      lineStr += v
+    })
+    orderStr += lineStr
+  })
+
+  const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' +
+                   formatTime(new Date().getTime() / 1000) +
+                   '.csv'
+  saveAs(blob, filename)
+}
 
 onMounted(() => {
   prepare()
