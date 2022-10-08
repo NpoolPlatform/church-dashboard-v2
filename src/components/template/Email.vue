@@ -31,18 +31,16 @@
         <span>{{ $t('MSG_CREATE_EMAIL_TEMPLATE') }}</span>
       </q-card-section>
       <q-card-section>
-        <div class='dark-bg'>
-          <LangSwitcher v-model:language='language' :emit-result='true' :set-lang='false' />
-        </div>
+        <LanguagePicker v-model:language='myTarget.LangID' :updating='updating' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.DefaultToUsername' :label='$t("MSG_DEFAULT_TO_USERNAME")' />
-        <q-select :options='UsedFors' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_USED_FOR")' />
-        <q-input v-model='target.Sender' :label='$t("MSG_SENDER")' />
-        <q-input v-model='replyTos' :label='$t("MSG_REPLY_TOS_COMMA")' />
-        <q-input v-model='ccTos' :label='$t("MSG_CC_TOS_COMMA")' />
-        <q-input v-model='target.Subject' :label='$t("MSG_SUBJECT")' />
-        <q-input v-model='target.Body' :label='$t("MSG_BODY")' type='textarea' />
+        <q-input v-model='myTarget.DefaultToUsername' :label='$t("MSG_DEFAULT_TO_USERNAME")' />
+        <q-select :options='UsedFors' :disable='updating' v-model='myTarget.UsedFor' :label='$t("MSG_USED_FOR")' />
+        <q-input v-model='myTarget.Sender' :label='$t("MSG_SENDER")' />
+        <q-input v-model='myTarget.ReplyTos' :label='$t("MSG_REPLY_TOS_COMMA")' />
+        <q-input v-model='myTarget.CCTos' :label='$t("MSG_CC_TOS_COMMA")' />
+        <q-input v-model='myTarget.Subject' :label='$t("MSG_SUBJECT")' />
+        <q-input v-model='myTarget.Body' :label='$t("MSG_BODY")' type='textarea' />
       </q-card-section>
       <q-item class='row'>
         <!-- <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' /> -->
@@ -56,11 +54,10 @@
 <script setup lang='ts'>
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType } from 'npool-cli-v4'
-import { Language } from 'npool-cli-v2'
+import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType, UsedFor } from 'npool-cli-v4'
 
-const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/LangSwitcher.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -69,7 +66,7 @@ interface MyEmailTemplate {
   ID: string
   LangID: string
   DefaultToUsername: string
-  UsedFor: string
+  UsedFor: UsedFor
   Sender: string
   ReplyTos: string
   CCTos: string
@@ -113,43 +110,24 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 
-const target = ref({} as unknown as EmailTemplate)
-const myTarget = ref({} as unknown as MyEmailTemplate)
-watch(myTarget, () => {
-  target.value = {
+const myTarget = ref({} as MyEmailTemplate)
+const target = computed(() => {
+  return {
     ID: myTarget.value.ID,
     LangID: myTarget.value.LangID,
     DefaultToUsername: myTarget.value.DefaultToUsername,
     UsedFor: myTarget.value.UsedFor,
     Sender: myTarget.value.Sender,
-    ReplyTos: myTarget.value.ReplyTos.split(','),
-    CCTos: myTarget.value.CCTos.split(','),
+    ReplyTos: myTarget.value.ReplyTos?.split(','),
+    CCTos: myTarget.value.CCTos?.split(','),
     Subject: myTarget.value.Subject,
     Body: myTarget.value.Body
   } as EmailTemplate
 })
 
-const replyTos = computed({
-  get: () => target.value?.ReplyTos?.join(','),
-  set: (val) => {
-    target.value.ReplyTos = val.split(',')
-  }
-})
-const ccTos = computed({
-  get: () => target.value?.CCTos?.join(','),
-  set: (val) => {
-    target.value.CCTos = val.split(',')
-  }
-})
-
-const language = ref(undefined as unknown as Language)
-watch(language, () => {
-  target.value.LangID = language.value?.ID
-})
-
 const onMenuHide = () => {
-  language.value = undefined as unknown as Language
-  target.value = {} as unknown as EmailTemplate
+  showing.value = false
+  myTarget.value = {} as MyEmailTemplate
 }
 
 const onRowClick = (template: MyEmailTemplate) => {
@@ -164,12 +142,10 @@ const onCreate = () => {
 }
 
 const onSubmit = (done: () => void) => {
-  target.value.LangID = language.value.ID
   updating.value ? updateAppEmailTemplate(done) : createAppEmailTemplate(done)
 }
 
 const onCancel = () => {
-  showing.value = false
   onMenuHide()
 }
 
@@ -195,15 +171,15 @@ const getAppEmailTemplates = (offset: number, limit: number) => {
   })
 }
 
-const updateAppEmailTemplate = (done: () => void) => {
-  templates.updateAppEmailTemplate({
+const createAppEmailTemplate = (done: () => void) => {
+  templates.createAppEmailTemplate({
     TargetAppID: appID.value,
-    TargetLangID: target.value.LangID,
+    TargetLangID: myTarget.value.LangID,
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_UPDATE_EMAIL_TEMPLATE',
-        Message: 'MSG_UPDATE_EMAIL_TEMPLATE_FAIL',
+        Title: 'MSG_CREATE_EMAIL_TEMPLATE',
+        Message: 'MSG_CREATE_EMAIL_TEMPLATE_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
@@ -215,16 +191,15 @@ const updateAppEmailTemplate = (done: () => void) => {
     }
   })
 }
-
-const createAppEmailTemplate = (done: () => void) => {
-  templates.createAppEmailTemplate({
+const updateAppEmailTemplate = (done: () => void) => {
+  templates.updateAppEmailTemplate({
     TargetAppID: appID.value,
-    TargetLangID: target.value.LangID,
+    TargetLangID: myTarget.value.LangID,
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_EMAIL_TEMPLATE',
-        Message: 'MSG_CREATE_EMAIL_TEMPLATE_FAIL',
+        Title: 'MSG_UPDATE_EMAIL_TEMPLATE',
+        Message: 'MSG_UPDATE_EMAIL_TEMPLATE_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
