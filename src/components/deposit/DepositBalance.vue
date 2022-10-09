@@ -260,6 +260,8 @@ const onCreate = () => {
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
+  amount.value = undefined
+  selectedCoin.value = undefined as unknown as MyCoin
 }
 
 const app = useLocalApplicationStore()
