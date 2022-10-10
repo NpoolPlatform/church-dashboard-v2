@@ -28,12 +28,12 @@
         <span>{{ $t('MSG_REVIEW_WITHDRAW_ADDRESSES') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_EMAIL_ADDRESS') }}: {{ target.User.User.EmailAddress }}</q-item-label>
-        <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ target.User.User.PhoneNO }}</q-item-label>
-        <q-item-label>{{ $t('MSG_USERNAME') }}: {{ target.User.Extra?.Username }}</q-item-label>
-        <q-item-label>{{ $t('MSG_FIRST_NAME') }}: {{ target.User.Extra?.FirstName }}</q-item-label>
-        <q-item-label>{{ $t('MSG_LAST_NAME') }}: {{ target.User.Extra?.LastName }}</q-item-label>
-        <q-item-label>{{ $t('MSG_GENDER') }}: {{ target.User.Extra?.Gender }}</q-item-label>
+        <q-item-label>{{ $t('MSG_EMAIL_ADDRESS') }}: {{ target.User.EmailAddress }}</q-item-label>
+        <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ target.User.PhoneNO }}</q-item-label>
+        <q-item-label>{{ $t('MSG_USERNAME') }}: {{ target.User.Username }}</q-item-label>
+        <q-item-label>{{ $t('MSG_FIRST_NAME') }}: {{ target.User.FirstName }}</q-item-label>
+        <q-item-label>{{ $t('MSG_LAST_NAME') }}: {{ target.User.LastName }}</q-item-label>
+        <q-item-label>{{ $t('MSG_GENDER') }}: {{ target.User.Gender }}</q-item-label>
       </q-card-section>
       <q-card-section>
         <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.Name }}</q-item-label>
@@ -58,15 +58,17 @@
 <script setup lang='ts'>
 import {
   NotificationType,
-  useReviewStore,
+  useCoinStore
+} from 'npool-cli-v2'
+import {
+  useChurchWithdrawAddressReviewStore,
   ReviewState,
   WithdrawAddressReview,
-  useCoinStore,
   formatTime,
-  useLoginedUserStore,
-  useChurchReviewStore,
-  Review
-} from 'npool-cli-v2'
+  Review,
+  useLocalUserStore,
+  NotifyType
+} from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -77,12 +79,11 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const review = useChurchReviewStore()
-const areview = useReviewStore()
+const review = useChurchWithdrawAddressReviewStore()
 const coins = useCoinStore()
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 
-const reviews = computed(() => review.WithdrawAddressReviews.get(appID.value))
+const reviews = computed(() => review.getWithdrawAddressReviewsByID(appID.value))
 const displayReviews = computed(() => Array.from(reviews.value ? reviews.value : []).map((el) => el.Review))
 const reviewLoading = ref(true)
 
@@ -90,19 +91,21 @@ const displayCoins = computed(() => coins.Coins)
 const coinLoading = ref(true)
 
 const prepare = () => {
-  review.getWithdrawAddressReviews({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_WITHDRAW_ADDRESS_REVIEWS'),
-        Message: t('MSG_GET_WITHDRAW_ADDRESS_REVIEWS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
+  if (reviews.value.length === 0) {
+    review.getAppWithdrawAddressReviews({
+      TargetAppID: appID.value,
+      Message: {
+        Error: {
+          Title: t('MSG_GET_WITHDRAW_ADDRESS_REVIEWS'),
+          Message: t('MSG_GET_WITHDRAW_ADDRESS_REVIEWS_FAIL'),
+          Popup: true,
+          Type: NotifyType.Error
+        }
       }
-    }
-  }, () => {
-    reviewLoading.value = false
-  })
+    }, () => {
+      reviewLoading.value = false
+    })
+  }
 }
 
 watch(appID, () => {
@@ -143,16 +146,17 @@ const onRowClick = (review: Review) => {
 }
 
 const updateReview = () => {
-  target.value.Review.ReviewerID = logined.LoginedUser?.User?.ID
+  target.value.Review.ReviewerID = logined.User.ID
 
-  areview.updateReview({
+  review.updateAppWithdrawAddressReview({
+    TargetAppID: appID.value,
     Info: target.value.Review,
     Message: {
       Error: {
         Title: t('MSG_UPDATE_WITHDRAW_ADDRESS_REVIEW'),
         Message: t('MSG_UPDATE_WITHDRAW_ADDRESS_REVIEW_FAIL'),
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {
