@@ -31,9 +31,7 @@
         <span>{{ $t('MSG_CREATE_SMS_TEMPLATE') }}</span>
       </q-card-section>
       <q-card-section>
-        <div class='dark-bg'>
-          <LangSwitcher v-model:language='language' :emit-result='true' :set-lang='false' />
-        </div>
+        <LanguagePicker v-model:language='target.LangID' :updating='updating' />
       </q-card-section>
       <q-card-section>
         <q-select :options='UsedFors' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_USED_FOR")' />
@@ -49,12 +47,11 @@
 </template>
 
 <script setup lang='ts'>
-import { Language } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useChurchSMSTemplateStore, SMSTemplate, NotifyType, UsedFors } from 'npool-cli-v4'
 
-const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/LangSwitcher.vue'))
+const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
@@ -82,10 +79,8 @@ const showing = ref(false)
 const updating = ref(false)
 
 const target = ref({} as unknown as SMSTemplate)
-const language = ref(undefined as unknown as Language)
 
 const onMenuHide = () => {
-  language.value = undefined as unknown as Language
   target.value = {} as unknown as SMSTemplate
 }
 
@@ -100,14 +95,13 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onSubmit = (done: () => void) => {
-  target.value.LangID = language.value.ID
-  updating.value ? updateAppSMSTemplate(done) : createAppSMSTemplate(done)
-}
-
 const onCancel = () => {
   showing.value = false
   onMenuHide()
+}
+
+const onSubmit = (done: () => void) => {
+  updating.value ? updateAppSMSTemplate(done) : createAppSMSTemplate(done)
 }
 
 const getAppSMSTemplates = (offset: number, limit: number) => {
