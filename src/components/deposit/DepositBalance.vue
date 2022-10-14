@@ -2,15 +2,6 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_DEPOSIT_RECORDS")'
-    :rows='(depositRecords as never)'
-    row-key='ID'
-    :loading='depositRecordsLoading'
-    :rows-per-page-options='[10]'
-  />
-  <q-table
-    dense
-    flat
     :title='$t("MSG_USERS")'
     :rows='displayUsers'
     row-key='ID'
@@ -38,6 +29,79 @@
           :label='$t("MSG_DEPOSIT")'
           @click='onCreate'
           :disable='selectedUser.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_GENERALS")'
+    :rows='displayGenerals'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='generalUsername'
+          :label='$t("MSG_USERNAME")'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_EXPORT")'
+          @click='generalsExport'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_DETAILS")'
+    :rows='displayDetails'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='detailUsername'
+          :label='$t("MSG_USERNAME")'
+        />
+        <q-btn
+          flat
+          class='btn flat'
+          :label='$t("MSG_EXPORT")'
+          @click='detailsExport'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_DEPOSIT_ACCOUNTS")'
+    :rows='displayAccounts'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='accountUsername'
+          :label='$t("MSG_USERNAME")'
         />
       </div>
     </template>
@@ -73,10 +137,11 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { Detail, formatTime, NotifyType, useChurchDepositStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { Account, Detail, formatTime, General, NotifyType, useChurchAccountStore, useChurchAppStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
 import { Coin, NotificationType, useCoinStore } from 'npool-cli-v2'
+import saveAs from 'file-saver'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -141,10 +206,6 @@ const coinBlacklist = (coinTypeID: string) => {
 }
 
 const deposit = useChurchDepositStore()
-const depositRecords = computed(() => deposit.Details.Details)
-
-const depositRecordsLoading = ref(false)
-
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
@@ -172,13 +233,23 @@ const onSubmit = () => {
         Type: NotifyType.Success
       }
     }
-  }, (detail: Detail, error: boolean) => {
+  }, (resp: Detail, error: boolean) => {
     submitting.value = false
     if (error) {
       return
     }
+    reset()
     onMenuHide()
   })
+}
+
+const reset = () => {
+  general.$reset()
+  detail.$reset()
+  account.$reset()
+  getAppGenerals(0, 500)
+  getAppDetails(0, 500)
+  getAppDepositAccounts(0, 500)
 }
 const onCancel = () => {
   onMenuHide()
@@ -189,6 +260,8 @@ const onCreate = () => {
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
+  amount.value = undefined
+  selectedCoin.value = undefined as unknown as MyCoin
 }
 
 const app = useLocalApplicationStore()
@@ -204,8 +277,16 @@ const userLoading = ref(false)
 
 const prepare = () => {
   if (!user.Users.get(appID.value)) {
-    userLoading.value = true
     getAppUsers(0, 500)
+  }
+  if (!detail.Details.Details.get(appID.value)) {
+    getAppDetails(0, 500)
+  }
+  if (!general.Generals.Generals.get(appID.value)) {
+    getAppGenerals(0, 500)
+  }
+  if (!account.Accounts.Accounts.get(appID.value)) {
+    getAppDepositAccounts(0, 100)
   }
 }
 
@@ -213,11 +294,141 @@ watch(appID, () => {
   prepare()
 })
 
-onMounted(() => {
-  if (!user.Users.get(appID.value)) {
-    userLoading.value = true
-    getAppUsers(0, 500)
+const detailUsername = ref('')
+const detail = useChurchDetailStore()
+const displayDetails = computed(() => !detail.Details.Details.get(appID.value) ? [] : detail.Details.Details.get(appID.value)?.filter((el) => {
+  return el.EmailAddress?.includes(detailUsername.value) || el.PhoneNO?.includes(detailUsername.value)
+}))
+
+const generalUsername = ref('')
+const general = useChurchGeneralStore()
+const displayGenerals = computed(() => !general.Generals.Generals.get(appID.value) ? [] : general.Generals.Generals.get(appID.value)?.filter((el) => {
+  return el.EmailAddress?.includes(generalUsername.value) || el.PhoneNO?.includes(generalUsername.value)
+}))
+
+const accountUsername = ref('')
+const account = useChurchAccountStore()
+const displayAccounts = computed(() => !account.Accounts.Accounts.get(appID.value) ? [] : account.Accounts.Accounts.get(appID.value)?.filter((el) => {
+  return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
+}))
+
+const application = useChurchAppStore()
+const generalsExport = () => {
+  if (!displayGenerals.value || displayGenerals.value.length === 0) {
+    return
   }
+  let orderStr = ''
+  let createdAtCol = 0
+  let paidAtCol = 0
+  let coinTypeID = 0
+  displayGenerals.value.forEach((el) => {
+    const obj = el as unknown as Record<string, unknown>
+    if (!orderStr.length) {
+      Object.keys(obj).forEach((k, col) => {
+        if (orderStr.length) {
+          orderStr += ','
+        }
+        if (k === 'CreatedAt') {
+          createdAtCol = col
+        }
+        if (k === 'PaidAt') {
+          paidAtCol = col
+        }
+        if (k === 'CoinTypeID') {
+          coinTypeID = col
+        }
+        orderStr += k
+      })
+    }
+    orderStr += '\n'
+    let lineStr = ''
+    Object.values(obj).forEach((v, col) => {
+      if (lineStr.length) {
+        lineStr += ','
+      }
+      if (col === coinTypeID) {
+        lineStr += obj.CoinTypeID
+        return
+      }
+      if (col === createdAtCol || col === paidAtCol) {
+        lineStr += formatTime(Number(v), false)
+        return
+      }
+      lineStr += v
+    })
+    orderStr += lineStr
+  })
+
+  const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Generals-' +
+                   formatTime(new Date().getTime() / 1000) +
+                   '.csv'
+  saveAs(blob, filename)
+}
+const detailsExport = () => {
+  if (!displayDetails.value || displayDetails.value.length === 0) {
+    return
+  }
+  let orderStr = ''
+  let createdAtCol = 0
+  let paidAtCol = 0
+  let ioExtra = 0
+  let coinTypeID = 0
+  displayDetails.value.forEach((el) => {
+    const obj = el as unknown as Record<string, unknown>
+    if (!orderStr.length) {
+      Object.keys(obj).forEach((k, col) => {
+        if (orderStr.length) {
+          orderStr += ','
+        }
+        if (k === 'CreatedAt') {
+          createdAtCol = col
+        }
+        if (k === 'PaidAt') {
+          paidAtCol = col
+        }
+        if (k === 'IOExtra') {
+          ioExtra = col
+        }
+        if (k === 'CoinTypeID') {
+          coinTypeID = col
+        }
+        orderStr += k
+      })
+    }
+    orderStr += '\n'
+    let lineStr = ''
+    Object.values(obj).forEach((v, col) => {
+      if (lineStr.length) {
+        lineStr += ','
+      }
+      if (col === coinTypeID) {
+        lineStr += obj.CoinTypeID
+        return
+      }
+      if (col === createdAtCol || col === paidAtCol) {
+        lineStr += formatTime(Number(v), false)
+        return
+      }
+      if (col === ioExtra) {
+        lineStr += (v as string).replace(/,/g, ';')
+        return
+      }
+
+      lineStr += v
+    })
+    orderStr += lineStr
+  })
+
+  const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' +
+                   formatTime(new Date().getTime() / 1000) +
+                   '.csv'
+  saveAs(blob, filename)
+}
+
+onMounted(() => {
+  prepare()
   if (coin.Coins.length === 0) {
     getCoins()
   }
@@ -238,7 +449,6 @@ const getAppUsers = (offset: number, limit: number) => {
     }
   }, (resp: Array<User>, error: boolean) => {
     if (error || resp.length < limit) {
-      userLoading.value = false
       return
     }
     getAppUsers(offset + limit, limit)
@@ -257,6 +467,50 @@ const getCoins = () => {
     }
   }, () => {
     // TODO
+  })
+}
+
+const getAppGenerals = (offset: number, limit: number) => {
+  general.getAppGenerals({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {}
+  }, (generals: Array<General>, error: boolean) => {
+    if (error || generals.length < limit) {
+      return
+    }
+    getAppGenerals(offset + limit, limit)
+  })
+}
+
+const getAppDetails = (offset: number, limit: number) => {
+  detail.getAppDetails({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {}
+    }
+  }, (details: Array<Detail>, error: boolean) => {
+    if (error || details.length < limit) {
+      return
+    }
+    getAppDetails(offset + limit, limit)
+  })
+}
+
+const getAppDepositAccounts = (offset: number, limit: number) => {
+  account.getAppDepositAccounts({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {}
+  }, (accounts: Array<Account>, error: boolean) => {
+    if (error || accounts.length < limit) {
+      return
+    }
+    getAppDepositAccounts(offset + limit, limit)
   })
 }
 </script>
