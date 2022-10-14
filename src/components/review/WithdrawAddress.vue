@@ -84,14 +84,15 @@ const coins = useCoinStore()
 const logined = useLocalUserStore()
 
 const reviews = computed(() => review.getWithdrawAddressReviewsByID(appID.value))
-const displayReviews = computed(() => Array.from(reviews.value ? reviews.value : []).map((el) => el.Review))
-const reviewLoading = ref(true)
+const displayReviews = computed(() => Array.from(reviews.value).map((el) => el.Review))
+const reviewLoading = ref(false)
 
 const displayCoins = computed(() => coins.Coins)
 const coinLoading = ref(true)
 
 const prepare = () => {
   if (reviews.value.length === 0) {
+    reviewLoading.value = true
     review.getAppWithdrawAddressReviews({
       TargetAppID: appID.value,
       Message: {
@@ -140,7 +141,7 @@ const onMenuHide = () => {
 const onRowClick = (review: Review) => {
   const index = reviews.value?.findIndex((el) => el.Review.ID === review.ID)
   if (index !== undefined && index >= 0) {
-    target.value = reviews.value ? reviews.value[index] : {} as unknown as WithdrawAddressReview
+    target.value = reviews.value ? JSON.parse(JSON.stringify(reviews.value[index])) as WithdrawAddressReview : {} as unknown as WithdrawAddressReview
   }
   showing.value = true
 }
