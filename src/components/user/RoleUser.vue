@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_ROLE_USERS")'
-    :rows='roleUsers'
+    :rows='displayRoleUsers'
     row-key='ID'
     :rows-per-page-options='[10]'
     selection='single'
@@ -16,7 +16,7 @@
           dense
           flat
           class='small'
-          v-model='username'
+          v-model='roleUsername'
           :label='$t("MSG_USERNAME")'
         />
         <q-btn
@@ -101,7 +101,9 @@ const userLoading = ref(false)
 const selectedUser = ref([] as Array<User>)
 
 const roleUserLoading = ref(false)
+const roleUsername = ref('')
 const roleUsers = computed(() => selectedRole.value.length > 0 ? role.AppRoleUsers.get(selectedRole.value[0].ID) : [] as Array<AppRoleUser>)
+const displayRoleUsers = computed(() => roleUsers.value?.filter((el) => el.EmailAddress?.includes(roleUsername.value) || el.PhoneNO?.includes(roleUsername.value)))
 const selectedRoleUser = ref([] as Array<User>)
 
 const username = ref('')
