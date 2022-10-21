@@ -90,7 +90,6 @@
 <script setup lang='ts'>
 import {
   NotificationType,
-  useLoginedUserStore,
   formatTime,
   UserSpecialOffer,
   useChurchSpecialOfferStore,
@@ -101,7 +100,7 @@ import {
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
-import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
+import { NotifyType, useChurchUserStore, useLocalUserStore, User } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -169,7 +168,7 @@ const displayCoupons = computed(() => coupons.value.filter((el) => {
 }))
 const loading = ref(true)
 
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
     TargetAppID: appID.value,
@@ -222,7 +221,7 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  ReleaseByUserID: logined.LoginedUser?.User.ID
+  ReleaseByUserID: logined.User?.ID
 } as unknown as UserSpecialOffer)
 const start = computed({
   get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
@@ -248,7 +247,7 @@ const onRowClick = (coupon: UserSpecialOffer) => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    ReleaseByUserID: logined.LoginedUser?.User.ID
+    ReleaseByUserID: logined.User?.ID
   } as unknown as UserSpecialOffer
 }
 

@@ -49,7 +49,6 @@
 <script setup lang='ts'>
 import {
   NotificationType,
-  useLoginedUserStore,
   formatTime,
   useChurchFixAmountStore,
   useFixAmountStore,
@@ -59,6 +58,7 @@ import {
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
+import { useLocalUserStore } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -71,7 +71,7 @@ const acoupon = useFixAmountStore()
 const coupons = computed(() => coupon.FixAmounts.get(appID.value) ? coupon.FixAmounts.get(appID.value) : [])
 const loading = ref(true)
 
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 
 const prepare = () => {
   loading.value = true
@@ -101,7 +101,7 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  ReleaseByUserID: logined.LoginedUser?.User.ID
+  ReleaseByUserID: logined.User?.ID
 } as unknown as FixAmountCoupon)
 const start = computed({
   get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
@@ -124,7 +124,7 @@ const onRowClick = (coupon: FixAmountCoupon) => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    ReleaseByUserID: logined.LoginedUser?.User.ID
+    ReleaseByUserID: logined.User?.ID
   } as unknown as FixAmountCoupon
 }
 

@@ -60,7 +60,6 @@
 import {
   NotificationType,
   EventCoupon,
-  useLoginedUserStore,
   useChurchEventCouponStore,
   useEventCouponStore,
   useChurchFixAmountStore,
@@ -77,6 +76,7 @@ import {
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
+import { useLocalUserStore } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -188,7 +188,7 @@ const selectedActivity = computed({
   }
 })
 
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 
 const prepare = () => {
   loading.value = true
@@ -260,7 +260,7 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  CreatedBy: logined.LoginedUser?.User.ID
+  CreatedBy: logined.User?.ID
 } as unknown as EventCoupon)
 
 const onCreate = () => {

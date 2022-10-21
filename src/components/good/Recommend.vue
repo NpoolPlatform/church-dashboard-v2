@@ -68,9 +68,9 @@ import {
   useGoodStore,
   Recommend,
   GoodBase,
-  useChurchGoodStore,
-  useLoginedUserStore
+  useChurchGoodStore
 } from 'npool-cli-v2'
+import { useLocalUserStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -91,10 +91,10 @@ const recommends = computed(() => cgood.Recommends.get(appID.value) ? cgood.Reco
 const promotionLoading = ref(true)
 const selectedGood = ref([] as Array<GoodBase>)
 
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 
 const target = ref({
-  RecommenderID: logined.LoginedUser?.User.ID
+  RecommenderID: logined.User?.ID
 } as unknown as Recommend)
 
 const selectedGoodID = computed(() => selectedGood.value[0]?.ID)
@@ -200,7 +200,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   target.value = {
-    RecommenderID: logined.LoginedUser?.User.ID
+    RecommenderID: logined.User?.ID
   } as unknown as Recommend
   target.value.GoodID = selectedGoodID.value as string
 }

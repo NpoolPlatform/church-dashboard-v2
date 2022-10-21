@@ -45,10 +45,11 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, Activity, useChurchActivityStore, useAdminActivityStore, useLoginedUserStore, formatTime } from 'npool-cli-v2'
+import { NotificationType, Activity, useChurchActivityStore, useAdminActivityStore, formatTime } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
+import { useLocalUserStore } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -61,7 +62,7 @@ const aactivity = useAdminActivityStore()
 const activities = computed(() => activity.Activities.get(appID.value) ? activity.Activities.get(appID.value) : [])
 const loading = ref(true)
 
-const logined = useLoginedUserStore()
+const logined = useLocalUserStore()
 
 const prepare = () => {
   loading.value = true
@@ -91,7 +92,7 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  CreatedBy: logined.LoginedUser?.User.ID
+  CreatedBy: logined.User?.ID
 } as unknown as Activity)
 const start = computed({
   get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
