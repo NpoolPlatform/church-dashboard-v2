@@ -281,6 +281,12 @@ const onSubmit = () => {
         Message: 'MSG_CREATE_SPECIAL_OFFER_FAIL',
         Popup: true,
         Type: NotificationType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_SPECIAL_OFFER',
+        Message: 'MSG_CREATE_SPECIAL_OFFER_SUCCESS',
+        Popup: true,
+        Type: NotificationType.Success
       }
     }
   }, () => {

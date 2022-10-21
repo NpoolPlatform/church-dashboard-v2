@@ -312,6 +312,12 @@ const onSubmit = () => {
           Message: t('MSG_CREATE_USER_COUPONS_FAIL'),
           Popup: true,
           Type: NotificationType.Error
+        },
+        Info: {
+          Title: 'MSG_CREATE_USER_COUPONS',
+          Message: 'MSG_CREATE_USER_COUPONS_SUCCESS',
+          Popup: true,
+          Type: NotificationType.Success
         }
       }
     }, () => {

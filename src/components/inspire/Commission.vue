@@ -70,6 +70,12 @@ const onSubmit = () => {
           Message: t('MSG_UPDATE_COMMISSION_SETTING_FAIL'),
           Popup: true,
           Type: NotificationType.Error
+        },
+        Info: {
+          Title: t('MSG_UPDATE_COMMISSION_SETTING'),
+          Message: t('MSG_UPDATE_COMMISSION_SETTING_SUCCESS'),
+          Popup: true,
+          Type: NotificationType.Success
         }
       }
     }, () => {
@@ -86,6 +92,12 @@ const onSubmit = () => {
         Message: t('MSG_CREATE_COMMISSION_SETTING_FAIL'),
         Popup: true,
         Type: NotificationType.Error
+      },
+      Info: {
+        Title: t('MSG_CREATE_COMMISSION_SETTING'),
+        Message: t('MSG_CREATE_COMMISSION_SETTING_SUCCESS'),
+        Popup: true,
+        Type: NotificationType.Success
       }
     }
   }, () => {

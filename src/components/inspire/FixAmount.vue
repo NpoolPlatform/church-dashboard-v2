@@ -157,6 +157,12 @@ const onSubmit = () => {
         Message: 'MSG_CREATE_FIX_AMOUNT_FAIL',
         Popup: true,
         Type: NotificationType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_FIX_AMOUNT',
+        Message: 'MSG_CREATE_FIX_AMOUNT_SUCCESS',
+        Popup: true,
+        Type: NotificationType.Success
       }
     }
   }, () => {

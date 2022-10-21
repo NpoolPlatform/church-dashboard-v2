@@ -138,6 +138,12 @@ const onSubmit = () => {
           Message: 'MSG_UPDATE_DISCOUNT_FAIL',
           Popup: true,
           Type: NotificationType.Error
+        },
+        Info: {
+          Title: 'MSG_UPDATE_DISCOUNT',
+          Message: 'MSG_UPDATE_DISCOUNT_SUCCESS',
+          Popup: true,
+          Type: NotificationType.Success
         }
       }
     }, () => {
@@ -155,6 +161,12 @@ const onSubmit = () => {
         Message: 'MSG_CREATE_DISCOUNT_FAIL',
         Popup: true,
         Type: NotificationType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_DISCOUNT',
+        Message: 'MSG_CREATE_DISCOUNT_SUCCESS',
+        Popup: true,
+        Type: NotificationType.Success
       }
     }
   }, () => {
