@@ -13,11 +13,19 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_USERNAME")'
+        />
         <q-btn
           dense
           flat
           class='btn flat'
           :label='$t("MSG_AIRDROP")'
+          :disable='selected'
           @click='onDo'
         />
       </div>
@@ -117,6 +125,7 @@ const username = ref('')
 const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
 
 const selectedUsers = ref([] as Array<User>)
+const selected = computed(() => selectedUsers.value.length > 0)
 
 interface MyFixAmount {
   label: string
