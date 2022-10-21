@@ -125,7 +125,7 @@ const username = ref('')
 const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
 
 const selectedUsers = ref([] as Array<User>)
-const selected = computed(() => selectedUsers.value.length > 0)
+const selected = computed(() => selectedUsers.value.length === 0)
 
 interface MyFixAmount {
   label: string
