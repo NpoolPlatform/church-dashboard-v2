@@ -62,7 +62,7 @@ import {
 } from 'npool-cli-v2'
 import {
   useChurchWithdrawAddressReviewStore,
-  ReviewState,
+  WithdrawAddressReviewState,
   WithdrawAddressReview,
   formatTime,
   Review,
@@ -167,14 +167,14 @@ const updateReview = () => {
 
 const onApprove = () => {
   showing.value = false
-  target.value.Review.State = ReviewState.Approved
+  target.value.Review.State = WithdrawAddressReviewState.Approved
   updateReview()
   onMenuHide()
 }
 
 const onReject = () => {
   showing.value = false
-  target.value.Review.State = ReviewState.Rejected
+  target.value.Review.State = WithdrawAddressReviewState.Rejected
   updateReview()
   onMenuHide()
 }
