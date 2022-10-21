@@ -54,7 +54,7 @@
           v-model='selectedDiscount'
           :label='$t("MSG_DISCOUNT_COUPON")'
         />
-        <q-input type='number' v-model='airdropCount' :label='$t("MSG_COUPON_COUNT")' />
+        <!-- <q-input type='number' v-model='airdropCount' :label='$t("MSG_COUPON_COUNT")' /> -->
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -163,7 +163,7 @@ const selectedDiscount = ref(undefined as unknown as MyDiscount)
 
 const loading = ref(false)
 const couponType = ref(undefined as unknown as CouponType)
-const airdropCount = ref(1)
+// const airdropCount = ref(1)
 const couponID = ref(undefined as unknown as string)
 watch(selectedDiscount, () => {
   couponID.value = selectedDiscount.value.value.ID as string
@@ -260,6 +260,12 @@ const onSubmit = () => {
           Message: t('MSG_CREATE_USER_COUPONS_FAIL'),
           Popup: true,
           Type: NotificationType.Error
+        },
+        Info: {
+          Title: t('MSG_CREATE_USER_COUPONS'),
+          Message: t('MSG_CREATE_USER_COUPONS_SUCCESS'),
+          Popup: true,
+          Type: NotificationType.Success
         }
       }
     }, () => {
