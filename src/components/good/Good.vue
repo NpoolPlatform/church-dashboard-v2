@@ -42,13 +42,9 @@
         <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' :updating='updating' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' :updating='updating' />
-        <!-- <q-select
-          multiple
-          use-chips
-          :options='coins'
-          v-model='supportCoins'
-          :label='$t("MSG_SUPPORT_COIN_TYPES")'
-        /> -->
+        <q-select
+          multiple filled v-model='model' :options='options'
+        />
 
         <q-select :options='BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
       </q-card-section>
@@ -87,6 +83,40 @@ const { t } = useI18n({ useScope: 'global' })
 const good = NewUseChurchGoodStore()
 const goods = computed(() => good.Goods.Goods)
 const target = ref({} as Good)
+const model = ref([])
+const options = ref([
+  {
+    label: 'Google',
+    value: 'Google',
+    description: 'Search engine',
+    category: '1'
+  },
+  {
+    label: 'Facebook',
+    value: 'Facebook',
+    description: 'Social media',
+    category: '1'
+  },
+  {
+    label: 'Twitter',
+    value: 'Twitter',
+    description: 'Quick updates',
+    category: '2'
+  },
+  {
+    label: 'Apple',
+    value: 'Apple',
+    description: 'iStuff',
+    category: '2'
+  },
+  {
+    label: 'Oracle',
+    value: 'Oracle',
+    disable: true,
+    description: 'Databases',
+    category: '3'
+  }
+])
 
 const getGoods = (offset: number, limit: number) => {
   good.getGoods({
