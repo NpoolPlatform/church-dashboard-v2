@@ -37,24 +37,22 @@
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
         <q-input v-model='target.DeliveryAt' :label='$t("MSG_DELIVERY_AT")' type='date' />
         <q-input v-model='target.StartAt' :label='$t("MSG_START_AT")' type='date' />
+        <q-input v-model='target.GoodTotal' :label='$t("MSG_GOOD_TOTAL")' type='number' min='0' />
+        <q-input v-model='target.GoodSold' :label='$t("MSG_GOOD_SOLD")' type='number' min='0' />
+        <q-input v-model='target.GoodInService' :label='$t("MSG_GOOD_INSERVICE")' type='number' min='0' />
+        <q-input v-model='target.GoodLocked' :label='$t("MSG_GOOD_LOCKED")' type='number' min='0' />
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' :updating='updating' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' :updating='updating' />
-        <q-select
-          multiple filled v-model='model' :options='options'
-        />
-
+        <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' :updating='updating' />
         <q-select :options='BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
-      </q-card-section>
-      <q-card-section>
-        <div>
-          <q-toggle dense v-model='target.Classic' :label='$t("MSG_GOOD_CLASSIC")' />
-        </div>
+        <q-select :options='GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -70,54 +68,102 @@
 import { NotifyType } from 'npool-cli-v4'
 import { useChurchGoodStore as NewUseChurchGoodStore } from 'src/teststore/good/good'
 import { Good } from 'src/teststore/good/good/types'
-import { BenefitTypes } from 'src/teststore/good/good/const'
+import { BenefitTypes, GoodTypes } from 'src/teststore/good/good/const'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const DeviceInfoPicker = defineAsyncComponent(() => import('src/components/good/DeviceInfoPicker.vue'))
 const VendorLocationPicker = defineAsyncComponent(() => import('src/components/good/VendorLocationPicker.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const good = NewUseChurchGoodStore()
 const goods = computed(() => good.Goods.Goods)
 const target = ref({} as Good)
-const model = ref([])
-const options = ref([
-  {
-    label: 'Google',
-    value: 'Google',
-    description: 'Search engine',
-    category: '1'
-  },
-  {
-    label: 'Facebook',
-    value: 'Facebook',
-    description: 'Social media',
-    category: '1'
-  },
-  {
-    label: 'Twitter',
-    value: 'Twitter',
-    description: 'Quick updates',
-    category: '2'
-  },
-  {
-    label: 'Apple',
-    value: 'Apple',
-    description: 'iStuff',
-    category: '2'
-  },
-  {
-    label: 'Oracle',
-    value: 'Oracle',
-    disable: true,
-    description: 'Databases',
-    category: '3'
-  }
-])
 
+const showing = ref(false)
+const updating = ref(false)
+
+const onCreate = () => {
+  updating.value = false
+  showing.value = true
+}
+
+const onRowClick = (row: Good) => {
+  target.value = { ...row }
+  updating.value = true
+  showing.value = true
+}
+
+const onSubmit = (done: () => void) => {
+  updating.value ? updateGood(done) : createGood(done)
+}
+
+const onCancel = () => {
+  showing.value = false
+}
+
+const onMenuHide = () => {
+  showing.value = false
+  updating.value = false
+  target.value = {} as Good
+}
+
+const createGood = (done: () => void) => {
+  good.createGood({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_CREATE_GOOD'),
+        Message: t('MSG_CREATE_GOOD_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_CREATE_GOOD'),
+        Message: t('MSG_CREATE_GOOD_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (g: Good, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const updateGood = (done: () => void) => {
+  good.updateGood({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_UPDATE_GOOD'),
+        Message: t('MSG_UPDATE_GOOD_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_UPDATE_GOOD'),
+        Message: t('MSG_UPDATE_GOOD_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (g: Good, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
 const getGoods = (offset: number, limit: number) => {
   good.getGoods({
     Offset: offset,
@@ -143,76 +189,6 @@ onMounted(() => {
     getGoods(0, 500)
   }
 })
-
-const showing = ref(false)
-const updating = ref(false)
-
-const onCreate = () => {
-  updating.value = false
-  showing.value = true
-}
-
-const onRowClick = (lgood: Good) => {
-  updating.value = true
-  showing.value = true
-  console.log(lgood)
-
-  //   const myGood = good.getGoodByID(lgood.ID)
-  //   target.value.VendorLocationID = myGood.Good.VendorLocation.ID as string
-  //   target.value.PriceCurrency = myGood.Good.PriceCurrency.ID as string
-  //   target.value.DeviceInfoID = myGood.Good.DeviceInfo.ID as string
-  //   target.value.CoinInfoID = myGood.Main?.ID as string
-  //   target.value.SupportCoinTypeIDs =
-  //     Array.from(myGood.SupportCoins ? myGood.SupportCoins : []).map((el) => el.ID) as Array<string>
-  //   target.value.FeeIDs = Array.from(myGood.Good.Fees).map((el) => el.Fee.ID) as Array<string>
-
-//   deliveryAt.value = formatTime(target.value.DeliveryAt, true).replace(/\//g, '-')
-//   startAt.value = formatTime(target.value.StartAt, true).replace(/\//g, '-')
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  if (updating.value) {
-    // cgood.updateGood({
-    //   Info: target.value as,
-    //   Message: {
-    //     Error: {
-    //       Title: t('MSG_UPDATE_GOOD'),
-    //       Message: t('MSG_UPDATE_GOOD_FAIL'),
-    //       Popup: true,
-    //       Type: NotificationType.Error
-    //     }
-    //   }
-    // }, () => {
-    //   // TODO
-    // })
-
-  }
-
-  // cgood.createGood({
-  //   Info: target.value,
-  //   Message: {
-  //     Error: {
-  //       Title: t('MSG_UPDATE_GOODS'),
-  //       Message: t('MSG_UPDATE_GOODS_FAIL'),
-  //       Popup: true,
-  //       Type: NotificationType.Error
-  //     }
-  //   }
-  // }, () => {
-  //   // TODO
-  // })
-}
-
-const onCancel = () => {
-  showing.value = false
-}
-
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {} as Good
-}
 </script>
 
 <style lang='sass' scoped>
