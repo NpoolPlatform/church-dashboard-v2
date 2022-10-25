@@ -1,5 +1,64 @@
 import { BaseRequest } from 'npool-cli-v4'
-import { Good } from '../good/types'
+import { BenefitType, GoodType } from '../good/const'
+import { Good, GoodCoinInfo } from '../good/types'
+
+export interface AppGood {
+  ID: string;
+  AppID: string;
+  GoodID: string;
+  Online: boolean;
+  Visible: boolean;
+  Price: string;
+  DisplayIndex: number;
+  PurchaseLimit: number;
+  CommissionPercent: number;
+  PromotionStartAt: number;
+  PromotionEndAt: number;
+  PromotionMessage: string;
+  PromotionPrice: string;
+  PromotionPosters: string[];
+  RecommenderID: string;
+  RecommenderEmailAddress: string;
+  RecommenderPhoneNO: string;
+  RecommenderUsername: string;
+  RecommenderFirstName: string;
+  RecommenderLastName: string;
+  RecommendMessage: string;
+  RecommendIndex: number;
+  RecommendAt: number;
+  DeviceType: string;
+  DeviceManufacturer: string;
+  DevicePowerComsuption: number;
+  DeviceShipmentAt: number;
+  DevicePosters: string[];
+  DurationDays: number;
+  VendorLocationCountry: string;
+  CoinTypeID: string;
+  CoinLogo: string;
+  CoinName: string;
+  CoinUnit: string;
+  CoinPreSale: boolean;
+  GoodType: GoodType;
+  BenefitType: BenefitType;
+  GoodName: string;
+  Unit: string;
+  UnitAmount: number;
+  TestOnly: boolean;
+  Posters: string[];
+  Labels: string[];
+  VoteCount: number;
+  Rating: number;
+  SupportCoins: GoodCoinInfo[];
+  GoodTotal: number;
+  GoodLocked: number;
+  GoodInService: number;
+  GoodSold: number;
+  SubGoods: Good[];
+  Must: boolean;
+  Commission: boolean;
+  StartAt: number;
+  CreatedAt: number;
+}
 
 export interface GetAppGoodsRequest extends BaseRequest {
   TargetAppID: string;
@@ -8,7 +67,7 @@ export interface GetAppGoodsRequest extends BaseRequest {
 }
 
 export interface GetAppGoodsResponse {
-  Infos: Good[];
+  Infos: AppGood[];
   Total: number;
 }
 
@@ -17,7 +76,7 @@ export interface UpdateAppGoodRequest extends BaseRequest {
   TargetAppID: string;
   Online: boolean;
   Visible: boolean;
-  Goodame: string;
+  GoodName: string;
   Price: string;
   DisplayIndex: number;
   PurchaseLimit: number;
@@ -25,7 +84,7 @@ export interface UpdateAppGoodRequest extends BaseRequest {
 }
 
 export interface UpdateAppGoodResponse {
-  Info: Good;
+  Info: AppGood;
 }
 
 export interface CreateAppGoodRequest extends BaseRequest{
@@ -33,7 +92,7 @@ export interface CreateAppGoodRequest extends BaseRequest{
   GoodID: string;
   Online: boolean;
   Visible: boolean;
-  Goodame: string;
+  GoodName: string;
   Price: string;
   DisplayIndex: number;
   PurchaseLimit: number;
@@ -41,5 +100,5 @@ export interface CreateAppGoodRequest extends BaseRequest{
 }
 
 export interface CreateAppGoodResponse {
-  Info: Good;
+  Info: AppGood;
 }

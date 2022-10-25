@@ -1,13 +1,20 @@
 import { doActionWithError } from 'npool-cli-v4'
 import { defineStore } from 'pinia'
-import { Good } from '../good/types'
 import { API } from './const'
-import { CreateAppGoodRequest, CreateAppGoodResponse, GetAppGoodsRequest, GetAppGoodsResponse, UpdateAppGoodRequest, UpdateAppGoodResponse } from './types'
+import {
+  AppGood,
+  CreateAppGoodRequest,
+  CreateAppGoodResponse,
+  GetAppGoodsRequest,
+  GetAppGoodsResponse,
+  UpdateAppGoodRequest,
+  UpdateAppGoodResponse
+} from './types'
 
 export const useChurchAppGoodStore = defineStore('church-appgood-v4', {
   state: () => ({
     AppGoods: {
-      AppGoods: new Map<string, Array<Good>>(),
+      AppGoods: new Map<string, Array<AppGood>>(),
       Total: 0
     }
   }),
@@ -15,12 +22,12 @@ export const useChurchAppGoodStore = defineStore('church-appgood-v4', {
     getGoodsByAppID () {
       return (appID: string) => {
         const data = this.AppGoods.AppGoods.get(appID)
-        return !data ? [] as Array<Good> : data
+        return !data ? [] as Array<AppGood> : data
       }
     }
   },
   actions: {
-    getAppGoods (req: GetAppGoodsRequest, done: (appGoods: Array<Good>, error: boolean) => void) {
+    getAppGoods (req: GetAppGoodsRequest, done: (appGoods: Array<AppGood>, error: boolean) => void) {
       doActionWithError<GetAppGoodsRequest, GetAppGoodsResponse>(
         API.GET_APPGOODS,
         req,
@@ -35,7 +42,7 @@ export const useChurchAppGoodStore = defineStore('church-appgood-v4', {
           done([], true)
         })
     },
-    updateAppGood (req: UpdateAppGoodRequest, done: (appGood: Good, error: boolean) => void) {
+    updateAppGood (req: UpdateAppGoodRequest, done: (appGood: AppGood, error: boolean) => void) {
       doActionWithError<UpdateAppGoodRequest, UpdateAppGoodResponse>(
         API.UPDATE_APPGOOD,
         req,
@@ -47,10 +54,10 @@ export const useChurchAppGoodStore = defineStore('church-appgood-v4', {
           this.AppGoods.AppGoods.set(req.TargetAppID, data)
           done(resp.Info, false)
         }, () => {
-          done({} as Good, true)
+          done({} as AppGood, true)
         })
     },
-    createAppGood (req: CreateAppGoodRequest, done: (appGood: Good, error: boolean) => void) {
+    createAppGood (req: CreateAppGoodRequest, done: (appGood: AppGood, error: boolean) => void) {
       doActionWithError<CreateAppGoodRequest, CreateAppGoodResponse>(
         API.CREATE_APPGOOD,
         req,
@@ -62,7 +69,7 @@ export const useChurchAppGoodStore = defineStore('church-appgood-v4', {
           this.AppGoods.Total += 1
           done(resp.Info, false)
         }, () => {
-          done({} as Good, true)
+          done({} as AppGood, true)
         })
     }
   }
