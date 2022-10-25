@@ -35,8 +35,8 @@
         <q-input v-model.number='target.UnitAmount' :label='$t("MSG_UNIT_POWER")' type='number' :min='1' />
         <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
-        <DatePicker v-model:date='target.DeliveryAt' :updating='updating' label='MSG_DELIVERY_AT' />
-        <DatePicker v-model:date='target.StartAt' :updating='updating' label='MSG_START_AT' />
+        <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
+        <DatePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.GoodTotal' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='0' />

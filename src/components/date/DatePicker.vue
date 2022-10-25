@@ -1,7 +1,7 @@
 <template>
   <q-input
     v-model='target'
-    :label='$t(label)'
+    :label='label'
     type='date'
     @change='onChange'
   />
