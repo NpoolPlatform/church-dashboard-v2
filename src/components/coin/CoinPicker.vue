@@ -46,17 +46,19 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  coinStore.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
+  if (coinStore.Coins.length === 0) {
+    coinStore.getCoins({
+      Message: {
+        Error: {
+          Title: 'MSG_GET_COINS',
+          Message: 'MSG_GET_COINS_FAIL',
+          Popup: true,
+          Type: NotificationType.Error
+        }
       }
-    }
-  }, () => {
+    }, () => {
     // TODO
-  })
+    })
+  }
 })
 </script>
