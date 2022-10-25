@@ -36,7 +36,7 @@
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -59,6 +59,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const deviceInfo = useChurchDeviceInfoStore()
 const devices = computed(() => deviceInfo.DeviceInfos.DeviceInfos)
@@ -78,9 +79,9 @@ const onRowClick = (row: DeviceInfo) => {
   target.value = { ...row }
 }
 
-const onSubmit = () => {
+const onSubmit = (done: () => void) => {
   showing.value = false
-  updating.value ? updateDevice() : createDevice()
+  updating.value ? updateDevice(done) : createDevice(done)
 }
 
 const onCancel = () => {
@@ -92,7 +93,7 @@ const onMenuHide = () => {
   showing.value = false
 }
 
-const updateDevice = () => {
+const updateDevice = (done: () => void) => {
   deviceInfo.updateDeviceInfo({
     ...target.value,
     Message: {
@@ -110,6 +111,7 @@ const updateDevice = () => {
       }
     }
   }, (d: DeviceInfo, error: boolean) => {
+    done()
     if (error) {
       return
     }
@@ -117,7 +119,7 @@ const updateDevice = () => {
   })
 }
 
-const createDevice = () => {
+const createDevice = (done: () => void) => {
   deviceInfo.createDeviceInfo({
     ...target.value,
     Message: {
@@ -135,6 +137,7 @@ const createDevice = () => {
       }
     }
   }, (d: DeviceInfo, error: boolean) => {
+    done()
     if (error) {
       return
     }
