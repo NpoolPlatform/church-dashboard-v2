@@ -102,6 +102,12 @@ const createVendorLocation = (done: () => void) => {
         Message: t('MSG_CREATE_VENDOR_LOCATION_FAIL'),
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_CREATE_VENDOR_LOCATION'),
+        Message: t('MSG_CREATE_VENDOR_LOCATION_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (v: VendorLocation, error: boolean) => {
@@ -122,6 +128,12 @@ const updateVendorLocation = (done: () => void) => {
         Message: t('MSG_UPDATE_VENDOR_LOCATION_FAIL'),
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
+        Message: t('MSG_UPDATE_VENDOR_LOCATION_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (v: VendorLocation, error: boolean) => {
