@@ -5,7 +5,6 @@
     :title='$t("MSG_COINS")'
     :rows='coins'
     row-key='ID'
-    :loading='coinLoading'
     :rows-per-page-options='[10]'
   />
   <q-table
@@ -14,7 +13,6 @@
     :title='$t("MSG_GOODS")'
     :rows='goods'
     row-key='ID'
-    :loading='goodLoading'
     :rows-per-page-options='[10]'
     selection='single'
     v-model:selected='selectedGood'
@@ -41,183 +39,168 @@
     :title='$t("MSG_APP_GOODS")'
     :rows='appGoods'
     row-key='ID'
-    :loading='appGoodLoading'
-    :rows-per-page-options='[10]'
     selection='single'
-    v-model:selected='selectedAppGood'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <div v-if='!appGood' class='column justify-center'>
-          <span class='warning'>{{ $t('MSG_SELECT_APP_GOOD') }}</span>
-        </div>
-        <div class='column'>
-          <q-space />
-          <q-btn
-            dense
-            flat
-            class='btn flat'
-            :label='$t("MSG_SET_PRICE")'
-            @click='onSetPriceClick'
-            :disable='!appGood'
-          />
-        </div>
-        <q-input
-          dense
-          class='small'
-          v-if='appGood'
-          v-model='appGood.Price'
-          :label='$t("MSG_PRICE")'
-        />
-        <div class='column'>
-          <q-space />
-          <q-btn
-            dense
-            flat
-            class='btn flat'
-            :label='$t("MSG_SET_PURCHASE_LIMIT")'
-            @click='onSetPurchaseLimitClick'
-            :disable='!appGood'
-          />
-        </div>
-        <q-input
-          dense
-          class='small'
-          v-if='appGood'
-          v-model='appGood.PurchaseLimit'
-          :label='$t("MSG_PURCHASE_LIMIT")'
-        />
-        <div class='column'>
-          <q-space />
-          <q-btn-toggle
-            dense
-            flat
-            rounded
-            class='toggle'
-            :options='saleOptions'
-            v-model='online'
-            toggle-color='primary'
-            size='0.625em'
-            :disable='!appGood'
-          />
-        </div>
-        <div class='column'>
-          <q-space />
-          <q-btn-toggle
-            dense
-            flat
-            rounded
-            class='toggle'
-            :options='visibleOptions'
-            v-model='visible'
-            toggle-color='primary'
-            size='0.625em'
-            :disable='!appGood'
-          />
-        </div>
-      </div>
-    </template>
-  </q-table>
+    :rows-per-page-options='[10]'
+    @row-click='(evt, row, index) => onRowClick(row as AppGood)'
+  />
   <q-card>
     <q-card-section class='bg-primary text-white'>
       {{ $t('MSG_ADVERTISEMENT_POSITION') }}
     </q-card-section>
   </q-card>
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <span>{{ $t('MSG_CREATE_APP_GOOD') }} : {{ updating? target.GoodName : selectedGood[0]?.Title }}</span>
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
+        <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
+        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
+        <q-input v-model.number='target.CommissionPercent' :label='$t("MSG_COMMISSION_PERCENT")' type='number' :min='0' />
+      </q-card-section>
+      <q-card-section>
+        <div>
+          <q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' />
+        </div>
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
 import {
-  AppGood,
-  buildGoods,
-  GoodBase,
-  InitAreaStrategy,
-  NotificationType,
-  useAdminGoodStore,
-  useChurchGoodStore,
   useCoinStore
 } from 'npool-cli-v2'
+import { NotifyType } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useChurchAppGoodStore } from 'src/teststore/good/appgood'
+import { AppGood } from 'src/teststore/good/appgood/types'
+import { useChurchGoodStore } from 'src/teststore/good/good'
+import { Good } from 'src/teststore/good/good/types'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const coin = useCoinStore()
 const coins = computed(() => coin.Coins)
-const coinLoading = ref(true)
 
 const good = useChurchGoodStore()
-const adminGood = useAdminGoodStore()
+const goods = computed(() => good.Goods.Goods)
+const selectedGood = ref([] as Array<Good>)
 
-const appGoods = computed(() => good.AppGoods.get(appID.value) ? good.AppGoods.get(appID.value) as Array<AppGood> : [])
-const goods = computed(() => {
-  return buildGoods(adminGood.Goods).filter((good) => {
-    return appGoods.value.findIndex((ag) => ag.GoodID === good.ID) < 0
-  })
-})
-const selectedGood = ref([] as Array<GoodBase>)
-const goodLoading = ref(true)
+const appGood = useChurchAppGoodStore()
+const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
 
-const appGoodLoading = ref(true)
-const selectedAppGood = ref([] as Array<AppGood>)
-const appGood = computed(() => selectedAppGood.value.length > 0 ? selectedAppGood.value[0] : undefined as unknown as AppGood)
-const online = computed({
-  get: () => appGood.value?.Online ? appGood.value?.Online : false,
-  set: (val) => {
-    onOnlineChange(val)
-  }
-})
-const visible = computed({
-  get: () => appGood.value?.Visible ? appGood.value?.Visible : false,
-  set: (val: boolean) => {
-    onVisibleChange(val)
-  }
-})
+const target = ref({} as AppGood)
 
-interface Option {
-  label: string
-  value: boolean
+const showing = ref(false)
+const updating = ref(false)
+
+const onMenuHide = () => {
+  target.value = {} as AppGood
+  showing.value = false
 }
 
-const saleOptions = computed(() => [
-  {
-    label: t('MSG_ONSALE'),
-    value: true
-  }, {
-    label: t('MSG_OFFSALE'),
-    value: false
-  }
-] as Array<Option>)
+const onAuthorizeClick = () => {
+  showing.value = true
+  updating.value = false
+}
 
-const visibleOptions = computed(() => [
-  {
-    label: t('MSG_VISIBLE'),
-    value: true
-  }, {
-    label: t('MSG_HIDE'),
-    value: false
-  }
-] as Array<Option>)
+const onSubmit = (done: () => void) => {
+  updating.value ? updateAppGood(done) : createAppGood(done)
+}
 
-const prepare = () => {
-  appGoodLoading.value = true
-  good.getAppGoods({
+const createAppGood = (done: () => void) => {
+  appGood.createAppGood({
     TargetAppID: appID.value,
+    ...target.value,
+    GoodID: selectedGood.value[0].ID,
+    GoodName: selectedGood.value[0].Title,
     Message: {
       Error: {
-        Title: 'MSG_GET_APP_GOODS',
-        Message: 'MSG_GET_APP_GOODS_FAIL',
+        Title: 'MSG_AUTHORIZE_GOOD',
+        Message: 'MSG_AUTHORIZE_GOOD_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_AUTHORIZE_GOOD',
+        Message: 'MSG_AUTHORIZE_GOOD_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
-  }, () => {
-    appGoodLoading.value = false
+  }, (g: AppGood, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
   })
+}
+
+const updateTarget = computed(() => {
+  return {
+    ID: target.value.ID,
+    TargetAppID: appID.value,
+    Online: target.value.Online,
+    Visible: target.value.Visible,
+    GoodName: target.value.GoodName,
+    Price: target.value.Price,
+    DisplayIndex: target.value.DisplayIndex,
+    PurchaseLimit: target.value.PurchaseLimit,
+    CommissionPercent: target.value.CommissionPercent
+  }
+})
+const updateAppGood = (done: () => void) => {
+  appGood.updateAppGood({
+    ...updateTarget.value,
+    Message: {
+      Error: {
+        Title: 'MSG_AUTHORIZE_GOOD',
+        Message: 'MSG_AUTHORIZE_GOOD_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_AUTHORIZE_GOOD',
+        Message: 'MSG_AUTHORIZE_GOOD_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (g: AppGood, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onRowClick = (row: AppGood) => {
+  target.value = { ...row }
+  updating.value = true
+  showing.value = true
 }
 
 watch(appID, () => {
@@ -225,153 +208,33 @@ watch(appID, () => {
 })
 
 onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    coinLoading.value = false
-  })
-
-  adminGood.getAllGoods({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOODS',
-        Message: 'MSG_GET_GOODS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    goodLoading.value = false
-  })
-
   prepare()
 })
 
-const onSetPriceClick = () => {
-  good.setGoodPrice({
+const getAppGoods = (offset: number, limit: number) => {
+  appGood.getAppGoods({
+    Offset: offset,
+    Limit: limit,
     TargetAppID: appID.value,
-    Info: appGood.value,
     Message: {
       Error: {
-        Title: 'MSG_SET_GOOD_PRICE',
-        Message: 'MSG_SET_GOOD_PRICE_FAIL',
+        Title: 'MSG_GET_APP_GOODS',
+        Message: 'MSG_GET_APP_GOODS_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (goods: Array<AppGood>, error: boolean) => {
+    if (error || goods.length < limit) {
+      return
+    }
+    getAppGoods(offset + limit, limit)
   })
 }
 
-const onVisibleChange = (visible: boolean) => {
-  good.updateAppGood({
-    TargetAppID: appID.value,
-    Info: {
-      ID: appGood.value.ID,
-      GoodID: appGood.value.GoodID,
-      Price: appGood.value.Price,
-      Online: appGood.value.Online,
-      InitAreaStrategy: appGood.value.InitAreaStrategy,
-      DisplayIndex: appGood.value.DisplayIndex,
-      Visible: visible,
-      PurchaseLimit: appGood.value.PurchaseLimit
-    },
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_GOOD',
-        Message: 'MSG_UPDATE_GOOD_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    appGood.value.Visible = visible
-  })
-}
-
-const onSetPurchaseLimitClick = () => {
-  good.updateAppGood({
-    TargetAppID: appID.value,
-    Info: appGood.value,
-    Message: {
-      Error: {
-        Title: 'MSG_SET_PURCHASE_LIMIT',
-        Message: 'MSG_SET_PURCHASE_LIMIT_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-const onOnlineChange = (online: boolean) => {
-  if (online) {
-    good.onlineGood({
-      TargetAppID: appID.value,
-      Info: appGood.value,
-      Message: {
-        Error: {
-          Title: 'MSG_ONLINE_GOOD',
-          Message: 'MSG_ONLINE_GOOD_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      appGood.value.Online = online
-    })
-    return
+const prepare = () => {
+  if (appGoods.value.length === 0) {
+    getAppGoods(0, 500)
   }
-
-  good.offlineGood({
-    TargetAppID: appID.value,
-    Info: appGood.value,
-    Message: {
-      Error: {
-        Title: 'MSG_OFFLINE_GOOD',
-        Message: 'MSG_OFFLINE_GOOD_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    appGood.value.Online = online
-  })
 }
-
-const onAuthorizeClick = () => {
-  good.authorizeGood({
-    TargetAppID: appID.value,
-    Info: {
-      GoodID: selectedGood.value[0].ID as string,
-      Price: 0,
-      Online: false,
-      InitAreaStrategy: InitAreaStrategy.All,
-      DisplayIndex: 0,
-      Visible: true,
-      PurchaseLimit: 0
-    },
-    Message: {
-      Error: {
-        Title: 'MSG_AUTHORIZE_GOOD',
-        Message: 'MSG_AUTHORIZE_GOOD_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
 </script>
