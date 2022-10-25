@@ -310,7 +310,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '库存',
       caption: '管理与展示商品库存',
@@ -319,7 +319,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */{
       menuId: uid(),
       label: 'APP商品管理',
       caption: '授权、价格与上下架管理',
@@ -376,7 +376,7 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
-  } as MenuItem, {
+  } as MenuItem, /* {
     menuId: uid(),
     label: '服务费',
     caption: '管理商品服务费',
@@ -405,7 +405,7 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
-  } as MenuItem, {
+  } as MenuItem, */ {
     menuId: uid(),
     label: '审核',
     caption: '管理审核项目',
