@@ -32,22 +32,25 @@
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
-        <q-input v-model='target.UnitAmount' :label='$t("MSG_UNIT_POWER")' type='number' min='1' />
-        <q-input v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
-        <q-input v-model='target.DeliveryAt' :label='$t("MSG_DELIVERY_AT")' type='date' />
-        <q-input v-model='target.StartAt' :label='$t("MSG_START_AT")' type='date' />
-        <q-input v-model='target.GoodTotal' :label='$t("MSG_GOOD_TOTAL")' type='number' min='0' />
-        <q-input v-model='target.GoodSold' :label='$t("MSG_GOOD_SOLD")' type='number' min='0' />
-        <q-input v-model='target.GoodInService' :label='$t("MSG_GOOD_INSERVICE")' type='number' min='0' />
-        <q-input v-model='target.GoodLocked' :label='$t("MSG_GOOD_LOCKED")' type='number' min='0' />
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' min='0' />
+        <q-input v-model.number='target.UnitAmount' :label='$t("MSG_UNIT_POWER")' type='number' :min='1' />
+        <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
+        <DatePicker v-model:date='target.DeliveryAt' :updating='updating' label='MSG_DELIVERY_AT' />
+        <DatePicker v-model:date='target.StartAt' :updating='updating' label='MSG_START_AT' />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model.number='target.GoodTotal' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='0' />
+        <q-input v-model.number='target.GoodSold' :label='$t("MSG_GOOD_SOLD")' type='number' :min='0' />
+        <q-input v-model.number='target.GoodInService' :label='$t("MSG_GOOD_INSERVICE")' type='number' :min='0' />
+        <q-input v-model.number='target.GoodLocked' :label='$t("MSG_GOOD_LOCKED")' type='number' :min='0' />
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
+        <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' :updating='updating' />
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' :updating='updating' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' :updating='updating' />
-        <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' :updating='updating' />
+      </q-card-section>
+      <q-card-section>
         <q-select :options='BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
         <q-select :options='GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
       </q-card-section>
@@ -77,6 +80,7 @@ const VendorLocationPicker = defineAsyncComponent(() => import('src/components/g
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
