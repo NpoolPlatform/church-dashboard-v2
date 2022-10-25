@@ -69,7 +69,7 @@
 
 <script setup lang='ts'>
 import { NotifyType } from 'npool-cli-v4'
-import { useChurchGoodStore as NewUseChurchGoodStore } from 'src/teststore/good/good'
+import { useChurchGoodStore } from 'src/teststore/good/good'
 import { Good } from 'src/teststore/good/good/types'
 import { BenefitTypes, GoodTypes } from 'src/teststore/good/good/const'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
@@ -85,7 +85,7 @@ const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePi
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const good = NewUseChurchGoodStore()
+const good = useChurchGoodStore()
 const goods = computed(() => good.Goods.Goods)
 const target = ref({} as Good)
 
@@ -114,7 +114,7 @@ const onCancel = () => {
 const onMenuHide = () => {
   showing.value = false
   updating.value = false
-  target.value = {} as Good
+  // target.value = {} as Good
 }
 
 const createGood = (done: () => void) => {
@@ -144,9 +144,6 @@ const createGood = (done: () => void) => {
 }
 
 const updateGood = (done: () => void) => {
-  const current = (({ ...UpdateGoodRequest }) => ({ ...UpdateGoodRequest }))(target.value)
-  console.log('current: ', current)
-
   good.updateGood({
     ...target.value,
     Message: {
