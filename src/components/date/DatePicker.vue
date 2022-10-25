@@ -11,13 +11,11 @@ import { formatTime } from 'npool-cli-v4'
 import { defineProps, defineEmits, toRef, ref, onMounted } from 'vue'
 interface Props {
   date: number
-  updating: boolean
   label: string
 }
 
 const props = defineProps<Props>()
 const date = toRef(props, 'date')
-const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
 
 const target = ref('')
@@ -29,8 +27,6 @@ const onChange = () => {
 }
 
 onMounted(() => {
-  if (updating.value) {
-    target.value = formatTime(date.value, true).replace(/\//g, '-')
-  }
+  target.value = formatTime(date.value, true).replace(/\//g, '-')
 })
 </script>

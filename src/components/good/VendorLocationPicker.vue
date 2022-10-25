@@ -29,7 +29,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 interface Props {
   location: string
-  updating: boolean
+  updating?: boolean
 }
 
 const props = defineProps<Props>()

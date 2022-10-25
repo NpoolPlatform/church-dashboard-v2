@@ -25,7 +25,7 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
   coins: string[]
-  updating: boolean
+  updating?: boolean
 }
 
 const props = defineProps<Props>()

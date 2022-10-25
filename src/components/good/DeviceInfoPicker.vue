@@ -28,7 +28,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 interface Props {
   device: string
-  updating: boolean
+  updating?: boolean
 }
 
 const props = defineProps<Props>()
