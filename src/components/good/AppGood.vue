@@ -62,13 +62,13 @@
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
         <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
         <q-input
-          class='commission-percent' v-model.number='target.CommissionPercent' :label='$t("MSG_COMMISSION_PERCENT")' type='number'
+          class='commission-percent'
+          v-model.number='target.CommissionPercent'
+          :label='$t("MSG_COMMISSION_PERCENT")'
+          type='number'
           :min='0'
-        >
-          <template #append>
-            <span>%</span>
-          </template>
-        </q-input>
+          suffix='%'
+        />
       </q-card-section>
       <q-card-section>
         <div>
