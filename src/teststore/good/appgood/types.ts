@@ -50,9 +50,9 @@ export interface AppGood {
   Rating: number;
   SupportCoins: GoodCoinInfo[];
   GoodTotal: number;
-  GoodLocked: number;
-  GoodInService: number;
-  GoodSold: number;
+  Locked: number;
+  InService: number;
+  Sold: number;
   SubGoods: Good[];
   Must: boolean;
   Commission: boolean;
