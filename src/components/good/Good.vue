@@ -140,6 +140,9 @@ const createGood = (done: () => void) => {
 }
 
 const updateGood = (done: () => void) => {
+  const current = (({ ...UpdateGoodRequest }) => ({ ...UpdateGoodRequest }))(target.value)
+  console.log('current: ', current)
+
   good.updateGood({
     ...target.value,
     Message: {
@@ -164,6 +167,7 @@ const updateGood = (done: () => void) => {
     onMenuHide()
   })
 }
+
 const getGoods = (offset: number, limit: number) => {
   good.getGoods({
     Offset: offset,
