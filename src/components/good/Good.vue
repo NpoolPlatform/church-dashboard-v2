@@ -39,16 +39,16 @@
         <DatePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='0' />
-        <q-input v-model.number='target.Sold' :label='$t("MSG_GOOD_SOLD")' type='number' :min='0' />
+        <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
+        <q-input v-model.number='target.Sold' :label='$t("MSG_GOOD_SOLD")' type='number' :min='1' />
         <q-input v-model.number='target.InService' :label='$t("MSG_GOOD_INSERVICE")' type='number' :min='0' />
         <q-input v-model.number='target.Locked' :label='$t("MSG_GOOD_LOCKED")' type='number' :min='0' />
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
-        <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' :updating='updating' />
-        <DeviceInfoPicker v-model:device='target.DeviceInfoID' :updating='updating' />
-        <VendorLocationPicker v-model:location='target.VendorLocationID' :updating='updating' />
+        <CoinPicker v-model:coin='target.CoinTypeID' />
+        <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' />
+        <DeviceInfoPicker v-model:device='target.DeviceInfoID' />
+        <VendorLocationPicker v-model:location='target.VendorLocationID' />
       </q-card-section>
       <q-card-section>
         <q-select :options='BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
@@ -72,7 +72,7 @@ import { NotifyType } from 'npool-cli-v4'
 import { useChurchGoodStore } from 'src/teststore/good/good'
 import { Good } from 'src/teststore/good/good/types'
 import { BenefitTypes, GoodTypes } from 'src/teststore/good/good/const'
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const DeviceInfoPicker = defineAsyncComponent(() => import('src/components/good/DeviceInfoPicker.vue'))
@@ -86,7 +86,15 @@ const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePi
 const { t } = useI18n({ useScope: 'global' })
 
 const good = useChurchGoodStore()
-const goods = computed(() => good.Goods.Goods)
+const goods = computed(() => Array.from(good.Goods.Goods, (el) => {
+  el.SupportCoinTypeIDs = []
+  el.SupportCoins.forEach((sl) => {
+    if (sl) {
+      el.SupportCoinTypeIDs.push(sl.CoinTypeID)
+    }
+  })
+  return { ...el }
+}))
 const target = ref({} as Good)
 
 const showing = ref(false)
@@ -169,31 +177,6 @@ const updateGood = (done: () => void) => {
   })
 }
 
-const getGoods = (offset: number, limit: number) => {
-  good.getGoods({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_GOODS'),
-        Message: t('MSG_GET_GOODS_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Good>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getGoods(offset + limit, limit)
-  })
-}
-
-onMounted(() => {
-  if (good.Goods.Goods.length === 0) {
-    getGoods(0, 500)
-  }
-})
 </script>
 
 <style lang='sass' scoped>
