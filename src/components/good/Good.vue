@@ -39,10 +39,10 @@
         <DatePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model.number='target.GoodTotal' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='0' />
-        <q-input v-model.number='target.GoodSold' :label='$t("MSG_GOOD_SOLD")' type='number' :min='0' />
-        <q-input v-model.number='target.GoodInService' :label='$t("MSG_GOOD_INSERVICE")' type='number' :min='0' />
-        <q-input v-model.number='target.GoodLocked' :label='$t("MSG_GOOD_LOCKED")' type='number' :min='0' />
+        <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='0' />
+        <q-input v-model.number='target.Sold' :label='$t("MSG_GOOD_SOLD")' type='number' :min='0' />
+        <q-input v-model.number='target.InService' :label='$t("MSG_GOOD_INSERVICE")' type='number' :min='0' />
+        <q-input v-model.number='target.Locked' :label='$t("MSG_GOOD_LOCKED")' type='number' :min='0' />
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
