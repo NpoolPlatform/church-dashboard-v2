@@ -114,7 +114,7 @@ const onCancel = () => {
 const onMenuHide = () => {
   showing.value = false
   updating.value = false
-  // target.value = {} as Good
+  target.value = {} as Good
 }
 
 const createGood = (done: () => void) => {
