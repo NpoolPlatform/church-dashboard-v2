@@ -44,14 +44,13 @@ export interface Good {
   VoteCount: number;
   Rating: number;
   SupportCoins: GoodCoinInfo[];
+  SupportCoinTypeIDs: string[];
   GoodStockID: string;
   GoodTotal: number;
   GoodLocked: number;
   GoodInService: number;
   GoodSold: number;
   DeliveryAt: number;
-  Actual: boolean;
-  Classic: boolean;
   StartAt: number;
   CreatedAt: number;
   UpdatedAt: number;
@@ -62,7 +61,7 @@ export interface CreateGoodRequest extends BaseRequest {
   DeviceInfoID: string;
   DurationDays: number;
   CoinTypeID: string;
-  InheritFromGoodID: string;
+  InheritFromGoodID?: string;
   VendorLocationID: string;
   Price: string;
   BenefitType: string;
@@ -74,10 +73,10 @@ export interface CreateGoodRequest extends BaseRequest {
   DeliveryAt: number;
   StartAt: number;
   TestOnly: boolean;
-  Total: number;
-  Locked: number;
-  InService: number;
-  Sold: number;
+  GoodTotal: number;
+  GoodLocked: number;
+  GoodInService: number;
+  GoodSold: number;
   Posters: string[];
   Labels: string[];
 }
@@ -119,8 +118,8 @@ export interface UpdateGoodRequest extends BaseRequest{
   DeliveryAt: number;
   StartAt: number;
   TestOnly: boolean;
-  Total: number;
-  Sold: number;
+  GoodTotal: number;
+  GoodSold: number;
   Posters: string[];
   Labels: string[];
 }
