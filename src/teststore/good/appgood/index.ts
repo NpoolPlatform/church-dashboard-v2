@@ -4,7 +4,7 @@ import { Good } from '../good/types'
 import { API } from './const'
 import { CreateAppGoodRequest, CreateAppGoodResponse, GetAppGoodsRequest, GetAppGoodsResponse, UpdateAppGoodRequest, UpdateAppGoodResponse } from './types'
 
-export const useChurchGoodStore = defineStore('church-appgood-v4', {
+export const useChurchAppGoodStore = defineStore('church-appgood-v4', {
   state: () => ({
     AppGoods: {
       AppGoods: new Map<string, Array<Good>>(),
