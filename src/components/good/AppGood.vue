@@ -61,7 +61,14 @@
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
         <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
-        <q-input v-model.number='target.CommissionPercent' :label='$t("MSG_COMMISSION_PERCENT")' type='number' :min='0' />
+        <q-input
+          class='commission-percent' v-model.number='target.CommissionPercent' :label='$t("MSG_COMMISSION_PERCENT")' type='number'
+          :min='0'
+        >
+          <template #append>
+            <span>%</span>
+          </template>
+        </q-input>
       </q-card-section>
       <q-card-section>
         <div>
@@ -238,3 +245,8 @@ const prepare = () => {
   }
 }
 </script>
+<style lang='sass' scoped>
+.commission-percent
+  ::v-deep .q-field__append
+    align-items: flex-end
+</style>
