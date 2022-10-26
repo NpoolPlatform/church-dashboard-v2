@@ -27,6 +27,8 @@ const onChange = () => {
 }
 
 onMounted(() => {
-  target.value = formatTime(date.value, true).replace(/\//g, '-')
+  if (date.value) {
+    target.value = formatTime(date.value, true).replace(/\//g, '-')
+  }
 })
 </script>

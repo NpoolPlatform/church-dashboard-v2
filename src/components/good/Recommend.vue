@@ -9,6 +9,7 @@
     selection='single'
     v-model:selected='selectedGood'
   />
+
   <q-table
     dense
     flat
@@ -41,10 +42,13 @@
         <span>{{ $t('MSG_CREATE_RECOMMEND') }}</span>
       </q-card-section>
       <q-card-section>
-        <span>{{ selectedGood[0]?.Title }}</span>
+        <span> {{ updating? target.GoodName : selectedGood[0]?.Title }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model.number='target.RecommendIndex' :label='$t("MSG_RECOMMEND_INDEX")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -148,7 +152,8 @@ const createAppRecommend = (done: () => void) => {
 const updateAppRecommend = (done: () => void) => {
   recommend.updateAppRecommend({
     TargetAppID: appID.value,
-    ...target.value,
+    ID: target.value.ID,
+    Message: target.value.Message,
     NotifyMessage: {
       Error: {
         Title: t('MSG_UPDATE_RECOMMEND'),

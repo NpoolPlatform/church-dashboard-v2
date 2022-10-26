@@ -25,6 +25,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_CREATE")'
+          :disable='selectedGood.length === 0'
           @click='onCreate'
         />
       </div>
@@ -40,13 +41,13 @@
         <span>{{ $t('MSG_CREATE_PROMOTION') }}</span>
       </q-card-section>
       <q-card-section>
-        <span>{{ selectedGood[0]?.Title }}</span>
+        <span>{{ updating? target.GoodName : selectedGood[0]?.Title }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
         <q-input type='number' v-model='target.Price' :label='$t("MSG_PRICE")' />
         <DatePicker v-model:date='target.StartAt' :label='$t("MSG_START_AT")' />
-        <DatePicker v-model:date='target.StartAt' :label='$t("MSG_END_AT")' />
+        <DatePicker v-model:date='target.EndAt' :label='$t("MSG_END_AT")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -108,8 +109,8 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as Promotion
   showing.value = false
+  target.value = {} as Promotion
 }
 
 const onSubmit = (done: () => void) => {
