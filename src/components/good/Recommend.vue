@@ -2,8 +2,8 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_GOODS")'
-    :rows='goods'
+    :title='$t("MSG_APP_GOODS")'
+    :rows='appGoods'
     row-key='ID'
     :rows-per-page-options='[10]'
     selection='single'
@@ -42,7 +42,7 @@
         <span>{{ $t('MSG_CREATE_RECOMMEND') }}</span>
       </q-card-section>
       <q-card-section>
-        <span> {{ updating? target.GoodName : selectedGood[0]?.Title }}</span>
+        <span> {{ updating? target.GoodName : selectedGood[0]?.GoodName }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
@@ -66,8 +66,8 @@
 <script setup lang='ts'>
 import { NotifyType, useLocalUserStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
-import { useChurchGoodStore } from 'src/teststore/good/good'
-import { Good } from 'src/teststore/good/good/types'
+import { useChurchAppGoodStore } from 'src/teststore/good/appgood'
+import { AppGood } from 'src/teststore/good/appgood/types'
 import { useChurchRecommendStore } from 'src/teststore/good/recommend'
 import { Recommend } from 'src/teststore/good/recommend/types'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
@@ -80,9 +80,9 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const good = useChurchGoodStore()
-const goods = computed(() => good.Goods.Goods)
-const selectedGood = ref([] as Array<Good>)
+const appGood = useChurchAppGoodStore()
+const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
+const selectedGood = ref([] as Array<AppGood>)
 
 const recommend = useChurchRecommendStore()
 const recommends = computed(() => recommend.getRecommendsByAppID(appID.value))
@@ -189,6 +189,9 @@ const prepare = () => {
   if (recommends.value.length === 0) {
     getAppRecommends(0, 500)
   }
+  if (appGoods.value.length === 0) {
+    getAppGoods(0, 500)
+  }
 }
 
 const getAppRecommends = (offset: number, limit: number) => {
@@ -209,6 +212,27 @@ const getAppRecommends = (offset: number, limit: number) => {
       return
     }
     getAppRecommends(offset + limit, limit)
+  })
+}
+
+const getAppGoods = (offset: number, limit: number) => {
+  appGood.getAppGoods({
+    Offset: offset,
+    Limit: limit,
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_GOODS',
+        Message: 'MSG_GET_APP_GOODS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (goods: Array<AppGood>, error: boolean) => {
+    if (error || goods.length < limit) {
+      return
+    }
+    getAppGoods(offset + limit, limit)
   })
 }
 </script>
