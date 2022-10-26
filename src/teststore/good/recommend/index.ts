@@ -29,7 +29,7 @@ export const useChurchRecommendStore = defineStore('church-recommend-v4', {
   actions: {
     getAppRecommends (req: GetAppRecommendsRequest, done: (appRecommends: Array<Recommend>, error: boolean) => void) {
       doActionWithError<GetAppRecommendsRequest, GetAppRecommendsResponse>(
-        API.GET_APP_RECOMMANDS,
+        API.GET_APP_RECOMMENDS,
         req,
         req.Message,
         (resp: GetAppRecommendsResponse): void => {
@@ -44,7 +44,7 @@ export const useChurchRecommendStore = defineStore('church-recommend-v4', {
     },
     updateAppRecommend (req: UpdateAppRecommendRequest, done: (appRecommend: Recommend, error: boolean) => void) {
       doActionWithError<UpdateAppRecommendRequest, UpdateAppRecommendResponse>(
-        API.UPDATE_APP_RECOMMAND,
+        API.UPDATE_APP_RECOMMEND,
         req,
         req.NotifyMessage,
         (resp: UpdateAppRecommendResponse): void => {
@@ -59,7 +59,7 @@ export const useChurchRecommendStore = defineStore('church-recommend-v4', {
     },
     createAppRecommend (req: CreateAppRecommendRequest, done: (appRecommend: Recommend, error: boolean) => void) {
       doActionWithError<CreateAppRecommendRequest, CreateAppRecommendResponse>(
-        API.CREATE_APP_RECOMMAND,
+        API.CREATE_APP_RECOMMEND,
         req,
         req.NotifyMessage,
         (resp: CreateAppRecommendResponse): void => {
