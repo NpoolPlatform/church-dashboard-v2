@@ -63,7 +63,6 @@ import {
   useCoinStore,
   NotificationType,
   Coin,
-  useAdminGoodStore,
   useCoinSettingStore,
   CoinSetting,
   useGoodSettingStore,
@@ -78,7 +77,6 @@ const appID = computed(() => app.AppID)
 const account = useChurchAccountStore()
 const coin = useCoinStore()
 const setting = useCoinSettingStore()
-const good = useAdminGoodStore()
 const gsetting = useGoodSettingStore()
 
 interface MySetting extends CoinSetting {
@@ -278,19 +276,6 @@ onMounted(() => {
       Error: {
         Title: 'MSG_GET_GOOD_BENEFITS',
         Message: 'MSG_GET_GOOD_BENEFITS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  good.getAllGoods({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOODS',
-        Message: 'MSG_GET_GOODS_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }

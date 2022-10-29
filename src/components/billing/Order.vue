@@ -45,7 +45,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, OrderBase, PaymentState, useAdminGoodStore, useChurchBillingStore, useChurchOrderStore, PriceCoinName } from 'npool-cli-v2'
+import { NotificationType, OrderBase, PaymentState, useChurchBillingStore, useChurchOrderStore, PriceCoinName } from 'npool-cli-v2'
+import { AppGood, NotifyType, useChurchAppGoodStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch, ref } from 'vue'
 
@@ -63,7 +64,8 @@ interface MyOrder extends OrderBase {
 const billing = useChurchBillingStore()
 const payments = computed(() => billing.Payments.get(appID.value))
 
-const good = useAdminGoodStore()
+const good = useChurchAppGoodStore()
+const goods = computed(() => good.getGoodsByAppID(appID.value))
 
 const order = useChurchOrderStore()
 const orders = computed(() => {
@@ -88,9 +90,9 @@ const orders = computed(() => {
       }
     }
 
-    const index = good.Goods.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
+    const index = goods.value.findIndex((gl) => gl.GoodID === el.GoodID)
     if (index >= 0) {
-      o.GoodName = good.Goods[index].Good.Good.Title
+      o.GoodName = goods.value[index].GoodName
     }
     return o
   })
@@ -163,18 +165,29 @@ watch(appID, () => {
 
 onMounted(() => {
   prepare()
-  good.getAllGoods({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_ALL_GOODS',
-        Message: 'MSG_GET_ALL_GOODS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (goods.value.length === 0) {
+    getAppGoods(0, 500)
+  }
 })
 
+const getAppGoods = (offset: number, limit: number) => {
+  good.getAppGoods({
+    Offset: offset,
+    Limit: limit,
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_GOODS',
+        Message: 'MSG_GET_APP_GOODS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (goods: Array<AppGood>, error: boolean) => {
+    if (error || goods.length < limit) {
+      return
+    }
+    getAppGoods(offset + limit, limit)
+  })
+}
 </script>
