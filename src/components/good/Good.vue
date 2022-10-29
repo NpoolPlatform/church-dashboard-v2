@@ -43,20 +43,20 @@
         <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
         <q-input
           v-model.number='target.Sold'
-          :disable='updating'
+          disable
           :label='$t("MSG_GOOD_SOLD")'
           type='number' :min='1'
         />
         <q-input
           v-model.number='target.InService'
-          :disable='updating'
+          disable
           :label='$t("MSG_GOOD_INSERVICE")'
           type='number'
           :min='0'
         />
         <q-input
           v-model.number='target.Locked'
-          :disable='updating'
+          disable
           :label='$t("MSG_GOOD_LOCKED")'
           type='number'
           :min='0'
@@ -172,11 +172,9 @@ const targetUpdate = computed(() => {
     DeliveryAt: target.value.DeliveryAt,
     StartAt: target.value.StartAt,
     Total: target.value.Total,
-    InheritFromGoodID: target.value.InheritFromGoodID,
-    TestOnly: target.value.TestOnly,
-    Sold: target.value.Sold,
-    Posters: target.value.Posters,
-    Labels: target.value.Labels
+    TestOnly: target.value.TestOnly
+    // Posters: target.value.Posters,
+    // Labels: target.value.Labels
   }
 })
 
@@ -287,6 +285,11 @@ const columns = computed(() => [
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
     field: (row: Good) => formatTime(row.StartAt)
+  },
+  {
+    name: 'CREATEDAT',
+    label: t('MSG_CREATEDAT'),
+    field: (row: Good) => formatTime(row.CreatedAt)
   }
 ])
 </script>
