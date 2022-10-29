@@ -27,13 +27,8 @@ import {
   useCoinStore
 } from 'npool-cli-v2'
 
-import { ErrorTarget, notify, NotifyType, SwitchTarget, useErrorStore, useLocalUserStore, useNotificationStore, User } from 'npool-cli-v4'
+import { ErrorTarget, notify, SwitchTarget, useErrorStore, useLocalUserStore, useNotificationStore, User } from 'npool-cli-v4'
 import { useRouter } from 'vue-router'
-import { useChurchGoodStore } from 'src/teststore/good/good'
-import { useI18n } from 'vue-i18n'
-import { Good } from 'src/teststore/good/good/types'
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
 
 const MainHeader = defineAsyncComponent(() => import('src/components/header/MainHeader.vue'))
 const Footer = defineAsyncComponent(() => import('src/components/footer/Footer.vue'))
@@ -77,7 +72,6 @@ watch(triggerV4, () => {
   }
 })
 
-const good = useChurchGoodStore()
 const coin = useCoinStore()
 
 onMounted(() => {
@@ -97,9 +91,7 @@ onMounted(() => {
       }
     })
   })
-  if (good.Goods.Goods.length === 0) {
-    getGoods(0, 500)
-  }
+
   if (coin.Coins.length === 0) {
     coin.getCoins({
       Message: {
@@ -115,26 +107,6 @@ onMounted(() => {
     })
   }
 })
-
-const getGoods = (offset: number, limit: number) => {
-  good.getGoods({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_GOODS'),
-        Message: t('MSG_GET_GOODS_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Good>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getGoods(offset + limit, limit)
-  })
-}
 </script>
 
 <style lang='sass' scoped>
