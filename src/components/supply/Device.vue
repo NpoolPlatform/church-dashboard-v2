@@ -49,9 +49,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
-import { useChurchDeviceInfoStore } from 'src/teststore/good/deviceinfo'
-import { DeviceInfo } from 'src/teststore/good/deviceinfo/types'
+import { NotifyType, useChurchDeviceInfoStore, DeviceInfo } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 

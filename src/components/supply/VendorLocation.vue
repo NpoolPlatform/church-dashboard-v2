@@ -49,9 +49,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
-import { useChurchVendorLocationStore } from 'src/teststore/good/vendorlocation'
-import { VendorLocation } from 'src/teststore/good/vendorlocation/types'
+import { NotifyType, useChurchVendorLocationStore, VendorLocation } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
