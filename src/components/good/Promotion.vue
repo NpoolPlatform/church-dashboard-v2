@@ -5,6 +5,7 @@
     :title='$t("MSG_APP_GOODS")'
     :rows='appGoods'
     row-key='ID'
+    :columns='appGoodsColumns'
     :rows-per-page-options='[10]'
     selection='single'
     v-model:selected='selectedGood'
@@ -63,12 +64,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
+import { useChurchAppGoodStore, AppGood, useChurchPromotionStore, Promotion, NotifyType, formatTime } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
-import { useChurchAppGoodStore } from 'src/teststore/good/appgood'
-import { AppGood } from 'src/teststore/good/appgood/types'
-import { useChurchPromotionStore } from 'src/teststore/good/promotion'
-import { Promotion } from 'src/teststore/good/promotion/types'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -228,4 +225,72 @@ const getAppGoods = (offset: number, limit: number) => {
     getAppGoods(offset + limit, limit)
   })
 }
+
+const appGoodsColumns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: AppGood) => row.ID
+  },
+  {
+    name: 'ONLINE',
+    label: t('MSG_ONLINE'),
+    field: (row: AppGood) => row.Online
+  },
+  {
+    name: 'VISIBLE',
+    label: t('MSG_VISIBLE'),
+    field: (row: AppGood) => row.Visible
+  },
+  {
+    name: 'GOODTYPE',
+    label: t('MSG_GOOD_TYPE'),
+    field: (row: AppGood) => row.GoodType
+  },
+  {
+    name: 'GOODPRICE',
+    label: t('MSG_GOOD_PRICE'),
+    field: (row: AppGood) => row.Price
+  },
+  {
+    name: 'GOODUNIT',
+    label: t('MSG_GOOD_UNIT'),
+    field: (row: AppGood) => row.Unit
+  },
+  {
+    name: 'GOODTOTAL',
+    label: t('MSG_GOOD_TOTAL'),
+    field: (row: AppGood) => row.Total
+  },
+  {
+    name: 'GOODSOLD',
+    label: t('MSG_GOOD_SOLD'),
+    field: (row: AppGood) => row.Sold
+  },
+  {
+    name: 'GOODLOCKED',
+    label: t('MSG_GOOD_LOCKED'),
+    field: (row: AppGood) => row.Locked
+  },
+  {
+    name: 'GOODINSERVICE',
+    label: t('MSG_GOOD_INSERVICE'),
+    field: (row: AppGood) => row.InService
+  },
+  {
+    name: 'COINNAME',
+    label: t('MSG_COINNAME'),
+    field: (row: AppGood) => row.CoinName
+  },
+  {
+    name: 'BENEFITTYPE',
+    label: t('MSG_BENEFITTYPE'),
+    field: (row: AppGood) => row.BenefitType
+  },
+  {
+    name: 'STARTAT',
+    label: t('MSG_STARTAT'),
+    field: (row: AppGood) => formatTime(row.StartAt)
+  }
+])
 </script>

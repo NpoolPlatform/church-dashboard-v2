@@ -6,6 +6,7 @@
     :rows='goods'
     row-key='ID'
     :rows-per-page-options='[10]'
+    :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as Good)'
   >
     <template #top-right>
@@ -40,13 +41,30 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
-        <q-input v-model.number='target.Sold' :label='$t("MSG_GOOD_SOLD")' type='number' :min='1' />
-        <q-input v-model.number='target.InService' :label='$t("MSG_GOOD_INSERVICE")' type='number' :min='0' />
-        <q-input v-model.number='target.Locked' :label='$t("MSG_GOOD_LOCKED")' type='number' :min='0' />
+        <q-input
+          v-model.number='target.Sold'
+          :disable='updating'
+          :label='$t("MSG_GOOD_SOLD")'
+          type='number' :min='1'
+        />
+        <q-input
+          v-model.number='target.InService'
+          :disable='updating'
+          :label='$t("MSG_GOOD_INSERVICE")'
+          type='number'
+          :min='0'
+        />
+        <q-input
+          v-model.number='target.Locked'
+          :disable='updating'
+          :label='$t("MSG_GOOD_LOCKED")'
+          type='number'
+          :min='0'
+        />
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:coin='target.CoinTypeID' />
-        <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' />
+        <!-- <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' /> -->
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' />
       </q-card-section>
@@ -68,17 +86,14 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
-import { useChurchGoodStore } from 'src/teststore/good/good'
-import { Good } from 'src/teststore/good/good/types'
-import { BenefitTypes, GoodTypes } from 'src/teststore/good/good/const'
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { Good, NotifyType, useChurchGoodStore, BenefitTypes, GoodTypes, formatTime } from 'npool-cli-v4'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const DeviceInfoPicker = defineAsyncComponent(() => import('src/components/good/DeviceInfoPicker.vue'))
 const VendorLocationPicker = defineAsyncComponent(() => import('src/components/good/VendorLocationPicker.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
-const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
+// const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
 
@@ -86,15 +101,7 @@ const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePi
 const { t } = useI18n({ useScope: 'global' })
 
 const good = useChurchGoodStore()
-const goods = computed(() => Array.from(good.Goods.Goods, (el) => {
-  el.SupportCoinTypeIDs = []
-  el.SupportCoins.forEach((sl) => {
-    if (sl) {
-      el.SupportCoinTypeIDs.push(sl.CoinTypeID)
-    }
-  })
-  return { ...el }
-}))
+const goods = computed(() => Array.from(good.Goods.Goods))
 const target = ref({} as Good)
 
 const showing = ref(false)
@@ -151,9 +158,31 @@ const createGood = (done: () => void) => {
   })
 }
 
+const targetUpdate = computed(() => {
+  return {
+    ID: target.value.ID,
+    DeviceInfoID: target.value.DeviceInfoID,
+    DurationDays: target.value.DurationDays,
+    CoinTypeID: target.value.CoinTypeID,
+    VendorLocationID: target.value.VendorLocationID,
+    Price: target.value.Price,
+    Title: target.value.Title,
+    Unit: target.value.Unit,
+    UnitAmount: target.value.UnitAmount,
+    DeliveryAt: target.value.DeliveryAt,
+    StartAt: target.value.StartAt,
+    Total: target.value.Total,
+    InheritFromGoodID: target.value.InheritFromGoodID,
+    TestOnly: target.value.TestOnly,
+    Sold: target.value.Sold,
+    Posters: target.value.Posters,
+    Labels: target.value.Labels
+  }
+})
+
 const updateGood = (done: () => void) => {
   good.updateGood({
-    ...target.value,
+    ...targetUpdate.value,
     Message: {
       Error: {
         Title: t('MSG_UPDATE_GOOD'),
@@ -177,6 +206,89 @@ const updateGood = (done: () => void) => {
   })
 }
 
+onMounted(() => {
+  if (good.Goods.Goods.length === 0) {
+    getGoods(0, 500)
+  }
+})
+
+const getGoods = (offset: number, limit: number) => {
+  good.getGoods({
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: t('MSG_GET_GOODS'),
+        Message: t('MSG_GET_GOODS_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (goods: Array<Good>, error: boolean) => {
+    if (error || goods.length < limit) {
+      return
+    }
+    getGoods(offset + limit, limit)
+  })
+}
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: Good) => row.ID
+  },
+  {
+    name: 'GOODTYPE',
+    label: t('MSG_GOOD_TYPE'),
+    field: (row: Good) => row.GoodType
+  },
+  {
+    name: 'GOODPRICE',
+    label: t('MSG_GOOD_PRICE'),
+    field: (row: Good) => row.Price
+  },
+  {
+    name: 'GOODUNIT',
+    label: t('MSG_GOOD_UNIT'),
+    field: (row: Good) => row.Unit
+  },
+  {
+    name: 'GOODTOTAL',
+    label: t('MSG_GOOD_TOTAL'),
+    field: (row: Good) => row.Total
+  },
+  {
+    name: 'GOODSOLD',
+    label: t('MSG_GOOD_SOLD'),
+    field: (row: Good) => row.Sold
+  },
+  {
+    name: 'GOODLOCKED',
+    label: t('MSG_GOOD_LOCKED'),
+    field: (row: Good) => row.Locked
+  },
+  {
+    name: 'GOODINSERVICE',
+    label: t('MSG_GOOD_INSERVICE'),
+    field: (row: Good) => row.InService
+  },
+  {
+    name: 'COINNAME',
+    label: t('MSG_COINNAME'),
+    field: (row: Good) => row.CoinName
+  },
+  {
+    name: 'BENEFITTYPE',
+    label: t('MSG_BENEFITTYPE'),
+    field: (row: Good) => row.BenefitType
+  },
+  {
+    name: 'STARTAT',
+    label: t('MSG_STARTAT'),
+    field: (row: Good) => formatTime(row.StartAt)
+  }
+])
 </script>
 
 <style lang='sass' scoped>

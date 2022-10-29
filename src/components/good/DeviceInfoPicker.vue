@@ -19,9 +19,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
-import { useChurchDeviceInfoStore } from 'src/teststore/good/deviceinfo'
-import { DeviceInfo } from 'src/teststore/good/deviceinfo/types'
+
+import { DeviceInfo, NotifyType, useChurchDeviceInfoStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
