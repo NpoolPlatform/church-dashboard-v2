@@ -9,7 +9,7 @@
       @click='onCreate'
     />
   </div>
-  <Order />
+  <OrderPage />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -24,7 +24,13 @@
         <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedGood?.value?.Locked }}</q-item-label>
         <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedGood?.value?.InService }}</q-item-label>
         <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
-        <q-select :options='users' v-model='selectedUser' :label='$t("MSG_USER")' />
+        <q-select
+          :options='displayUsers'
+          use-input
+          v-model='selectedUser'
+          :label='$t("MSG_USER")'
+          @filter='filterUser'
+        />
         <q-input
           v-model='units' :label='$t("MSG_PURCHASE_UNITS")' type='number' min='0'
           :max='maxUnits'
@@ -45,13 +51,8 @@
 </template>
 
 <script setup lang='ts'>
-import {
-  NotificationType,
-  useChurchOrderStore,
-  useCoinStore,
-  useOrderStore
-} from 'npool-cli-v2'
-import { AppGood, NotifyType, useChurchAppGoodStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { AppGood, NotifyType, useChurchAppGoodStore, useChurchOrderStore, useChurchUserStore, User, Order, OrderType } from 'npool-cli-v4'
+import { getAppUsers } from 'src/api/user'
 import { useLocalApplicationStore } from 'src/localstore'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -59,31 +60,18 @@ import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const Order = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
+const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
+
+const good = useChurchAppGoodStore()
+const appGoods = computed(() => good.getGoodsByAppID(appID.value))
 
 interface MyGood {
   label: string
   value: AppGood
 }
-
-const good = useChurchAppGoodStore()
-const appGoods = computed(() => good.getGoodsByAppID(appID.value))
-const order = useChurchOrderStore()
-const forder = useOrderStore()
-const coin = useCoinStore()
-const payCoinID = computed(() => {
-  const index = coin.Coins.findIndex((el) => {
-    return (el.ENV === selectedGood.value?.value.CoinEnv) && (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') || el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
-  })
-  if (index < 0) {
-    return undefined as unknown as string
-  }
-  return coin.Coins[index].ID
-})
-
 const goods = computed(() => Array.from(appGoods.value.filter((el) => el.Online)).map((el) => {
   return {
     label: el.GoodName,
@@ -104,9 +92,19 @@ const users = computed(() => Array.from(user.Users.get(appID.value) ? user.Users
   } as MyUser
 }))
 
+const displayUsers = ref(users.value)
+const filterUser = (val: string, doneFn: (callbackFn: () => void) => void) => {
+  doneFn(() => {
+    displayUsers.value = users.value.filter((el) => {
+      return el.value.EmailAddress?.toLowerCase().includes(val.toLowerCase()) || el.value.PhoneNO?.toLowerCase().includes(val.toLowerCase())
+    })
+  })
+}
+
 const selectedGood = ref(undefined as unknown as MyGood)
 const selectedUser = ref(undefined as unknown as MyUser)
-const units = ref(0)
+
+const units = ref(1)
 const maxUnits = computed(() => selectedGood.value?.value?.Total - (selectedGood.value?.value?.Locked) - (selectedGood.value?.value?.InService))
 
 const showing = ref(false)
@@ -115,41 +113,17 @@ const onCreate = () => {
   showing.value = true
 }
 
+const onCancel = () => {
+  onMenuHide()
+}
+
 const onMenuHide = () => {
   showing.value = false
   selectedGood.value = undefined as unknown as MyGood
   selectedUser.value = undefined as unknown as MyUser
 }
 
-const prepare = () => {
-  if (users.value.length === 0) {
-    getAppUsers(0, 500)
-  }
-  if (goods.value.length === 0) {
-    getAppGoods(0, 500)
-  }
-}
-
-watch(appID, () => {
-  prepare()
-})
-
-onMounted(() => {
-  prepare()
-
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
+const order = useChurchOrderStore()
 
 const onSubmit = () => {
   if (units.value > maxUnits.value) {
@@ -164,88 +138,41 @@ const onSubmit = () => {
     console.log('please select user')
     return
   }
-  if (!payCoinID.value || payCoinID.value.length === 0) {
-    console.log('pay coin is missed')
-    return
-  }
 
-  order.submitOrder({
+  order.createAppUserOrder({
     TargetAppID: appID.value,
-    TargetUserID: selectedUser?.value.value.ID,
+    TargetUserID: selectedUser.value.value.ID,
     GoodID: selectedGood.value.value.GoodID,
     Units: units.value,
+    PaymentCoinID: selectedGood.value.value.CoinTypeID,
+    OrderType: OrderType.Offline,
     Message: {
       Error: {
         Title: t('MSG_CREATE_ORDER'),
         Message: t('MSG_CREATE_ORDER_FAIL'),
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, (orderID: string, error: boolean) => {
+  }, (o : Order, error: boolean) => {
     if (error) {
       return
     }
-
-    forder.createPayment({
-      PaymentCoinTypeID: payCoinID.value as string,
-      OrderID: orderID,
-      Message: {
-        Error: {
-          Title: t('MSG_CREATE_PAYMENT'),
-          Message: t('MSG_CREATE_PAYMENT_FAIL'),
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      showing.value = false
-    })
+    onMenuHide()
   })
 }
 
-const onCancel = () => {
-  onMenuHide()
-}
-const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
-    TargetAppID: appID.value,
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_USERS',
-        Message: 'MSG_GET_USERS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (resp: Array<User>, error: boolean) => {
-    if (error || resp.length < limit) {
-      return
-    }
-    getAppUsers(offset + limit, limit)
-  })
+const prepare = () => {
+  if (users.value.length === 0) {
+    getAppUsers(0, 500)
+  }
 }
 
-const getAppGoods = (offset: number, limit: number) => {
-  good.getAppGoods({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_GOODS',
-        Message: 'MSG_GET_APP_GOODS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<AppGood>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppGoods(offset + limit, limit)
-  })
-}
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
+})
 </script>
