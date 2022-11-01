@@ -15,6 +15,7 @@
     flat
     :title='$t("MSG_APP_GOOD_PROMOTIONS")'
     :rows='promotions'
+    :columns='columns'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as Promotion)'
@@ -65,6 +66,7 @@
 
 <script setup lang='ts'>
 import { useChurchAppGoodStore, AppGood, useChurchPromotionStore, Promotion, NotifyType, formatTime } from 'npool-cli-v4'
+import { getAppGoods, getAppPromotions } from 'src/api/good'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -85,7 +87,6 @@ const promotion = useChurchPromotionStore()
 const promotions = computed(() => promotion.getPromotionsByAppID(appID.value))
 
 const target = ref({} as Promotion)
-
 const showing = ref(false)
 const updating = ref(false)
 
@@ -185,47 +186,6 @@ const prepare = () => {
   }
 }
 
-const getAppPromotions = (offset: number, limit: number) => {
-  promotion.getAppPromotions({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_GOOD_PROMOTIONS'),
-        Message: t('MSG_GET_GOOD_PROMOTIONS_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Promotion>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppPromotions(offset + limit, limit)
-  })
-}
-const getAppGoods = (offset: number, limit: number) => {
-  appGood.getAppGoods({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_GOODS',
-        Message: 'MSG_GET_APP_GOODS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<AppGood>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppGoods(offset + limit, limit)
-  })
-}
-
 const appGoodsColumns = computed(() => [
   {
     name: 'ID',
@@ -291,6 +251,39 @@ const appGoodsColumns = computed(() => [
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
     field: (row: AppGood) => formatTime(row.StartAt)
+  }
+])
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: Promotion) => row.ID
+  },
+  {
+    name: 'GOODID',
+    label: t('MSG_GOOD_ID'),
+    field: (row: Promotion) => row.GoodID
+  },
+  {
+    name: 'GOODNAME',
+    label: t('MSG_GOOD_NAME'),
+    field: (row: Promotion) => row.GoodName
+  },
+  {
+    name: 'PRICE',
+    label: t('MSG_GOOD_RPICE'),
+    field: (row: Promotion) => row.Price
+  },
+  {
+    name: 'START_AT',
+    label: t('MSG_START_AT'),
+    field: (row: Promotion) => formatTime(row.StartAt)
+  },
+  {
+    name: 'END_AT',
+    label: t('MSG_END_AT'),
+    field: (row: Promotion) => formatTime(row.EndAt)
   }
 ])
 </script>
