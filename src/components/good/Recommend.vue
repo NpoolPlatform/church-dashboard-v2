@@ -69,6 +69,7 @@ import { useLocalApplicationStore } from 'src/localstore'
 import { useChurchAppGoodStore, AppGood, Recommend, NotifyType, useLocalUserStore, useChurchRecommendStore, formatTime } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getAppGoods, getAppRecommends } from 'src/api/good'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
@@ -151,6 +152,7 @@ const updateAppRecommend = (done: () => void) => {
     TargetAppID: appID.value,
     ID: target.value.ID,
     Message: target.value.Message,
+    RecommendIndex: target.value.RecommendIndex,
     NotifyMessage: {
       Error: {
         Title: t('MSG_UPDATE_RECOMMEND'),
@@ -189,48 +191,6 @@ const prepare = () => {
   if (appGoods.value.length === 0) {
     getAppGoods(0, 500)
   }
-}
-
-const getAppRecommends = (offset: number, limit: number) => {
-  recommend.getAppRecommends({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_GOOD_RECOMMENDS'),
-        Message: t('MSG_GET_GOOD_RECOMMENDS_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Recommend>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppRecommends(offset + limit, limit)
-  })
-}
-
-const getAppGoods = (offset: number, limit: number) => {
-  appGood.getAppGoods({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APP_GOODS',
-        Message: 'MSG_GET_APP_GOODS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<AppGood>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppGoods(offset + limit, limit)
-  })
 }
 
 const appGoodsColumns = computed(() => [
