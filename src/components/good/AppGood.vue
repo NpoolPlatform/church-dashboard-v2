@@ -131,6 +131,16 @@ const onAuthorizeClick = () => {
   updating.value = false
 }
 
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onRowClick = (row: AppGood) => {
+  target.value = { ...row }
+  updating.value = true
+  showing.value = true
+}
+
 const onSubmit = (done: () => void) => {
   updating.value ? updateAppGood(done) : createAppGood(done)
 }
@@ -203,16 +213,6 @@ const updateAppGood = (done: () => void) => {
   })
 }
 
-const onCancel = () => {
-  onMenuHide()
-}
-
-const onRowClick = (row: AppGood) => {
-  target.value = { ...row }
-  updating.value = true
-  showing.value = true
-}
-
 watch(appID, () => {
   prepare()
 })
@@ -220,7 +220,7 @@ watch(appID, () => {
 onMounted(() => {
   prepare()
 
-  if (good.Goods.Goods.length === 0) {
+  if (goods.value.length === 0) {
     getGoods(0, 500)
   }
   if (coin.Coins.length === 0) {
