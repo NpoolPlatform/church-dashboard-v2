@@ -732,7 +732,7 @@ const routes: RouteRecordRaw[] = [
           ShowTopTip: false,
           NeedLogined: true
         }
-      }, {
+      }, /* {
         path: 'billing/incoming',
         component: () => import('pages/billing/Incoming.vue'),
         meta: {
@@ -744,7 +744,7 @@ const routes: RouteRecordRaw[] = [
           ShowTopTip: false,
           NeedLogined: true
         }
-      }, {
+      }, */ {
         path: 'billing/order',
         component: () => import('pages/billing/Order.vue'),
         meta: {

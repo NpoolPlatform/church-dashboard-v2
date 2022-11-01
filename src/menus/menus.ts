@@ -671,7 +671,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '销售收入',
       caption: '查看用户购买支付收入',
@@ -680,7 +680,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */ {
       menuId: uid(),
       label: '订单',
       caption: '查看订单列表',
