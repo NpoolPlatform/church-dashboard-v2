@@ -197,3 +197,12 @@ const prepare = () => {
   }
 }
 </script>
+<style scoped>
+select {
+  border: none;
+  outline: none
+}
+.cancel-order-tip {
+  color: #34b6e0
+}
+</style>
