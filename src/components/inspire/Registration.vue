@@ -45,13 +45,14 @@
 import {
   NotificationType,
   RegInvitation,
-  useChurchRegInvitationStore,
-  useChurchUsersStore,
-  UserInfo
+  useChurchRegInvitationStore
 } from 'npool-cli-v2'
+
+import { useChurchUserStore, User } from 'npool-cli-v4'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
+import { getAppUsers } from 'src/api/user'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -70,31 +71,32 @@ const loading = ref(true)
 
 interface MyUser {
   label: string
-  value: UserInfo
+  value: User
 }
 
-const user = useChurchUsersStore()
-const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) : [])
-const myUsers = computed(() => Array.from(users.value as Array<UserInfo>).map((el) => {
+const user = useChurchUserStore()
+const users = computed(() => user.getUsersByAppID(appID.value))
+const myUsers = computed(() => Array.from(users.value).map((el) => {
   return {
-    label: el.User.EmailAddress?.length ? el.User.EmailAddress : el.User.PhoneNO,
+    label: el.EmailAddress?.length ? el.EmailAddress : el.PhoneNO,
     value: el
   } as MyUser
 }))
+
 const inviter = computed({
   get: () => {
-    const inviter = users.value?.findIndex((uel) => uel.User.ID === target.value.InviterID)
+    const inviter = users.value?.findIndex((uel) => uel.ID === target.value.InviterID)
     if (inviter !== undefined && inviter >= 0) {
-      const user = (users.value as Array<UserInfo>)[inviter]
+      const user = users.value[inviter]
       return {
-        label: user.User.EmailAddress?.length ? user.User.EmailAddress : user.User.PhoneNO,
+        label: user.EmailAddress?.length ? user.EmailAddress : user.PhoneNO,
         value: user
       } as MyUser
     }
     return undefined as unknown as MyUser
   },
   set: (val) => {
-    target.value.InviterID = val.value.User.ID as string
+    target.value.InviterID = val.value.ID
   }
 })
 
@@ -103,18 +105,18 @@ const displayInvitations = computed(() => Array.from(invitations.value as Array<
   const i = el as MyInvitation
   i.InviteeName = ''
   i.InviterName = ''
-  const inviter = users.value?.findIndex((uel) => uel.User.ID === el.InviterID)
+  const inviter = users.value?.findIndex((uel) => uel.ID === el.InviterID)
   if (inviter !== undefined && inviter >= 0 && users.value?.length) {
-    i.InviterName = users.value[inviter].User.EmailAddress as string
+    i.InviterName = users.value[inviter].EmailAddress
     if (i.InviterName.length === 0) {
-      i.InviterName = users.value[inviter].User.PhoneNO as string
+      i.InviterName = users.value[inviter].PhoneNO
     }
   }
-  const invitee = users.value?.findIndex((uel) => uel.User.ID === el.InviteeID)
+  const invitee = users.value?.findIndex((uel) => uel.ID === el.InviteeID)
   if (invitee !== undefined && invitee >= 0 && users.value?.length) {
-    i.InviteeName = users.value[invitee].User.EmailAddress as string
+    i.InviteeName = users.value[invitee].EmailAddress
     if (i.InviteeName.length === 0) {
-      i.InviteeName = users.value[invitee].User.PhoneNO as string
+      i.InviteeName = users.value[invitee].PhoneNO
     }
   }
   return i
@@ -124,45 +126,6 @@ const displayInvitations = computed(() => Array.from(invitations.value as Array<
         el.InviteeID?.includes(searchStr.value) ||
         el.InviterID?.includes(searchStr.value)
 }))
-
-const prepare = () => {
-  loading.value = true
-  invitation.getRegInvitations({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_REGISTRATION_INVITATIONS'),
-        Message: t('MSG_GET_REGISTRATION_INVITATIONS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    loading.value = false
-  })
-
-  user.getUsers({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_USERS'),
-        Message: t('MSG_GET_USERS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-watch(appID, () => {
-  prepare()
-})
-
-onMounted(() => {
-  prepare()
-})
 
 const showing = ref(false)
 const target = ref({} as unknown as RegInvitation)
@@ -175,6 +138,10 @@ const onRowClick = (coupon: RegInvitation) => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {} as unknown as RegInvitation
+}
+
+const onCancel = () => {
+  showing.value = false
 }
 
 const onSubmit = () => {
@@ -194,8 +161,32 @@ const onSubmit = () => {
   })
 }
 
-const onCancel = () => {
-  showing.value = false
+onMounted(() => {
+  prepare()
+})
+
+const prepare = () => {
+  loading.value = true
+  invitation.getRegInvitations({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: t('MSG_GET_REGISTRATION_INVITATIONS'),
+        Message: t('MSG_GET_REGISTRATION_INVITATIONS_FAIL'),
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    loading.value = false
+  })
+
+  if (users.value.length === 0) {
+    getAppUsers(0, 500)
+  }
 }
 
+watch(appID, () => {
+  prepare()
+})
 </script>
