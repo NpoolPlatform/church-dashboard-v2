@@ -4,6 +4,7 @@
     flat
     :title='$t("MSG_DEVICES")'
     :rows='devices'
+    :columns='columns'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as DeviceInfo)'
@@ -49,7 +50,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchDeviceInfoStore, DeviceInfo } from 'npool-cli-v4'
+import { NotifyType, useChurchDeviceInfoStore, DeviceInfo, formatTime } from 'npool-cli-v4'
+import { getDeviceInfos } from 'src/api/good'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -149,24 +151,41 @@ onMounted(() => {
   }
 })
 
-const getDeviceInfos = (offset: number, limit: number) => {
-  deviceInfo.getDeviceInfos({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_DEVICES'),
-        Message: t('MSG_GET_DEVICES_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (devices: Array<DeviceInfo>, error: boolean) => {
-    if (error || devices.length < limit) {
-      return
-    }
-    getDeviceInfos(offset + limit, limit)
-  })
-}
-
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: DeviceInfo) => row.ID
+  },
+  {
+    name: 'MANUFACTURER',
+    label: t('MSG_MANUFACTURER'),
+    field: (row: DeviceInfo) => row.Manufacturer
+  },
+  {
+    name: 'POWERCOMSUPTION',
+    label: t('MSG_POWERCOMSUPTION'),
+    field: (row: DeviceInfo) => row.PowerComsuption
+  },
+  {
+    name: 'SHIPMENTAT',
+    label: t('MSG_SHIPMENT_AT'),
+    field: (row: DeviceInfo) => row.ShipmentAt
+  },
+  {
+    name: 'Type',
+    label: t('MSG_TYPE'),
+    field: (row: DeviceInfo) => row.Type
+  },
+  {
+    name: 'CREATED_AT',
+    label: t('MSG_CREATED_AT'),
+    field: (row: DeviceInfo) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UPDATED_AT',
+    label: t('MSG_UPDATED_AT'),
+    field: (row: DeviceInfo) => formatTime(row.UpdatedAt)
+  }
+])
 </script>

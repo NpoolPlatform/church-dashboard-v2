@@ -1,4 +1,4 @@
-import { AppGood, Good, NotifyType, Promotion, Recommend, useChurchAppGoodStore, useChurchGoodStore, useChurchPromotionStore, useChurchRecommendStore } from 'npool-cli-v4'
+import { AppGood, DeviceInfo, Good, NotifyType, Promotion, Recommend, useChurchAppGoodStore, useChurchDeviceInfoStore, useChurchGoodStore, useChurchPromotionStore, useChurchRecommendStore } from 'npool-cli-v4'
 import { appID } from './app'
 
 const good = useChurchGoodStore()
@@ -86,5 +86,26 @@ export const getAppRecommends = (offset: number, limit: number) => {
       return
     }
     getAppRecommends(offset + limit, limit)
+  })
+}
+
+const device = useChurchDeviceInfoStore()
+export const getDeviceInfos = (offset: number, limit: number) => {
+  device.getDeviceInfos({
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_DEVICES',
+        Message: 'MSG_GET_DEVICES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (devices: Array<DeviceInfo>, error: boolean) => {
+    if (error || devices.length < limit) {
+      return
+    }
+    getDeviceInfos(offset + limit, limit)
   })
 }
