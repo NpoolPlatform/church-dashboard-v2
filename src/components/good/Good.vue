@@ -87,6 +87,7 @@
 
 <script setup lang='ts'>
 import { Good, NotifyType, useChurchGoodStore, BenefitTypes, GoodTypes, formatTime } from 'npool-cli-v4'
+import { getGoods } from 'src/api/good'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -102,8 +103,8 @@ const { t } = useI18n({ useScope: 'global' })
 
 const good = useChurchGoodStore()
 const goods = computed(() => Array.from(good.Goods.Goods))
-const target = ref({} as Good)
 
+const target = ref({} as Good)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -173,8 +174,6 @@ const targetUpdate = computed(() => {
     StartAt: target.value.StartAt,
     Total: target.value.Total,
     TestOnly: target.value.TestOnly
-    // Posters: target.value.Posters,
-    // Labels: target.value.Labels
   }
 })
 
@@ -209,26 +208,6 @@ onMounted(() => {
     getGoods(0, 500)
   }
 })
-
-const getGoods = (offset: number, limit: number) => {
-  good.getGoods({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_GOODS'),
-        Message: t('MSG_GET_GOODS_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Good>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getGoods(offset + limit, limit)
-  })
-}
 
 const columns = computed(() => [
   {
