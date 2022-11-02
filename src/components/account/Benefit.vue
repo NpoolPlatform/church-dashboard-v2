@@ -137,7 +137,7 @@ const accounts = computed(() => account.Accounts.filter((el) => {
   if (index >= 0) {
     return false
   }
-  return el.CoinTypeID === selectedCoin.value?.value.ID && el.PlatformHoldPrivateKey
+  return el.CoinTypeID === selectedCoin.value?.value?.ID && el.PlatformHoldPrivateKey
 }).map((el) => {
   return {
     label: selectedCoin.value?.value.Name as string + ' | ' + el.Address,
@@ -167,7 +167,7 @@ interface MyGood {
 }
 
 const goods = computed(() => Array.from(good.Goods.Goods.filter((g) => {
-  return g.CoinTypeID === selectedCoin.value?.value.ID
+  return g.CoinTypeID === selectedCoin.value?.value?.ID
 })).map((el) => {
   return {
     label: el.Title,
@@ -294,8 +294,8 @@ const onRowClick = (acc: GoodBenefit) => {
   updating.value = true
   const ac = account.getAccountByID(target.value.BenefitAccountID)
   selectedCoin.value = {
-    label: coin.getCoinByID(ac.CoinTypeID).Name as string,
-    value: coin.getCoinByID(ac.CoinTypeID)
+    label: coin.getCoinByID(ac?.CoinTypeID)?.Name as string,
+    value: coin.getCoinByID(ac?.CoinTypeID)
   }
 }
 
