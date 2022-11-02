@@ -19,7 +19,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { NotificationType, useCoinStore } from 'npool-cli-v2'
+import { useCoinStore } from 'npool-cli-v2'
+import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
@@ -47,18 +48,7 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (coinStore.Coins.length === 0) {
-    coinStore.getCoins({
-      Message: {
-        Error: {
-          Title: 'MSG_GET_COINS',
-          Message: 'MSG_GET_COINS_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-    // TODO
-    })
+    getCoins()
   }
 })
 </script>
