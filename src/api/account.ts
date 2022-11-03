@@ -16,10 +16,24 @@ export const getNAppUserAccounts = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (resp: Array<Account>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (accounts: Array<Account>, error: boolean) => {
+    if (error || accounts.length < limit) {
       return
     }
     getNAppUserAccounts(offset + limit, limit)
+  })
+}
+
+export const getAppDepositAccounts = (offset: number, limit: number) => {
+  account.getAppDepositAccounts({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {}
+  }, (accounts: Array<Account>, error: boolean) => {
+    if (error || accounts.length < limit) {
+      return
+    }
+    getAppDepositAccounts(offset + limit, limit)
   })
 }
