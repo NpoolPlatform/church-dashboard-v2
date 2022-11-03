@@ -90,7 +90,7 @@
     dense
     flat
     :title='$t("MSG_DEPOSIT_ACCOUNTS")'
-    :rows='displayAccounts'
+    :rows='accounts'
     row-key='ID'
     :rows-per-page-options='[10]'
   >
@@ -137,11 +137,12 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { Account, Detail, formatTime, General, NotifyType, useChurchAccountStore, useChurchAppStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { Detail, formatTime, General, NotifyType, useChurchUserAccountStore, useChurchAppStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
 import { Coin, NotificationType, useCoinStore } from 'npool-cli-v2'
 import saveAs from 'file-saver'
+import { getAppDepositAccounts } from 'src/api/account'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -275,25 +276,6 @@ const selectedUser = ref([] as Array<User>)
 
 const userLoading = ref(false)
 
-const prepare = () => {
-  if (!user.Users.get(appID.value)) {
-    getAppUsers(0, 500)
-  }
-  if (!detail.Details.Details.get(appID.value)) {
-    getAppDetails(0, 500)
-  }
-  if (!general.Generals.Generals.get(appID.value)) {
-    getAppGenerals(0, 500)
-  }
-  if (!account.Accounts.Accounts.get(appID.value)) {
-    getAppDepositAccounts(0, 100)
-  }
-}
-
-watch(appID, () => {
-  prepare()
-})
-
 const detailUsername = ref('')
 const detail = useChurchDetailStore()
 const displayDetails = computed(() => !detail.Details.Details.get(appID.value) ? [] : detail.Details.Details.get(appID.value)?.filter((el) => {
@@ -307,8 +289,8 @@ const displayGenerals = computed(() => !general.Generals.Generals.get(appID.valu
 }))
 
 const accountUsername = ref('')
-const account = useChurchAccountStore()
-const displayAccounts = computed(() => !account.Accounts.Accounts.get(appID.value) ? [] : account.Accounts.Accounts.get(appID.value)?.filter((el) => {
+const account = useChurchUserAccountStore()
+const accounts = computed(() => account.getDepositAccountsByAppID(appID.value).filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
 
@@ -434,6 +416,25 @@ onMounted(() => {
   }
 })
 
+const prepare = () => {
+  if (!user.Users.get(appID.value)) {
+    getAppUsers(0, 500)
+  }
+  if (!detail.Details.Details.get(appID.value)) {
+    getAppDetails(0, 500)
+  }
+  if (!general.Generals.Generals.get(appID.value)) {
+    getAppGenerals(0, 500)
+  }
+  if (accounts.value.length === 0) {
+    getAppDepositAccounts(0, 100)
+  }
+}
+
+watch(appID, () => {
+  prepare()
+})
+
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
     TargetAppID: appID.value,
@@ -497,20 +498,6 @@ const getAppDetails = (offset: number, limit: number) => {
       return
     }
     getAppDetails(offset + limit, limit)
-  })
-}
-
-const getAppDepositAccounts = (offset: number, limit: number) => {
-  account.getAppDepositAccounts({
-    TargetAppID: appID.value,
-    Offset: offset,
-    Limit: limit,
-    Message: {}
-  }, (accounts: Array<Account>, error: boolean) => {
-    if (error || accounts.length < limit) {
-      return
-    }
-    getAppDepositAccounts(offset + limit, limit)
   })
 }
 </script>
