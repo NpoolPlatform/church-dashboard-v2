@@ -82,7 +82,7 @@ const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPi
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const platform = useChurchPlatformAccountStore()
-const platformAccounts = computed(() => platform.PlatformAccounts.PlatformAccounts)
+const platformAccounts = computed(() => platform.getAccountsByKey(AccountUsedFor.PlatformBenefitCold))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -171,7 +171,7 @@ const createPlatformAccount = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (platformAccounts.value.length === 0) {
+  if (platform.PlatformAccounts.PlatformAccounts.length === 0) {
     getPlatformAccounts(0, 500)
   }
 })
