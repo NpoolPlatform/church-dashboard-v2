@@ -13,8 +13,8 @@
       <q-input
         dense
         class='small'
-        v-model='searchStr'
-        :label='$t("MSG_SEARCH")'
+        v-model='address'
+        :label='$t("MSG_ADDRESS")'
       />
       <q-btn
         dense
@@ -48,10 +48,10 @@ const coin = useCoinStore()
 const payment = useChurchPaymentAccountStore()
 const paymentAccounts = computed(() => payment.PaymentAccounts.PaymentAccounts)
 const displayAccounts = computed(() => paymentAccounts.value.filter((el) => {
-  return el.Address?.includes(searchStr.value)
+  return el.Address?.includes(address.value)
 }))
 
-const searchStr = ref('')
+const address = ref('')
 const selectedAccount = ref([] as Array<PlatformAccount>)
 
 const onCreatePaymentBalance = () => {
