@@ -50,9 +50,10 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:good', coin: string): void}>()
+const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
-  emit('update:good', target.value)
+  console.log('target.value: ', target.value)
+  emit('update:id', target.value)
 }
 
 const app = useLocalApplicationStore()
