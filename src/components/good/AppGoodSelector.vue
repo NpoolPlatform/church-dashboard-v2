@@ -18,8 +18,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useChurchGoodStore } from 'npool-cli-v4'
-import { getGoods } from 'src/api/good'
+import { useChurchAppGoodStore } from 'npool-cli-v4'
+import { getAppGoods } from 'src/api/good'
 import { useLocalApplicationStore } from 'src/localstore/application'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
@@ -31,18 +31,19 @@ const props = defineProps<Props>()
 const goodID = toRef(props, 'id')
 const target = ref(goodID.value)
 
-const good = useChurchGoodStore()
+const appGood = useChurchAppGoodStore()
+const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
 
-const goods = computed(() => Array.from(good.Goods.Goods, (el) => {
+const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
-    value: el.ID,
-    label: el.Title
+    value: el.GoodID,
+    label: el.GoodName
   }
 }))
 
-const emit = defineEmits<{(e: 'update:good', coin: string): void}>()
+const emit = defineEmits<{(e: 'update:appgood', coin: string): void}>()
 const onUpdate = () => {
-  emit('update:good', target.value)
+  emit('update:appgood', target.value)
 }
 
 const app = useLocalApplicationStore()
@@ -57,8 +58,8 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (goods.value.length === 0) {
-    getGoods(0, 500)
+  if (appGoods.value.length === 0) {
+    getAppGoods(0, 500)
   }
 }
 </script>
