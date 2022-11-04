@@ -1,4 +1,4 @@
-import { Account, NotifyType, useChurchUserAccountStore, useChurchPlatformAccountStore, PlatformAccount, useChurchPaymentAccountStore, useChurchGoodBenefitAccountStore } from 'npool-cli-v4'
+import { Account, NotifyType, useChurchUserAccountStore, useChurchPlatformAccountStore, PlatformAccount, useChurchPaymentAccountStore, useChurchGoodBenefitAccountStore, PaymentAccount, GoodBenefitAccount } from 'npool-cli-v4'
 import { appID } from './app'
 
 const account = useChurchUserAccountStore()
@@ -72,7 +72,7 @@ export const getPaymentAccounts = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (accounts: Array<PlatformAccount>, error: boolean) => {
+  }, (accounts: Array<PaymentAccount>, error: boolean) => {
     if (error || accounts.length < limit) {
       return
     }
@@ -93,7 +93,7 @@ export const getGoodBenefitAccounts = (offset: number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (accounts: Array<PlatformAccount>, error: boolean) => {
+  }, (accounts: Array<GoodBenefitAccount>, error: boolean) => {
     if (error || accounts.length < limit) {
       return
     }
