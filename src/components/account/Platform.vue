@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang='ts'>
-import { PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
+import { PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4/.'
 import { getPlatformAccounts } from 'src/api/account'
 import { computed, onMounted, ref } from 'vue'
 
