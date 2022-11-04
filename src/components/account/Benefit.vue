@@ -5,7 +5,7 @@
     :rows='gbAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
+    @row-click='(evt, row, index) => onRowClick(row as GoodBenefitAccount)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -29,49 +29,56 @@
         <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
       </q-card-section>
       <q-card-section>
-        <!-- <CoinPicker v-model:coin='target.CoinTypeID' />
         <GoodSelector v-model:id='target.GoodID' />
-        <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
-        <q-input
+        <!-- <q-input
           type='number'
           min='1'
           max='24'
           v-model='target.BenefitIntervalHours'
           :label='$t("MSG_ADDRESS")'
           :suffix='$t("MSG_HOUR")'
-        />
-      </q-card-section> -->
-        <q-item class='row'>
-          <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-          <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
-        </q-item>
+        /> -->
       </q-card-section>
+      <q-card-section :v-show='updating'>
+        <div>
+          <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Blocked' :label='$t("MSG_BLOCKED")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Active' :label='$t("MSG_ACTIVE")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Locked' :label='$t("MSG_LOCKED")' />
+        </div>
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import {
-  NotificationType,
-  useCoinSettingStore
-} from 'npool-cli-v2'
-import { PlatformAccount, useChurchGoodBenefitAccountStore, useChurchGoodStore } from 'npool-cli-v4'
+import { GoodBenefitAccount, NotifyType, useChurchGoodBenefitAccountStore } from 'npool-cli-v4'
 import { getGoodBenefitAccounts } from 'src/api/account'
-import { getGoods } from 'src/api/good'
-import { computed, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
-// const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
-// const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
+const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const setting = useCoinSettingStore()
+const gb = useChurchGoodBenefitAccountStore()
+const gbAccounts = computed(() => gb.GoodBenefitAccounts.GoodBenefitAccounts)
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as PlatformAccount)
+const target = ref({} as GoodBenefitAccount)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as PlatformAccount
+  target.value = {} as GoodBenefitAccount
 }
 
 const onCreate = () => {
@@ -79,83 +86,61 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (row: PlatformAccount) => {
-  target.value = { ...row }
-  showing.value = true
-  updating.value = true
-  // const ac = account.getAccountByID(target.value.BenefitAccountID)
-  // selectedCoin.value = {
-  //   label: coin.getCoinByID(ac?.CoinTypeID)?.Name as string,
-  //   value: coin.getCoinByID(ac?.CoinTypeID)
-  // }
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  // if (!selectedCoin.value) {
-  //   return
-  // }
-
-  // if (updating.value) {
-  //   setting.updateGoodBenefit({
-  //     Info: target.value,
-  //     Message: {
-  //       Error: {
-  //         Title: 'MSG_UPDATE_GOOD_BENEFIT',
-  //         Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
-  //         Popup: true,
-  //         Type: NotificationType.Error
-  //       }
-  //     }
-  //   }, () => {
-  //     // TODO
-  //   })
-  //   return
-  // }
-
-  // setting.createGoodBenefit({
-  //   Info: target.value,
-  //   Message: {
-  //     Error: {
-  //       Title: 'MSG_CREATE_GOOD_BENEFIT',
-  //       Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
-  //       Popup: true,
-  //       Type: NotificationType.Error
-  //     }
-  //   }
-  // }, () => {
-  //   // TODO
-  // })
-}
-
 const onCancel = () => {
   onMenuHide()
 }
 
-const gb = useChurchGoodBenefitAccountStore()
-const gbAccounts = computed(() => gb.GoodBenefitAccounts.GoodBenefitAccounts)
+const onRowClick = (row: GoodBenefitAccount) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+}
 
-const good = useChurchGoodStore()
-const goods = computed(() => good.Goods.Goods)
+const onSubmit = (done: () => void) => {
+  updating.value ? updateGoodBenefitAccount(done) : createGoodBenefitAccount(done)
+}
 
-onMounted(() => {
-  setting.getGCoinSettings({
+const createGoodBenefitAccount = (done: () => void) => {
+  gb.createGoodBenefitAccount({
+    ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_GET_COIN_SETTINGS',
-        Message: 'MSG_GET_COIN_SETTINGS_FAIL',
+        Title: 'MSG_CREATE_GOOD_BENEFIT',
+        Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (account: GoodBenefitAccount, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
   })
+}
 
-  if (goods.value.length === 0) {
-    getGoods(0, 500)
-  }
+const updateGoodBenefitAccount = (done: () => void) => {
+  gb.updateGoodBenefitAccount({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_GOOD_BENEFIT',
+        Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (account: GoodBenefitAccount, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+onMounted(() => {
   if (gbAccounts.value.length === 0) {
     getGoodBenefitAccounts(0, 500)
   }
