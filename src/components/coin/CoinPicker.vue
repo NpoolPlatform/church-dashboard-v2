@@ -2,12 +2,14 @@
   <q-select
     :disable='!updating ? false : true'
     v-model='target'
-    :options='coins'
+    :options='displayCoins'
     options-selected-class='text-deep-orange'
     emit-value
     label='MSG_COINS'
     map-options
     @update:model-value='onUpdate'
+    use-input
+    @filter='onFilter'
   >
     <template #option='scope'>
       <q-item v-bind='scope.itemProps'>
@@ -32,14 +34,23 @@ const props = defineProps<Props>()
 const coin = toRef(props, 'coin')
 const updating = toRef(props, 'updating')
 const target = ref(coin.value)
-const coinStore = useCoinStore()
 
+const coinStore = useCoinStore()
 const coins = computed(() => Array.from(coinStore.Coins).map((el) => {
   return {
     value: el.ID,
     label: el.Name
   }
 }))
+const displayCoins = ref(coins.value)
+
+const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
+  doneFn(() => {
+    displayCoins.value = coins.value.filter((el) => {
+      return el?.label?.toLowerCase().includes(val.toLowerCase())
+    })
+  })
+}
 
 const emit = defineEmits<{(e: 'update:coin', coin: string): void}>()
 const onUpdate = () => {
