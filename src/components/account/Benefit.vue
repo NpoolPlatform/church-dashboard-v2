@@ -2,10 +2,10 @@
   <q-table
     dense
     flat
-    :rows='benefits'
+    :rows='gbAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as GoodBenefit)'
+    @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -29,8 +29,8 @@
         <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
-        <q-select :options='accounts' v-model='selectedAccount' :label='$t("MSG_ACCOUNT")' />
+        <!-- <CoinPicker v-model:coin='target.CoinTypeID' />
+        <GoodSelector v-model:id='target.GoodID' />
         <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
         <q-input
           type='number'
@@ -40,213 +40,107 @@
           :label='$t("MSG_ADDRESS")'
           :suffix='$t("MSG_HOUR")'
         />
+      </q-card-section> -->
+        <q-item class='row'>
+          <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+          <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        </q-item>
       </q-card-section>
-      <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
-      </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
 import {
-  Account,
-  useChurchAccountStore,
-  useCoinStore,
   NotificationType,
-  Coin,
-  GoodBenefit,
-  useGoodSettingStore,
-  useCoinSettingStore,
-  WithdrawAddress
+  useCoinSettingStore
 } from 'npool-cli-v2'
-import { Good, useChurchGoodStore } from 'npool-cli-v4'
+import { PlatformAccount, useChurchGoodBenefitAccountStore, useChurchGoodStore } from 'npool-cli-v4'
+import { getGoodBenefitAccounts } from 'src/api/account'
 import { getGoods } from 'src/api/good'
-import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
+// const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+// const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 
-const account = useChurchAccountStore()
-const coin = useCoinStore()
-const setting = useGoodSettingStore()
-const good = useChurchGoodStore()
-const csetting = useCoinSettingStore()
-
-interface MyBenefit extends GoodBenefit {
-  CoinName: string
-  GoodName: string
-  Address: string
-}
-
-const benefits = computed(() => Array.from(setting.GoodBenefits).map((el) => {
-  const gb = el as MyBenefit
-  const ac = account.getAccountByID(gb.BenefitAccountID)
-  gb.CoinName = coin.getCoinByID(ac?.CoinTypeID)?.Name as string
-  gb.Address = ac?.Address
-  gb.GoodName = good.getGoodByID(gb.GoodID)?.Title as string
-  return gb
-}))
-
-interface MyCoin {
-  label: string
-  value: Coin
-}
-
-const coins = computed(() => Array.from(coin.Coins).map((el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-const selectedCoin = ref(undefined as unknown as MyCoin)
-
-interface MyAccount {
-  label: string
-  value: Account
-}
-
-const accounts = computed(() => account.Accounts.filter((el) => {
-  let index = csetting.CoinSettings.findIndex((cs) => {
-    return cs.PlatformOfflineAccountID === el.ID ||
-           cs.UserOfflineAccountID === el.ID ||
-           cs.UserOnlineAccountID === el.ID ||
-           cs.GoodIncomingAccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  index = benefits.value.findIndex((gs) => {
-    return gs.BenefitAccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  index = account.GoodPayments.findIndex((gp) => {
-    return gp.AccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  const addresses = account.WithdrawAddresses.get(appID.value) ? account.WithdrawAddresses.get(appID.value) as Array<WithdrawAddress> : []
-  index = addresses.findIndex((wa) => {
-    return wa.AccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  return el.CoinTypeID === selectedCoin.value?.value?.ID && el.PlatformHoldPrivateKey
-}).map((el) => {
-  return {
-    label: selectedCoin.value?.value.Name as string + ' | ' + el.Address,
-    value: el
-  } as MyAccount
-}))
-const selectedAccount = computed({
-  get: () => {
-    const ac = account.getAccountByID(target.value.BenefitAccountID)
-    if (!ac) {
-      return undefined as unknown as MyAccount
-    }
-    const cc = coin.getCoinByID(ac?.CoinTypeID)
-    return {
-      label: cc?.Name as string + ' | ' + ac?.Address,
-      value: ac
-    } as MyAccount
-  },
-  set: (val) => {
-    target.value.BenefitAccountID = val.value.ID as string
-  }
-})
-
-interface MyGood {
-  label: string
-  value: Good
-}
-
-const goods = computed(() => Array.from(good.Goods.Goods.filter((g) => {
-  return g.CoinTypeID === selectedCoin.value?.value?.ID
-})).map((el) => {
-  return {
-    label: el.Title,
-    value: el
-  } as MyGood
-}))
-const selectedGood = computed({
-  get: () => {
-    return {
-      label: good.getGoodByID(target.value.GoodID)?.Title,
-      value: good.getGoodByID(target.value.GoodID)
-    } as MyGood
-  },
-  set: (val) => {
-    target.value.GoodID = val.value.ID
-  }
-})
+const setting = useCoinSettingStore()
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as unknown as GoodBenefit)
+const target = ref({} as PlatformAccount)
 
-watch(appID, () => {
-  account.getWithdrawAddresses({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
-        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as PlatformAccount
+}
+
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
+
+const onRowClick = (row: PlatformAccount) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+  // const ac = account.getAccountByID(target.value.BenefitAccountID)
+  // selectedCoin.value = {
+  //   label: coin.getCoinByID(ac?.CoinTypeID)?.Name as string,
+  //   value: coin.getCoinByID(ac?.CoinTypeID)
+  // }
+}
+
+const onSubmit = () => {
+  showing.value = false
+
+  // if (!selectedCoin.value) {
+  //   return
+  // }
+
+  // if (updating.value) {
+  //   setting.updateGoodBenefit({
+  //     Info: target.value,
+  //     Message: {
+  //       Error: {
+  //         Title: 'MSG_UPDATE_GOOD_BENEFIT',
+  //         Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
+  //         Popup: true,
+  //         Type: NotificationType.Error
+  //       }
+  //     }
+  //   }, () => {
+  //     // TODO
+  //   })
+  //   return
+  // }
+
+  // setting.createGoodBenefit({
+  //   Info: target.value,
+  //   Message: {
+  //     Error: {
+  //       Title: 'MSG_CREATE_GOOD_BENEFIT',
+  //       Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
+  //       Popup: true,
+  //       Type: NotificationType.Error
+  //     }
+  //   }
+  // }, () => {
+  //   // TODO
+  // })
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const gb = useChurchGoodBenefitAccountStore()
+const gbAccounts = computed(() => gb.GoodBenefitAccounts.GoodBenefitAccounts)
+
+const good = useChurchGoodStore()
+const goods = computed(() => good.Goods.Goods)
 
 onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  account.getAccounts({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_ACCOUNTS',
-        Message: 'MSG_GET_ACCOUNTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  setting.getGoodBenefits({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOOD_BENEFITS',
-        Message: 'MSG_GET_GOOD_BENEFITS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  csetting.getGCoinSettings({
+  setting.getGCoinSettings({
     Message: {
       Error: {
         Title: 'MSG_GET_COIN_SETTINGS',
@@ -259,87 +153,11 @@ onMounted(() => {
     // TODO
   })
 
-  account.getWithdrawAddresses({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
-        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  if (good.Goods.Goods.length === 0) {
+  if (goods.value.length === 0) {
     getGoods(0, 500)
   }
+  if (gbAccounts.value.length === 0) {
+    getGoodBenefitAccounts(0, 500)
+  }
 })
-
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {} as unknown as GoodBenefit
-}
-
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (acc: GoodBenefit) => {
-  target.value = acc
-  showing.value = true
-  updating.value = true
-  const ac = account.getAccountByID(target.value.BenefitAccountID)
-  selectedCoin.value = {
-    label: coin.getCoinByID(ac?.CoinTypeID)?.Name as string,
-    value: coin.getCoinByID(ac?.CoinTypeID)
-  }
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  if (!selectedCoin.value) {
-    return
-  }
-
-  if (updating.value) {
-    setting.updateGoodBenefit({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_GOOD_BENEFIT',
-          Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  setting.createGoodBenefit({
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_GOOD_BENEFIT',
-        Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-const onCancel = () => {
-  onMenuHide()
-}
-
 </script>
