@@ -125,9 +125,19 @@ const createGoodBenefitAccount = (done: () => void) => {
   })
 }
 
+const updateTarget = computed(() => {
+  return {
+    ID: target.value.ID,
+    Backup: target.value.Backup,
+    Active: target.value.Active,
+    Blocked: target.value.Blocked,
+    Locked: target.value.Locked
+  }
+})
+
 const updateGoodBenefitAccount = (done: () => void) => {
   gb.updateGoodBenefitAccount({
-    ...target.value,
+    ...updateTarget.value,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_GOOD_BENEFIT',
