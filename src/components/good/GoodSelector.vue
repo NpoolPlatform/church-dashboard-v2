@@ -37,7 +37,7 @@ const good = useChurchGoodStore()
 const goods = computed(() => Array.from(good.Goods.Goods, (el) => {
   return {
     value: el.ID,
-    label: el.Title
+    label: `${el.Title} | ${el.Unit}`
   }
 }))
 const displayGoods = ref(goods.value)
@@ -52,7 +52,6 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
 
 const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
-  console.log('target.value: ', target.value)
   emit('update:id', target.value)
 }
 

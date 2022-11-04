@@ -26,7 +26,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
+        <span>{{ $t('MSG_CREATE_GOOD_BENEFIT_ACCOUNT') }}</span>
       </q-card-section>
       <q-card-section>
         <GoodSelector v-model:id='target.GoodID' />
@@ -39,7 +39,7 @@
           :suffix='$t("MSG_HOUR")'
         /> -->
       </q-card-section>
-      <q-card-section :v-show='updating'>
+      <q-card-section v-if='updating'>
         <div>
           <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
         </div>
@@ -109,6 +109,11 @@ const createGoodBenefitAccount = (done: () => void) => {
         Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_GOOD_BENEFIT',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (account: GoodBenefitAccount, error: boolean) => {
@@ -129,6 +134,11 @@ const updateGoodBenefitAccount = (done: () => void) => {
         Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_GOOD_BENEFIT',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (account: GoodBenefitAccount, error: boolean) => {
