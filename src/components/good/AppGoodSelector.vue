@@ -41,9 +41,9 @@ const goods = computed(() => Array.from(appGoods.value, (el) => {
   }
 }))
 
-const emit = defineEmits<{(e: 'update:appgood', coin: string): void}>()
+const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
-  emit('update:appgood', target.value)
+  emit('update:id', target.value)
 }
 
 const app = useLocalApplicationStore()
