@@ -28,7 +28,10 @@
       <q-card-section>
         <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
+        <CoinPicker v-model:coin='target.CoinTypeID' />
+        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
+        <q-select :options='AccountUsedFors' v-model='target.UsedFor' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
         <!-- <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
         <q-select :options='userAccounts' v-model='selectedIncomingAccount' :label='$t("MSG_GOOD_INCOMING_ACCOUNT")' />
         <q-select :options='userAccounts' v-model='selectedPlatformOfflineAccount' :label='$t("MSG_PLATFORM_OFFLINE_ACCOUNT")' />
@@ -48,8 +51,22 @@
           :suffix='selectedCoin?.value?.Unit'
         /> -->
       </q-card-section>
+      <q-card-section v-if='updating'>
+        <div>
+          <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Blocked' :label='$t("MSG_BLOCKED")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Active' :label='$t("MSG_ACTIVE")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Locked' :label='$t("MSG_LOCKED")' />
+        </div>
+      </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -57,20 +74,23 @@
 </template>
 
 <script setup lang='ts'>
-import { PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
+import { PlatformAccount, useChurchPlatformAccountStore, AccountUsedFors, AccountUsedFor, NotifyType } from 'npool-cli-v4'
 import { getPlatformAccounts } from 'src/api/account'
-import { computed, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const platform = useChurchPlatformAccountStore()
 const platformAccounts = computed(() => platform.PlatformAccounts.PlatformAccounts)
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as PlatformAccount)
+const target = ref({ UsedFor: AccountUsedFor.PlatformBenefitCold } as PlatformAccount)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as PlatformAccount
+  target.value = { UsedFor: AccountUsedFor.PlatformBenefitCold } as PlatformAccount
 }
 
 const onCreate = () => {
@@ -84,57 +104,70 @@ const onRowClick = (row: PlatformAccount) => {
   updating.value = true
 }
 
-const onSubmit = () => {
-  showing.value = false
-
-  // const accs = new Map<string, number>()
-  // accs.set(target.value.GoodIncomingAccountID as string, 1)
-  // accs.set(target.value.PlatformOfflineAccountID as string, 1)
-  // accs.set(target.value.UserOfflineAccountID as string, 1)
-  // accs.set(target.value.UserOnlineAccountID as string, 1)
-  // accs.set(target.value.GasProviderAccountID as string, 1)
-  // if (accs.size < 5) {
-  //   return
-  // }
-
-  // if (!selectedCoin.value) {
-  //   return
-  // }
-
-  // if (updating.value) {
-  //   setting.updateCoinSetting({
-  //     Info: target.value,
-  //     Message: {
-  //       Error: {
-  //         Title: 'MSG_UPDATE_COIN_SETTING',
-  //         Message: 'MSG_UPDATE_COIN_SETTING_FAIL',
-  //         Popup: true,
-  //         Type: NotificationType.Error
-  //       }
-  //     }
-  //   }, () => {
-  //     // TODO
-  //   })
-  //   return
-  // }
-
-  // setting.createCoinSetting({
-  //   Info: target.value,
-  //   Message: {
-  //     Error: {
-  //       Title: 'MSG_CREATE_COIN_SETTING',
-  //       Message: 'MSG_CREATE_COIN_SETTING_FAIL',
-  //       Popup: true,
-  //       Type: NotificationType.Error
-  //     }
-  //   }
-  // }, () => {
-  //   // TODO
-  // })
-}
-
 const onCancel = () => {
   onMenuHide()
+}
+
+const onSubmit = (done: () => void) => {
+  updating.value ? updatePlatformAccount(done) : createPlatformAccount(done)
+}
+
+const updateTarget = computed(() => {
+  return {
+    ID: target.value.ID,
+    Backup: target.value.Backup,
+    Active: target.value.Active,
+    Blocked: target.value.Blocked,
+    Locked: target.value.Locked
+  }
+})
+
+const updatePlatformAccount = (done: () => void) => {
+  platform.updatePlatformAccount({
+    ...updateTarget.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_PLATFORM_ACCOUNT',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_PLATFORM_ACCOUNT',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (account: PlatformAccount, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const createPlatformAccount = (done: () => void) => {
+  platform.createPlatformAccount({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_PLATFORM_ACCOUNT',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_PLATFORM_ACCOUNT',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (account: PlatformAccount, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
 }
 
 onMounted(() => {
