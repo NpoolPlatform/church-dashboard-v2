@@ -4,6 +4,7 @@
     flat
     :title='$t("MSG_DEVICES")'
     :rows='devices'
+    :columns='columns'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as DeviceInfo)'
@@ -31,12 +32,12 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
-        <q-input type='number' v-model='target.Consumption' :label='$t("MSG_CONSUMPTION")' suffix='W' />
-        <q-input type='date' v-model='shipmentAt' :label='$t("MSG_SHIPMENT_AT")' />
+        <q-input type='number' v-model='target.PowerComsuption' :label='$t("MSG_POWER_CONSUMPTION")' suffix='W' />
+        <DatePicker v-model:date='target.ShipmentAt' :updating='updating' :label='$t("MSG_SHIPMENT_AT")' />
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -49,37 +50,21 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useDeviceStore, DeviceInfo, formatTime } from 'npool-cli-v2'
-import { computed, onMounted, ref, watch } from 'vue'
+import { NotifyType, useChurchDeviceInfoStore, DeviceInfo, formatTime } from 'npool-cli-v4'
+import { getDeviceInfos } from 'src/api/good'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const device = useDeviceStore()
-const devices = computed(() => device.Devices)
+const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const target = ref({} as unknown as DeviceInfo)
-const shipmentAt = ref('')
-watch(shipmentAt, () => {
-  target.value.ShipmentAt = new Date(shipmentAt.value).getTime() / 1000
-})
+const deviceInfo = useChurchDeviceInfoStore()
+const devices = computed(() => deviceInfo.DeviceInfos.DeviceInfos)
 
-onMounted(() => {
-  device.getDevices({
-    Message: {
-      Error: {
-        Title: t('MSG_GET_DEVICES'),
-        Message: t('MSG_GET_DEVICES_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
-
+const target = ref({} as DeviceInfo)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -88,46 +73,15 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (device: DeviceInfo) => {
+const onRowClick = (row: DeviceInfo) => {
   updating.value = true
   showing.value = true
-  target.value = device
-  shipmentAt.value = formatTime(target.value.ShipmentAt).replace(/\//g, '-')
+  target.value = { ...row }
 }
 
-const onSubmit = () => {
+const onSubmit = (done: () => void) => {
   showing.value = false
-
-  if (updating.value) {
-    device.updateDevice({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: t('MSG_UPDATE_DEVICES'),
-          Message: t('MSG_UPDATE_DEVICES_FAIL'),
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  device.createDevice({
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_UPDATE_DEVICES'),
-        Message: t('MSG_UPDATE_DEVICES_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  updating.value ? updateDevice(done) : createDevice(done)
 }
 
 const onCancel = () => {
@@ -135,7 +89,103 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as unknown as DeviceInfo
+  target.value = {} as DeviceInfo
+  showing.value = false
 }
 
+const updateDevice = (done: () => void) => {
+  deviceInfo.updateDeviceInfo({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_UPDATE_DEVICE'),
+        Message: t('MSG_UPDATE_DEVICE_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_UPDATE_DEVICE'),
+        Message: t('MSG_UPDATE_DEVICE_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (d: DeviceInfo, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const createDevice = (done: () => void) => {
+  deviceInfo.createDeviceInfo({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_CREATE_DEVICE'),
+        Message: t('MSG_CREATE_DEVICE_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_CREATE_DEVICE'),
+        Message: t('MSG_CREATE_DEVICE_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (d: DeviceInfo, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+onMounted(() => {
+  if (deviceInfo.DeviceInfos.DeviceInfos.length === 0) {
+    getDeviceInfos(0, 500)
+  }
+})
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: DeviceInfo) => row.ID
+  },
+  {
+    name: 'MANUFACTURER',
+    label: t('MSG_MANUFACTURER'),
+    field: (row: DeviceInfo) => row.Manufacturer
+  },
+  {
+    name: 'POWERCOMSUPTION',
+    label: t('MSG_POWERCOMSUPTION'),
+    field: (row: DeviceInfo) => row.PowerComsuption
+  },
+  {
+    name: 'SHIPMENTAT',
+    label: t('MSG_SHIPMENT_AT'),
+    field: (row: DeviceInfo) => row.ShipmentAt
+  },
+  {
+    name: 'Type',
+    label: t('MSG_TYPE'),
+    field: (row: DeviceInfo) => row.Type
+  },
+  {
+    name: 'CREATED_AT',
+    label: t('MSG_CREATED_AT'),
+    field: (row: DeviceInfo) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UPDATED_AT',
+    label: t('MSG_UPDATED_AT'),
+    field: (row: DeviceInfo) => formatTime(row.UpdatedAt)
+  }
+])
 </script>

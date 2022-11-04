@@ -36,7 +36,7 @@
         <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -49,32 +49,19 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, VendorLocation, useVendorLocationStore } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { NotifyType, useChurchVendorLocationStore, VendorLocation } from 'npool-cli-v4'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const location = useVendorLocationStore()
-const locations = computed(() => location.VendorLocations)
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const target = ref({} as unknown as VendorLocation)
+const vendor = useChurchVendorLocationStore()
+const locations = computed(() => vendor.VendorLocations.VendorLocations)
 
-onMounted(() => {
-  location.getVendorLocations({
-    Message: {
-      Error: {
-        Title: t('MSG_GET_VENCOR_LOCATIONS'),
-        Message: t('MSG_GET_VENCOR_LOCATIONS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
+const target = ref({} as VendorLocation)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -84,53 +71,101 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (location: VendorLocation) => {
+const onRowClick = (row: VendorLocation) => {
   updating.value = true
   showing.value = true
-  target.value = location
+  target.value = { ...row }
 }
 
-const onSubmit = () => {
+const onMenuHide = () => {
+  target.value = {} as VendorLocation
   showing.value = false
-
-  if (updating.value) {
-    location.updateVendorLocation({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: t('MSG_UPDATE_VENCOR_LOCATIONS'),
-          Message: t('MSG_UPDATE_VENCOR_LOCATIONS_FAIL'),
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  location.createVendorLocation({
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_UPDATE_VENCOR_LOCATIONS'),
-        Message: t('MSG_UPDATE_VENCOR_LOCATIONS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
 }
 
 const onCancel = () => {
   showing.value = false
 }
 
-const onMenuHide = () => {
-  target.value = {} as unknown as VendorLocation
+const onSubmit = (done: () => void) => {
+  showing.value = false
+  updating.value ? updateVendorLocation(done) : createVendorLocation(done)
 }
 
+const createVendorLocation = (done: () => void) => {
+  vendor.createVendorLocation({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_CREATE_VENDOR_LOCATION'),
+        Message: t('MSG_CREATE_VENDOR_LOCATION_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_CREATE_VENDOR_LOCATION'),
+        Message: t('MSG_CREATE_VENDOR_LOCATION_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (v: VendorLocation, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const updateVendorLocation = (done: () => void) => {
+  vendor.updateVendorLocation({
+    ...target.value,
+    Message: {
+      Error: {
+        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
+        Message: t('MSG_UPDATE_VENDOR_LOCATION_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
+        Message: t('MSG_UPDATE_VENDOR_LOCATION_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (v: VendorLocation, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+onMounted(() => {
+  if (vendor.VendorLocations.VendorLocations.length === 0) {
+    getVendorLocations(0, 500)
+  }
+})
+
+const getVendorLocations = (offset: number, limit: number) => {
+  vendor.getVendorLocations({
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: t('MSG_GET_VENDOR_LOCATIONS'),
+        Message: t('MSG_GET_VENDOR_LOCATIONS_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (vendorLocations: Array<VendorLocation>, error: boolean) => {
+    if (error || vendorLocations.length < limit) {
+      return
+    }
+    getVendorLocations(offset + limit, limit)
+  })
+}
 </script>

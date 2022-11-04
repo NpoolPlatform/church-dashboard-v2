@@ -83,11 +83,9 @@ import {
   useChurchCommissionStore,
   PriceCoinName,
   formatTime,
-  InvalidID,
-  useAdminGoodStore,
-  Good
+  InvalidID
 } from 'npool-cli-v2'
-import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
+import { AppGood, NotifyType, useChurchAppGoodStore, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -151,9 +149,9 @@ const settings = computed(() => Array.from(appSettings.value).map((el) => {
   s.EmailAddress = user.getUserByAppUserID(appID.value, s.UserID as string)?.EmailAddress
   s.PhoneNO = user.getUserByAppUserID(appID.value, s.UserID as string)?.PhoneNO
   s.GoodName = ''
-  const index = goods.value.findIndex((gel) => gel.Good.Good.ID === el.GoodID)
+  const index = goods.value.findIndex((gel) => gel.GoodID === el.GoodID)
   if (index >= 0) {
-    s.GoodName = goods.value[index].Good.Good.Title
+    s.GoodName = goods.value[index].GoodName
   }
   return s
 }))
@@ -220,32 +218,32 @@ const getAppUsers = (offset: number, limit: number) => {
     getAppUsers(offset + limit, limit)
   })
 }
-const good = useAdminGoodStore()
-const goods = computed(() => good.Goods)
+const good = useChurchAppGoodStore()
+const goods = computed(() => good.getGoodsByAppID(appID.value))
 
 interface MyGood {
   label: string
-  value: Good
+  value: AppGood
 }
 const myGoods = computed(() => Array.from(goods.value).map((el) => {
   return {
-    label: el.Good.Good.Title + '(' + (el.Good.Good.ID as string) + ')',
+    label: el.GoodName + '(' + (el.GoodID) + ')',
     value: el
   } as MyGood
 }))
 const selectedGood = computed({
   get: () => {
-    const index = goods.value.findIndex((el) => el.Good.Good.ID === target.value.GoodID)
+    const index = goods.value.findIndex((el) => el.GoodID === target.value.GoodID)
     if (index < 0) {
       return undefined as unknown as MyGood
     }
     return {
-      label: goods.value[index].Good.Good.Title + '(' + (goods.value[index].Good.Good.ID as string) + ')',
+      label: goods.value[index].GoodName + '(' + (goods.value[index].GoodID) + ')',
       value: goods.value[index]
     } as MyGood
   },
   set: (val: MyGood) => {
-    target.value.GoodID = val.value.Good.Good.ID as string
+    target.value.GoodID = val.value.GoodID
   }
 })
 
@@ -255,18 +253,9 @@ watch(appID, () => {
 
 onMounted(() => {
   prepare()
-  good.getAllGoods({
-    Message: {
-      Error: {
-        Title: t('MSG_GET_ALL_GOODS'),
-        Message: t('MSG_GET_ALL_GOODS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (goods.value.length === 0) {
+    getAppGoods(0, 500)
+  }
 })
 
 const showing = ref(false)
@@ -364,4 +353,24 @@ const onCancel = () => {
   onMenuHide()
 }
 
+const getAppGoods = (offset: number, limit: number) => {
+  good.getAppGoods({
+    Offset: offset,
+    Limit: limit,
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_GOODS',
+        Message: 'MSG_GET_APP_GOODS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (goods: Array<AppGood>, error: boolean) => {
+    if (error || goods.length < limit) {
+      return
+    }
+    getAppGoods(offset + limit, limit)
+  })
+}
 </script>

@@ -58,11 +58,11 @@ import {
   Coin,
   GoodBenefit,
   useGoodSettingStore,
-  useAdminGoodStore,
-  GoodBase,
   useCoinSettingStore,
   WithdrawAddress
 } from 'npool-cli-v2'
+import { Good, useChurchGoodStore } from 'npool-cli-v4'
+import { getGoods } from 'src/api/good'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -72,7 +72,7 @@ const appID = computed(() => app.AppID)
 const account = useChurchAccountStore()
 const coin = useCoinStore()
 const setting = useGoodSettingStore()
-const good = useAdminGoodStore()
+const good = useChurchGoodStore()
 const csetting = useCoinSettingStore()
 
 interface MyBenefit extends GoodBenefit {
@@ -86,7 +86,7 @@ const benefits = computed(() => Array.from(setting.GoodBenefits).map((el) => {
   const ac = account.getAccountByID(gb.BenefitAccountID)
   gb.CoinName = coin.getCoinByID(ac?.CoinTypeID)?.Name as string
   gb.Address = ac?.Address
-  gb.GoodName = good.getGoodByID(gb.GoodID)?.Good.Good.Title
+  gb.GoodName = good.getGoodByID(gb.GoodID)?.Title as string
   return gb
 }))
 
@@ -137,7 +137,7 @@ const accounts = computed(() => account.Accounts.filter((el) => {
   if (index >= 0) {
     return false
   }
-  return el.CoinTypeID === selectedCoin.value?.value.ID && el.PlatformHoldPrivateKey
+  return el.CoinTypeID === selectedCoin.value?.value?.ID && el.PlatformHoldPrivateKey
 }).map((el) => {
   return {
     label: selectedCoin.value?.value.Name as string + ' | ' + el.Address,
@@ -163,26 +163,26 @@ const selectedAccount = computed({
 
 interface MyGood {
   label: string
-  value: GoodBase
+  value: Good
 }
 
-const goods = computed(() => Array.from(good.Goods.filter((g) => {
-  return g.Main?.ID === selectedCoin.value?.value.ID
+const goods = computed(() => Array.from(good.Goods.Goods.filter((g) => {
+  return g.CoinTypeID === selectedCoin.value?.value?.ID
 })).map((el) => {
   return {
-    label: el.Good.Good.Title,
-    value: el.Good.Good
+    label: el.Title,
+    value: el
   } as MyGood
 }))
 const selectedGood = computed({
   get: () => {
     return {
-      label: good.getGoodByID(target.value.GoodID)?.Good.Good.Title,
-      value: good.getGoodByID(target.value.GoodID)?.Good.Good
+      label: good.getGoodByID(target.value.GoodID)?.Title,
+      value: good.getGoodByID(target.value.GoodID)
     } as MyGood
   },
   set: (val) => {
-    target.value.GoodID = val.value.ID as string
+    target.value.GoodID = val.value.ID
   }
 })
 
@@ -259,19 +259,6 @@ onMounted(() => {
     // TODO
   })
 
-  good.getAllGoods({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOODS',
-        Message: 'MSG_GET_GOODS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
   account.getWithdrawAddresses({
     TargetAppID: appID.value,
     Message: {
@@ -285,6 +272,10 @@ onMounted(() => {
   }, () => {
     // TODO
   })
+
+  if (good.Goods.Goods.length === 0) {
+    getGoods(0, 500)
+  }
 })
 
 const onMenuHide = () => {
@@ -303,8 +294,8 @@ const onRowClick = (acc: GoodBenefit) => {
   updating.value = true
   const ac = account.getAccountByID(target.value.BenefitAccountID)
   selectedCoin.value = {
-    label: coin.getCoinByID(ac.CoinTypeID).Name as string,
-    value: coin.getCoinByID(ac.CoinTypeID)
+    label: coin.getCoinByID(ac?.CoinTypeID)?.Name as string,
+    value: coin.getCoinByID(ac?.CoinTypeID)
   }
 }
 

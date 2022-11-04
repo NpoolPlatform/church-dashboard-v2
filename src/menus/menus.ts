@@ -298,7 +298,7 @@ const MainDrawerMenus = [
     label: '商品',
     caption: '应用内商品定价与上下架',
     icon: 'perm_identity',
-    target: '/app/goods',
+    target: '/app/good',
     level: 1,
     sectionBegin: false,
     children: [{
@@ -306,11 +306,11 @@ const MainDrawerMenus = [
       label: '商品管理',
       caption: '添加与编辑商品',
       icon: 'perm_identity',
-      target: '/goods',
+      target: '/app/good/goods',
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '库存',
       caption: '管理与展示商品库存',
@@ -319,12 +319,12 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */ {
       menuId: uid(),
       label: 'APP商品管理',
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',
-      target: '/app/goods',
+      target: '/app/good/appgoods',
       level: 1,
       sectionBegin: false,
       children: []
@@ -376,7 +376,7 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
-  } as MenuItem, {
+  } as MenuItem, /* {
     menuId: uid(),
     label: '服务费',
     caption: '管理商品服务费',
@@ -405,7 +405,7 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
-  } as MenuItem, {
+  } as MenuItem, */ {
     menuId: uid(),
     label: '审核',
     caption: '管理审核项目',
@@ -671,7 +671,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '销售收入',
       caption: '查看用户购买支付收入',
@@ -680,7 +680,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */ {
       menuId: uid(),
       label: '订单',
       caption: '查看订单列表',
