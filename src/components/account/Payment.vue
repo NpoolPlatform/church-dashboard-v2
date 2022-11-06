@@ -60,11 +60,11 @@ const address = ref('')
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({ } as PaymentAccount)
+const target = ref({} as PaymentAccount)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = { } as PaymentAccount
+  target.value = {} as PaymentAccount
 }
 
 const onRowClick = (row: PaymentAccount) => {

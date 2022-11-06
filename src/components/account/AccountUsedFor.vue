@@ -37,16 +37,27 @@
 
 <script setup lang='ts'>
 import { AccountUsedFor, AccountUsedFors, NotifyType, PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, ref, defineProps, toRef } from 'vue'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
+interface Props {
+  visible: boolean
+  update: boolean
+}
+
+const props = defineProps<Props>()
+const visible = toRef(props, 'visible')
+const update = toRef(props, 'update')
+
+// const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>()
+
 const platform = useChurchPlatformAccountStore()
 
 const target = ref({} as PlatformAccount)
-const showing = ref(false)
-const updating = ref(false)
+const showing = ref(visible)
+const updating = ref(update)
 
 const onMenuHide = () => {
   showing.value = false
