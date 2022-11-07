@@ -37,7 +37,7 @@
 
 <script setup lang='ts'>
 import { AccountUsedFor, AccountUsedFors, NotifyType, PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
-import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits, onMounted } from 'vue'
+import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits } from 'vue'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -59,13 +59,13 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>()
 
 const platform = useChurchPlatformAccountStore()
 
-const target = ref({ UsedFor: usedFor.value } as PlatformAccount)
+const target = ref({ ...account.value, UsedFor: usedFor.value })
 const showing = ref(visible)
 const updating = ref(update)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as PlatformAccount
+  target.value = { ...account.value, UsedFor: usedFor.value }
   emit('update:visible', false)
 }
 
@@ -135,9 +135,10 @@ const createPlatformAccount = (done: () => void) => {
   })
 }
 
-onMounted(() => {
-  if (account.value?.ID) {
-    target.value = { ...account.value }
-  }
-})
+// onMounted(() => {
+//   if (account.value?.ID) {
+//     target.value = { ...account.value }
+//   }
+//   console.log('account: ', account.value)
+// })
 </script>
