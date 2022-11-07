@@ -136,7 +136,7 @@ const createPlatformAccount = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (account.value.ID) {
+  if (account.value?.ID) {
     target.value = { ...account.value }
   }
 })
