@@ -71,7 +71,7 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <UsedFor :update='updating' :visible='showing' />
+  <!-- <UsedFor :update='updating' :visible='showing' v-model:used-for='AccountUsedFor.' /> -->
 </template>
 
 <script setup lang='ts'>
@@ -81,7 +81,7 @@ import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
+// const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
 
 const platform = useChurchPlatformAccountStore()
 const platformAccounts = computed(() => platform.getAccountsByKey(AccountUsedFor.PlatformBenefitCold))
