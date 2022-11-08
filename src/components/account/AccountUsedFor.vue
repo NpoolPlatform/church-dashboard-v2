@@ -15,6 +15,10 @@
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
+          <span>{{ $t("MSG_ID") }}:</span>
+          <span>{{ target?.ID }}</span>
+        </div>
+        <div>
           <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
         </div>
         <div>
