@@ -119,16 +119,25 @@ const MainDrawerMenus = [
         label: '资金归集账户',
         caption: '管理资金归集账户',
         icon: 'perm_identity',
-        target: '/account/platform/hold',
+        target: '/account/platform/collector',
         level: 1,
         sectionBegin: false,
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '用户账户',
-        caption: '管理用户账户',
+        label: '冷钱包',
+        caption: '用户冷钱包',
         icon: 'perm_identity',
-        target: '/account/user/hold',
+        target: '/account/user/cold',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '热钱包',
+        caption: '用户热钱包',
+        icon: 'perm_identity',
+        target: '/account/user/hot',
         level: 1,
         sectionBegin: false,
         children: []
@@ -174,6 +183,15 @@ const MainDrawerMenus = [
         caption: '用户提现地址',
         icon: 'perm_identity',
         target: '/account/withdraw',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '直接收益账户',
+        caption: '用户直接收益账户',
+        icon: 'perm_identity',
+        target: '/account/directbenefit',
         level: 1,
         sectionBegin: false,
         children: []

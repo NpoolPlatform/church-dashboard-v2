@@ -2,8 +2,8 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_WITHDRAW_ADDRESS")'
-    :rows='withdrawAddress'
+    :title='$t("MSG_DIRECT_BENEFIT_ADDRESS")'
+    :rows='directBenefitAccounts'
     row-key='ID'
     :rows-per-page-options='[20]'
   />
@@ -21,7 +21,7 @@ const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const account = useChurchUserAccountStore()
-const withdrawAddress = computed(() => account.withdrawAddress(appID.value))
+const directBenefitAccounts = computed(() => account.directBenefitAddress(appID.value))
 
 watch(appID, () => {
   prepare()
