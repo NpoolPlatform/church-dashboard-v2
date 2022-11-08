@@ -116,8 +116,8 @@ const MainDrawerMenus = [
     children: [
       {
         menuId: uid(),
-        label: '平台托管账户',
-        caption: '管理平台托管账户',
+        label: '资金归集账户',
+        caption: '管理资金归集账户',
         icon: 'perm_identity',
         target: '/account/platform/hold',
         level: 1,
@@ -423,7 +423,7 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
+      } as MenuItem, /* {
         menuId: uid(),
         label: '提现地址',
         caption: '审核体现地址设置',
@@ -432,7 +432,7 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
+      } as MenuItem, */{
         menuId: uid(),
         label: '提现请求',
         caption: '审核提现请求',
