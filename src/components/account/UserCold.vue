@@ -2,8 +2,8 @@
   <q-table
     dense
     flat
-    :rows='userBenefitColdsAndHots'
-    :title='$t("MSG_USER_BENEFIT_COLDS_AND_HOTS")'
+    :rows='userBenefitCold'
+    :title='$t("MSG_USER_BENEFIT_COLDS")'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
@@ -31,7 +31,7 @@ import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
 
 const platform = useChurchPlatformAccountStore()
-const userBenefitColdsAndHots = computed(() => platform.getAccountsByKey(AccountUsedFor.UserBenefitCold).concat(platform.getAccountsByKey(AccountUsedFor.UserBenefitHot)))
+const userBenefitCold = computed(() => platform.getAccountsByKey(AccountUsedFor.UserBenefitCold))
 
 const showing = ref(false)
 const updating = ref(false)

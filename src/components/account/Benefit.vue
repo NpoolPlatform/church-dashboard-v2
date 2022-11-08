@@ -2,6 +2,7 @@
   <q-table
     dense
     flat
+    :title='$t("MSG_GOOD_BENEFIT_ADDRESSES")'
     :rows='gbAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'

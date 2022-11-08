@@ -2,8 +2,8 @@
   <q-table
     dense
     flat
-    :rows='platformAccounts'
-    :title='$t("MSG_PLATFORM_ADDRESSES")'
+    :rows='userBenefitHots'
+    :title='$t("MSG_USER_BENEFIT_HOTS")'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
@@ -20,18 +20,18 @@
       </div>
     </template>
   </q-table>
-  <UsedFor v-model:update='updating' v-model:visible='showing' v-model:used-for='AccountUsedFor.PlatformBenefitCold' v-model:account='target' />
+  <UsedFor v-model:update='updating' v-model:visible='showing' :used-for='AccountUsedFor.UserBenefitHot' v-model:account='target' />
 </template>
 
 <script setup lang='ts'>
-import { PlatformAccount, useChurchPlatformAccountStore, AccountUsedFor } from 'npool-cli-v4'
+import { AccountUsedFor, PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
 import { getPlatformAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
 const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
 
 const platform = useChurchPlatformAccountStore()
-const platformAccounts = computed(() => platform.getAccountsByKey(AccountUsedFor.PlatformBenefitCold))
+const userBenefitHots = computed(() => platform.getAccountsByKey(AccountUsedFor.UserBenefitHot))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -53,4 +53,5 @@ onMounted(() => {
     getPlatformAccounts(0, 500)
   }
 })
+
 </script>

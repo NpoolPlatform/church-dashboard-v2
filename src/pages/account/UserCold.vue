@@ -1,11 +1,11 @@
 <template>
-  <PlatformHold />
+  <UserCold />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const PlatformHold = defineAsyncComponent(() => import('src/components/account/PlatformHold.vue'))
+const UserCold = defineAsyncComponent(() => import('src/components/account/UserCold.vue'))
 
 </script>
 

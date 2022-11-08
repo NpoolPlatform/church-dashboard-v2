@@ -505,8 +505,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'account/platform/hold',
-        component: () => import('pages/account/PlatformHold.vue'),
+        path: 'account/platform/collector',
+        component: () => import('src/pages/account/Collector.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -517,8 +517,20 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'account/user/hold',
-        component: () => import('pages/account/UserHold.vue'),
+        path: 'account/user/hot',
+        component: () => import('pages/account/UserHot.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'account/user/cold',
+        component: () => import('pages/account/UserCold.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -567,6 +579,18 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'account/withdraw',
         component: () => import('pages/account/Withdraw.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'account/directbenefit',
+        component: () => import('pages/account/DirectBenefit.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
