@@ -15,8 +15,13 @@
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
-          <span>{{ $t("MSG_ID") }}:</span>
-          <span>{{ target?.ID }}</span>
+          <span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ACCOUNT_ID") }}: {{ target?.AccountID }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ADDRESS") }}: {{ target?.Address }}</span>
         </div>
         <div>
           <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
@@ -139,10 +144,4 @@ const createPlatformAccount = (done: () => void) => {
   })
 }
 
-// onMounted(() => {
-//   if (account.value?.ID) {
-//     target.value = { ...account.value }
-//   }
-//   console.log('account: ', account.value)
-// })
 </script>
