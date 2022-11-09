@@ -40,6 +40,7 @@ const target = ref({} as PlatformAccount)
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value = { UsedFor: AccountUsedFor.GasProvider } as PlatformAccount
 }
 
 const onRowClick = (row: PlatformAccount) => {

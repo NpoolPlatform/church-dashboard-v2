@@ -5,12 +5,9 @@
     position='right'
   >
     <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
-      </q-card-section>
       <q-card-section v-if='!updating'>
         <CoinPicker v-model:coin='target.CoinTypeID' />
-        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
+        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' placeholder='optional' />
         <q-select :options='AccountUsedFors' v-model='target.UsedFor' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
       </q-card-section>
       <q-card-section v-if='updating'>
@@ -22,6 +19,12 @@
         </div>
         <div>
           <span>{{ $t("MSG_ADDRESS") }}: {{ target?.Address }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_COIN_NAME") }}: {{ target?.CoinName }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ACCOUNT_USED_FOR") }}: {{ target?.UsedFor }}</span>
         </div>
         <div>
           <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
@@ -66,15 +69,15 @@ const account = toRef(props, 'account')
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>()
 
-const platform = useChurchPlatformAccountStore()
+const target = computed(() => {
+  return { ...account.value, UsedFor: usedFor.value }
+})
 
-const target = ref({ ...account.value, UsedFor: usedFor.value })
 const showing = ref(visible)
 const updating = ref(update)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = { ...account.value, UsedFor: usedFor.value }
   emit('update:visible', false)
 }
 
@@ -86,6 +89,8 @@ const onSubmit = (done: () => void) => {
   updating.value ? updatePlatformAccount(done) : createPlatformAccount(done)
 }
 
+const platform = useChurchPlatformAccountStore()
+
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
@@ -95,7 +100,6 @@ const updateTarget = computed(() => {
     Locked: target.value.Locked
   }
 })
-
 const updatePlatformAccount = (done: () => void) => {
   platform.updatePlatformAccount({
     ...updateTarget.value,
