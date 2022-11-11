@@ -20,7 +20,7 @@
       </div>
     </template>
   </q-table>
-  <UsedFor v-model:update='updating' v-model:visible='showing' :used-for='AccountUsedFor.PaymentCollector' v-model:account='target' />
+  <UsedFor v-model:update='updating' v-model:visible='showing' v-model:account='target' />
 </template>
 
 <script setup lang='ts'>

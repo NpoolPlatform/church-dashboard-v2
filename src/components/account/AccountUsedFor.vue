@@ -57,7 +57,6 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 interface Props {
   visible: boolean
   update: boolean
-  usedFor: AccountUsedFor
   account: PlatformAccount
 }
 
