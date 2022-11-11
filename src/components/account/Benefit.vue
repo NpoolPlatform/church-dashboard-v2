@@ -29,7 +29,7 @@
       <q-card-section>
         <span>{{ $t('MSG_CREATE_GOOD_BENEFIT_ACCOUNT') }}</span>
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
         <GoodSelector v-model:id='target.GoodID' />
         <!-- <q-input
           type='number'
@@ -41,6 +41,12 @@
         /> -->
       </q-card-section>
       <q-card-section v-if='updating'>
+        <div><span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span></div>
+        <div><span>{{ $t("MSG_ACCOUNT_ID") }}: {{ target?.AccountID }}</span></div>
+        <div><span>{{ $t("MSG_GOOD_ID") }}: {{ target?.GoodID }}</span></div>
+        <div><span>{{ $t("MSG_GOOD_NAME") }}: {{ target?.GoodName }}</span></div>
+        <div><span>{{ $t("MSG_ADDRESS") }}: {{ target?.Address }}</span></div>
+        <div><span>{{ $t("MSG_COIN_NAME") }}: {{ target?.CoinName }}</span></div>
         <div>
           <q-toggle dense v-model='target.Backup' :label='$t("MSG_BACKUP")' />
         </div>
