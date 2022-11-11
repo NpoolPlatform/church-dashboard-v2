@@ -7,7 +7,7 @@
     <q-card class='popup-menu'>
       <q-card-section v-if='!updating'>
         <CoinPicker v-model:coin='target.CoinTypeID' />
-        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' placeholder='optional' />
+        <q-input v-if='target?.UsedFor !== AccountUsedFor.UserBenefitHot' v-model='target.Address' :label='$t("MSG_ADDRESS")' />
         <q-select :options='AccountUsedFors' v-model='target.UsedFor' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
       </q-card-section>
       <q-card-section v-if='updating'>
