@@ -64,14 +64,11 @@ interface Props {
 const props = defineProps<Props>()
 const visible = toRef(props, 'visible')
 const update = toRef(props, 'update')
-const usedFor = toRef(props, 'usedFor')
 const account = toRef(props, 'account')
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>()
 
-const target = computed(() => {
-  return { ...account.value, UsedFor: usedFor.value }
-})
+const target = computed(() => account.value)
 
 const showing = ref(visible)
 const updating = ref(update)
