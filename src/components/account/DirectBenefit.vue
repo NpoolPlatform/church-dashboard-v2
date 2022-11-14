@@ -7,6 +7,7 @@
     row-key='ID'
     :columns='directBenefitColumns'
     :rows-per-page-options='[20]'
+    @row-click='(evt, row, index) => onRowClick(row as Account)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -20,6 +21,7 @@
       </div>
     </template>
   </q-table>
+  <WithdrawDirectUpdate v-model:update='updating' v-model:visible='showing' v-model:account='target' />
 </template>
 
 <script setup lang='ts'>
@@ -29,10 +31,12 @@ import {
 } from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -46,6 +50,16 @@ const displayDirectBenefitAccounts = computed(() => {
                                               el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
   )
 })
+
+const updating = ref(true)
+const showing = ref(false)
+const target = ref({} as Account)
+
+const onRowClick = (row: Account) => {
+  updating.value = true
+  showing.value = true
+  target.value = { ...row }
+}
 
 watch(appID, () => {
   prepare()
