@@ -29,12 +29,13 @@
         <span>{{ $t('MSG_CREATE_WITHDRAW_SETTING') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
+        <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
+        <!-- <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' /> -->
         <q-input
           type='number'
           v-model='target.WithdrawAutoReviewCoinAmount'
           :label='$t("MSG_WITHDRAW_AUTH_REVIEW_AMOUNT")'
-          :suffix='selectedCoin.value?.Unit'
+          :suffix='targetCoinUnit'
         />
       </q-card-section>
       <q-item class='row'>
@@ -46,9 +47,11 @@
 </template>
 
 <script setup lang='ts'>
-import { Coin, NotificationType, useChurchWithdrawettingStore, useCoinStore, WithdrawSetting } from 'npool-cli-v2'
+import { NotificationType, useChurchWithdrawettingStore, useCoinStore, WithdrawSetting } from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -65,29 +68,8 @@ const settings = computed(() => Array.from(appSettings.value as Array<WithdrawSe
   return ms
 }))
 
-interface MyCoin {
-  label: string
-  value: Coin
-}
-
 const coin = useCoinStore()
-const coins = computed(() => Array.from(coin.Coins.filter((coin) => !coin.PreSale)).map((el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-const selectedCoin = computed({
-  get: () => {
-    return {
-      label: coin.getCoinByID(target.value?.CoinTypeID)?.Name,
-      value: coin.getCoinByID(target.value?.CoinTypeID)
-    } as MyCoin
-  },
-  set: (val) => {
-    target.value.CoinTypeID = val.value.ID as string
-  }
-})
+const targetCoinUnit = computed(() => coin.getCoinByID(target.value?.CoinTypeID)?.Unit)
 
 onMounted(() => {
   setting.getWithdrawSettings({
@@ -96,19 +78,6 @@ onMounted(() => {
       Error: {
         Title: 'MSG_GET_WITHDRAW_SETTINGS',
         Message: 'MSG_GET_WITHDRAW_SETTINGS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
         Popup: true,
         Type: NotificationType.Error
       }
