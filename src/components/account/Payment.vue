@@ -24,7 +24,18 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
+        <div>
+          <span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ACCOUNT_ID") }}: {{ target?.AccountID }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ADDRESS") }}: {{ target?.Address }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_COIN_NAME") }}: {{ target?.CoinName }}</span>
+        </div>
       </q-card-section>
       <q-card-section>
         <div>
@@ -48,7 +59,9 @@
 <script setup lang='ts'>
 import { NotifyType, PaymentAccount, useChurchPaymentAccountStore } from 'npool-cli-v4'
 import { getPaymentAccounts } from 'src/api/account'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const payment = useChurchPaymentAccountStore()
 const paymentAccounts = computed(() => payment.PaymentAccounts.PaymentAccounts)
