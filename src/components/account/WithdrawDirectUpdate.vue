@@ -93,12 +93,12 @@ const updateUserAccount = (done: () => void) => {
     ...updateTarget.value,
     Message: {
       Error: {
-        Title: 'MSG_UPDATE_PLATFORM_ACCOUNT',
+        Title: 'MSG_UPDATE_ACCOUNT',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_UPDATE_PLATFORM_ACCOUNT',
+        Title: 'MSG_UPDATE_ACCOUNT',
         Popup: true,
         Type: NotifyType.Success
       }
