@@ -3,11 +3,23 @@
     dense
     flat
     :title='$t("MSG_DIRECT_BENEFIT_ADDRESS")'
-    :rows='directBenefitAccounts'
+    :rows='displayDirectBenefitAccounts'
     row-key='ID'
     :columns='directBenefitColumns'
     :rows-per-page-options='[20]'
-  />
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
@@ -17,7 +29,7 @@ import {
 } from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -27,6 +39,13 @@ const appID = computed(() => app.AppID)
 
 const account = useChurchUserAccountStore()
 const directBenefitAccounts = computed(() => account.directBenefitAddress(appID.value))
+
+const username = ref('')
+const displayDirectBenefitAccounts = computed(() => {
+  return directBenefitAccounts.value.filter((el) => el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
+                                              el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
+  )
+})
 
 watch(appID, () => {
   prepare()
