@@ -102,6 +102,7 @@ const updateTarget = computed(() => {
     Locked: target.value.Locked
   }
 })
+// Only For GasFeeder & Platform & UserCold & UserHot & Collector Account
 const updatePlatformAccount = (done: () => void) => {
   platform.updatePlatformAccount({
     ...updateTarget.value,
