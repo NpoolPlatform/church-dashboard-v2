@@ -1,23 +1,27 @@
 <template>
   <q-toggle
+    v-if='backing !== undefined'
     label='backup'
     color='green'
     v-model='backing'
     @update:model-value='$emit("update:backup", backing)'
   />
   <q-toggle
+    v-if='blocking !== undefined'
     label='blocked'
     color='green'
     v-model='blocking'
     @update:model-value='$emit("update:blocked", blocking)'
   />
   <q-toggle
+    v-if='activating !== undefined'
     label='active'
     color='green'
     v-model='activating'
     @update:model-value='$emit("update:active", activating)'
   />
   <q-toggle
+    v-if='locking !== undefined'
     label='locked'
     color='green'
     v-model='locking'
@@ -35,10 +39,10 @@
 import { defineProps, toRef, ref, defineEmits } from 'vue'
 
 interface Props {
-  backup: boolean | null;
-  blocked: boolean | null;
-  active: boolean | null;
-  locked: boolean | null;
+  backup?: boolean | null | undefined;
+  blocked?: boolean | null| undefined;
+  active?: boolean | null | undefined;
+  locked?: boolean | null | undefined;
 }
 
 const props = defineProps<Props>()
@@ -61,13 +65,21 @@ const activating = ref(active.value)
 const locking = ref(locked.value)
 
 const onReset = () => {
-  backing.value = null
-  blocking.value = null
-  activating.value = null
-  locking.value = null
-  emit('update:active', null)
-  emit('update:backup', null)
-  emit('update:locked', null)
-  emit('update:blocked', null)
+  if (backup.value !== undefined) {
+    backing.value = null
+    emit('update:backup', null)
+  }
+  if (blocked.value !== undefined) {
+    blocking.value = null
+    emit('update:blocked', null)
+  }
+  if (active.value !== undefined) {
+    activating.value = null
+    emit('update:active', null)
+  }
+  if (locked.value !== undefined) {
+    locking.value = null
+    emit('update:locked', null)
+  }
 }
 </script>

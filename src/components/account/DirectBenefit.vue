@@ -9,15 +9,18 @@
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as Account)'
   >
-    <template #top-right>
-      <div class='row indent flat'>
-        <q-input
-          dense
-          flat
-          class='small'
-          v-model='username'
-          :label='$t("MSG_USERNAME")'
-        />
+    <template #top>
+      <div class='row justify-end table-right'>
+        <TableHeaderFilter :backup='undefined' v-model:blocked='blocked' v-model:active='active' locked='undefined' />
+        <div class='row indent flat align-bottom'>
+          <q-input
+            dense
+            flat
+            class='small'
+            v-model='username'
+            :label='$t("MSG_USERNAME")'
+          />
+        </div>
       </div>
     </template>
   </q-table>
@@ -44,11 +47,22 @@ const appID = computed(() => app.AppID)
 const account = useChurchUserAccountStore()
 const directBenefitAccounts = computed(() => account.directBenefitAddress(appID.value))
 
+const blocked = ref(null)
+const active = ref(null)
 const username = ref('')
+
 const displayDirectBenefitAccounts = computed(() => {
-  return directBenefitAccounts.value.filter((el) => el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
+  return directBenefitAccounts.value.filter((el) => {
+    let flag = el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
                                               el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
-  )
+    if (blocked.value !== null) {
+      flag = flag && el.Blocked === blocked.value
+    }
+    if (active.value !== null) {
+      flag = flag && el.Active === active.value
+    }
+    return flag
+  })
 })
 
 const updating = ref(true)
@@ -148,3 +162,12 @@ const directBenefitColumns = computed(() => [
   }
 ])
 </script>
+
+<style lang='sass' scoped>
+.table-right
+  width: 100%
+  ::v-deep .button
+    line-height: 30px
+    height: 30px
+    margin-left: 10px
+</style>

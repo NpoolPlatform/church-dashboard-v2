@@ -8,13 +8,18 @@
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as PaymentAccount)'
   >
-    <template #top-right>
-      <q-input
-        dense
-        class='small'
-        v-model='address'
-        :label='$t("MSG_ADDRESS")'
-      />
+    <template #top>
+      <div class='row justify-end table-right'>
+        <TableHeaderFilter :backup='undefined' v-model:blocked='blocked' v-model:active='active' v-model:locked='locked' />
+        <div class='row indent flat align-bottom'>
+          <q-input
+            dense
+            class='small'
+            v-model='address'
+            :label='$t("MSG_ADDRESS")'
+          />
+        </div>
+      </div>
     </template>
   </q-table>
   <q-dialog
@@ -62,14 +67,29 @@ import { getPaymentAccounts } from 'src/api/account'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
 const payment = useChurchPaymentAccountStore()
 const paymentAccounts = computed(() => payment.PaymentAccounts.PaymentAccounts)
-const displayAccounts = computed(() => paymentAccounts.value.filter((el) => {
-  return el.Address?.includes(address.value)
-}))
 
 const address = ref('')
+const blocked = ref(null)
+const active = ref(null)
+const locked = ref(null)
+
+const displayAccounts = computed(() => paymentAccounts.value.filter((el) => {
+  let flag = el.Address?.toLowerCase().includes(address.value?.toLowerCase())
+  if (blocked.value !== null) {
+    flag = flag && el.Blocked === blocked.value
+  }
+  if (active.value !== null) {
+    flag = flag && el.Active === active.value
+  }
+  if (locked.value !== null) {
+    flag = flag && el.Locked === locked.value
+  }
+  return flag
+}))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -129,3 +149,11 @@ onMounted(() => {
   }
 })
 </script>
+<style lang='sass' scoped>
+.table-right
+  width: 100%
+  ::v-deep .button
+    line-height: 30px
+    height: 30px
+    margin-left: 10px
+</style>

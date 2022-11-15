@@ -3,20 +3,23 @@
     dense
     flat
     :title='$t("MSG_GOOD_BENEFIT_ADDRESSES")'
-    :rows='gbAccounts'
+    :rows='displayGbAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as GoodBenefitAccount)'
   >
-    <template #top-right>
-      <div class='row indent flat'>
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_CREATE")'
-          @click='onCreate'
-        />
+    <template #top>
+      <div class='row justify-end table-right'>
+        <TableHeaderFilter v-model:backup='backup' v-model:blocked='blocked' v-model:active='active' v-model:locked='locked' />
+        <div class='row indent flat align-bottom'>
+          <q-btn
+            dense
+            flat
+            class='btn flat'
+            :label='$t("MSG_CREATE")'
+            @click='onCreate'
+          />
+        </div>
       </div>
     </template>
   </q-table>
@@ -75,10 +78,32 @@ import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
 const gb = useChurchGoodBenefitAccountStore()
 const gbAccounts = computed(() => gb.GoodBenefitAccounts.GoodBenefitAccounts)
 
+const backup = ref(null)
+const blocked = ref(null)
+const active = ref(null)
+const locked = ref(null)
+
+const displayGbAccounts = computed(() => gbAccounts.value.filter((el) => {
+  let flag = true
+  if (backup.value !== null) {
+    flag = flag && el.Backup === backup.value
+  }
+  if (blocked.value !== null) {
+    flag = flag && el.Blocked === blocked.value
+  }
+  if (active.value !== null) {
+    flag = flag && el.Active === active.value
+  }
+  if (locked.value !== null) {
+    flag = flag && el.Locked === locked.value
+  }
+  return flag
+}))
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as GoodBenefitAccount)
@@ -173,3 +198,11 @@ onMounted(() => {
   }
 })
 </script>
+<style lang='sass' scoped>
+.table-right
+  width: 100%
+  ::v-deep .button
+    line-height: 30px
+    height: 30px
+    margin-left: 10px
+</style>
