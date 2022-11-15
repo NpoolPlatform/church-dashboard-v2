@@ -10,30 +10,19 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchBillingStore, NotificationType } from 'npool-cli-v2'
+import { getAppWithdraws } from 'src/api/ledger'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch } from 'vue'
+import { useChurchLedgerWithdrawDepositStore } from 'npool-cli-v4'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const billing = useChurchBillingStore()
-const withdraws = computed(() => billing.Withdraws.get(appID.value) ? billing.Withdraws.get(appID.value) : [])
+const withdraw = useChurchLedgerWithdrawDepositStore()
+const withdraws = computed(() => withdraw.getWithdrawsByAppID(appID.value))
 
 const prepare = () => {
-  billing.getWithdraws({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_WITHDRAWS',
-        Message: 'MSG_GET_WITHDRAWS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  getAppWithdraws(0, 500)
 }
 
 watch(appID, () => {
