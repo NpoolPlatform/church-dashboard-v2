@@ -92,13 +92,13 @@ const prepare = () => {
 
 const withdrawColumns = computed(() => [
   {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
+    name: 'ID',
+    label: t('MSG_ID'),
     field: (row: Account) => row.ID
   },
   {
     name: 'ID',
-    label: t('MSG_ID'),
+    label: t('MSG_AppID'),
     field: (row: Account) => row.AppID
   },
   {
