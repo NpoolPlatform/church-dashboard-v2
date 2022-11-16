@@ -117,7 +117,7 @@ const MainDrawerMenus = [
       {
         menuId: uid(),
         label: '平台入金归集地址',
-        caption: '查看平台入金归集地址',
+        caption: '管理平台入金归集地址',
         icon: 'perm_identity',
         target: '/account/platform/collector',
         level: 1,
@@ -135,7 +135,7 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '用户热钱包',
-        caption: '提现出金地址',
+        caption: '用户提现出金地址',
         icon: 'perm_identity',
         target: '/account/user/hot',
         level: 1,
@@ -144,7 +144,7 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '商品收益地址',
-        caption: '查看商品收益地址',
+        caption: '管理商品收益地址',
         icon: 'perm_identity',
         target: '/account/benefit',
         level: 1,
@@ -162,7 +162,7 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '商品购买支付地址',
-        caption: '查看商品购买支付地址',
+        caption: '管理商品购买支付地址',
         icon: 'perm_identity',
         target: '/account/payment',
         level: 1,
@@ -171,7 +171,7 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '手续费供应地址',
-        caption: '查看手续费供应地址',
+        caption: '管理手续费供应地址',
         icon: 'perm_identity',
         target: '/account/gasfeeder',
         level: 1,
@@ -180,7 +180,7 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '用户提现地址',
-        caption: '查看用户提现地址',
+        caption: '用户提现地址',
         icon: 'perm_identity',
         target: '/account/withdraw',
         level: 1,
