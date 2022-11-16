@@ -74,7 +74,7 @@
 <script setup lang='ts'>
 import { GoodBenefitAccount, NotifyType, useChurchGoodBenefitAccountStore } from 'npool-cli-v4'
 import { getGoodBenefitAccounts } from 'src/api/account'
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -131,14 +131,6 @@ const onRowClick = (row: GoodBenefitAccount) => {
 const onSubmit = (done: () => void) => {
   updating.value ? updateGoodBenefitAccount(done) : createGoodBenefitAccount(done)
 }
-
-// Active & Blocked is exclusive
-watch(() => target.value?.Active, () => {
-  target.value.Blocked = !target.value?.Active
-})
-watch(() => target.value?.Blocked, () => {
-  target.value.Active = !target.value?.Blocked
-})
 
 const createGoodBenefitAccount = (done: () => void) => {
   gb.createGoodBenefitAccount({
