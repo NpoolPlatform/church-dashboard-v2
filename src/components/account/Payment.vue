@@ -64,7 +64,7 @@
 <script setup lang='ts'>
 import { NotifyType, PaymentAccount, useChurchPaymentAccountStore } from 'npool-cli-v4'
 import { getPaymentAccounts } from 'src/api/account'
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
@@ -109,6 +109,14 @@ const onRowClick = (row: PaymentAccount) => {
 const onCancel = () => {
   onMenuHide()
 }
+
+// Active & Blocked is exclusive
+watch(() => target.value?.Active, () => {
+  target.value.Blocked = !target.value?.Active
+})
+watch(() => target.value?.Blocked, () => {
+  target.value.Active = !target.value?.Blocked
+})
 
 const updateTarget = computed(() => {
   return {
