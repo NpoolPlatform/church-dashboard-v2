@@ -98,7 +98,7 @@ const withdrawColumns = computed(() => [
   },
   {
     name: 'ID',
-    label: t('MSG_AppID'),
+    label: t('MSG_APP_ID'),
     field: (row: Account) => row.AppID
   },
   {
