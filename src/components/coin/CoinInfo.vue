@@ -42,7 +42,7 @@
           <q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_FOR_PAY")' />
         </div>
         <div>
-          <q-toggle dense v-model='target.PreSale' :label='$t("MSG_COIN_PRESALE")' />
+          <q-toggle dense v-model='target.Presale' :label='$t("MSG_COIN_PRESALE")' />
         </div>
         <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' />
       </q-card-section>
@@ -55,37 +55,21 @@
 </template>
 
 <script setup lang='ts'>
-import { useCoinStore, NotificationType, Coin, CoinEnvironments, useChurchCoinStore } from 'npool-cli-v2'
+import { CoinEnvironments } from 'npool-cli-v2'
+import { useChurchCoinStore, Coin, NotifyType } from 'npool-cli-v4'
+import { getCoinsInfos } from 'src/api/coin'
 import { computed, onMounted, ref } from 'vue'
 
-const coin = useCoinStore()
-const coins = computed(() => coin.Coins)
-
-const ccoin = useChurchCoinStore()
-
-onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
+const coin = useChurchCoinStore()
+const coins = computed(() => coin.Coins.Coins)
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as unknown as Coin)
+const target = ref({} as Coin)
 
-const onRowClick = (myCoin: Coin) => {
-  target.value = myCoin
-  showing.value = true
-  updating.value = true
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as Coin
 }
 
 const onCreate = () => {
@@ -93,62 +77,89 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {} as unknown as Coin
+const onCancel = () => {
+  onMenuHide()
 }
 
-const onSubmit = () => {
-  showing.value = false
+const onRowClick = (row: Coin) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+}
 
-  if (updating.value) {
-    ccoin.updateCoin({
-      ID: target.value.ID as string,
-      PreSale: target.value.PreSale,
-      Logo: target.value.Logo,
-      ReservedAmount: target.value.ReservedAmount,
-      ForPay: target.value.ForPay,
-      HomePage: target.value.HomePage,
-      Specs: target.value.Specs,
-      Name: target.value.Name,
-      Unit: target.value.Unit,
-      ENV: target.value.ENV,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_COIN',
-          Message: 'MSG_UPDATE_COIN_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-  ccoin.createCoin({
-    PreSale: target.value.PreSale,
-    Logo: target.value.Logo,
+const onSubmit = (done: () => void) => {
+  updating.value ? updateCoin(done) : createCoin(done)
+}
+
+const updateTarget = computed(() => {
+  return {
+    ID: target.value.ID,
+    Presale: target.value.Presale,
     ReservedAmount: target.value.ReservedAmount,
     ForPay: target.value.ForPay,
+    HomePage: target.value.HomePage,
+    Specs: target.value.Specs,
+    FeeCoinTypeID: target.value.FeeCoinTypeID,
+    WithdrawFeeByStableUSD: target.value.WithdrawFeeByStableUSD,
+    WithdrawFeeAmount: target.value.WithdrawFeeAmount,
+    CollectFeeAmount: target.value.CollectFeeAmount,
+    HotWalletAccountAmount: target.value.HotWalletAccountAmount,
+    LowFeeAmount: target.value.LowFeeAmount,
+    HotWalletFeeAmount: target.value.HotWalletAccountAmount,
+    PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount
+  }
+})
+
+const updateCoin = (done: () => void) => {
+  coin.updateCoin({
+    ...updateTarget.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_COIN',
+        Message: 'MSG_UPDATE_COIN_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const createCoin = (done: () => void) => {
+  coin.createCoin({
+    Logo: target.value.Logo,
+    ForPay: target.value.ForPay,
     Name: target.value.Name,
-    Unit: target.value.Unit,
-    ENV: target.value.ENV,
+    AppID: '',
+    UserID: '',
+    CoinTypeID: '',
+    ID: '',
+    WithdrawAutoReviewAmount: '',
+    MarketValue: '',
+    SettlePercent: 0,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
         Message: 'MSG_CREATE_COIN_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
   })
 }
 
-const onCancel = () => {
-  onMenuHide()
-}
-
+onMounted(() => {
+  getCoinsInfos(0, 500)
+})
 </script>
