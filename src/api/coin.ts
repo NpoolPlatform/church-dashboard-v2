@@ -1,4 +1,4 @@
-import { Coin, CoinDescription, NotifyType, useChurchAppCoinDescriptionStore, useChurchCoinStore } from 'npool-cli-v4'
+import { Coin, CoinDescription, NotifyType, useChurchAppCoinDescriptionStore, useChurchAppCoinStore, useChurchCoinStore } from 'npool-cli-v4'
 import { appID } from './app'
 
 const coin = useChurchCoinStore()
@@ -41,5 +41,27 @@ export const getAppCoinDescriptions = (offset : number, limit: number) => {
       return
     }
     getAppCoinDescriptions(offset + limit, limit)
+  })
+}
+
+const appCoin = useChurchAppCoinStore()
+export const getAppCoins = (offset : number, limit: number) => {
+  appCoin.getAppCoins({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_COINS',
+        Message: 'MSG_GET_COINS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (error: boolean, coins: Array<Coin>) => {
+    if (error || coins.length < limit) {
+      return
+    }
+    getAppCoins(offset + limit, limit)
   })
 }

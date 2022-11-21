@@ -23,7 +23,7 @@
 <script setup lang='ts'>
 import { useChurchAppCoinStore } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
-import { getCoins } from 'src/api/coin'
+import { getAppCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
@@ -60,7 +60,7 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (coin.getCoinsByAppID(appID.value).length === 0) {
-    getCoins(0, 500)
+    getAppCoins(0, 500)
   }
 })
 </script>
