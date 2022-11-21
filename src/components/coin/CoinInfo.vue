@@ -57,7 +57,7 @@
 <script setup lang='ts'>
 import { CoinEnvironments } from 'npool-cli-v2'
 import { useChurchCoinStore, Coin, NotifyType } from 'npool-cli-v4'
-import { getCoinsInfos } from 'src/api/coin'
+import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref } from 'vue'
 
 const coin = useChurchCoinStore()
@@ -160,6 +160,6 @@ const createCoin = (done: () => void) => {
 }
 
 onMounted(() => {
-  getCoinsInfos(0, 500)
+  getCoins(0, 500)
 })
 </script>

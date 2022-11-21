@@ -21,22 +21,22 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useCoinStore } from 'npool-cli-v2'
+import { useChurchCoinStore } from 'npool-cli-v4'
 import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
-  coin: string
+  id: string
   updating?: boolean
 }
 
 const props = defineProps<Props>()
-const coin = toRef(props, 'coin')
+const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
-const target = ref(coin.value)
+const target = ref(id.value)
 
-const coinStore = useCoinStore()
-const coins = computed(() => Array.from(coinStore.Coins).map((el) => {
+const coinStore = useChurchCoinStore()
+const coins = computed(() => Array.from(coinStore.Coins.Coins).map((el) => {
   return {
     value: el.ID,
     label: el.Name
@@ -52,14 +52,14 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:coin', coin: string): void}>()
+const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
-  emit('update:coin', target.value)
+  emit('update:id', target.value)
 }
 
 onMounted(() => {
-  if (coinStore.Coins.length === 0) {
-    getCoins()
+  if (coinStore.Coins.Coins.length === 0) {
+    getCoins(0, 500)
   }
 })
 </script>
