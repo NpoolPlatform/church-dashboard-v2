@@ -20,46 +20,36 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { NotificationType, useCoinStore } from 'npool-cli-v2'
+import { useChurchCoinStore } from 'npool-cli-v4'
+import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
-  coins: string[]
+  ids: string[]
   updating?: boolean
 }
 
 const props = defineProps<Props>()
-const coin = toRef(props, 'coins')
+const ids = toRef(props, 'ids')
 const updating = toRef(props, 'updating')
-const target = ref(coin.value)
-const coinStore = useCoinStore()
+const target = ref(ids.value)
+const coin = useChurchCoinStore()
 
-const coins = computed(() => Array.from(coinStore.Coins).map((el) => {
+const coins = computed(() => Array.from(coin.Coins.Coins).map((el) => {
   return {
     value: el.ID,
     label: el.Name
   }
 }))
 
-const emit = defineEmits<{(e: 'update:coins', coin: Array<string>): void}>()
+const emit = defineEmits<{(e: 'update:ids', coin: Array<string>): void}>()
 const onUpdate = () => {
-  emit('update:coins', target.value)
+  emit('update:ids', target.value)
 }
 
 onMounted(() => {
-  if (coinStore.Coins.length === 0) {
-    coinStore.getCoins({
-      Message: {
-        Error: {
-          Title: 'MSG_GET_COINS',
-          Message: 'MSG_GET_COINS_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-    // TODO
-    })
+  if (coin.Coins.Coins.length === 0) {
+    getCoins(0, 500)
   }
 })
 </script>

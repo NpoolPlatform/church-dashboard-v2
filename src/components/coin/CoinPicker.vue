@@ -35,8 +35,8 @@ const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
 const target = ref(id.value)
 
-const coinStore = useChurchCoinStore()
-const coins = computed(() => Array.from(coinStore.Coins.Coins).map((el) => {
+const coin = useChurchCoinStore()
+const coins = computed(() => Array.from(coin.Coins.Coins).map((el) => {
   return {
     value: el.ID,
     label: el.Name
@@ -58,7 +58,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (coinStore.Coins.Coins.length === 0) {
+  if (coin.Coins.Coins.length === 0) {
     getCoins(0, 500)
   }
 })
