@@ -13,12 +13,12 @@
 import { getAppWithdraws } from 'src/api/ledger'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch } from 'vue'
-import { useChurchLedgerWithdrawDepositStore } from 'npool-cli-v4'
+import { useChurchLedgerWithdrawStore } from 'npool-cli-v4'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const withdraw = useChurchLedgerWithdrawDepositStore()
+const withdraw = useChurchLedgerWithdrawStore()
 const withdraws = computed(() => withdraw.getWithdrawsByAppID(appID.value))
 
 const prepare = () => {
