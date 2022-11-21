@@ -10,30 +10,21 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchBillingStore, NotificationType } from 'npool-cli-v2'
+import { useChurchTxStore } from 'npool-cli-v4'
+import { getTxs } from 'src/api/chain'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const billing = useChurchBillingStore()
-const transactions = computed(() => billing.Transactions.get(appID.value) ? billing.Transactions.get(appID.value) : [])
+const tx = useChurchTxStore()
+const transactions = computed(() => tx.getTxsByAppID(appID.value))
 
 const prepare = () => {
-  billing.getTransactions({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_TRANSACTIONS',
-        Message: 'MSG_GET_TRANSACTIONS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (transactions.value.length === 0) {
+    getTxs(0, 500)
+  }
 }
 
 watch(appID, () => {
