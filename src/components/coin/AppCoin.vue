@@ -140,7 +140,7 @@ const createAppCoin = (done: () => void) => {
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP_COIN',
-        Message: 'MSG_UPDATE_APP_COIN_FAIL',
+        Message: 'MSG_CREATE_APP_COIN_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
