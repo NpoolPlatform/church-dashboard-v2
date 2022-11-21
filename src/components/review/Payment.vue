@@ -20,7 +20,9 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, Payment, useChurchBillingStore, useCoinStore, UserPaymentBalance } from 'npool-cli-v2'
+import { NotificationType, Payment, useChurchBillingStore, UserPaymentBalance } from 'npool-cli-v2'
+import { useChurchAppCoinStore } from 'npool-cli-v4'
+import { getAppCoins } from 'src/api/coin'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -52,7 +54,7 @@ const myBalances = computed(() => {
       return
     }
     const payment = payments.value[index]
-    el.CoinName = coin.getCoinByID(payment.CoinInfoID)?.Name as string
+    el.CoinName = coin.getCoinByID(appID.value, payment.CoinInfoID)?.Name as string
     el.CoinUSDCurrency = payment.CoinUSDCurrency
     el.USDAmount = el.Amount * payment.CoinUSDCurrency
     bls.push(el)
@@ -60,10 +62,19 @@ const myBalances = computed(() => {
   return bls
 })
 
-const coin = useCoinStore()
+const coin = useChurchAppCoinStore()
+const coins = computed(() => coin.getCoinsByAppID(appID.value))
 
 const paymentLoading = ref(false)
 const balanceLoading = ref(false)
+
+watch(appID, () => {
+  prepare()
+})
+
+onMounted(() => {
+  prepare()
+})
 
 const prepare = () => {
   paymentLoading.value = true
@@ -96,27 +107,9 @@ const prepare = () => {
   }, () => {
     balanceLoading.value = false
   })
+
+  if (coins.value.length === 0) {
+    getAppCoins(0, 500)
+  }
 }
-
-watch(appID, () => {
-  prepare()
-})
-
-onMounted(() => {
-  prepare()
-
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
-
 </script>

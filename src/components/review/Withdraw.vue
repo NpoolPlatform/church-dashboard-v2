@@ -2,19 +2,9 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_COINS")'
-    :rows='displayCoins'
-    row-key='ID'
-    :loading='coinLoading'
-    :rows-per-page-options='[10]'
-  />
-  <q-table
-    dense
-    flat
     :title='$t("MSG_WITHDRAW_REVIEWS")'
     :rows='displayReviews'
     row-key='ID'
-    :loading='reviewLoading'
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as WithdrawReview)'
   />
@@ -37,7 +27,7 @@
         <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ target?.PhoneNO }}</q-item-label>
       </q-card-section>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.Name }}</q-item-label>
+        <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.getCoinByID(appID, target.CoinTypeID)?.Name }}</q-item-label>
         <q-item-label>{{ $t('MSG_AMOUNT') }}: {{ target?.Amount }}</q-item-label>
         <q-item-label>{{ $t('MSG_MESSAGE') }}: {{ target?.Trigger }}</q-item-label>
       </q-card-section>
@@ -55,11 +45,10 @@
 
 <script setup lang='ts'>
 import {
-  NotificationType,
-  useCoinStore,
   useLocaleStore
 } from 'npool-cli-v2'
-import { NotifyType, useChurchWithdrawReviewStore, useLocalUserStore, WithdrawReview, ReviewState } from 'npool-cli-v4'
+import { NotifyType, useChurchWithdrawReviewStore, useLocalUserStore, WithdrawReview, ReviewState, useChurchAppCoinStore } from 'npool-cli-v4'
+import { getAppCoins } from 'src/api/coin'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -72,32 +61,19 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
+const coin = useChurchAppCoinStore()
+const coins = computed(() => coin.getCoinsByAppID(appID.value))
+
 const review = useChurchWithdrawReviewStore()
-const coins = useCoinStore()
 const locale = useLocaleStore()
 const logined = useLocalUserStore()
 
 const displayReviews = computed(() => {
   return review.WithdrawReviews.WithdrawReviews.get(appID.value) ? review.WithdrawReviews.WithdrawReviews.get(appID.value) : []
 })
-const reviewLoading = ref(false)
-
-const displayCoins = computed(() => coins.Coins)
-const coinLoading = ref(true)
-
-const prepare = () => {
-  if (!review.WithdrawReviews.WithdrawReviews.get(appID.value)) {
-    getAppWithdrawReviews(0, 500)
-  }
-}
-
-watch(appID, () => {
-  prepare()
-})
 
 const showing = ref(false)
 const target = ref({} as WithdrawReview)
-const coin = computed(() => coins.getCoinByID(target?.value.CoinTypeID))
 
 const onMenuHide = () => {
   target.value = {} as WithdrawReview
@@ -128,23 +104,6 @@ const onCancel = () => {
   showing.value = false
   onMenuHide()
 }
-
-onMounted(() => {
-  prepare()
-
-  coins.getCoins({
-    Message: {
-      Error: {
-        Title: t('MSG_GET_WITHDRAW_REVIEWS'),
-        Message: t('MSG_GET_WITHDRAW_REVIEWS_FAIL'),
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    coinLoading.value = false
-  })
-})
 
 const getAppWithdrawReviews = (offset: number, limit: number) => {
   review.getAppWithdrawReviews({
@@ -191,5 +150,23 @@ const updateAppWithdrawReview = (done: () => void) => {
     }
     onMenuHide()
   })
+}
+
+onMounted(() => {
+  prepare()
+})
+
+watch(appID, () => {
+  prepare()
+})
+
+const prepare = () => {
+  if (!review.WithdrawReviews.WithdrawReviews.get(appID.value)) {
+    getAppWithdrawReviews(0, 500)
+  }
+
+  if (coins.value.length === 0) {
+    getAppCoins(0, 500)
+  }
 }
 </script>

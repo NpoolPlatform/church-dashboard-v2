@@ -47,7 +47,9 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useChurchWithdrawettingStore, useCoinStore, WithdrawSetting } from 'npool-cli-v2'
+import { NotificationType, useChurchWithdrawettingStore, WithdrawSetting } from 'npool-cli-v2'
+import { useChurchCoinStore } from 'npool-cli-v4'
+import { getCoins } from 'src/api/coin'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
@@ -68,24 +70,8 @@ const settings = computed(() => Array.from(appSettings.value as Array<WithdrawSe
   return ms
 }))
 
-const coin = useCoinStore()
+const coin = useChurchCoinStore()
 const targetCoinUnit = computed(() => coin.getCoinByID(target.value?.CoinTypeID)?.Unit)
-
-onMounted(() => {
-  setting.getWithdrawSettings({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_WITHDRAW_SETTINGS',
-        Message: 'MSG_GET_WITHDRAW_SETTINGS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
 
 const showing = ref(false)
 const updating = ref(false)
@@ -145,4 +131,22 @@ const onCancel = () => {
   onMenuHide()
 }
 
+onMounted(() => {
+  setting.getWithdrawSettings({
+    TargetAppID: appID.value,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_WITHDRAW_SETTINGS',
+        Message: 'MSG_GET_WITHDRAW_SETTINGS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+  if (coin.Coins.Coins.length === 0) {
+    getCoins(0, 500)
+  }
+})
 </script>

@@ -47,15 +47,6 @@ const MainDrawerMenus = [
         level: 0,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '币种汇率',
-        caption: '设置周期汇率(价格预言机)',
-        icon: 'pending',
-        target: '/coin/oracle/currency',
-        level: 0,
-        sectionBegin: false,
-        children: []
       } as MenuItem
     ]
   } as MenuItem, {
@@ -680,16 +671,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, /* {
-      menuId: uid(),
-      label: '销售收入',
-      caption: '查看用户购买支付收入',
-      icon: 'format_list_numbered',
-      target: '/billing/incoming',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, */ {
+    } as MenuItem, {
       menuId: uid(),
       label: '订单',
       caption: '查看订单列表',

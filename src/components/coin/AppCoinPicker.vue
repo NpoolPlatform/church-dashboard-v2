@@ -5,7 +5,7 @@
     :options='displayCoins'
     options-selected-class='text-deep-orange'
     emit-value
-    label='MSG_COINS'
+    label='MSG_APP_COINS'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -24,7 +24,7 @@
 import { useChurchAppCoinStore } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
 import { getAppCoins } from 'src/api/coin'
-import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {
   id: string
@@ -59,6 +59,12 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
+  if (coin.getCoinsByAppID(appID.value).length === 0) {
+    getAppCoins(0, 500)
+  }
+})
+
+watch(appID, () => {
   if (coin.getCoinsByAppID(appID.value).length === 0) {
     getAppCoins(0, 500)
   }

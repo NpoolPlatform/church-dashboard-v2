@@ -137,12 +137,26 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { Detail, formatTime, General, NotifyType, useChurchUserAccountStore, useChurchAppStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
+import {
+  Detail,
+  formatTime,
+  General,
+  NotifyType,
+  useChurchUserAccountStore,
+  useChurchAppStore,
+  useChurchDepositStore,
+  useChurchDetailStore,
+  useChurchGeneralStore,
+  useChurchUserStore,
+  User,
+  useChurchAppCoinStore,
+  Coin
+} from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
-import { Coin, NotificationType, useCoinStore } from 'npool-cli-v2'
 import saveAs from 'file-saver'
 import { getAppDepositAccounts } from 'src/api/account'
+import { getAppCoins } from 'src/api/coin'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -183,8 +197,9 @@ interface MyCoin {
   label: string
   value: Coin
 }
-const coin = useCoinStore()
-const displayCoins = computed(() => Array.from(coin.Coins.filter((el) => !el.PreSale && !coinBlacklist(el.ID as string)), (el) => {
+const coin = useChurchAppCoinStore()
+const coins = computed(() => coin.getCoinsByAppID(appID.value))
+const displayCoins = computed(() => Array.from(coins.value.filter((el) => !el.Presale && !coinBlacklist(el.ID)), (el) => {
   return {
     label: el.Name,
     value: el
@@ -193,7 +208,7 @@ const displayCoins = computed(() => Array.from(coin.Coins.filter((el) => !el.Pre
 const selectedCoin = ref(undefined as unknown as MyCoin)
 const coinBlacklist = (coinTypeID: string) => {
   const names = ['Ethereum', 'Tron', 'Solana', 'USD Coin']
-  const existingItem = coin.Coins.find((el) => el.ID === coinTypeID)
+  const existingItem = coins.value.find((el) => el.ID === coinTypeID)
   if (!existingItem) {
     return true
   }
@@ -218,7 +233,7 @@ const onSubmit = () => {
   deposit.createAppUserDeposit({
     TargetAppID: appID.value,
     TargetUserID: selectedUser.value[0].ID,
-    CoinTypeID: selectedCoin.value.value.ID as string,
+    CoinTypeID: selectedCoin.value.value.ID,
     Amount: amount.value,
     Message: {
       Error: {
@@ -403,16 +418,15 @@ const detailsExport = () => {
   })
 
   const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
-  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' +
-                   formatTime(new Date().getTime() / 1000) +
-                   '.csv'
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' + (new Date().getTime() / 1000) + '.csv'
   saveAs(blob, filename)
 }
 
 onMounted(() => {
   prepare()
-  if (coin.Coins.length === 0) {
-    getCoins()
+  if (coins.value.length === 0) {
+    getAppCoins(0, 500)
   }
 })
 
@@ -453,21 +467,6 @@ const getAppUsers = (offset: number, limit: number) => {
       return
     }
     getAppUsers(offset + limit, limit)
-  })
-}
-
-const getCoins = () => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
   })
 }
 
