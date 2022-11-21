@@ -46,11 +46,8 @@
       </q-card-section>
       <q-card-section>
         <div>
-          <q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_FOR_PAY")' />
-          <!-- <q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_DISABLE")' /> -->
-        </div>
-        <div>
-          <!-- <q-toggle dense v-model='target.Presale' :label='$t("MSG_COIN_PRESALE")' /> -->
+          <q-toggle dense v-model='target.CoinForPay' :label='$t("MSG_COIN_FOR_PAY")' />
+          <q-toggle dense v-model='target.CoinDisabled' :label='$t("MSG_COIN_DISABLE")' />
         </div>
         <!-- <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' /> -->
       </q-card-section>
@@ -157,6 +154,15 @@ const createAppCoin = (done: () => void) => {
     onMenuHide()
   })
 }
+
+watch([() => target.value?.CoinDisabled, () => target.value?.CoinForPay], () => {
+  if (target.value?.Disabled) {
+    target.value.CoinDisabled = true
+  }
+  if (!target.value?.ForPay) {
+    target.value.CoinForPay = false
+  }
+})
 
 watch(appID, () => {
   if (coins.value?.length === 0) {
