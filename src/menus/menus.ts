@@ -40,15 +40,6 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '币种产品信息',
-        caption: '为币种添加产品信息',
-        icon: 'pending',
-        target: '/coin/productinfos',
-        level: 0,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
         label: '收益估算',
         caption: '设置估算收益(产出预言机)',
         icon: 'pending',

@@ -361,18 +361,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'coin/productinfos',
-        component: () => import('pages/coin/ProductInfo.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'coin/oracle/reward',
         component: () => import('pages/coin/OracleReward.vue'),
         meta: {
