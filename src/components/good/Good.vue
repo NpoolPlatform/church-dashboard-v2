@@ -63,7 +63,7 @@
         />
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:coin='target.CoinTypeID' />
+        <CoinPicker v-model:id='target.CoinTypeID' />
         <!-- <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' /> -->
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' />

@@ -29,7 +29,7 @@
         <span>{{ $t('MSG_CREATE_WITHDRAW_SETTING') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:coin='target.CoinTypeID' :updating='updating' />
+        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
         <!-- <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' /> -->
         <q-input
           type='number'
