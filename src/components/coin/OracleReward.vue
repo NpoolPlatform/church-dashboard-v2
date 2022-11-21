@@ -30,11 +30,11 @@
         <span>{{ $t('MSG_CREATE_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select dense :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN")' />
+        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
         <q-input
           type='number'
           v-model='target.DailyReward'
-          :suffix='selectedCoin.value?.Unit'
+          :suffix='selectedCoin?.Unit'
           :label='$t("MSG_ESTIMATED_DAILY_REWARD")'
         />
       </q-card-section>
@@ -48,89 +48,38 @@
 
 <script setup lang='ts'>
 import {
-  useCoinStore,
   NotificationType,
-  Coin,
   Reward,
   useOracleStore,
   useChurchOracleStore,
   Cond
 } from 'npool-cli-v2'
-import { computed, onMounted, ref } from 'vue'
+import { useChurchCoinStore } from 'npool-cli-v4'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
-const coin = useCoinStore()
-
-interface MyCoin {
-  label: string
-  value: Coin
-}
-const coins = computed(() => Array.from(coin.Coins).map((el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-
-const oracle = useOracleStore()
-const coracle = useChurchOracleStore()
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 
 interface MyReward extends Reward {
   CoinName: string
 }
 
+const coin = useChurchCoinStore()
+const selectedCoin = computed(() => coin.getCoinByID(target.value?.CoinTypeID))
+
+const oracle = useOracleStore()
+const coracle = useChurchOracleStore()
 const rewards = computed(() => Array.from(oracle.Rewards).map((el) => {
   const r = el as MyReward
-  r.CoinName = coin.getCoinByID(el.CoinTypeID)?.Name as string
+  r.CoinName = selectedCoin.value?.Name as string
   return r
 }))
 
-onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  oracle.getRewards({
-    Conds: new Map<string, Cond>(),
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COIN_ESTIMATED_REWARDS',
-        Message: 'MSG_GET_COIN_ESTIMATED_REWARDS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
-
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as unknown as Reward)
+const target = ref({} as Reward)
 
-const selectedCoin = computed({
-  get: () => {
-    return {
-      label: coin.getCoinByID(target.value?.CoinTypeID)?.Name,
-      value: coin.getCoinByID(target.value?.CoinTypeID)
-    } as MyCoin
-  },
-  set: (val) => {
-    target.value.CoinTypeID = val.value?.ID as string
-  }
-})
-
-const onRowClick = (myCoin: Reward) => {
-  target.value = myCoin
+const onRowClick = (row: Reward) => {
+  target.value = { ...row }
   showing.value = true
   updating.value = true
 }
@@ -142,7 +91,11 @@ const onCreate = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as unknown as Reward
+  target.value = {} as Reward
+}
+
+const onCancel = () => {
+  onMenuHide()
 }
 
 const onSubmit = () => {
@@ -179,8 +132,19 @@ const onSubmit = () => {
   })
 }
 
-const onCancel = () => {
-  onMenuHide()
-}
-
+onMounted(() => {
+  oracle.getRewards({
+    Conds: new Map<string, Cond>(),
+    Message: {
+      Error: {
+        Title: 'MSG_GET_COIN_ESTIMATED_REWARDS',
+        Message: 'MSG_GET_COIN_ESTIMATED_REWARDS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+})
 </script>
