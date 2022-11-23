@@ -23,7 +23,7 @@ const MainDrawerMenus = [
       {
         menuId: uid(),
         label: '币种',
-        caption: '添加、删除与修改',
+        caption: '管理币种|收益估算',
         icon: 'pending',
         target: '/coins',
         level: 0,
@@ -32,18 +32,9 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '币种描述',
-        caption: '为币种添加描述',
+        caption: '管理币种描述',
         icon: 'pending',
         target: '/coin/descriptions',
-        level: 0,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '收益估算',
-        caption: '设置估算收益(产出预言机)',
-        icon: 'pending',
-        target: '/coin/oracle/reward',
         level: 0,
         sectionBegin: false,
         children: []
