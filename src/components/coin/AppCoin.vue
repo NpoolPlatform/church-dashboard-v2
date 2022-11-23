@@ -38,21 +38,15 @@
         <q-input type='number' v-model='target.WithdrawAutoReviewAmount' :label='$t("MSG_WITHDRAW_AUTO_REVIEW_AMOUNT")' />
         <q-input type='number' v-model='target.MarketValue' :label='$t("MSG_COIN_MARKET_VALUE")' />
         <q-input type='number' v-model.number='target.SettlePercent' :label='$t("MSG_COIN_SETTLE_PERCENT")' />
-      </q-card-section>
-      <q-card-section>
-        <div>
-          <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
-        </div>
-      </q-card-section>
-      <q-card-section>
-        <div>
-          <q-toggle dense v-model='target.CoinForPay' :label='$t("MSG_COIN_FOR_PAY")' />
-          <q-toggle dense v-model='target.CoinDisabled' :label='$t("MSG_COIN_DISABLE")' />
-        </div>
         <!-- <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' /> -->
       </q-card-section>
+      <q-card-section v-if='updating'>
+        <div><q-toggle dense v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' /></div>
+        <div><q-toggle dense v-model='target.CoinForPay' :label='$t("MSG_COIN_FOR_PAY")' /></div>
+        <div><q-toggle dense v-model='target.CoinDisabled' :label='$t("MSG_COIN_DISABLE")' /></div>
+      </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -66,9 +60,10 @@ import { getAppCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.AppCoins.AppCoins.get(appID.value))
+const coins = computed(() => coin.getCoinsByAppID(appID.value))
 
 const showing = ref(false)
 const updating = ref(false)

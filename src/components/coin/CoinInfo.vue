@@ -17,6 +17,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
+        <CoinPicker v-model:id='target.FeeCoinTypeID' :updating='updating' />
         <!-- <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' /> -->
         <q-input v-model='target.ReservedAmount' :label='$t("MSG_COIN_RESERVED_AMOUNT")' />
         <!-- <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' /> -->
@@ -25,21 +26,16 @@
         <q-input v-model='target.Specs' :label='$t("MSG_COIN_SPECS")' />
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:id='target.FeeCoinTypeID' :updating='updating' />
         <q-input type='number' v-model='target.WithdrawFeeAmount' :label='$t("MSG_WITHDRAW_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.CollectFeeAmount' :label='$t("MSG_COLLECT_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.LowFeeAmount' :label='$t("MSG_LOW_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.HotWalletFeeAmount' :label='$t("MSG_HOT_WALLET_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.PaymentAccountCollectAmount' :label='$t("MSG_PAYMENT_ACCOUNT_COLLECT_AMOUNT")' />
-        <q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' />
       </q-card-section>
       <q-card-section>
-        <div>
-          <q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_FOR_PAY")' />
-        </div>
-        <div>
-          <q-toggle dense v-model='target.Presale' :label='$t("MSG_COIN_PRESALE")' />
-        </div>
+        <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
+        <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_FOR_PAY")' /></div>
+        <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_COIN_PRESALE")' /></div>
         <!-- <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' /> -->
       </q-card-section>
       <q-item class='row'>
