@@ -39,7 +39,7 @@ const coin = useChurchCoinStore()
 const coins = computed(() => Array.from(coin.Coins.Coins).map((el) => {
   return {
     value: el.ID,
-    label: el.Name
+    label: `${el.Name} | ${el.ID}`
   }
 }))
 const displayCoins = ref(coins.value)
