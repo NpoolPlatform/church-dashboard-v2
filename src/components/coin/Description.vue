@@ -6,7 +6,6 @@
     row-key='ID'
     :title='$t("MSG_COIN_DESCRIPTIONS")'
     :rows-per-page-options='[5]'
-    @row-click='(evt, row, index) => onRowClick(row as CoinDescription)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -72,11 +71,11 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onRowClick = (row: CoinDescription) => {
-  target.value = { ...row }
-  showing.value = true
-  updating.value = true
-}
+// const onRowClick = (row: CoinDescription) => {
+//   target.value = { ...row }
+//   showing.value = true
+//   updating.value = true
+// }
 
 const onMenuHide = () => {
   showing.value = false
@@ -84,7 +83,7 @@ const onMenuHide = () => {
 }
 
 const onSubmit = (done: () => void) => {
-  updating.value ? updateCoinDescription() : createCoinDescription(done)
+  createCoinDescription(done)
 }
 
 // const updateTarget = computed(() => {
@@ -97,26 +96,25 @@ const onSubmit = (done: () => void) => {
 //   }
 // })
 
-const updateCoinDescription = () => {
-  console.log('not support!')
-  // description.updateAppCoinDescription({
-  //   ...updateTarget.value,
-  //   NotifyMessage: {
-  //     Error: {
-  //       Title: 'MSG_UPDATE_DESCRIPTION',
-  //       Message: 'MSG_UPDATE_DESCRIPTION_FAIL',
-  //       Popup: true,
-  //       Type: NotifyType.Error
-  //     }
-  //   }
-  // }, (error: boolean) => {
-  //   done()
-  //   if (error) {
-  //     return
-  //   }
-  //   onMenuHide()
-  // })
-}
+// const updateCoinDescription = () => {
+// description.updateAppCoinDescription({
+//   ...updateTarget.value,
+//   NotifyMessage: {
+//     Error: {
+//       Title: 'MSG_UPDATE_DESCRIPTION',
+//       Message: 'MSG_UPDATE_DESCRIPTION_FAIL',
+//       Popup: true,
+//       Type: NotifyType.Error
+//     }
+//   }
+// }, (error: boolean) => {
+//   done()
+//   if (error) {
+//     return
+//   }
+//   onMenuHide()
+// })
+// }
 
 const createCoinDescription = (done: () => void) => {
   description.createAppCoinDescription({
