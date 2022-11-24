@@ -2,13 +2,24 @@
   <q-table
     dense
     flat
-    :rows='coins'
+    :rows='displayCoins'
     row-key='ID'
     :title='$t("MSG_COINS")'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as Coin)'
-  />
-
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='name'
+          :label='$t("MSG_COINNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
   <AppCoin />
   <q-dialog
     v-model='showing'
@@ -57,6 +68,11 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 
 const coin = useChurchCoinStore()
 const coins = computed(() => coin.Coins.Coins)
+
+const name = ref('')
+const displayCoins = computed(() => {
+  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()))
+})
 
 const showing = ref(false)
 const updating = ref(false)

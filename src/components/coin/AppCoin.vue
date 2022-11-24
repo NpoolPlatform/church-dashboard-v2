@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :rows='coins'
+    :rows='displayCoins'
     row-key='ID'
     :title='$t("MSG_APP_COINS")'
     :rows-per-page-options='[10]'
@@ -10,6 +10,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='name'
+          :label='$t("MSG_COINNAME")'
+        />
         <q-btn
           dense
           flat
@@ -64,6 +71,11 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 
 const coin = useChurchAppCoinStore()
 const coins = computed(() => coin.getCoinsByAppID(appID.value))
+
+const name = ref('')
+const displayCoins = computed(() => {
+  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()))
+})
 
 const showing = ref(false)
 const updating = ref(false)
