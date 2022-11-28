@@ -47,6 +47,7 @@
         <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
         <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_FOR_PAY")' /></div>
         <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_COIN_PRESALE")' /></div>
+        <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_COIN_DISABLED")' /></div>
         <!-- <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' /> -->
       </q-card-section>
       <q-item class='row'>
