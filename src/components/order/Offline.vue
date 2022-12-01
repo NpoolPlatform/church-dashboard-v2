@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang='ts'>
+import { NotificationType, useCoinStore } from 'npool-cli-v2'
 import { AppGood, NotifyType, useChurchAppGoodStore, useChurchOrderStore, useChurchUserStore, User, Order, OrderType } from 'npool-cli-v4'
 import { getAppUsers } from 'src/api/user'
 import { useLocalApplicationStore } from 'src/localstore'
@@ -144,7 +145,7 @@ const onSubmit = () => {
     TargetUserID: selectedUser.value.value.ID,
     GoodID: selectedGood.value.value.GoodID,
     Units: units.value,
-    PaymentCoinID: selectedGood.value.value.CoinTypeID,
+    PaymentCoinID: payCoinID.value,
     OrderType: OrderType.Offline,
     Message: {
       Error: {
@@ -162,6 +163,17 @@ const onSubmit = () => {
   })
 }
 
+const coin = useCoinStore()
+const payCoinID = computed(() => {
+  const index = coin.Coins.findIndex((el) => {
+    return (el.ENV === selectedGood.value?.value.CoinEnv) && (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') || el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
+  })
+  if (index < 0) {
+    return undefined as unknown as string
+  }
+  return coin.Coins[index].ID
+})
+
 const prepare = () => {
   if (users.value.length === 0) {
     getAppUsers(0, 500)
@@ -174,5 +186,17 @@ watch(appID, () => {
 
 onMounted(() => {
   prepare()
+  coin.getCoins({
+    Message: {
+      Error: {
+        Title: 'MSG_GET_COINS',
+        Message: 'MSG_GET_COINS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 })
 </script>
