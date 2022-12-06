@@ -48,7 +48,7 @@
         <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_COIN_FOR_PAY")' /></div>
         <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_COIN_PRESALE")' /></div>
         <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_COIN_DISABLED")' /></div>
-        <!-- <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' /> -->
+        <div><q-toggle dense v-model='target.StableUSD' :label='$t("MSG_STABLEUSD")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -113,7 +113,8 @@ const updateTarget = computed(() => {
     HotWalletAccountAmount: target.value.HotWalletAccountAmount,
     LowFeeAmount: target.value.LowFeeAmount,
     HotWalletFeeAmount: target.value.HotWalletAccountAmount,
-    PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount
+    PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
+    StableUSD: target.value?.StableUSD
   }
 })
 const updateCoin = (done: () => void) => {

@@ -40,17 +40,15 @@
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_COIN_LOGO")' />
         <q-input v-model='target.HomePage' :label='$t("MSG_COIN_HOMEPAGE")' />
-        <!-- <q-input v-model='target.Specs' :label='$t("MSG_COIN_SPECS")' /> -->
-        <!-- <q-input type='number' v-model='target.ReservedAmount' :label='$t("MSG_COIN_RESERVED_AMOUNT")' /> -->
         <q-input type='number' v-model='target.WithdrawAutoReviewAmount' :label='$t("MSG_WITHDRAW_AUTO_REVIEW_AMOUNT")' />
         <q-input type='number' v-model='target.MarketValue' :label='$t("MSG_COIN_MARKET_VALUE")' />
         <q-input type='number' v-model.number='target.SettlePercent' :label='$t("MSG_COIN_SETTLE_PERCENT")' />
-        <!-- <q-select dense :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENVIRONMENT")' /> -->
+        <q-input type='number' v-model.number='target.DailyRewardAmount' :label='$t("MSG_DAILY_REWARD_AMOUNT")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div><q-toggle dense v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' /></div>
-        <div><q-toggle dense v-model='target.CoinForPay' :label='$t("MSG_COIN_FOR_PAY")' /><span class='tip'>ForPay: {{ target.ForPay }}</span></div>
-        <div><q-toggle dense v-model='target.CoinDisabled' :label='$t("MSG_COIN_DISABLE")' /><span class='tip'>Disabled: {{ target.Disabled }}</span></div>
+        <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_FOR_PAY")' /><span class='tip'>CoinForPay: {{ target.CoinForPay }}</span></div>
+        <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' /><span class='tip'>CoinDisabled: {{ target.CoinDisabled }}</span></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -116,7 +114,9 @@ const updateTarget = computed(() => {
     WithdrawAutoReviewAmount: target.value?.WithdrawAutoReviewAmount,
     MarketValue: target.value?.MarketValue,
     SettlePercent: target.value?.SettlePercent,
-    ProductPage: target.value?.ProductPage
+    ProductPage: target.value?.ProductPage,
+    DailyRewardAmount: target?.value?.DailyRewardAmount,
+    Disabled: target?.value?.Disabled
   }
 })
 
@@ -162,12 +162,12 @@ const createAppCoin = (done: () => void) => {
   })
 }
 
-watch([() => target.value?.CoinDisabled, () => target.value?.CoinForPay], () => {
-  if (target.value?.Disabled) {
-    target.value.CoinDisabled = true
+watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
+  if (target.value?.CoinDisabled) {
+    target.value.Disabled = true
   }
-  if (!target.value?.ForPay) {
-    target.value.CoinForPay = false
+  if (!target.value?.CoinForPay) {
+    target.value.ForPay = false
   }
 })
 
