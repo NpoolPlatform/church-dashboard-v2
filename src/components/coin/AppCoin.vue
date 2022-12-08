@@ -4,8 +4,10 @@
     flat
     :rows='displayCoins'
     row-key='ID'
+    selection='multiple'
     :title='$t("MSG_APP_COINS")'
     :rows-per-page-options='[10]'
+    v-model:selected='selectedCoin'
     @row-click='(evt, row, index) => onRowClick(row as AppCoin)'
   >
     <template #top-right>
@@ -23,6 +25,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='(selectedCoin.length === 0)'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -159,6 +169,26 @@ const createAppCoin = (done: () => void) => {
       return
     }
     onMenuHide()
+  })
+}
+
+const selectedCoin = ref([] as Array<AppCoin>)
+const onDelete = () => {
+  selectedCoin.value.forEach((el) => {
+    coin.deleteAppCoin({
+      ID: el.ID,
+      TargetAppID: el.AppID,
+      Message: {
+        Error: {
+          Title: 'MSG_DELETE_APP_COIN',
+          Message: 'MSG_DELETE_COIN_FAIL',
+          Popup: true,
+          Type: NotifyType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
   })
 }
 
