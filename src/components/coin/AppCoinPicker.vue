@@ -40,7 +40,7 @@ const coin = useChurchAppCoinStore()
 const coins = computed(() => Array.from(coin.getCoinsByAppID(appID.value)).map((el) => {
   return {
     value: el.ID,
-    label: el.Name
+    label: `${el.Name} | ${el.ID}`
   }
 }))
 const displayCoins = ref(coins.value)
