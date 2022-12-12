@@ -5,7 +5,7 @@
     :options='displayCoins'
     options-selected-class='text-deep-orange'
     emit-value
-    label='MSG_COINS'
+    :label='myLabel'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -28,11 +28,18 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 interface Props {
   id: string
   updating?: boolean
+  label?: string
 }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
+const label = toRef(props, 'label')
+
+const myLabel = computed(() => {
+  return !label.value ? 'MSG_COINS' : label.value
+})
+
 const target = ref(id.value)
 
 const coin = useChurchCoinStore()

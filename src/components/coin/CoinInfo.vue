@@ -28,12 +28,9 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.FeeCoinTypeID' :updating='updating' />
-        <!-- <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' /> -->
+        <CoinPicker v-model:id='target.FeeCoinTypeID' label='MSG_FEE_COIN_TYPE_ID' />
         <q-input v-model='target.ReservedAmount' :label='$t("MSG_COIN_RESERVED_AMOUNT")' />
-        <!-- <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' /> -->
         <q-input v-model='target.HomePage' :label='$t("MSG_COIN_HOMEPAGE")' />
-        <!-- <q-input v-model='target.Logo' :label='$t("MSG_COIN_LOGO")' /> -->
         <q-input v-model='target.Specs' :label='$t("MSG_COIN_SPECS")' />
       </q-card-section>
       <q-card-section>
