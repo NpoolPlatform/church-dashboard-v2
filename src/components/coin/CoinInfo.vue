@@ -69,7 +69,7 @@ const coins = computed(() => coin.Coins.Coins)
 
 const name = ref('')
 const displayCoins = computed(() => {
-  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()))
+  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
 })
 
 const showing = ref(false)
