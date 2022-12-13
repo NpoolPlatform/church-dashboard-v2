@@ -28,13 +28,15 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 interface Props {
   id: string
   updating?: boolean
-  label?: string
+  label?: string,
+  getData?: boolean
 }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
+const getData = toRef(props, 'getData')
 
 const myLabel = computed(() => {
   return !label.value ? 'MSG_COINS' : label.value
@@ -65,6 +67,10 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
+  if (getData.value === false) {
+    return
+  }
+
   if (coin.Coins.Coins.length === 0) {
     getCoins(0, 500)
   }

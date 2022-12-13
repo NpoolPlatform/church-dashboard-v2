@@ -49,7 +49,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
+        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
