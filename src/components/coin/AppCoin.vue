@@ -8,7 +8,6 @@
     :title='$t("MSG_APP_COINS")'
     :rows-per-page-options='[10]'
     v-model:selected='selectedCoin'
-    @row-click='(evt, row, index) => onRowClick(row as AppCoin)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -99,11 +98,11 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (row: AppCoin) => {
-  target.value = { ...row }
-  showing.value = true
-  updating.value = true
-}
+// const onRowClick = (row: AppCoin) => {
+//   target.value = { ...row }
+//   showing.value = true
+//   updating.value = true
+// }
 
 const onCancel = () => {
   onMenuHide()
