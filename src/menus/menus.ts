@@ -210,35 +210,6 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '限额设置',
-    caption: '管理公告与通知',
-    icon: 'pending',
-    target: '/limits',
-    level: 0,
-    sectionBegin: false,
-    children: [
-      {
-        menuId: uid(),
-        label: '平台限额(USD)',
-        caption: '管理热钱包、支付划转和自动审核限额',
-        icon: 'perm_identity',
-        target: '/limits/platform',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '提现自动审核限额(币)',
-        caption: '设置提现自动审核币额度',
-        icon: 'perm_identity',
-        target: '/limits/withdraw',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem
-    ]
-  } as MenuItem, {
-    menuId: uid(),
     label: '国际化',
     caption: '管理应用语言包',
     icon: 'perm_identity',
