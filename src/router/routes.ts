@@ -181,18 +181,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'review/payment',
-        component: () => import('pages/review/Payment.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'users',
         component: () => import('pages/user/User.vue'),
         meta: {
@@ -709,18 +697,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'billing/benefit',
-        component: () => import('pages/billing/Benefit.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'billing/order',
         component: () => import('pages/billing/Order.vue'),
         meta: {
@@ -747,18 +723,6 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'billing/purchase',
         component: () => import('pages/billing/Purchase.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'billing/user/benefit',
-        component: () => import('pages/billing/UserBenefit.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

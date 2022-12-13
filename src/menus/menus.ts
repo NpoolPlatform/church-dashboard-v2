@@ -432,15 +432,6 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '超时支付',
-        caption: '管理超时支付账户',
-        icon: 'format_list_numbered',
-        target: '/review/payment',
-        level: 1,
-        sectionBegin: false,
-        children: []
       } as MenuItem
     ]
   } as MenuItem, {
@@ -655,15 +646,6 @@ const MainDrawerMenus = [
     sectionBegin: false,
     children: [{
       menuId: uid(),
-      label: '商品收益',
-      caption: '查看商品收益统计',
-      icon: 'format_list_numbered',
-      target: '/billing/benefit',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, {
-      menuId: uid(),
       label: '订单',
       caption: '查看订单列表',
       icon: 'format_list_numbered',
@@ -686,15 +668,6 @@ const MainDrawerMenus = [
       caption: '算力采购支出',
       icon: 'format_list_numbered',
       target: '/billing/purchase',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, {
-      menuId: uid(),
-      label: '用户分成',
-      caption: '用户每日分成记录',
-      icon: 'format_list_numbered',
-      target: '/billing/user/benefit',
       level: 1,
       sectionBegin: false,
       children: []
