@@ -109,7 +109,7 @@ const updateTarget = computed(() => {
     CollectFeeAmount: target.value.CollectFeeAmount,
     HotWalletAccountAmount: target.value.HotWalletAccountAmount,
     LowFeeAmount: target.value.LowFeeAmount,
-    HotWalletFeeAmount: target.value.HotWalletAccountAmount,
+    HotWalletFeeAmount: target.value.HotWalletFeeAmount,
     PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
     StableUSD: target.value?.StableUSD,
     Disabled: target.value?.Disabled
