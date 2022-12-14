@@ -67,11 +67,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (getData.value === false) {
-    return
-  }
-
-  if (coin.Coins.Coins.length === 0) {
+  if (coin.Coins.Coins.length === 0 && getData.value === undefined) {
     getCoins(0, 500)
   }
 })
