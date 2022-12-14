@@ -136,6 +136,8 @@ const updateCoin = (done: () => void) => {
 }
 
 onMounted(() => {
-  getCoins(0, 500)
+  if (coin.Coins.Coins.length === 0) {
+    getCoins(0, 500)
+  }
 })
 </script>

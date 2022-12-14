@@ -67,7 +67,9 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (coin.Coins.Coins.length === 0 && getData.value === undefined) {
+  console.log('getData: ', getData.value)
+  if (coin.Coins.Coins.length === 0 && (getData.value === undefined || getData.value === false)) {
+    console.log('执行了...')
     getCoins(0, 500)
   }
 })
