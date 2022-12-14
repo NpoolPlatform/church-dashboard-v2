@@ -49,7 +49,7 @@
 
 <script setup lang='ts'>
 import { AccountUsedFor, AccountUsedFors, NotifyType, PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
-import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits, watch } from 'vue'
+import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits } from 'vue'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -90,14 +90,6 @@ const onCancel = () => {
 const onSubmit = (done: () => void) => {
   updating.value ? updatePlatformAccount(done) : createPlatformAccount(done)
 }
-
-// Active & Blocked is exclusive
-watch(() => target.value?.Active, () => {
-  target.value.Blocked = !target.value.Active
-})
-watch(() => target.value?.Blocked, () => {
-  target.value.Active = !target.value.Blocked
-})
 
 const platform = useChurchPlatformAccountStore()
 
