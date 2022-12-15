@@ -37,10 +37,10 @@ const updating = toRef(props, 'updating')
 const target = ref(id.value)
 
 const coin = useChurchAppCoinStore()
-const coins = computed(() => Array.from(coin.getCoinsByAppID(appID.value)).map((el) => {
+const coins = computed(() => Array.from(coin.getCoinsByAppID(appID.value).filter((el) => !el.Disabled)).map((el) => {
   return {
-    value: el.ID,
-    label: `${el.Name} | ${el.ID}`
+    value: el.CoinTypeID,
+    label: `${el.Name} | ${el.CoinTypeID}`
   }
 }))
 const displayCoins = ref(coins.value)
