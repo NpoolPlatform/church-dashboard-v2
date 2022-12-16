@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { API } from './const'
 import {
-  GetAppAppLangsRequest,
-  GetAppAppLangsResponse,
+  GetAppLangsRequest,
+  GetAppLangsResponse,
   AppLang,
   CreateAppLangRequest,
   CreateAppLangResponse,
@@ -27,12 +27,12 @@ export const useChurchAppLangStore = defineStore('church-applang-v4', {
     }
   },
   actions: {
-    getAppAppLangs (req: GetAppAppLangsRequest, done: (error: boolean, rows: Array<AppLang>) => void) {
-      doActionWithError<GetAppAppLangsRequest, GetAppAppLangsResponse>(
+    getAppLangs (req: GetAppLangsRequest, done: (error: boolean, rows: Array<AppLang>) => void) {
+      doActionWithError<GetAppLangsRequest, GetAppLangsResponse>(
         API.GET_APP_APPLANGS,
         req,
         req.Message,
-        (resp: GetAppAppLangsResponse): void => {
+        (resp: GetAppLangsResponse): void => {
           const data = this.getAppLangsByAppID(req.TargetAppID)
           data.push(...resp.Infos)
           this.AppLangs.AppLangs.set(req.TargetAppID, data)

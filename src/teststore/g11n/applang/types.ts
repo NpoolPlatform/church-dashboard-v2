@@ -33,13 +33,13 @@ export interface DeleteAppLangResponse {
   Info: AppLang;
 }
 
-export interface GetAppAppLangsRequest extends BaseRequest {
+export interface GetAppLangsRequest extends BaseRequest {
   TargetAppID: string;
   Offset: number;
   Limit: number;
 }
 
-export interface GetAppAppLangsResponse {
+export interface GetAppLangsResponse {
   Infos: AppLang[];
   Total: number;
 }

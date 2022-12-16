@@ -15,15 +15,15 @@ import { doActionWithError } from 'npool-cli-v4'
 
 export const useChurchLangStore = defineStore('church-lang-v4', {
   state: () => ({
-    Lang: {
-      Lang: [] as Array<Lang>,
+    Langs: {
+      Langs: [] as Array<Lang>,
       Total: 0
     }
   }),
   getters: {
     getLangByID () {
       return (ID: string) => {
-        return this.Lang.Lang.find((el) => el.ID === ID)
+        return this.Langs.Langs.find((el) => el.ID === ID)
       }
     }
   },
@@ -34,8 +34,8 @@ export const useChurchLangStore = defineStore('church-lang-v4', {
         req,
         req.Message,
         (resp: GetLangsResponse): void => {
-          this.Lang.Lang.push(...resp.Infos)
-          this.Lang.Total = resp.Total
+          this.Langs.Langs.push(...resp.Infos)
+          this.Langs.Total = resp.Total
           done(false, resp.Infos)
         }, () => {
           done(true, [])
@@ -48,8 +48,8 @@ export const useChurchLangStore = defineStore('church-lang-v4', {
         req,
         req.Message,
         (resp: UpdateLangResponse): void => {
-          const index = this.Lang.Lang.findIndex((el) => el.ID === resp.Info.ID)
-          this.Lang.Lang.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
+          const index = this.Langs.Langs.findIndex((el) => el.ID === resp.Info.ID)
+          this.Langs.Langs.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
           done(false, resp.Info)
         }, () => {
           done(true, {} as Lang)
@@ -62,8 +62,8 @@ export const useChurchLangStore = defineStore('church-lang-v4', {
         req,
         req.Message,
         (resp: CreateLangResponse): void => {
-          const index = this.Lang.Lang.findIndex((el) => el.ID === resp.Info.ID)
-          this.Lang.Lang.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
+          const index = this.Langs.Langs.findIndex((el) => el.ID === resp.Info.ID)
+          this.Langs.Langs.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
           done(false, resp.Info)
         }, () => {
           done(true, {} as Lang)
@@ -77,8 +77,8 @@ export const useChurchLangStore = defineStore('church-lang-v4', {
         req.Message,
         (resp: CreateLangsResponse): void => {
           resp.Infos.forEach((al) => {
-            const index = this.Lang.Lang.findIndex((el) => el.ID === al.ID)
-            this.Lang.Lang.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, al)
+            const index = this.Langs.Langs.findIndex((el) => el.ID === al.ID)
+            this.Langs.Langs.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, al)
           })
           done(false, resp.Infos)
         }, () => {

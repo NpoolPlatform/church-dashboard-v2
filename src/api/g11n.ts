@@ -1,8 +1,12 @@
 import { NotifyType } from 'npool-cli-v4'
 import { useChurchAppCountryStore } from 'src/teststore/g11n/appcountry'
 import { AppCountry } from 'src/teststore/g11n/appcountry/types'
+import { useChurchAppLangStore } from 'src/teststore/g11n/applang'
+import { AppLang } from 'src/teststore/g11n/applang/types'
 import { useChurchCountryStore } from 'src/teststore/g11n/country'
 import { Country } from 'src/teststore/g11n/country/types'
+import { useChurchLangStore } from 'src/teststore/g11n/lang'
+import { Lang } from 'src/teststore/g11n/lang/types'
 import { appID } from './app'
 
 const country = useChurchCountryStore()
@@ -45,5 +49,48 @@ export const getAppCountries = (offset: number, limit: number) => {
       return
     }
     getAppCountries(offset + limit, limit)
+  })
+}
+
+const lang = useChurchLangStore()
+export const getLangs = (offset: number, limit: number) => {
+  lang.getLangs({
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_LANGUAGES',
+        Message: 'MSG_GET_LANGUAGES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (error: boolean, rows: Array<Lang>) => {
+    if (error || rows.length === 0) {
+      return
+    }
+    getLangs(offset + limit, limit)
+  })
+}
+
+const appLang = useChurchAppLangStore()
+export const getAppLangs = (offset: number, limit: number) => {
+  appLang.getAppLangs({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_APP_LANGUAGES',
+        Message: 'MSG_GET_APP_LANGUAGES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (error: boolean, rows: Array<AppLang>) => {
+    if (error || rows.length === 0) {
+      return
+    }
+    getAppLangs(offset + limit, limit)
   })
 }
