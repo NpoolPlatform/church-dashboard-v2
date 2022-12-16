@@ -30,13 +30,13 @@ export interface DeleteAppCountryResponse {
   Info: AppCountry;
 }
 
-export interface GetAppAppCountriesRequest extends BaseRequest {
+export interface GetAppCountriesRequest extends BaseRequest {
   TargetAppID: string;
   Offset: number;
   Limit: number;
 }
 
-export interface GetAppAppCountriesResponse {
+export interface GetAppCountriesResponse {
   Infos: AppCountry[];
   Total: number;
 }

@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { API } from './const'
 import {
-  GetAppAppCountriesRequest,
-  GetAppAppCountriesResponse,
+  GetAppCountriesRequest,
+  GetAppCountriesResponse,
   AppCountry,
   CreateAppCountryRequest,
   CreateAppCountryResponse,
@@ -27,12 +27,12 @@ export const useChurchAppCountryStore = defineStore('church-appcountry-v4', {
     }
   },
   actions: {
-    getAppAppCountries (req: GetAppAppCountriesRequest, done: (error: boolean, countries: Array<AppCountry>) => void) {
-      doActionWithError<GetAppAppCountriesRequest, GetAppAppCountriesResponse>(
+    getAppCountries (req: GetAppCountriesRequest, done: (error: boolean, countries: Array<AppCountry>) => void) {
+      doActionWithError<GetAppCountriesRequest, GetAppCountriesResponse>(
         API.GET_APP_APPCOUNTRIES,
         req,
         req.Message,
-        (resp: GetAppAppCountriesResponse): void => {
+        (resp: GetAppCountriesResponse): void => {
           const data = this.getCountriesByAppID(req.TargetAppID)
           data.push(...resp.Infos)
           this.AppCountries.AppCountries.set(req.TargetAppID, data)
