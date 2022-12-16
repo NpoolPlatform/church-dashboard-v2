@@ -67,6 +67,7 @@
       </div>
     </template>
   </q-table>
+  <AppCountry />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -96,7 +97,8 @@ import { NotificationType, useChurchLangStore } from 'npool-cli-v2'
 import { NotifyType, formatTime } from 'npool-cli-v4'
 import { useChurchCountryStore } from 'src/teststore/g11n/country'
 import { Country, UpdateCountryRequest } from 'src/teststore/g11n/country/types'
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
+import AppCountry from './AppCountry.vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -235,32 +237,6 @@ const onSubmitLoaded = () => {
     }
   }, () => {
     // TODO
-  })
-}
-
-onMounted(() => {
-  if (countries.value.length === 0) {
-    getCountries(0, 100)
-  }
-})
-
-const getCountries = (offset: number, limit: number) => {
-  country.getCountries({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COUNTRIES',
-        Message: 'MSG_GET_COUNTRIES_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (error: boolean, rows: Array<Country>) => {
-    if (error || rows.length === 0) {
-      return
-    }
-    getCountries(offset + limit, limit)
   })
 }
 </script>
