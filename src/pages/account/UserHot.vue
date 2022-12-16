@@ -1,11 +1,11 @@
 <template>
-  <Benefit />
+  <UserHot />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const Benefit = defineAsyncComponent(() => import('src/components/billing/Benefit.vue'))
+const UserHot = defineAsyncComponent(() => import('src/components/account/UserHot.vue'))
 
 </script>
 

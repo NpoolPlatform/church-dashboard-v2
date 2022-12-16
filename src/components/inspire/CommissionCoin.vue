@@ -29,10 +29,10 @@
         <span>{{ $t('MSG_CREATE_COMMISSION_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
+        <AppCoinPicker v-model:id='target.CoinTypeID' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -44,56 +44,34 @@ import {
   useChurchCommissionStore,
   CommissionCoinSetting,
   NotificationType,
-  useCommissionStore,
-  useCoinStore,
-  Coin
+  useCommissionStore
 } from 'npool-cli-v2'
-import { computed, onMounted, ref, watch } from 'vue'
+import { useChurchAppCoinStore } from 'npool-cli-v4'
+import { appID } from 'src/api/app'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
+const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+
 const commission = useChurchCommissionStore()
 const acommission = useCommissionStore()
-const coin = useCoinStore()
-
-interface MyCoin {
-  label: string
-  value: Coin
-}
-const coins = computed(() => Array.from(coin.Coins).map((el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-const selectedCoin = ref(undefined as unknown as MyCoin)
 
 interface MySetting extends CommissionCoinSetting {
   CoinName: string
 }
 
+const coin = useChurchAppCoinStore()
 const settings = computed(() => Array.from(acommission.CommissionCoinSettings).map((el) => {
   const s = el as MySetting
-  s.CoinName = coin.getCoinByID(el.CoinTypeID)?.Name as string
+  s.CoinName = coin.getCoinByID(appID.value, el.CoinTypeID)?.Name as string
   return s
 }))
 
 onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
   acommission.getCommissionCoinSettings({
     Message: {
       Error: {
@@ -110,9 +88,6 @@ onMounted(() => {
 
 const showing = ref(false)
 const target = ref({} as CommissionCoinSetting)
-watch(selectedCoin, () => {
-  target.value.CoinTypeID = selectedCoin.value?.value.ID as string
-})
 
 const onCreate = () => {
   showing.value = true
@@ -121,7 +96,7 @@ const onCreate = () => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    CoinTypeID: selectedCoin.value?.value.ID
+    CoinTypeID: target.value?.CoinTypeID
   } as CommissionCoinSetting
 }
 

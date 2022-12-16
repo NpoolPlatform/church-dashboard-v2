@@ -23,7 +23,7 @@ const MainDrawerMenus = [
       {
         menuId: uid(),
         label: '币种',
-        caption: '添加、删除与修改',
+        caption: '管理币种|收益估算',
         icon: 'pending',
         target: '/coins',
         level: 0,
@@ -32,36 +32,9 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '币种描述',
-        caption: '为币种添加描述',
+        caption: '管理币种描述',
         icon: 'pending',
         target: '/coin/descriptions',
-        level: 0,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '币种产品信息',
-        caption: '为币种添加产品信息',
-        icon: 'pending',
-        target: '/coin/productinfos',
-        level: 0,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '收益估算',
-        caption: '设置估算收益(产出预言机)',
-        icon: 'pending',
-        target: '/coin/oracle/reward',
-        level: 0,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '币种汇率',
-        caption: '设置周期汇率(价格预言机)',
-        icon: 'pending',
-        target: '/coin/oracle/currency',
         level: 0,
         sectionBegin: false,
         children: []
@@ -116,26 +89,35 @@ const MainDrawerMenus = [
     children: [
       {
         menuId: uid(),
-        label: '平台托管账户',
-        caption: '管理平台托管账户',
+        label: '平台入金归集地址',
+        caption: '管理平台入金归集地址',
         icon: 'perm_identity',
-        target: '/account/platform/hold',
+        target: '/account/platform/collector',
         level: 1,
         sectionBegin: false,
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '用户账户',
-        caption: '管理用户账户',
+        label: '用户冷钱包',
+        caption: '用户收益部分离线管理地址',
         icon: 'perm_identity',
-        target: '/account/user/hold',
+        target: '/account/user/cold',
         level: 1,
         sectionBegin: false,
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '商品收益账户',
-        caption: '管理商品收益账户',
+        label: '用户热钱包',
+        caption: '用户提现出金地址',
+        icon: 'perm_identity',
+        target: '/account/user/hot',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '商品收益地址',
+        caption: '管理商品收益地址',
         icon: 'perm_identity',
         target: '/account/benefit',
         level: 1,
@@ -143,8 +125,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '平台账户',
-        caption: '管理平台收益账户',
+        label: '平台冷钱包',
+        caption: '平台收益部分离线管理地址',
         icon: 'perm_identity',
         target: '/account/platform',
         level: 1,
@@ -152,8 +134,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '支付账户',
-        caption: '购买支付转账账户',
+        label: '商品购买支付地址',
+        caption: '管理商品购买支付地址',
         icon: 'perm_identity',
         target: '/account/payment',
         level: 1,
@@ -161,8 +143,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '支付账户GAS充值',
-        caption: '向支付账户充值GAS',
+        label: '手续费供应地址',
+        caption: '管理手续费供应地址',
         icon: 'perm_identity',
         target: '/account/gasfeeder',
         level: 1,
@@ -170,10 +152,19 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '提现地址',
+        label: '用户提现地址',
         caption: '用户提现地址',
         icon: 'perm_identity',
         target: '/account/withdraw',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '用户直接收益地址',
+        caption: '用户直接从商品获取收益的地址',
+        icon: 'perm_identity',
+        target: '/account/directbenefit',
         level: 1,
         sectionBegin: false,
         children: []
@@ -212,35 +203,6 @@ const MainDrawerMenus = [
         caption: '管理应用站内信',
         icon: 'perm_identity',
         target: '/mail',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem
-    ]
-  } as MenuItem, {
-    menuId: uid(),
-    label: '限额设置',
-    caption: '管理公告与通知',
-    icon: 'pending',
-    target: '/limits',
-    level: 0,
-    sectionBegin: false,
-    children: [
-      {
-        menuId: uid(),
-        label: '平台限额(USD)',
-        caption: '管理热钱包、支付划转和自动审核限额',
-        icon: 'perm_identity',
-        target: '/limits/platform',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '提现自动审核限额(币)',
-        caption: '设置提现自动审核币额度',
-        icon: 'perm_identity',
-        target: '/limits/withdraw',
         level: 1,
         sectionBegin: false,
         children: []
@@ -423,7 +385,7 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
+      } as MenuItem, /* {
         menuId: uid(),
         label: '提现地址',
         caption: '审核体现地址设置',
@@ -432,21 +394,12 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
+      } as MenuItem, */{
         menuId: uid(),
         label: '提现请求',
         caption: '审核提现请求',
         icon: 'format_list_numbered',
         target: '/review/withdraw',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '超时支付',
-        caption: '管理超时支付账户',
-        icon: 'format_list_numbered',
-        target: '/review/payment',
         level: 1,
         sectionBegin: false,
         children: []
@@ -664,24 +617,6 @@ const MainDrawerMenus = [
     sectionBegin: false,
     children: [{
       menuId: uid(),
-      label: '商品收益',
-      caption: '查看商品收益统计',
-      icon: 'format_list_numbered',
-      target: '/billing/benefit',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, /* {
-      menuId: uid(),
-      label: '销售收入',
-      caption: '查看用户购买支付收入',
-      icon: 'format_list_numbered',
-      target: '/billing/incoming',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, */ {
-      menuId: uid(),
       label: '订单',
       caption: '查看订单列表',
       icon: 'format_list_numbered',
@@ -704,15 +639,6 @@ const MainDrawerMenus = [
       caption: '算力采购支出',
       icon: 'format_list_numbered',
       target: '/billing/purchase',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, {
-      menuId: uid(),
-      label: '用户分成',
-      caption: '用户每日分成记录',
-      icon: 'format_list_numbered',
-      target: '/billing/user/benefit',
       level: 1,
       sectionBegin: false,
       children: []

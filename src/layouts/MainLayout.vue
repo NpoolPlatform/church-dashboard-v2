@@ -22,9 +22,7 @@ import {
   notify as OldNotify,
   useErrorSwitcherStore as useOldErrorSwitcherStore,
   SwitchTarget as OldSwitchTarget,
-  ErrorTarget as OldErrorTarget,
-  NotificationType,
-  useCoinStore
+  ErrorTarget as OldErrorTarget
 } from 'npool-cli-v2'
 
 import { ErrorTarget, notify, SwitchTarget, useErrorStore, useLocalUserStore, useNotificationStore, User } from 'npool-cli-v4'
@@ -72,8 +70,6 @@ watch(triggerV4, () => {
   }
 })
 
-const coin = useCoinStore()
-
 onMounted(() => {
   notification.$subscribe((_, state) => {
     state.Notifications.forEach((notif, index) => {
@@ -91,21 +87,6 @@ onMounted(() => {
       }
     })
   })
-
-  if (coin.Coins.length === 0) {
-    coin.getCoins({
-      Message: {
-        Error: {
-          Title: 'MSG_GET_COINS',
-          Message: 'MSG_GET_COINS_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  }
 })
 </script>
 

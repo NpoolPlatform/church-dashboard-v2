@@ -2,14 +2,6 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_COINS")'
-    :rows='coins'
-    row-key='ID'
-    :rows-per-page-options='[10]'
-  />
-  <q-table
-    dense
-    flat
     :title='$t("MSG_GOODS")'
     :rows='goods'
     row-key='ID'
@@ -89,15 +81,11 @@
 </template>
 
 <script setup lang='ts'>
-import {
-  useCoinStore
-} from 'npool-cli-v2'
 import { useLocalApplicationStore } from 'src/localstore'
 import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAppGoods, getGoods } from 'src/api/good'
-import { getCoins } from 'src/api/coin'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -106,9 +94,6 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
-
-const coin = useCoinStore()
-const coins = computed(() => coin.Coins)
 
 const good = useChurchGoodStore()
 const goods = computed(() => good.Goods.Goods)
@@ -222,9 +207,6 @@ onMounted(() => {
 
   if (goods.value.length === 0) {
     getGoods(0, 500)
-  }
-  if (coin.Coins.length === 0) {
-    getCoins()
   }
 })
 

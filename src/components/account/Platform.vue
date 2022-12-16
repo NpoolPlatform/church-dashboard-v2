@@ -2,369 +2,90 @@
   <q-table
     dense
     flat
-    :rows='settings'
+    :rows='displayPlatformAccounts'
+    :title='$t("MSG_PLATFORM_ADDRESSES")'
     row-key='ID'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as CoinSetting)'
+    @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
   >
-    <template #top-right>
-      <div class='row indent flat'>
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_CREATE")'
-          @click='onCreate'
-        />
+    <template #top>
+      <div class='row justify-end table-right'>
+        <TableHeaderFilter v-model:backup='backup' v-model:blocked='blocked' v-model:active='active' v-model:locked='locked' />
+        <div class='row indent flat align-bottom'>
+          <q-btn
+            dense
+            flat
+            class='btn flat'
+            :label='$t("MSG_CREATE")'
+            @click='onCreate'
+          />
+        </div>
       </div>
     </template>
   </q-table>
-  <q-dialog
-    v-model='showing'
-    @hide='onMenuHide'
-    position='right'
-  >
-    <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
-      </q-card-section>
-      <q-card-section>
-        <q-select :options='coins' v-model='selectedCoin' :label='$t("MSG_COIN_TYPE")' />
-        <q-select :options='userAccounts' v-model='selectedIncomingAccount' :label='$t("MSG_GOOD_INCOMING_ACCOUNT")' />
-        <q-select :options='userAccounts' v-model='selectedPlatformOfflineAccount' :label='$t("MSG_PLATFORM_OFFLINE_ACCOUNT")' />
-        <q-select :options='userAccounts' v-model='selectedUserOfflineAccount' :label='$t("MSG_USER_OFFLINE_ACCOUNT")' />
-        <q-select :options='platformAccounts' v-model='selectedUserOnlineAccount' :label='$t("MSG_USER_ONLINE_ACCOUNT")' />
-        <q-select :options='platformAccounts' v-model='selectedGasProviderAccount' :label='$t("MSG_GAS_PROVIDER_ACCOUNT")' />
-        <q-input
-          type='number'
-          v-model='target.WarmAccountCoinAmount'
-          :label='$t("MSG_WARM_ACCOUNT_COIN_AMOUNT")'
-          :suffix='selectedCoin?.value?.Unit'
-        />
-        <q-input
-          type='number'
-          v-model='target.PaymentAccountCoinAmount'
-          :label='$t("MSG_PAYMENT_ACCOUNT_COIN_AMOUNT")'
-          :suffix='selectedCoin?.value?.Unit'
-        />
-      </q-card-section>
-      <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
-      </q-item>
-    </q-card>
-  </q-dialog>
+  <UsedFor v-model:update='updating' v-model:visible='showing' v-model:account='target' />
 </template>
 
 <script setup lang='ts'>
-import {
-  Account,
-  useChurchAccountStore,
-  useCoinStore,
-  NotificationType,
-  Coin,
-  useCoinSettingStore,
-  CoinSetting,
-  useGoodSettingStore,
-  WithdrawAddress
-} from 'npool-cli-v2'
-import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { PlatformAccount, useChurchPlatformAccountStore, AccountUsedFor } from 'npool-cli-v4'
+import { getPlatformAccounts } from 'src/api/account'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
+const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
+const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const account = useChurchAccountStore()
-const coin = useCoinStore()
-const setting = useCoinSettingStore()
-const gsetting = useGoodSettingStore()
+const platform = useChurchPlatformAccountStore()
+const platformAccounts = computed(() => platform.getAccountsByKey(AccountUsedFor.PlatformBenefitCold))
 
-interface MySetting extends CoinSetting {
-  CoinName: string
-  GoodIncomingAddress: string
-  PlatformOfflineAddress: string
-  UserOfflineAddress: string
-  UserOnlineAddress: string
-  GasProviderAddress: string
-}
+const backup = ref(null)
+const blocked = ref(null)
+const active = ref(null)
+const locked = ref(null)
 
-const settings = computed(() => Array.from(setting.CoinSettings).map((el) => {
-  const cs = el as MySetting
-  cs.CoinName = coin.getCoinByID(cs.CoinTypeID)?.Name as string
-  cs.GoodIncomingAddress = account.getAccountByID(cs.GoodIncomingAccountID as string)?.Address
-  cs.PlatformOfflineAddress = account.getAccountByID(cs.PlatformOfflineAccountID as string)?.Address
-  cs.UserOfflineAddress = account.getAccountByID(cs.UserOfflineAccountID as string)?.Address
-  cs.UserOnlineAddress = account.getAccountByID(cs.UserOnlineAccountID as string)?.Address
-  cs.GasProviderAddress = account.getAccountByID(cs.GasProviderAccountID as string)?.Address
-  return cs
+const displayPlatformAccounts = computed(() => platformAccounts.value.filter((el) => {
+  let flag = true
+  if (backup.value !== null) {
+    flag = flag && el.Backup === backup.value
+  }
+  if (blocked.value !== null) {
+    flag = flag && el.Blocked === blocked.value
+  }
+  if (active.value !== null) {
+    flag = flag && el.Active === active.value
+  }
+  if (locked.value !== null) {
+    flag = flag && el.Locked === locked.value
+  }
+  return flag
 }))
-
-interface MyCoin {
-  label: string
-  value: Coin
-}
-
-const coins = computed(() => Array.from(coin.Coins).map((el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-const selectedCoin = computed({
-  get: () => {
-    return {
-      label: coin.getCoinByID(target.value.CoinTypeID)?.Name,
-      value: coin.getCoinByID(target.value.CoinTypeID)
-    } as MyCoin
-  },
-  set: (val) => {
-    target.value.CoinTypeID = val.value.ID as string
-  }
-})
-
-interface MyAccount {
-  label: string
-  value: Account
-}
-
-const accounts = computed(() => account.Accounts.filter((el) => {
-  let index = settings.value.findIndex((cs) => {
-    return cs.PlatformOfflineAccountID === el.ID ||
-           cs.UserOfflineAccountID === el.ID ||
-           cs.UserOnlineAccountID === el.ID ||
-           cs.GoodIncomingAccountID === el.ID ||
-           cs.GasProviderAccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  index = gsetting.GoodBenefits.findIndex((gs) => {
-    return gs.BenefitAccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  index = account.GoodPayments.findIndex((gp) => {
-    return gp.AccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  const addresses = account.WithdrawAddresses.get(appID.value) ? account.WithdrawAddresses.get(appID.value) as Array<WithdrawAddress> : []
-  index = addresses.findIndex((wa) => {
-    return wa.AccountID === el.ID
-  })
-  if (index >= 0) {
-    return false
-  }
-  return el.CoinTypeID === selectedCoin.value?.value?.ID
-}).map((el) => {
-  return {
-    label: selectedCoin.value?.value?.Name as string + ' | ' + el.Address,
-    value: el
-  } as MyAccount
-}))
-
-const platformAccounts = computed(() => accounts.value.filter((el) => el.value.PlatformHoldPrivateKey))
-const userAccounts = computed(() => accounts.value.filter((el) => !el.value.PlatformHoldPrivateKey))
-
-const constructAccount = (id: string): MyAccount => {
-  const ac = account.getAccountByID(id)
-  if (!ac) {
-    return undefined as unknown as MyAccount
-  }
-  const cc = coin.getCoinByID(ac?.CoinTypeID)
-  return {
-    label: cc?.Name as string + ' | ' + ac?.Address,
-    value: ac
-  } as MyAccount
-}
-
-const selectedIncomingAccount = computed({
-  get: () => constructAccount(target.value.GoodIncomingAccountID as string),
-  set: (val) => {
-    target.value.GoodIncomingAccountID = val.value.ID as string
-  }
-})
-const selectedPlatformOfflineAccount = computed({
-  get: () => constructAccount(target.value.PlatformOfflineAccountID as string),
-  set: (val) => {
-    target.value.PlatformOfflineAccountID = val.value.ID as string
-  }
-})
-const selectedUserOfflineAccount = computed({
-  get: () => constructAccount(target.value.UserOfflineAccountID as string),
-  set: (val) => {
-    target.value.UserOfflineAccountID = val.value.ID as string
-  }
-})
-const selectedUserOnlineAccount = computed({
-  get: () => constructAccount(target.value.UserOnlineAccountID as string),
-  set: (val) => {
-    target.value.UserOnlineAccountID = val.value.ID as string
-  }
-})
-const selectedGasProviderAccount = computed({
-  get: () => constructAccount(target.value.GasProviderAccountID as string),
-  set: (val) => {
-    target.value.GasProviderAccountID = val.value.ID as string
-  }
-})
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as unknown as CoinSetting)
-
-watch(appID, () => {
-  account.getWithdrawAddresses({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_WITHDRAW_ADDRESSES',
-        Message: 'MSG_GET_WITHDRAW_ADDRESSES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
-
-onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  account.getAccounts({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_ACCOUNTS',
-        Message: 'MSG_GET_ACCOUNTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  setting.getGCoinSettings({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COIN_SETTINGS',
-        Message: 'MSG_GET_COIN_SETTINGS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  gsetting.getGoodBenefits({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOOD_BENEFITS',
-        Message: 'MSG_GET_GOOD_BENEFITS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  account.getGoodPayments({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOOD_PAYMENTS',
-        Message: 'MSG_GET_GOOD_PAYMENTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-})
-
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {} as unknown as CoinSetting
-}
+const target = ref({} as PlatformAccount)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value = { UsedFor: AccountUsedFor.PlatformBenefitCold } as PlatformAccount
 }
 
-const onRowClick = (acc: CoinSetting) => {
-  target.value = acc
+const onRowClick = (row: PlatformAccount) => {
+  target.value = { ...row }
   showing.value = true
   updating.value = true
 }
 
-const onSubmit = () => {
-  showing.value = false
-
-  const accs = new Map<string, number>()
-  accs.set(target.value.GoodIncomingAccountID as string, 1)
-  accs.set(target.value.PlatformOfflineAccountID as string, 1)
-  accs.set(target.value.UserOfflineAccountID as string, 1)
-  accs.set(target.value.UserOnlineAccountID as string, 1)
-  accs.set(target.value.GasProviderAccountID as string, 1)
-  if (accs.size < 5) {
-    return
+onMounted(() => {
+  if (platform.PlatformAccounts.PlatformAccounts.length === 0) {
+    getPlatformAccounts(0, 500)
   }
-
-  if (!selectedCoin.value) {
-    return
-  }
-
-  if (updating.value) {
-    setting.updateCoinSetting({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_COIN_SETTING',
-          Message: 'MSG_UPDATE_COIN_SETTING_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
-  }
-
-  setting.createCoinSetting({
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_COIN_SETTING',
-        Message: 'MSG_CREATE_COIN_SETTING_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-const onCancel = () => {
-  onMenuHide()
-}
-
+})
 </script>
+<style lang='sass' scoped>
+.table-right
+  width: 100%
+  ::v-deep .button
+    line-height: 30px
+    height: 30px
+    margin-left: 10px
+</style>

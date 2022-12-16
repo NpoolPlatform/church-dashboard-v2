@@ -2,8 +2,8 @@
   <q-table
     dense
     flat
-    :rows='displayGasProvider'
-    :title='$t("MSG_GAS_FEEDER")'
+    :rows='displayUserBenefitCold'
+    :title='$t("MSG_USER_BENEFIT_COLDS")'
     row-key='ID'
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
@@ -35,14 +35,14 @@ const UsedFor = defineAsyncComponent(() => import('src/components/account/Accoun
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
 const platform = useChurchPlatformAccountStore()
-const gasProvider = computed(() => platform.getAccountsByKey(AccountUsedFor.GasProvider))
+const userBenefitCold = computed(() => platform.getAccountsByKey(AccountUsedFor.UserBenefitCold))
 
 const backup = ref(null)
 const blocked = ref(null)
 const active = ref(null)
 const locked = ref(null)
 
-const displayGasProvider = computed(() => gasProvider.value.filter((el) => {
+const displayUserBenefitCold = computed(() => userBenefitCold.value.filter((el) => {
   let flag = true
   if (backup.value !== null) {
     flag = flag && el.Backup === backup.value
@@ -66,7 +66,7 @@ const target = ref({} as PlatformAccount)
 const onCreate = () => {
   showing.value = true
   updating.value = false
-  target.value = { UsedFor: AccountUsedFor.GasProvider } as PlatformAccount
+  target.value = { UsedFor: AccountUsedFor.UserBenefitCold } as PlatformAccount
 }
 
 const onRowClick = (row: PlatformAccount) => {

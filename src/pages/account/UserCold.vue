@@ -1,11 +1,11 @@
 <template>
-  <Payment />
+  <UserCold />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const Payment = defineAsyncComponent(() => import('src/components/review/Payment.vue'))
+const UserCold = defineAsyncComponent(() => import('src/components/account/UserCold.vue'))
 
 </script>
 

@@ -1,14 +1,12 @@
 <template>
   <q-select
     v-model='target'
-    :options='displayGoods'
+    :options='goods'
     options-selected-class='text-deep-orange'
     emit-value
-    label='MSG_GOODS'
+    label='MSG_APP_GOODS'
     map-options
     @update:model-value='onUpdate'
-    use-input
-    @filter='onFilter'
   >
     <template #option='scope'>
       <q-item v-bind='scope.itemProps'>
@@ -20,8 +18,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useChurchGoodStore } from 'npool-cli-v4'
-import { getGoods } from 'src/api/good'
+import { useChurchAppGoodStore } from 'npool-cli-v4'
+import { getAppGoods } from 'src/api/good'
 import { useLocalApplicationStore } from 'src/localstore/application'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
@@ -33,22 +31,15 @@ const props = defineProps<Props>()
 const goodID = toRef(props, 'id')
 const target = ref(goodID.value)
 
-const good = useChurchGoodStore()
-const goods = computed(() => Array.from(good.Goods.Goods, (el) => {
+const appGood = useChurchAppGoodStore()
+const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
+
+const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
-    value: el.ID,
-    label: `${el.Title} | ${el.Unit}`
+    value: el.GoodID,
+    label: el.GoodName
   }
 }))
-const displayGoods = ref(goods.value)
-
-const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
-  doneFn(() => {
-    displayGoods.value = goods.value.filter((el) => {
-      return el.label.toLowerCase().includes(val.toLowerCase())
-    })
-  })
-}
 
 const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
@@ -67,8 +58,8 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (goods.value.length === 0) {
-    getGoods(0, 500)
+  if (appGoods.value.length === 0) {
+    getAppGoods(0, 500)
   }
 }
 </script>

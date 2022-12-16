@@ -90,7 +90,7 @@
     dense
     flat
     :title='$t("MSG_DEPOSIT_ACCOUNTS")'
-    :rows='displayAccounts'
+    :rows='accounts'
     row-key='ID'
     :rows-per-page-options='[10]'
   >
@@ -119,16 +119,16 @@
         <q-input
           type='number'
           :min='0'
-          v-model='amount'
+          v-model='target.Amount'
           :label='$t("MSG_AMOUNT")'
         />
-        <q-select :options='displayCoins' v-model='selectedCoin' />
+        <AppCoinPicker v-model:id='target.CoinTypeID' />
       </q-card-section>
       <q-item class='row'>
-        <q-item-label>{{ $t("MSG_COIN_UNIT") }} : {{ selectedCoin?.value?.Unit }}</q-item-label>
+        <q-item-label>{{ $t("MSG_COIN_UNIT") }} : {{ selectedCoin?.Unit }}</q-item-label>
       </q-item>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' :disabled='!amount || !selectedCoin || submitting' />
+        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' :disabled='!target.Amount || !target.CoinTypeID || submitting' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -136,15 +136,32 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, watch } from 'vue'
-import { Account, Detail, formatTime, General, NotifyType, useChurchAccountStore, useChurchAppStore, useChurchDepositStore, useChurchDetailStore, useChurchGeneralStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import {
+  Detail,
+  formatTime,
+  General,
+  NotifyType,
+  useChurchUserAccountStore,
+  useChurchAppStore,
+  useChurchDepositStore,
+  useChurchDetailStore,
+  useChurchGeneralStore,
+  useChurchUserStore,
+  User,
+  useChurchAppCoinStore
+} from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
-import { Coin, NotificationType, useCoinStore } from 'npool-cli-v2'
 import saveAs from 'file-saver'
+import { getAppDepositAccounts } from 'src/api/account'
+import { CreateAppUserDepositRequest } from 'npool-cli-v4/dist/store/church/ledger/ledger/types'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
+
 const columns = computed(() => [
   {
     name: 'AppID',
@@ -178,47 +195,25 @@ const columns = computed(() => [
   }
 ])
 
-interface MyCoin {
-  label: string
-  value: Coin
-}
-const coin = useCoinStore()
-const displayCoins = computed(() => Array.from(coin.Coins.filter((el) => !el.PreSale && !coinBlacklist(el.ID as string)), (el) => {
-  return {
-    label: el.Name,
-    value: el
-  } as MyCoin
-}))
-const selectedCoin = ref(undefined as unknown as MyCoin)
-const coinBlacklist = (coinTypeID: string) => {
-  const names = ['Ethereum', 'Tron', 'Solana', 'USD Coin']
-  const existingItem = coin.Coins.find((el) => el.ID === coinTypeID)
-  if (!existingItem) {
-    return true
-  }
-  let flag = false
-  names.forEach((el) => {
-    if (existingItem.Name?.toLowerCase().includes(el.toLowerCase())) {
-      flag = true
-    }
-  })
-  return flag
-}
+const coin = useChurchAppCoinStore()
+const selectedCoin = computed(() => coin.getCoinByID(appID.value, target.value?.CoinTypeID))
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
+
+const target = ref({
+  TargetAppID: appID.value
+} as CreateAppUserDepositRequest)
 
 const deposit = useChurchDepositStore()
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
 const onSubmit = () => {
-  if (!amount.value || !selectedCoin.value) {
-    return
-  }
   submitting.value = true
   deposit.createAppUserDeposit({
-    TargetAppID: appID.value,
+    ...target.value,
     TargetUserID: selectedUser.value[0].ID,
-    CoinTypeID: selectedCoin.value.value.ID as string,
-    Amount: amount.value,
     Message: {
       Error: {
         Title: 'MSG_DEPOSIT_BALANCE',
@@ -251,6 +246,7 @@ const reset = () => {
   getAppDetails(0, 500)
   getAppDepositAccounts(0, 500)
 }
+
 const onCancel = () => {
   onMenuHide()
 }
@@ -261,11 +257,7 @@ const onMenuHide = () => {
   showing.value = false
   submitting.value = false
   amount.value = undefined
-  selectedCoin.value = undefined as unknown as MyCoin
 }
-
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const user = useChurchUserStore()
 const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
@@ -274,25 +266,6 @@ const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAd
 const selectedUser = ref([] as Array<User>)
 
 const userLoading = ref(false)
-
-const prepare = () => {
-  if (!user.Users.get(appID.value)) {
-    getAppUsers(0, 500)
-  }
-  if (!detail.Details.Details.get(appID.value)) {
-    getAppDetails(0, 500)
-  }
-  if (!general.Generals.Generals.get(appID.value)) {
-    getAppGenerals(0, 500)
-  }
-  if (!account.Accounts.Accounts.get(appID.value)) {
-    getAppDepositAccounts(0, 100)
-  }
-}
-
-watch(appID, () => {
-  prepare()
-})
 
 const detailUsername = ref('')
 const detail = useChurchDetailStore()
@@ -307,8 +280,8 @@ const displayGenerals = computed(() => !general.Generals.Generals.get(appID.valu
 }))
 
 const accountUsername = ref('')
-const account = useChurchAccountStore()
-const displayAccounts = computed(() => !account.Accounts.Accounts.get(appID.value) ? [] : account.Accounts.Accounts.get(appID.value)?.filter((el) => {
+const account = useChurchUserAccountStore()
+const accounts = computed(() => account.getDepositAccountsByAppID(appID.value).filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
 
@@ -421,17 +394,32 @@ const detailsExport = () => {
   })
 
   const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
-  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' +
-                   formatTime(new Date().getTime() / 1000) +
-                   '.csv'
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' + (new Date().getTime() / 1000) + '.csv'
   saveAs(blob, filename)
 }
 
 onMounted(() => {
   prepare()
-  if (coin.Coins.length === 0) {
-    getCoins()
+})
+
+const prepare = () => {
+  if (!user.Users.get(appID.value)) {
+    getAppUsers(0, 500)
   }
+  if (!detail.Details.Details.get(appID.value)) {
+    getAppDetails(0, 500)
+  }
+  if (!general.Generals.Generals.get(appID.value)) {
+    getAppGenerals(0, 500)
+  }
+  if (accounts.value.length === 0) {
+    getAppDepositAccounts(0, 100)
+  }
+}
+
+watch(appID, () => {
+  prepare()
 })
 
 const getAppUsers = (offset: number, limit: number) => {
@@ -452,21 +440,6 @@ const getAppUsers = (offset: number, limit: number) => {
       return
     }
     getAppUsers(offset + limit, limit)
-  })
-}
-
-const getCoins = () => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
   })
 }
 
@@ -497,20 +470,6 @@ const getAppDetails = (offset: number, limit: number) => {
       return
     }
     getAppDetails(offset + limit, limit)
-  })
-}
-
-const getAppDepositAccounts = (offset: number, limit: number) => {
-  account.getAppDepositAccounts({
-    TargetAppID: appID.value,
-    Offset: offset,
-    Limit: limit,
-    Message: {}
-  }, (accounts: Array<Account>, error: boolean) => {
-    if (error || accounts.length < limit) {
-      return
-    }
-    getAppDepositAccounts(offset + limit, limit)
   })
 }
 </script>

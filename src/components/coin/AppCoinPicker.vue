@@ -5,7 +5,7 @@
     :options='displayCoins'
     options-selected-class='text-deep-orange'
     emit-value
-    :label='myLabel'
+    label='MSG_APP_COINS'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -21,34 +21,26 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useChurchCoinStore } from 'npool-cli-v4'
-import { getCoins } from 'src/api/coin'
-import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { useChurchAppCoinStore } from 'npool-cli-v4'
+import { appID } from 'src/api/app'
+import { getAppCoins } from 'src/api/coin'
+import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {
   id: string
   updating?: boolean
-  label?: string,
-  getData?: boolean
 }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
-const label = toRef(props, 'label')
-const getData = toRef(props, 'getData')
-
-const myLabel = computed(() => {
-  return !label.value ? 'MSG_COINS' : label.value
-})
-
 const target = ref(id.value)
 
-const coin = useChurchCoinStore()
-const coins = computed(() => Array.from(coin.Coins.Coins).map((el) => {
+const coin = useChurchAppCoinStore()
+const coins = computed(() => Array.from(coin.getCoinsByAppID(appID.value).filter((el) => !el.Disabled)).map((el) => {
   return {
-    value: el.ID,
-    label: `${el.Name} | ${el.ID}`
+    value: el.CoinTypeID,
+    label: `${el.Name} | ${el.CoinTypeID}`
   }
 }))
 const displayCoins = ref(coins.value)
@@ -67,10 +59,14 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  console.log('getData: ', getData.value)
-  if (coin.Coins.Coins.length === 0 && (getData.value === undefined || getData.value === false)) {
-    console.log('执行了...')
-    getCoins(0, 500)
+  if (coin.getCoinsByAppID(appID.value).length === 0) {
+    getAppCoins(0, 500)
+  }
+})
+
+watch(appID, () => {
+  if (coin.getCoinsByAppID(appID.value).length === 0) {
+    getAppCoins(0, 500)
   }
 })
 </script>

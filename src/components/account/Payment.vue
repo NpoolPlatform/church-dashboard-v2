@@ -6,236 +6,154 @@
     :rows='displayAccounts'
     row-key='ID'
     :rows-per-page-options='[10]'
-    selection='single'
-    v-model:selected='selectedAccount'
+    @row-click='(evt, row, index) => onRowClick(row as PaymentAccount)'
   >
-    <template #top-right>
-      <q-input
-        dense
-        class='small'
-        v-model='searchStr'
-        :label='$t("MSG_SEARCH")'
-      />
-      <q-btn
-        dense
-        flat
-        class='btn flat'
-        :label='$t("MSG_CREATE_PAYMENT_BALANCE")'
-        @click='onCreatePaymentBalance'
-      />
-      <q-btn
-        dense
-        flat
-        class='btn flat'
-        :label='$t("MSG_RESET_PAYMENT_ACCOUNT")'
-        @click='onResetPaymentAccount'
-      />
+    <template #top>
+      <div class='row justify-end table-right'>
+        <TableHeaderFilter :backup='undefined' v-model:blocked='blocked' v-model:active='active' v-model:locked='locked' />
+        <div class='row indent flat align-bottom'>
+          <q-input
+            dense
+            class='small'
+            v-model='address'
+            :label='$t("MSG_ADDRESS")'
+          />
+        </div>
+      </div>
     </template>
   </q-table>
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <div>
+          <span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ACCOUNT_ID") }}: {{ target?.AccountID }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_ADDRESS") }}: {{ target?.Address }}</span>
+        </div>
+        <div>
+          <span>{{ $t("MSG_COIN_NAME") }}: {{ target?.CoinName }}</span>
+        </div>
+      </q-card-section>
+      <q-card-section>
+        <div>
+          <q-toggle dense v-model='target.Blocked' :label='$t("MSG_BLOCKED")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Active' :label='$t("MSG_ACTIVE")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Locked' :label='$t("MSG_LOCKED")' />
+        </div>
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import {
-  useChurchAccountStore,
-  useCoinStore,
-  NotificationType,
-  GoodPayment,
-  PaymentState,
-  useChurchBillingStore,
-  InvalidID,
-  Payment
-} from 'npool-cli-v2'
-import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { NotifyType, PaymentAccount, useChurchPaymentAccountStore } from 'npool-cli-v4'
+import { getPaymentAccounts } from 'src/api/account'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const account = useChurchAccountStore()
-const coin = useCoinStore()
+const payment = useChurchPaymentAccountStore()
+const paymentAccounts = computed(() => payment.PaymentAccounts.PaymentAccounts)
 
-interface MyAccount extends GoodPayment {
-  CoinName: string
-  Address: string
-  PaymentState: PaymentState
-  PaymentID: string
-  OrderID: string
-  UserPaymentBalanceID: string
-}
+const address = ref('')
+const blocked = ref(null)
+const active = ref(null)
+const locked = ref(null)
 
-const billing = useChurchBillingStore()
-const payments = computed(() => billing.Payments.get(appID.value)?.filter((el) => el.State === PaymentState.TIMEOUT || el.State === PaymentState.CANCELED))
-const balances = computed(() => billing.PaymentBalances.get(appID.value))
-
-const accounts = computed(() => Array.from(account.GoodPayments).map((el) => {
-  const ac = el as MyAccount
-  ac.Address = account.getAccountByID(ac.AccountID)?.Address
-  ac.CoinName = coin.getCoinByID(account.getAccountByID(ac.AccountID)?.CoinTypeID)?.Name as string
-  ac.PaymentState = 'MSG_NOT_AVAILABLE' as PaymentState
-  ac.PaymentID = InvalidID
-  ac.UserPaymentBalanceID = InvalidID
-  if (payments.value) {
-    const index = payments.value.findIndex((pel) => pel.AccountID === el.AccountID && !el.Idle)
-    if (index >= 0) {
-      ac.PaymentState = payments.value[index].State as PaymentState
-      ac.PaymentID = payments.value[index].ID
-      ac.OrderID = payments.value[index].OrderID
-    }
+const displayAccounts = computed(() => paymentAccounts.value.filter((el) => {
+  let flag = el.Address?.toLowerCase().includes(address.value?.toLowerCase())
+  if (blocked.value !== null) {
+    flag = flag && el.Blocked === blocked.value
   }
-  if (balances.value) {
-    const index = balances.value.findIndex((bel) => bel.PaymentID === ac.PaymentID)
-    if (index >= 0) {
-      ac.UserPaymentBalanceID = balances.value[index].ID as string
-    }
+  if (active.value !== null) {
+    flag = flag && el.Active === active.value
   }
-  return ac
+  if (locked.value !== null) {
+    flag = flag && el.Locked === locked.value
+  }
+  return flag
 }))
 
-const searchStr = ref('')
-const displayAccounts = computed(() => accounts.value.filter((el) => {
-  return el.Address?.includes(searchStr.value)
-}))
+const showing = ref(false)
+const updating = ref(false)
+const target = ref({} as PaymentAccount)
 
-const selectedAccount = ref([] as Array<MyAccount>)
-
-const prepare = () => {
-  billing.getPayments({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_PAYMENTS',
-        Message: 'MSG_GET_PAYMENTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  billing.getPaymentBalances({
-    TargetAppID: appID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_USER_PAYMENT_BALANCES',
-        Message: 'MSG_GET_USER_PAYMENT_BALANCES_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as PaymentAccount
 }
 
-watch(appID, () => {
-  prepare()
+const onRowClick = (row: PaymentAccount) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const updateTarget = computed(() => {
+  return {
+    ID: target.value.ID,
+    Active: target.value.Active,
+    Blocked: target.value.Blocked,
+    Locked: target.value.Locked
+  }
 })
+
+const onSubmit = (done: () => void) => {
+  payment.updatePaymentAccount({
+    ...updateTarget.value,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (account: PaymentAccount, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
 
 onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  account.getAccounts({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_ACCOUNTS',
-        Message: 'MSG_GET_ACCOUNTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  account.getGoodPayments({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOOD_PAYMENTS',
-        Message: 'MSG_GET_GOOD_PAYMENTS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
-  prepare()
+  if (paymentAccounts.value.length === 0) {
+    getPaymentAccounts(0, 500)
+  }
 })
-
-const onCreatePaymentBalance = () => {
-  selectedAccount.value.forEach((account) => {
-    if (account.Idle) {
-      return
-    }
-    if (account.PaymentState !== PaymentState.TIMEOUT) {
-      return
-    }
-    if (account.UserPaymentBalanceID !== InvalidID) {
-      return
-    }
-
-    const index = payments.value?.findIndex((el) => el.AccountID === account.AccountID)
-    const payment = payments.value?.[index as number] as Payment
-    if (payment.FinishAmount <= payment.StartAmount) {
-      return
-    }
-
-    billing.createPaymentBalance({
-      TargetAppID: appID.value,
-      TargetUserID: payment.UserID,
-      Info: {
-        PaymentID: payment.ID,
-        Amount: payment.FinishAmount - payment.StartAmount,
-        UsedByPaymentID: InvalidID
-      },
-      Message: {
-        Error: {
-          Title: 'MSG_GET_GOOD_PAYMENTS',
-          Message: 'MSG_GET_GOOD_PAYMENTS_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  })
-}
-
-const onResetPaymentAccount = () => {
-  selectedAccount.value.forEach((acc) => {
-    if (acc.Idle) {
-      return
-    }
-    acc.Idle = true
-    acc.OccupiedBy = ''
-    account.updateGoodPayment({
-      Info: acc,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_GOOD_PAYMENTS',
-          Message: 'MSG_UPDATE_GOOD_PAYMENTS_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-  })
-}
-
 </script>
+<style lang='sass' scoped>
+.table-right
+  width: 100%
+  ::v-deep .button
+    line-height: 30px
+    height: 30px
+    margin-left: 10px
+</style>

@@ -1,11 +1,11 @@
 <template>
-  <PlatformUSD />
+  <Collector />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const PlatformUSD = defineAsyncComponent(() => import('src/components/limit/PlatformUSD.vue'))
+const Collector = defineAsyncComponent(() => import('src/components/account/Collector.vue'))
 
 </script>
 

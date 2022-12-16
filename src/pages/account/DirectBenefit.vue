@@ -1,11 +1,11 @@
 <template>
-  <PlatformHold />
+  <DirectBenefit />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const PlatformHold = defineAsyncComponent(() => import('src/components/account/PlatformHold.vue'))
+const DirectBenefit = defineAsyncComponent(() => import('src/components/account/DirectBenefit.vue'))
 
 </script>
 

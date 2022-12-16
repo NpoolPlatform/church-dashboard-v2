@@ -2,16 +2,16 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_WITHDRAW_ADDRESS")'
-    :rows='displayWithdrawAddress'
+    :title='$t("MSG_DIRECT_BENEFIT_ADDRESS")'
+    :rows='displayDirectBenefitAccounts'
     row-key='ID'
-    :columns='withdrawColumns'
+    :columns='directBenefitColumns'
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as Account)'
   >
     <template #top>
       <div class='row justify-end table-right'>
-        <TableHeaderFilter :backup='undefined' v-model:blocked='blocked' v-model:active='active' :locked='undefined' />
+        <TableHeaderFilter :backup='undefined' v-model:blocked='blocked' v-model:active='active' locked='undefined' />
         <div class='row indent flat align-bottom'>
           <q-input
             dense
@@ -34,26 +34,25 @@ import {
 } from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
-const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const account = useChurchUserAccountStore()
-const withdrawAddress = computed(() => account.withdrawAddress(appID.value))
+const directBenefitAccounts = computed(() => account.directBenefitAddress(appID.value))
 
 const blocked = ref(null)
 const active = ref(null)
 const username = ref('')
 
-const displayWithdrawAddress = computed(() => {
-  return withdrawAddress.value.filter((el) => {
+const displayDirectBenefitAccounts = computed(() => {
+  return directBenefitAccounts.value.filter((el) => {
     let flag = el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
                                               el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
     if (blocked.value !== null) {
@@ -90,15 +89,15 @@ const prepare = () => {
   }
 }
 
-const withdrawColumns = computed(() => [
+const directBenefitColumns = computed(() => [
   {
-    name: 'ID',
-    label: t('MSG_ID'),
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
     field: (row: Account) => row.ID
   },
   {
     name: 'ID',
-    label: t('MSG_APP_ID'),
+    label: t('MSG_ID'),
     field: (row: Account) => row.AppID
   },
   {
@@ -163,6 +162,7 @@ const withdrawColumns = computed(() => [
   }
 ])
 </script>
+
 <style lang='sass' scoped>
 .table-right
   width: 100%

@@ -2,12 +2,10 @@
   <q-table
     dense
     flat
-    :rows='coins'
+    :rows='descriptions'
     row-key='ID'
-    :title='$t("MSG_COINS")'
-    :rows-per-page-options='[10]'
-    selection='single'
-    v-model:selected='selectedCoin'
+    :title='$t("MSG_COIN_DESCRIPTIONS")'
+    :rows-per-page-options='[5]'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -16,21 +14,11 @@
           flat
           class='btn flat'
           :label='$t("MSG_CREATE_DESCRIPTION")'
-          @click='onCreateDescription'
-          :disable='selectedCoin.length === 0'
+          @click='onCreate'
         />
       </div>
     </template>
   </q-table>
-  <q-table
-    dense
-    flat
-    :rows='descriptions'
-    row-key='ID'
-    :title='$t("MSG_COIN_DESCRIPTIONS")'
-    :rows-per-page-options='[5]'
-    @row-click='(evt, row, index) => onRowClick(row as Description)'
-  />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -41,7 +29,7 @@
         <span>{{ $t('MSG_CREATE_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <span>{{ $t('MSG_COIN_NAME') }}: {{ selectedCoin[0]?.Name }}</span>
+        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
@@ -51,7 +39,7 @@
         <q-select dense :options='CoinDescriptionUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -59,34 +47,93 @@
 </template>
 
 <script setup lang='ts'>
-import { useCoinStore, NotificationType, Coin, CoinDescriptionUsedFors, useChurchCoinStore, Description } from 'npool-cli-v2'
-import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { useChurchAppCoinDescriptionStore, CoinDescription, NotifyType, CoinDescriptionUsedFors } from 'npool-cli-v4'
+import { appID } from 'src/api/app'
+import { getAppCoinDescriptions } from 'src/api/coin'
+import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const coin = useCoinStore()
-const coins = computed(() => coin.Coins)
-const selectedCoin = ref([] as Array<Coin>)
-const coinTypeID = computed(() => selectedCoin.value.length > 0 ? selectedCoin.value[0].ID : undefined as unknown as string)
+const description = useChurchAppCoinDescriptionStore()
+const descriptions = computed(() => description.getCoinsByAppID(appID.value))
 
-const ccoin = useChurchCoinStore()
-const descriptions = computed(() => ccoin.Descriptions.get(appID.value) as Array<Description>)
+const showing = ref(false)
+const updating = ref(false)
+const target = ref({} as CoinDescription)
 
-const prepare = () => {
-  ccoin.getDescriptions({
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+// const onRowClick = (row: CoinDescription) => {
+//   target.value = { ...row }
+//   showing.value = true
+//   updating.value = true
+// }
+
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as CoinDescription
+}
+
+const onSubmit = (done: () => void) => {
+  createCoinDescription(done)
+}
+
+// const updateTarget = computed(() => {
+//   return {
+//     TargetAppID: target.value?.AppID,
+//     ID: target.value?.ID,
+//     AppID: target.value?.AppID,
+//     Title: target.value?.Title,
+//     Message: target.value?.Message
+//   }
+// })
+
+// const updateCoinDescription = () => {
+// description.updateAppCoinDescription({
+//   ...updateTarget.value,
+//   NotifyMessage: {
+//     Error: {
+//       Title: 'MSG_UPDATE_DESCRIPTION',
+//       Message: 'MSG_UPDATE_DESCRIPTION_FAIL',
+//       Popup: true,
+//       Type: NotifyType.Error
+//     }
+//   }
+// }, (error: boolean) => {
+//   done()
+//   if (error) {
+//     return
+//   }
+//   onMenuHide()
+// })
+// }
+
+const createCoinDescription = (done: () => void) => {
+  description.createAppCoinDescription({
     TargetAppID: appID.value,
-    Message: {
+    ...target.value,
+    NotifyMessage: {
       Error: {
-        Title: 'MSG_GET_COIN_DESCRIPTIONS',
-        Message: 'MSG_GET_COIN_DESCRIPTIONS_FAIL',
+        Title: 'MSG_CREATE_DESCRIPTION',
+        Message: 'MSG_CREATE_DESCRIPTION_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    // TODO
+  }, (error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
   })
 }
 
@@ -95,86 +142,13 @@ watch(appID, () => {
 })
 
 onMounted(() => {
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
   prepare()
 })
 
-const showing = ref(false)
-const updating = ref(false)
-const target = ref({} as unknown as Description)
-watch(coinTypeID, () => {
-  target.value.CoinTypeID = coinTypeID.value as string
-})
-
-const onRowClick = (desc: Description) => {
-  target.value = desc
-  showing.value = true
-  updating.value = true
-  selectedCoin.value = [coin.getCoinByID(desc.CoinTypeID)]
-}
-
-const onCreateDescription = () => {
-  showing.value = true
-  updating.value = false
-  target.value = {
-    AppID: appID.value,
-    CoinTypeID: selectedCoin.value[0].ID
-  } as unknown as Description
-}
-
-const onMenuHide = () => {
-  showing.value = false
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  if (updating.value) {
-    ccoin.updateDescription({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_DESCRIPTION',
-          Message: 'MSG_UPDATE_DESCRIPTION_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
+const prepare = () => {
+  if (descriptions.value.length === 0) {
+    getAppCoinDescriptions(0, 500)
   }
-  ccoin.createDescription({
-    TargetAppID: appID.value,
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_DESCRIPTION',
-        Message: 'MSG_CREATE_DESCRIPTION_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-const onCancel = () => {
-  onMenuHide()
 }
 
 </script>
