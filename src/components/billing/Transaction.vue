@@ -4,6 +4,7 @@
     flat
     :title='$t("MSG_GOOD_TRANSACTIONS")'
     :rows='transactions'
+    :loading='loading'
     row-key='ID'
     v-model:pagination='pagination'
     @request='handlePageChange'
@@ -31,25 +32,7 @@ const pagination = ref({
   rowsNumber: 10
 })
 
-const getTxs = (offset : number, limit: number) => {
-  tx.getTxs({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (error: boolean) => {
-    if (error) {
-      return
-    }
-    pagination.value.rowsNumber = tx.Txs.Total
-  })
-}
+const loading = ref(false)
 
 const prepare = () => {
   if (transactions.value.length === 0) {
@@ -63,11 +46,33 @@ const handlePageChange = (row: any) => {
   pagination.value = { ...page }
   console.log('page: ', page)
   tx.$reset()
+  loading.value = true
   getTxs((pagination.value.page - 1) * pagination.value.rowsPerPage, pagination.value.rowsPerPage)
 }
 
 onMounted(() => {
   prepare()
 })
+
+const getTxs = (offset : number, limit: number) => {
+  tx.getTxs({
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_COINS',
+        Message: 'MSG_GET_COINS_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (error: boolean) => {
+    loading.value = false
+    if (error) {
+      return
+    }
+    pagination.value.rowsNumber = tx.Txs.Total
+  })
+}
 
 </script>
