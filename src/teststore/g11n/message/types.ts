@@ -23,7 +23,6 @@ export interface MessageReq {
 }
 
 export interface CreateAppMessageRequest extends MyRequest {
-  AppID: string;
   TargetAppID: string;
   TargetLangID: string;
   MessageID: string;
@@ -57,9 +56,8 @@ export interface DeleteAppMessageResponse {
 }
 
 export interface GetAppMessagesRequest extends MyRequest {
-  AppID: string;
-  TargetAppID: string;
-  Disabled: boolean;
+  TargetAppID?: string;
+  Disabled?: boolean;
   Offset: number;
   Limit: number;
 }
@@ -71,7 +69,6 @@ export interface GetAppMessagesResponse {
 
 export interface UpdateAppMessageRequest extends MyRequest {
   ID: string;
-  AppID: string;
   TargetAppID: string;
   TargetLangID: string;
   MessageID: string;

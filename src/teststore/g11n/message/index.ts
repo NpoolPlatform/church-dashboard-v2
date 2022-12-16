@@ -37,9 +37,9 @@ export const useChurchMessageStore = defineStore('church-message-v4', {
         req,
         req.NotifyMessage,
         (resp: GetAppMessagesResponse): void => {
-          const data = this.getMessagesByAppID(req.TargetAppID)
+          const data = this.getMessagesByAppID(req.TargetAppID as string)
           data.push(...resp.Infos)
-          this.Messages.Messages.set(req.TargetAppID, data)
+          this.Messages.Messages.set(req.TargetAppID as string, data)
           this.Messages.Total = resp.Total
           done(false, resp.Infos)
         }, () => {
