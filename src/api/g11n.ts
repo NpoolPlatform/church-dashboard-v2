@@ -7,6 +7,8 @@ import { useChurchCountryStore } from 'src/teststore/g11n/country'
 import { Country } from 'src/teststore/g11n/country/types'
 import { useChurchLangStore } from 'src/teststore/g11n/lang'
 import { Lang } from 'src/teststore/g11n/lang/types'
+import { useChurchMessageStore } from 'src/teststore/g11n/message'
+import { Message } from 'src/teststore/g11n/message/types'
 import { appID } from './app'
 
 const country = useChurchCountryStore()
@@ -92,5 +94,26 @@ export const getAppLangs = (offset: number, limit: number) => {
       return
     }
     getAppLangs(offset + limit, limit)
+  })
+}
+const message = useChurchMessageStore()
+export const getAppMessages = (offset: number, limit: number) => {
+  message.getAppMessages({
+    TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
+    NotifyMessage: {
+      Error: {
+        Title: 'MSG_GET_APP_MESSAGES',
+        Message: 'MSG_GET_APP_MESSAGES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (error: boolean, rows: Array<Message>) => {
+    if (error || rows.length === 0) {
+      return
+    }
+    getAppMessages(offset + limit, limit)
   })
 }
