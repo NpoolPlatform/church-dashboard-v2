@@ -84,7 +84,7 @@ export const useChurchMessageStore = defineStore('church-message-v4', {
       doActionWithError<CreateAppMessagesRequest, CreateAppMessagesResponse>(
         API.CREATE_APP_MESSAGE,
         req,
-        req.NotifyMessage,
+        req.Message,
         (resp: CreateAppMessagesResponse): void => {
           const data = this.getMessagesByAppID(req.TargetAppID)
           resp.Infos.forEach((el) => {
