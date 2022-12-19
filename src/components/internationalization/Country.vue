@@ -24,50 +24,9 @@
           :label='$t("MSG_EXPORT")'
           @click='onExport'
         />
-        <q-btn
-          color='primary'
-          dense
-          icon='cloud_upload'
-          round
-          @click='upload'
-        />
       </div>
     </template>
   </q-table>
-  <q-table
-    dense
-    flat
-    :title='$t("MSG_LOADED_COUNTRIES")'
-    row-key='ID'
-    :rows-per-page-options='[10]'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <input
-          ref='loadFileButton'
-          type='file'
-          style='display: none;'
-          @change='onFileLoaded'
-          accept='.json'
-        >
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_LOAD_FILE")'
-          @click='onLoadFile'
-        />
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_SUBMIT")'
-          @click='onSubmitLoaded'
-        />
-      </div>
-    </template>
-  </q-table>
-  <AppCountry />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -89,11 +48,45 @@
       </q-item>
     </q-card>
   </q-dialog>
+  <AppCountry />
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_LOADED_COUNTRIES")'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <input
+          ref='loadFileButton'
+          type='file'
+          style='display: none;'
+          @change='uploadFile'
+          accept='.json'
+        >
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_IMPORT")'
+          @click='loadFileButton?.click()'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_BATCH_CREATE")'
+          :disable='loadedCountries.length === 0'
+          @click='onBatchCreate'
+        />
+      </div>
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { NotificationType, useChurchLangStore } from 'npool-cli-v2'
 import { NotifyType, formatTime } from 'npool-cli-v4'
 import { useChurchCountryStore } from 'src/teststore/g11n/country'
 import { Country, UpdateCountryRequest } from 'src/teststore/g11n/country/types'
@@ -104,9 +97,6 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 
 const country = useChurchCountryStore()
 const countries = computed(() => country.Countries.Countries)
-const loadedCountries = ref([] as Array<Country>)
-
-const churchLang = useChurchLangStore()
 
 const target = ref({} as Country)
 const showing = ref(false)
@@ -203,16 +193,10 @@ const onExport = () => {
   saveAs(blob, filename)
 }
 
-const upload = () => {
-  // TODO
-}
-
+const loadedCountries = ref([] as Array<Country>)
 const loadFileButton = ref<HTMLInputElement>()
-const onLoadFile = () => {
-  loadFileButton.value?.click()
-}
 
-const onFileLoaded = (evt: Event) => {
+const uploadFile = (evt: Event) => {
   const target = evt.target as unknown as HTMLInputElement
   if (target.files) {
     const filename = target.files[0]
@@ -224,15 +208,21 @@ const onFileLoaded = (evt: Event) => {
   }
 }
 
-const onSubmitLoaded = () => {
-  churchLang.createCountries({
+const onBatchCreate = () => {
+  country.createCountries({
     Infos: loadedCountries.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COUNTRIES',
         Message: 'MSG_CREATE_COUNTRIES_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_BATCH_CREATE_COUNTRIES',
+        Message: 'MSG_BATCH_CREATE_COUNTRIES_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
