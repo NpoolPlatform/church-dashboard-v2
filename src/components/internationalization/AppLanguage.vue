@@ -67,7 +67,7 @@ const lang = useChurchAppLangStore()
 const langs = computed(() => lang.getAppLangsByAppID(appID.value))
 
 const selectedAppLangs = ref([] as Array<AppLang>)
-const target = ref({} as AppLang)
+const target = ref({ Main: false } as AppLang)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -79,6 +79,7 @@ const onCreate = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  target.value = { Main: false } as AppLang
 }
 
 const onCancel = () => {
