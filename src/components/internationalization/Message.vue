@@ -46,14 +46,15 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_MESSAGE') }}</span>
+        <span>{{ updating ? $t('MSG_CREATE_MESSAGE') : $t('MSG_UPDATE_MESSAGE') }}</span>
       </q-card-section>
       <q-card-section>
-        <span>{{ $t('MSG_LANGUAGE') }}:</span>
+        <AppLanguagePicker v-model:id='targetLangID' label='MSG_SELECT_LANGUAGE' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.MessageID' :label='$t("MSG_MESSAGE_ID")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
+        <q-input v-model.number='target.GetIndex' :label='$t("MSG_GET_INDEX")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -73,6 +74,7 @@ import { Message } from 'src/teststore/g11n/message/types'
 import { NotifyType } from 'npool-cli-v4'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
 const message = useChurchMessageStore()
 const messages = computed(() => message.getMessagesByAppID(appID.value))
@@ -80,6 +82,7 @@ const messages = computed(() => message.getMessagesByAppID(appID.value))
 const messageID = ref('')
 const displayAppMsgs = computed(() => messages.value.filter((msg) => msg.MessageID.includes(messageID.value)))
 
+const targetLangID = ref('')
 const target = ref({} as Message)
 const showing = ref(false)
 const updating = ref(false)

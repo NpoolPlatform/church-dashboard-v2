@@ -73,8 +73,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/languages',
-        component: () => import('pages/internationalization/Language.vue'),
+        path: 'languages',
+        component: () => import('pages/internationalization/Languages.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -303,18 +303,6 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'application',
         component: () => import('pages/application/Application.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'languages',
-        component: () => import('pages/internationalization/Languages.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
