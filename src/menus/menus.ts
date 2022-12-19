@@ -219,8 +219,8 @@ const MainDrawerMenus = [
     children: [
       {
         menuId: uid(),
-        label: '国际化语言列表',
-        caption: '管理全局国际化语言列表',
+        label: '语言列表',
+        caption: '管理语言列表',
         icon: 'perm_identity',
         target: '/languages',
         level: 1,
@@ -228,28 +228,19 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: 'APP语言设置',
-        caption: '管理应用支持语言',
+        label: '国家列表',
+        caption: '管理国家列表',
         icon: 'perm_identity',
-        target: '/app/languages',
+        target: '/countries',
         level: 1,
         sectionBegin: false,
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '语言包管理',
+        label: '应用文案',
         caption: '管理应用文案',
         icon: 'perm_identity',
         target: '/app/messages',
-        level: 1,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '国家列表',
-        caption: '查看国家列表',
-        icon: 'perm_identity',
-        target: '/countries',
         level: 1,
         sectionBegin: false,
         children: []
