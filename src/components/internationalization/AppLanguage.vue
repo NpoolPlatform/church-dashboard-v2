@@ -126,7 +126,7 @@ const onDelete = () => {
       },
       Info: {
         Title: 'MSG_DELETE_APP_LANGUAGE',
-        Message: 'MSG_DELETE_APP_LANGUAGE_FAIL',
+        Message: 'MSG_DELETE_APP_LANGUAGE_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
