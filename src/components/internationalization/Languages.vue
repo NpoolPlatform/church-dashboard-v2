@@ -139,7 +139,7 @@ const updateLang = (done: () => void) => {
       },
       Info: {
         Title: 'MSG_UPDATE_LANGUAGE',
-        Message: 'MSG_UPDATE_LANGUAGE_FAIL',
+        Message: 'MSG_UPDATE_LANGUAGE_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
