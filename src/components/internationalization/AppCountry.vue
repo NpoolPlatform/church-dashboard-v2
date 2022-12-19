@@ -18,9 +18,10 @@
           :label='$t("MSG_AUTHORIZE")'
           @click='onCreate'
         />
-        <LoadingButton
+        <q-btn
           class='dense flat btn'
-          loading
+          dense
+          flat
           :label='$t("MSG_DELETE")'
           :disable='selectedCountries.length === 0'
           @click='onDelete'
@@ -106,7 +107,7 @@ const onAuthorize = (done: () => void) => {
   })
 }
 
-const onDelete = (done: () => void) => {
+const onDelete = () => {
   country.deleteAppCountry({
     ID: selectedCountries.value[0].ID,
     TargetAppID: selectedCountries.value[0].AppID,
@@ -125,7 +126,6 @@ const onDelete = (done: () => void) => {
       }
     }
   }, (error: boolean) => {
-    done()
     if (error) {
       return
     }
