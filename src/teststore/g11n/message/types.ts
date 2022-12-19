@@ -1,4 +1,4 @@
-import { MyRequest } from 'npool-cli-v4'
+import { BaseRequest, MyRequest } from 'npool-cli-v4'
 
 export interface Message {
   ID: string;
@@ -34,7 +34,7 @@ export interface CreateAppMessageResponse {
   Info: Message;
 }
 
-export interface CreateAppMessagesRequest extends MyRequest {
+export interface CreateAppMessagesRequest extends BaseRequest {
   TargetAppID: string;
   TargetLangID: string;
   Infos: MessageReq[];

@@ -62,6 +62,40 @@
       </q-item>
     </q-card>
   </q-dialog>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_LOADED_MESSAGES")'
+    row-key='ID'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <input
+          ref='loadFileButton'
+          type='file'
+          style='display: none;'
+          @change='uploadFile'
+          accept='.json'
+        >
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_IMPORT")'
+          @click='loadFileButton?.click()'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_BATCH_CREATE")'
+          :disable='loadedMessages.length === 0'
+          @click='onBatchCreate'
+        />
+      </div>
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
@@ -70,7 +104,7 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useChurchMessageStore } from 'src/teststore/g11n/message'
 import { getAppMessages } from 'src/api/g11n'
 import { appID } from 'src/api/app'
-import { Message } from 'src/teststore/g11n/message/types'
+import { Message, MessageReq } from 'src/teststore/g11n/message/types'
 import { NotifyType } from 'npool-cli-v4'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -174,6 +208,45 @@ const updateAppMessage = (done: () => void) => {
       return
     }
     onMenuHide()
+  })
+}
+
+const loadedMessages = ref([] as Array<MessageReq>)
+const loadFileButton = ref<HTMLInputElement>()
+
+const uploadFile = (evt: Event) => {
+  const target = evt.target as unknown as HTMLInputElement
+  if (target.files) {
+    const filename = target.files[0]
+    const reader = new FileReader()
+    reader.onload = () => {
+      loadedMessages.value = JSON.parse(reader.result as string) as Array<MessageReq>
+    }
+    reader.readAsText(filename)
+  }
+}
+
+const onBatchCreate = () => {
+  message.createAppMessages({
+    TargetAppID: appID.value,
+    TargetLangID: '',
+    Infos: loadedMessages.value,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_COUNTRIES',
+        Message: 'MSG_CREATE_COUNTRIES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_BATCH_CREATE_COUNTRIES',
+        Message: 'MSG_BATCH_CREATE_COUNTRIES_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, () => {
+    // TODO
   })
 }
 
