@@ -7,12 +7,7 @@ import {
   UpdateFiatCurrencyTypeResponse,
   FiatCurrencyType,
   CreateFiatCurrencyTypeRequest,
-  CreateFiatCurrencyTypeResponse,
-  FiatCurrency,
-  GetCoinFiatCurrenciesRequest,
-  GetCoinFiatCurrenciesResponse,
-  GetFiatCurrencyRequest,
-  GetFiatCurrencyResponse
+  CreateFiatCurrencyTypeResponse
 } from './types'
 import { doActionWithError } from 'npool-cli-v4'
 
@@ -21,26 +16,12 @@ export const useChurchFiatCurrencyStore = defineStore('church-fiatcurrency-v4', 
     FiatCurrencyTypes: {
       FiatCurrencyTypes: [] as Array<FiatCurrencyType>,
       Total: 0
-    },
-    CoinFiatCurrencies: {
-      CoinFiatCurrencies: [] as Array<FiatCurrency>,
-      Total: 0
-    },
-    Histories: {
-      Histories: [] as Array<FiatCurrency>,
-      Total: 0
     }
   }),
   getters: {
     getFiatCurrencyTypeByName () {
       return (name: string) => {
         return this.FiatCurrencyTypes.FiatCurrencyTypes.find((el) => el.Name === name)
-      }
-    },
-    getJYPCurrency () {
-      return () => {
-        const data = this.CoinFiatCurrencies.CoinFiatCurrencies.find((el) => el.FiatCurrencyName === 'name')
-        return !data ? '' : data.MarketValueHigh
       }
     }
   },
@@ -83,34 +64,6 @@ export const useChurchFiatCurrencyStore = defineStore('church-fiatcurrency-v4', 
           done(false, resp.Info)
         }, () => {
           done(true, {} as FiatCurrencyType)
-        }
-      )
-    },
-    getCoinFiatCurrencies (req: GetCoinFiatCurrenciesRequest, done: (error: boolean, rows: Array<FiatCurrency>) => void) {
-      doActionWithError<GetCoinFiatCurrenciesRequest, GetCoinFiatCurrenciesResponse>(
-        API.GET_COINFIATCURRENCIES,
-        req,
-        req.Message,
-        (resp: GetCoinFiatCurrenciesResponse): void => {
-          this.CoinFiatCurrencies.CoinFiatCurrencies.push(...resp.Infos)
-          this.CoinFiatCurrencies.Total = resp.Total
-          done(false, resp.Infos)
-        }, () => {
-          done(true, [] as Array<FiatCurrency>)
-        }
-      )
-    },
-    getFiatCurrency (req: GetFiatCurrencyRequest, done: (error: boolean, rows: FiatCurrency) => void) {
-      doActionWithError<GetFiatCurrencyRequest, GetFiatCurrencyResponse>(
-        API.GET_FIATCURRENCY,
-        req,
-        req.Message,
-        (resp: GetFiatCurrencyResponse): void => {
-          this.CoinFiatCurrencies.CoinFiatCurrencies.push(resp.Info)
-          this.CoinFiatCurrencies.Total += 1
-          done(false, resp.Info)
-        }, () => {
-          done(true, {} as FiatCurrency)
         }
       )
     }
