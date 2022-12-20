@@ -21,7 +21,6 @@
     </template>
   </q-table>
   <AppCoin />
-  <FiatCurrency />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -62,7 +61,6 @@ import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
-const FiatCurrency = defineAsyncComponent(() => import('src/components/coin/FiatCurrency.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
