@@ -17,6 +17,13 @@
           v-model='name'
           :label='$t("MSG_TYPE")'
         />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_CREATE")'
+          @click='onCreate'
+        />
       </div>
     </template>
   </q-table>
@@ -27,8 +34,8 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-input v-model='target.Name' :label='$t("MSG_FIAT_CURRENCY_TYPE")' />
-        <q-input v-model='target.Logo' :label='$t("MSG_FiatCurrencyType_HOMEPAGE")' />
+        <q-input v-model='target.Name' :label='$t("MSG_FIAT_CURRENCY_NAME")' />
+        <q-input v-model='target.Logo' :label='$t("MSG_FIAT_LOGO")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -58,6 +65,11 @@ const displayTypes = computed(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as FiatCurrencyType)
+
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
 
 const onRowClick = (row: FiatCurrencyType) => {
   target.value = { ...row }
