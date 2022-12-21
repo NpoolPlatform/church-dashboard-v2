@@ -43,10 +43,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ updating ? $t('MSG_CREATE_MESSAGE') : $t('MSG_UPDATE_MESSAGE') }}</span>
+        <span>{{ updating ? $t('MSG_UPDATE_MESSAGE') : $t('MSG_CREATE_MESSAGE') }}</span>
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
         <AppLanguagePicker v-model:id='targetLangID' label='MSG_SELECT_LANGUAGE' />
+      </q-card-section>
+      <q-card-section v-if='updating'>
+        <span> {{ target?.Lang }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.MessageID' :label='$t("MSG_MESSAGE_ID")' />
@@ -124,7 +127,7 @@ const message = useChurchMessageStore()
 const messages = computed(() => message.getMessagesByAppID(appID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
 
 const messageID = ref('')
-const displayAppMsgs = computed(() => messages.value.filter((msg) => msg.MessageID.includes(messageID.value)))
+const displayAppMsgs = computed(() => messages.value.filter((msg) => msg.MessageID?.toLowerCase().includes(messageID.value?.toLowerCase()) || msg.Message?.toLowerCase()?.includes(messageID.value?.toLowerCase())))
 
 const targetLangID = ref('')
 const target = ref({} as Message)
