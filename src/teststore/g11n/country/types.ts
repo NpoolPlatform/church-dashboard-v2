@@ -11,7 +11,7 @@ export interface Country {
 }
 
 export interface CountryReq {
-  ID: string;
+  // ID: string;
   Country: string;
   Flag: string;
   Code: string;

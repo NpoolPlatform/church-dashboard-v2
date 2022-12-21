@@ -214,9 +214,20 @@ const uploadFile = (evt: Event) => {
   }
 }
 
+const importedCountries = computed(() => {
+  return Array.from(selectLoadedCountries.value).map((el) => {
+    return {
+      Country: el.Country,
+      Code: el.Code,
+      Short: el.Short,
+      Flag: el.Flag
+    } as Country
+  })
+})
+
 const onBatchCreate = () => {
   country.createCountries({
-    Infos: selectLoadedCountries.value,
+    Infos: importedCountries.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COUNTRIES',
