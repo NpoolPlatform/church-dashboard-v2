@@ -88,9 +88,10 @@
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
 import { NotifyType, formatTime } from 'npool-cli-v4'
+import { getCountries } from 'src/api/g11n'
 import { useChurchCountryStore } from 'src/teststore/g11n/country'
 import { Country, UpdateCountryRequest } from 'src/teststore/g11n/country/types'
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import AppCountry from './AppCountry.vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -229,4 +230,11 @@ const onBatchCreate = () => {
     // TODO
   })
 }
+
+onMounted(() => {
+  if (countries.value.length === 0) {
+    getCountries(0, 100)
+  }
+})
+
 </script>

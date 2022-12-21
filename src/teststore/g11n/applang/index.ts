@@ -51,7 +51,7 @@ export const useChurchAppLangStore = defineStore('church-applang-v4', {
         (resp: DeleteAppLangResponse): void => {
           const data = this.getAppLangsByAppID(req.TargetAppID)
           const index = data.findIndex((el) => el.ID === resp.Info.ID)
-          data.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
+          data.splice(index, 1)
           this.AppLangs.AppLangs.set(req.TargetAppID, data)
           this.AppLangs.Total -= 1
           done(false, resp.Info)

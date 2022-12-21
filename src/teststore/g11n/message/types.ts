@@ -2,8 +2,10 @@ import { BaseRequest, MyRequest } from 'npool-cli-v4'
 
 export interface Message {
   ID: string;
+  AppID: string;
   AppName: string;
   Lang: string;
+  LangID: string;
   MessageID: string;
   Message: string;
   GetIndex: number;
