@@ -4,9 +4,9 @@
     flat
     :title='$t("MSG_APP_LANGUAGES")'
     :rows='langs'
-    row-key='ID'
+    row-key='LangID'
     :rows-per-page-options='[20]'
-    :selected='selectedAppLangs'
+    v-model:selected='selectedAppLangs'
     selection='single'
   >
     <template #top-right>
@@ -39,7 +39,9 @@
         <span>{{ $t('MSG_CREATE_APP_LANGUAGE') }}</span>
       </q-card-section>
       <q-card-selection>
-        <LanguagePicker v-model:id='target.LangID' />
+        <div>
+          <LanguagePicker v-model:id='target.LangID' />
+        </div>
       </q-card-selection>
       <q-card-section>
         <div><q-toggle dense v-model='target.Main' :label='$t("MSG_MAIN_LANGUAGE")' /></div>
@@ -67,7 +69,7 @@ const lang = useChurchAppLangStore()
 const langs = computed(() => lang.getAppLangsByAppID(appID.value))
 
 const selectedAppLangs = ref([] as Array<AppLang>)
-const target = ref({ Main: false } as AppLang)
+const target = ref({} as AppLang)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -75,11 +77,12 @@ const updating = ref(false)
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value = { Main: false } as AppLang
 }
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = { Main: false } as AppLang
+  target.value = {} as AppLang
 }
 
 const onCancel = () => {

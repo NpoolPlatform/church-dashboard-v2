@@ -39,7 +39,7 @@
       <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_LANGUAGE_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_LANGUAGE_LOGO")' />
-        <q-input v-model='target.Lang' :label='$t("MSG_LANGUAGE_SPEC")' />
+        <q-input v-model='target.Lang' :label='$t("MSG_LANGUAGE_LANG")' />
         <q-input v-model='target.Short' :label='$t("MSG_LANGUAGE_SHORT")' />
       </q-card-section>
       <q-item class='row'>
@@ -48,14 +48,17 @@
       </q-item>
     </q-card>
   </q-dialog>
+
+  <!-- AppLanguage -->
   <AppLanguage />
 </template>
 
 <script setup lang='ts'>
 import { NotifyType } from 'npool-cli-v4'
+import { getLangs } from 'src/api/g11n'
 import { useChurchLangStore } from 'src/teststore/g11n/lang'
 import { Lang, UpdateLangRequest } from 'src/teststore/g11n/lang/types'
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguage = defineAsyncComponent(() => import('src/components/internationalization/AppLanguage.vue'))
@@ -152,4 +155,10 @@ const updateLang = (done: () => void) => {
     onMenuHide()
   })
 }
+
+onMounted(() => {
+  if (langs.value.length === 0) {
+    getLangs(0, 100)
+  }
+})
 </script>

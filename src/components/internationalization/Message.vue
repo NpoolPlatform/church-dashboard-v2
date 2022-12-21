@@ -34,11 +34,6 @@
       </div>
     </template>
   </q-table>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -55,6 +50,9 @@
         <q-input v-model='target.MessageID' :label='$t("MSG_MESSAGE_ID")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
         <q-input v-model.number='target.GetIndex' :label='$t("MSG_GET_INDEX")' />
+      </q-card-section>
+      <q-card-section>
+        <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -96,6 +94,11 @@
       </div>
     </template>
   </q-table>
+  <q-card>
+    <q-card-section class='bg-primary text-white'>
+      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
+    </q-card-section>
+  </q-card>
 </template>
 
 <script setup lang='ts'>
@@ -111,7 +114,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
 const message = useChurchMessageStore()
-const messages = computed(() => message.getMessagesByAppID(appID.value))
+const messages = computed(() => message.getMessagesByAppID(appID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
 
 const messageID = ref('')
 const displayAppMsgs = computed(() => messages.value.filter((msg) => msg.MessageID.includes(messageID.value)))
@@ -124,6 +127,8 @@ const updating = ref(false)
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value.Disabled = false
+  target.value.GetIndex = 0
 }
 
 const onMenuHide = () => {
@@ -148,7 +153,7 @@ const onSubmit = (done: () => void) => {
 const createAppMessage = (done: () => void) => {
   message.createAppMessage({
     TargetAppID: appID.value,
-    TargetLangID: '',
+    TargetLangID: targetLangID.value,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -177,7 +182,7 @@ const updateTarget = computed(() => {
   return {
     ID: target?.value?.ID,
     TargetAppID: appID.value,
-    TargetLangID: target?.value?.Lang,
+    TargetLangID: target?.value?.LangID,
     Lang: target?.value?.Lang,
     MessageID: target?.value?.MessageID,
     Message: target?.value?.Message,
@@ -229,7 +234,7 @@ const uploadFile = (evt: Event) => {
 const onBatchCreate = () => {
   message.createAppMessages({
     TargetAppID: appID.value,
-    TargetLangID: '',
+    TargetLangID: target.value.Lang,
     Infos: loadedMessages.value,
     Message: {
       Error: {
