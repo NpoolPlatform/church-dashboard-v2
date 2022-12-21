@@ -82,7 +82,7 @@ export const useChurchMessageStore = defineStore('church-message-v4', {
     },
     createAppMessages (req: CreateAppMessagesRequest, done: (error: boolean, rows: Array<Message>) => void) {
       doActionWithError<CreateAppMessagesRequest, CreateAppMessagesResponse>(
-        API.CREATE_APP_MESSAGE,
+        API.CREATE_APP_MESSAGES,
         req,
         req.Message,
         (resp: CreateAppMessagesResponse): void => {
@@ -101,7 +101,7 @@ export const useChurchMessageStore = defineStore('church-message-v4', {
     },
     updateAppMessage (req: UpdateAppMessageRequest, done: (error: boolean, row: Message) => void) {
       doActionWithError<UpdateAppMessageRequest, UpdateAppMessageResponse>(
-        API.CREATE_APP_MESSAGE,
+        API.UPDATE_APP_MESSAGE,
         req,
         req.NotifyMessage,
         (resp: UpdateAppMessageResponse): void => {
