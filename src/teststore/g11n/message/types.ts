@@ -70,9 +70,8 @@ export interface GetAppMessagesResponse {
 }
 
 export interface UpdateAppMessageRequest extends MyRequest {
-  ID: string;
   TargetAppID: string;
-  TargetLangID: string;
+  ID: string;
   MessageID: string;
   Message: string;
   GetIndex: number;
