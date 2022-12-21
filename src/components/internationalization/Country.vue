@@ -54,7 +54,10 @@
     flat
     :title='$t("MSG_LOADED_COUNTRIES")'
     row-key='ID'
+    :rows='loadedCountries'
     :rows-per-page-options='[10]'
+    v-model:selected='selectLoadedCountries'
+    selection='multiple'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -77,7 +80,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_BATCH_CREATE")'
-          :disable='loadedCountries.length === 0'
+          :disable='selectLoadedCountries.length === 0'
           @click='onBatchCreate'
         />
       </div>
@@ -196,12 +199,14 @@ const onExport = () => {
 
 const loadedCountries = ref([] as Array<Country>)
 const loadFileButton = ref<HTMLInputElement>()
+const selectLoadedCountries = ref([] as Array<Country>)
 
 const uploadFile = (evt: Event) => {
   const target = evt.target as unknown as HTMLInputElement
   if (target.files) {
     const filename = target.files[0]
     const reader = new FileReader()
+
     reader.onload = () => {
       loadedCountries.value = JSON.parse(reader.result as string) as Array<Country>
     }
@@ -211,7 +216,7 @@ const uploadFile = (evt: Event) => {
 
 const onBatchCreate = () => {
   country.createCountries({
-    Infos: loadedCountries.value,
+    Infos: selectLoadedCountries.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COUNTRIES',
