@@ -7,6 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as Message)'
+    v-model:selected='exportMessages'
+    selection='multiple'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -23,14 +25,14 @@
           :label='$t("MSG_CREATE")'
           @click='onCreate'
         />
-        <!-- <q-btn
+        <q-btn
           dense
           flat
           class='btn flat'
           :label='$t("MSG_EXPORT")'
           @click='onExport'
-          :disable='!language'
-        /> -->
+          :disable='exportMessages.length === 0'
+        />
       </div>
     </template>
   </q-table>
@@ -51,7 +53,7 @@
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
         <q-input v-model.number='target.GetIndex' :label='$t("MSG_GET_INDEX")' />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='updating'>
         <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' /></div>
       </q-card-section>
       <q-item class='row'>
@@ -66,6 +68,9 @@
     :title='$t("MSG_LOADED_MESSAGES")'
     row-key='ID'
     :rows-per-page-options='[10]'
+    :rows='loadedMessages'
+    selection='multiple'
+    v-model:selected='selectedMessages'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -107,8 +112,10 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useChurchMessageStore } from 'src/teststore/g11n/message'
 import { getAppMessages } from 'src/api/g11n'
 import { appID } from 'src/api/app'
-import { Message, MessageReq } from 'src/teststore/g11n/message/types'
-import { NotifyType } from 'npool-cli-v4'
+import { Message } from 'src/teststore/g11n/message/types'
+import { formatTime, NotifyType } from 'npool-cli-v4'
+import saveAs from 'file-saver'
+import { useLocaleStore } from 'npool-cli-v2'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
@@ -127,7 +134,6 @@ const updating = ref(false)
 const onCreate = () => {
   showing.value = true
   updating.value = false
-  target.value.Disabled = false
   target.value.GetIndex = 0
 }
 
@@ -144,6 +150,13 @@ const onRowClick = (row: Message) => {
 
 const onCancel = () => {
   onMenuHide()
+}
+
+const exportMessages = ref([] as Array<Message>)
+const onExport = () => {
+  const blob = new Blob([JSON.stringify(exportMessages.value)], { type: 'text/plain;charset=utf-8' })
+  const filename = 'messages-' + formatTime(new Date().getTime() / 1000) + '.json'
+  saveAs(blob, filename)
 }
 
 const onSubmit = (done: () => void) => {
@@ -216,7 +229,8 @@ const updateAppMessage = (done: () => void) => {
   })
 }
 
-const loadedMessages = ref([] as Array<MessageReq>)
+const loadedMessages = ref([] as Array<Message>)
+const selectedMessages = ref([] as Array<Message>)
 const loadFileButton = ref<HTMLInputElement>()
 
 const uploadFile = (evt: Event) => {
@@ -225,17 +239,30 @@ const uploadFile = (evt: Event) => {
     const filename = target.files[0]
     const reader = new FileReader()
     reader.onload = () => {
-      loadedMessages.value = JSON.parse(reader.result as string) as Array<MessageReq>
+      loadedMessages.value = JSON.parse(reader.result as string) as Array<Message>
     }
     reader.readAsText(filename)
   }
 }
 
+const importMessages = computed(() => {
+  return Array.from(selectedMessages.value).map((el) => {
+    return {
+      MessageID: el.MessageID,
+      Message: el.Message,
+      GetIndex: el.GetIndex,
+      Disabled: el.Disabled
+    } as Message
+  })
+})
+
+const locale = useLocaleStore()
+
 const onBatchCreate = () => {
   message.createAppMessages({
     TargetAppID: appID.value,
-    TargetLangID: target.value.Lang,
-    Infos: loadedMessages.value,
+    TargetLangID: locale.CurLang?.ID as string,
+    Infos: importMessages.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COUNTRIES',
