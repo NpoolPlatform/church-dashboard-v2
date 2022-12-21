@@ -55,7 +55,7 @@ export const useChurchMessageStore = defineStore('church-message-v4', {
         (resp: DeleteAppMessageResponse): void => {
           const data = this.getMessagesByAppID(req.TargetAppID)
           const index = data.findIndex((el) => el.ID === resp.Info.ID)
-          data.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
+          data.splice(index, 1)
           this.Messages.Messages.set(req.TargetAppID, data)
           this.Messages.Total -= 1
           done(false, resp.Info)

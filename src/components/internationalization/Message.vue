@@ -29,6 +29,14 @@
           dense
           flat
           class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='exportMessages.length === 0'
+          @click='onDelete'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
           :label='$t("MSG_EXPORT")'
           @click='onExport'
           :disable='exportMessages.length === 0'
@@ -173,14 +181,14 @@ const createAppMessage = (done: () => void) => {
     ...target.value,
     NotifyMessage: {
       Error: {
-        Title: 'MSG_CREATE_COUNTRY',
-        Message: 'MSG_CREATE_COUNTRY_FAIL',
+        Title: 'MSG_CREATE_MESSAGE',
+        Message: 'MSG_CREATE_MESSAGE_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_CREATE_COUNTRY',
-        Message: 'MSG_CREATE_COUNTRY_SUCCESS',
+        Title: 'MSG_CREATE_MESSAGE',
+        Message: 'MSG_CREATE_MESSAGE_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
@@ -198,7 +206,6 @@ const updateTarget = computed(() => {
   return {
     ID: target?.value?.ID,
     TargetAppID: appID.value,
-    TargetLangID: target?.value?.LangID,
     Lang: target?.value?.Lang,
     MessageID: target?.value?.MessageID,
     Message: target?.value?.Message,
@@ -211,14 +218,14 @@ const updateAppMessage = (done: () => void) => {
     ...updateTarget.value,
     NotifyMessage: {
       Error: {
-        Title: 'MSG_UPDATE_COUNTRY',
-        Message: 'MSG_UPDATE_COUNTRY_FAIL',
+        Title: 'MSG_UPDATE_MESSAGE',
+        Message: 'MSG_UPDATE_MESSAGE_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_UPDATE_COUNTRY',
-        Message: 'MSG_UPDATE_COUNTRY_FAIL',
+        Title: 'MSG_UPDATE_MESSAGE',
+        Message: 'MSG_UPDATE_MESSAGE_FAIL',
         Popup: true,
         Type: NotifyType.Success
       }
@@ -229,6 +236,29 @@ const updateAppMessage = (done: () => void) => {
       return
     }
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  message.deleteAppMessage({
+    ID: exportMessages?.value[0].ID,
+    TargetAppID: appID.value,
+    NotifyMessage: {
+      Error: {
+        Title: 'MSG_DELETE_MESSAGE',
+        Message: 'MSG_DELETE_MESSAGE_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_DELETE_MESSAGE',
+        Message: 'MSG_DELETE_MESSAGE_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, () => {
+    // TODO
   })
 }
 
