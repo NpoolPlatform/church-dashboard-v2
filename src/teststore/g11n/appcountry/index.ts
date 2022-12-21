@@ -51,7 +51,7 @@ export const useChurchAppCountryStore = defineStore('church-appcountry-v4', {
         (resp: DeleteAppCountryResponse): void => {
           const data = this.getCountriesByAppID(req.TargetAppID)
           const index = data.findIndex((el) => el.ID === resp.Info.ID)
-          data.splice(index < 0 ? 0 : index, index < 0 ? 0 : 1, resp.Info)
+          data.splice(index, 1)
           this.AppCountries.AppCountries.set(req.TargetAppID, data)
           this.AppCountries.Total -= 1
           done(false, resp.Info)

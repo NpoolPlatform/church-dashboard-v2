@@ -6,8 +6,8 @@
     :rows='countries'
     row-key='ID'
     :rows-per-page-options='[10]'
-    :selected='selectedCountries'
-    selection='multiple'
+    v-model:selected='selectedCountries'
+    selection='single'
   >
     <template #top-right>
       <div class='row indent flat'>
