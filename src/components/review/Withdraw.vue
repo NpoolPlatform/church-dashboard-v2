@@ -120,7 +120,7 @@ const getAppWithdrawReviews = (offset: number, limit: number) => {
       }
     }
   }, (reviews: Array<WithdrawReview>, error: boolean) => {
-    if (error || reviews.length < limit) {
+    if (error || reviews.length === 0) {
       return
     }
     getAppWithdrawReviews(offset + limit, limit)
