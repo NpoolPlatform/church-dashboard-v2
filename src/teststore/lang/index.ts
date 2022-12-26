@@ -9,15 +9,25 @@ export const useLocalLangStore = defineStore('local-lang-v4', {
     I18n: useI18n()
   }),
   getters: {
-    setLang () {
-      return (lang: AppLang) => {
-        this.AppLang = lang
-        Cookies.set('X-Lang-ID', lang.ID, { expires: '4h', secure: true })
-        this.I18n.locale = lang.Lang
-      }
-    }
+
   },
   actions: {
-
+    setLang (lang: AppLang) {
+      this.AppLang = lang
+      Cookies.set('X-Lang-ID', lang.ID, { expires: '4h', secure: true })
+      this.I18n.locale = lang.Lang
+    },
+    setLangs (langs: Array<AppLang>) {
+      let flag = false
+      langs.forEach((el) => {
+        if (el.Main) {
+          flag = true
+          this.setLang(el)
+        }
+      })
+      if (!flag && langs.length > 0) {
+        this.setLang(langs[0])
+      }
+    }
   }
 })
