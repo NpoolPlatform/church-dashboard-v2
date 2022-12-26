@@ -5,6 +5,7 @@ import { AppLang } from 'src/teststore/g11n/applang/types'
 import { useAdminAppLangStore } from 'src/teststore/applang'
 import { useAdminMessageStore } from 'src/teststore/message'
 import { Message } from 'src/teststore/message/types'
+import { useLocalLangStore } from 'src/teststore/lang'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 // const { t } = useI18n({ useScope: 'global' })
@@ -23,6 +24,7 @@ onMounted(() => {
   }
 })
 
+const locale = useLocalLangStore()
 const getAppLangs = (offset: number, limit: number) => {
   lang.getAppLangs({
     Offset: offset,
@@ -31,6 +33,9 @@ const getAppLangs = (offset: number, limit: number) => {
     }
   }, (error: boolean, rows: Array<AppLang>) => {
     if (error || rows.length === 0) {
+      if (!error) {
+        locale.setLangs(langs.value)
+      }
       return
     }
     getAppLangs(offset + limit, limit)
