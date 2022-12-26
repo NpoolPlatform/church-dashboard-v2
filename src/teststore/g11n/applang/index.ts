@@ -10,7 +10,6 @@ import {
   DeleteAppLangResponse
 } from './types'
 import { doActionWithError } from 'npool-cli-v4'
-import { useLocalLangStore } from 'src/teststore/lang'
 
 export const useChurchAppLangStore = defineStore('church-applang-v4', {
   state: () => ({
@@ -37,17 +36,6 @@ export const useChurchAppLangStore = defineStore('church-applang-v4', {
           const data = this.getAppLangsByAppID(req.TargetAppID)
           data.push(...resp.Infos)
           this.AppLangs.AppLangs.set(req.TargetAppID, data)
-          if (data.length > 0) {
-            const local = useLocalLangStore()
-            data.forEach((el) => {
-              if (el.Main) {
-                local.setLang(el)
-              }
-            })
-            if (!local.AppLang) {
-              local.setLang(data?.[0])
-            }
-          }
           this.AppLangs.Total = resp.Total
           done(false, resp.Infos)
         }, () => {

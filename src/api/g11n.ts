@@ -111,7 +111,7 @@ export const getAppMessages = (offset: number, limit: number) => {
       }
     }
   }, (error: boolean, rows: Array<Message>) => {
-    if (error || rows.length === 0) {
+    if (error || rows.length < limit) {
       return
     }
     getAppMessages(offset + limit, limit)
