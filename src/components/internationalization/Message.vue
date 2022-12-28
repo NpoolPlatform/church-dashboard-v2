@@ -7,8 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as Message)'
-    v-model:selected='exportMessages'
-    selection='multiple'
+    v-model:selected='selectedMessages'
+    selection='single'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -30,7 +30,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_DELETE")'
-          :disable='exportMessages.length === 0'
+          :disable='selectedMessages.length === 0'
           @click='onDelete'
         />
         <q-btn
@@ -39,7 +39,6 @@
           class='btn flat'
           :label='$t("MSG_EXPORT")'
           @click='onExport'
-          :disable='exportMessages.length === 0'
         />
       </div>
     </template>
@@ -80,8 +79,6 @@
     row-key='ID'
     :rows-per-page-options='[10]'
     :rows='loadedMessages'
-    selection='multiple'
-    v-model:selected='selectedMessages'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -105,7 +102,7 @@
           class='btn flat'
           :label='$t("MSG_BATCH_CREATE")'
           :disable='loadedMessages.length === 0'
-          @click='onBatchCreate'
+          @click='onBatchClick'
         />
       </div>
     </template>
@@ -115,17 +112,35 @@
       {{ $t('MSG_ADVERTISEMENT_POSITION') }}
     </q-card-section>
   </q-card>
+
+  <q-dialog
+    v-model='batchCreating'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <span>{{ $t('MSG_BATCH_CREATE_MESSAGE') }}</span>
+      </q-card-section>
+      <q-card-section>
+        <AppLanguagePicker v-model:id='langID' label='MSG_CURRENT_MESSAGES_LANGUAGE' />
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onBatchCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
 
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { useChurchMessageStore, formatTime, NotifyType, Message } from 'npool-cli-v4'
+import { useChurchMessageStore, formatTime, NotifyType, Message, useLocaleStore, MessageReq } from 'npool-cli-v4'
 import { getAppMessages } from 'src/api/g11n'
 import { appID } from 'src/api/app'
 
 import saveAs from 'file-saver'
-import { useLocaleStore } from 'npool-cli-v2'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
@@ -280,20 +295,32 @@ const uploadFile = (evt: Event) => {
 const importMessages = computed(() => {
   return Array.from(selectedMessages.value).map((el) => {
     return {
+      AppID: appID.value,
       MessageID: el.MessageID,
       Message: el.Message,
       GetIndex: el.GetIndex,
       Disabled: el.Disabled
-    } as Message
+    } as MessageReq
   })
 })
 
 const locale = useLocaleStore()
+const langID = ref(locale?.AppLang?.LangID)
 
-const onBatchCreate = () => {
+const batchCreating = ref(false)
+
+const onBatchClick = () => {
+  batchCreating.value = true
+}
+
+const onBatchCancel = () => {
+  batchCreating.value = false
+}
+
+const onBatchSubmit = (done: () => void) => {
   message.createAppMessages({
     TargetAppID: appID.value,
-    TargetLangID: locale.CurLang?.ID as string,
+    TargetLangID: langID.value,
     Infos: importMessages.value,
     Message: {
       Error: {
@@ -309,8 +336,12 @@ const onBatchCreate = () => {
         Type: NotifyType.Success
       }
     }
-  }, () => {
-    // TODO
+  }, (error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onBatchCancel()
   })
 }
 
