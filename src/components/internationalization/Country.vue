@@ -90,10 +90,8 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { NotifyType, formatTime } from 'npool-cli-v4'
+import { NotifyType, formatTime, useChurchCountryStore, Country } from 'npool-cli-v4'
 import { getCountries } from 'src/api/g11n'
-import { useChurchCountryStore } from 'src/teststore/g11n/country'
-import { Country, UpdateCountryRequest } from 'src/teststore/g11n/country/types'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import AppCountry from './AppCountry.vue'
 
@@ -163,7 +161,7 @@ const updateTarget = computed(() => {
     Flag: target?.value?.Flag,
     Short: target?.value?.Short,
     Code: target?.value?.Code
-  } as UpdateCountryRequest
+  }
 })
 const updateCountry = (done: () => void) => {
   country.updateCountry({

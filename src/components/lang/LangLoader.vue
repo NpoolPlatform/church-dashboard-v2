@@ -1,11 +1,7 @@
 <script setup lang='ts'>
 import { onMounted, computed } from 'vue'
 // import { useI18n } from 'vue-i18n'
-import { AppLang } from 'src/teststore/g11n/applang/types'
-import { useAdminAppLangStore } from 'src/teststore/applang'
-import { useAdminMessageStore } from 'src/teststore/message'
-import { Message } from 'src/teststore/message/types'
-import { useLocalLangStore } from 'src/teststore/lang'
+import { AppLang, useAdminAppLangStore, useAdminMessageStore, Message, useLocaleStore } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 // const { t } = useI18n({ useScope: 'global' })
@@ -24,7 +20,7 @@ onMounted(() => {
   }
 })
 
-const locale = useLocalLangStore()
+const locale = useLocaleStore()
 const getAppLangs = (offset: number, limit: number) => {
   lang.getAppLangs({
     Offset: offset,

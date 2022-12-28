@@ -50,11 +50,9 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
+import { NotifyType, useChurchAppCountryStore, AppCountry } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
 import { getAppCountries } from 'src/api/g11n'
-import { useChurchAppCountryStore } from 'src/teststore/g11n/appcountry'
-import { AppCountry } from 'src/teststore/g11n/appcountry/types'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
