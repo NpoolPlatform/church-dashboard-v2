@@ -56,8 +56,6 @@
     row-key='ID'
     :rows='loadedCountries'
     :rows-per-page-options='[10]'
-    v-model:selected='selectLoadedCountries'
-    selection='multiple'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -80,7 +78,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_BATCH_CREATE")'
-          :disable='selectLoadedCountries.length === 0'
+          :disable='loadedCountries.length === 0'
           @click='onBatchCreate'
         />
       </div>
@@ -197,7 +195,6 @@ const onExport = () => {
 
 const loadedCountries = ref([] as Array<Country>)
 const loadFileButton = ref<HTMLInputElement>()
-const selectLoadedCountries = ref([] as Array<Country>)
 
 const uploadFile = (evt: Event) => {
   const target = evt.target as unknown as HTMLInputElement
@@ -213,7 +210,7 @@ const uploadFile = (evt: Event) => {
 }
 
 const importedCountries = computed(() => {
-  return Array.from(selectLoadedCountries.value).map((el) => {
+  return Array.from(loadedCountries.value).map((el) => {
     return {
       Country: el.Country,
       Code: el.Code,

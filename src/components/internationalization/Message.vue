@@ -179,9 +179,23 @@ const onCancel = () => {
 
 const exportMessages = ref([] as Array<Message>)
 const onExport = () => {
-  const blob = new Blob([JSON.stringify(exportMessages.value)], { type: 'text/plain;charset=utf-8' })
-  const filename = 'messages-' + formatTime(new Date().getTime() / 1000) + '.json'
-  saveAs(blob, filename)
+  const resultMap = new Map<string, Array<Message>>()
+  messages.value.forEach((el) => {
+    let data = resultMap.get(el.LangID)
+    if (!data) {
+      data = []
+    }
+    data.push(el)
+    resultMap.set(el.LangID, data)
+  })
+  resultMap.forEach((values, _key) => {
+    if (values.length > 0) {
+      console.log('_key: ', _key)
+      const blob = new Blob([JSON.stringify(values)], { type: 'text/plain;charset=utf-8' })
+      const filename = 'messages-' + values[0].Lang + '-' + formatTime(new Date().getTime() / 1000) + '.json'
+      saveAs(blob, filename)
+    }
+  })
 }
 
 const onSubmit = (done: () => void) => {
@@ -305,7 +319,8 @@ const importMessages = computed(() => {
 })
 
 const locale = useLocaleStore()
-const langID = ref(locale?.AppLang?.LangID)
+const _langID = computed(() => locale?.AppLang?.LangID)
+const langID = ref(_langID.value)
 
 const batchCreating = ref(false)
 
@@ -347,7 +362,7 @@ const onBatchSubmit = (done: () => void) => {
 
 const prepare = () => {
   if (messages.value?.length === 0) {
-    getAppMessages(0, 200)
+    getAppMessages(0, 500)
   }
 }
 
