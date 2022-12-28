@@ -24,7 +24,7 @@
 <script setup lang='ts'>
 import { appID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
-import { useChurchAppLangStore } from 'src/teststore/g11n/applang'
+import { useChurchAppLangStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {

@@ -54,10 +54,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
+import { NotifyType, useChurchLangStore, Lang } from 'npool-cli-v4'
 import { getLangs } from 'src/api/g11n'
-import { useChurchLangStore } from 'src/teststore/g11n/lang'
-import { Lang, UpdateLangRequest } from 'src/teststore/g11n/lang/types'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -127,7 +125,7 @@ const updateTarget = computed(() => {
     Logo: target.value?.Logo,
     Name: target.value?.Name,
     Short: target.value?.Short
-  } as UpdateLangRequest
+  }
 })
 
 const updateLang = (done: () => void) => {

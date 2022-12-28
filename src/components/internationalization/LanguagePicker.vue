@@ -22,7 +22,7 @@
 </template>
 <script setup lang='ts'>
 import { getLangs } from 'src/api/g11n'
-import { useChurchLangStore } from 'src/teststore/g11n/lang'
+import { useChurchLangStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {

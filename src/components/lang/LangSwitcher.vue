@@ -39,9 +39,7 @@
 
 <script setup lang='ts'>
 import { ref, computed, defineProps, withDefaults, toRef, defineEmits, onMounted } from 'vue'
-import { useAdminAppLangStore } from 'src/teststore/applang'
-import { AppLang } from 'src/teststore/g11n/applang/types'
-import { useLocalLangStore } from 'src/teststore/lang'
+import { useAdminAppLangStore, AppLang, useLocaleStore } from 'npool-cli-v4'
 
 interface Props {
   language?: AppLang
@@ -62,7 +60,7 @@ const language = toRef(props, 'language')
 const downArrow = ref('img: icons/DownArrow.svg')
 const internet = ref('img: icons/Internet.svg')
 
-const locale = useLocalLangStore()
+const locale = useLocaleStore()
 
 const lang = useAdminAppLangStore()
 const langs = computed(() => lang.AppLangs.AppLangs)

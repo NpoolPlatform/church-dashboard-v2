@@ -22,7 +22,7 @@
 </template>
 <script setup lang='ts'>
 import { getCountries } from 'src/api/g11n'
-import { useChurchCountryStore } from 'src/teststore/g11n/country'
+import { useChurchCountryStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {

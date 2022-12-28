@@ -1,14 +1,16 @@
-import { NotifyType } from 'npool-cli-v4'
-import { useChurchAppCountryStore } from 'src/teststore/g11n/appcountry'
-import { AppCountry } from 'src/teststore/g11n/appcountry/types'
-import { useChurchAppLangStore } from 'src/teststore/g11n/applang'
-import { AppLang } from 'src/teststore/g11n/applang/types'
-import { useChurchCountryStore } from 'src/teststore/g11n/country'
-import { Country } from 'src/teststore/g11n/country/types'
-import { useChurchLangStore } from 'src/teststore/g11n/lang'
-import { Lang } from 'src/teststore/g11n/lang/types'
-import { useChurchMessageStore } from 'src/teststore/g11n/message'
-import { Message } from 'src/teststore/g11n/message/types'
+import {
+  NotifyType,
+  useChurchAppCountryStore,
+  AppCountry,
+  useChurchAppLangStore,
+  AppLang,
+  useChurchCountryStore,
+  Country,
+  useChurchLangStore,
+  Lang,
+  useChurchMessageStore,
+  Message
+} from 'npool-cli-v4'
 import { appID } from './app'
 
 const country = useChurchCountryStore()

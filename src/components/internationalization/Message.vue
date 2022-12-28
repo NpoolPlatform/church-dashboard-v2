@@ -120,11 +120,10 @@
 <script setup lang='ts'>
 
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { useChurchMessageStore } from 'src/teststore/g11n/message'
+import { useChurchMessageStore, formatTime, NotifyType, Message } from 'npool-cli-v4'
 import { getAppMessages } from 'src/api/g11n'
 import { appID } from 'src/api/app'
-import { Message } from 'src/teststore/g11n/message/types'
-import { formatTime, NotifyType } from 'npool-cli-v4'
+
 import saveAs from 'file-saver'
 import { useLocaleStore } from 'npool-cli-v2'
 
