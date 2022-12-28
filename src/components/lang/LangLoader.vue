@@ -1,26 +1,24 @@
 <script setup lang='ts'>
-import { onMounted, computed, watch } from 'vue'
+import { onMounted, computed } from 'vue'
+import { AppLang, Message, NotifyType, useAdminAppLangStore, useAdminMessageStore, useLocaleStore } from 'npool-cli-v4'
 import { useI18n } from 'vue-i18n'
-import { AppLang, Message, useLocaleStore, useFrontendMessageStore, useAdminAppLangStore, NotifyType } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+const lang = useAdminAppLangStore()
+const langs = computed(() => lang.AppLangs.AppLangs)
+
+const message = useAdminMessageStore()
+const messages = computed(() => message.Messages.Messages)
+
 const locale = useLocaleStore()
-const langID = computed(() => locale.AppLang?.LangID)
 
-const message = useFrontendMessageStore()
-const messages = computed(() => message.getMessagesByLangID(langID.value))
-
-watch(langID, () => {
+onMounted(() => {
+  if (langs.value.length === 0) {
+    getAppLangs(0, 100)
+  }
   if (messages.value.length === 0) {
     getMessages(0, 500)
-  }
-})
-
-const lang = useAdminAppLangStore()
-onMounted(() => {
-  if (lang.AppLangs.AppLangs.length === 0) {
-    getAppLangs(0, 100)
   }
 })
 
@@ -32,6 +30,9 @@ const getAppLangs = (offset: number, limit: number) => {
     }
   }, (error: boolean, rows: Array<AppLang>) => {
     if (error || rows.length === 0) {
+      if (!error) {
+        locale.setLangs(langs.value)
+      }
       return
     }
     getAppLangs(offset + limit, limit)
@@ -40,7 +41,6 @@ const getAppLangs = (offset: number, limit: number) => {
 
 const getMessages = (offset: number, limit: number) => {
   message.getMessages({
-    LangID: langID.value,
     Disabled: false,
     Offset: offset,
     Limit: limit,
