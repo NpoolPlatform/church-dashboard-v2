@@ -234,6 +234,7 @@ const updateTarget = computed(() => {
   return {
     ID: target?.value?.ID,
     TargetAppID: appID.value,
+    TargetLangID: target?.value.LangID,
     Lang: target?.value?.Lang,
     MessageID: target?.value?.MessageID,
     Message: target?.value?.Message,
