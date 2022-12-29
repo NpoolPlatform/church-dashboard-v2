@@ -1,8 +1,8 @@
 <template>
   <div class='q-pb-sm'>
-    <q-badge>
+    <div>
       {{ label }}:
-    </q-badge>
+    </div>
   </div>
   <q-input filled v-model='target'>
     <template #prepend>
@@ -29,6 +29,8 @@
       </q-icon>
     </template>
   </q-input>
+
+  <div style='height: 20px' />
 </template>
 <script lang='ts' setup>
 import { formatTime } from 'npool-cli-v4'
