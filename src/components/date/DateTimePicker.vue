@@ -42,7 +42,6 @@ const props = defineProps<Props>()
 const date = toRef(props, 'date')
 const label = toRef(props, 'label')
 
-console.log('label: ', label)
 const target = ref('')
 
 const emit = defineEmits<{(e: 'update:date', target: number): void}>()
