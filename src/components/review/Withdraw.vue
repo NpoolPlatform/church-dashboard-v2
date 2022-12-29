@@ -46,9 +46,14 @@
 
 <script setup lang='ts'>
 import {
-  useLocaleStore
-} from 'npool-cli-v2'
-import { NotifyType, useChurchWithdrawReviewStore, useLocalUserStore, WithdrawReview, ReviewState, useChurchAppCoinStore } from 'npool-cli-v4'
+  useLocaleStore,
+  NotifyType,
+  useChurchWithdrawReviewStore,
+  useLocalUserStore,
+  WithdrawReview,
+  ReviewState,
+  useChurchAppCoinStore
+} from 'npool-cli-v4'
 import { getAppCoins } from 'src/api/coin'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
@@ -132,7 +137,7 @@ const updateAppWithdrawReview = (done: () => void) => {
     TargetAppID: appID.value,
     AppID: appID.value,
     ReviewID: target.value.ReviewID,
-    LangID: locale.CurLang?.ID as string,
+    LangID: locale.AppLang?.LangID,
     UserID: logined.User?.ID,
     Message: target.value.Message,
     State: target.value.State,

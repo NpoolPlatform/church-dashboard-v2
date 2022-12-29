@@ -56,8 +56,7 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocaleStore } from 'npool-cli-v2'
-import { NotifyType, KYCReview, KYCReviewState, ImageType, DocumentType, useChurchKycStore, User, useChurchUserStore } from 'npool-cli-v4'
+import { NotifyType, KYCReview, KYCReviewState, ImageType, DocumentType, useChurchKycStore, User, useChurchUserStore, useLocaleStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -215,7 +214,7 @@ const updateReview = (state: KYCReviewState) => {
   kyc.updateAppKycReview({
     TargetAppID: appID.value,
     ReviewID: target.value?.ReviewID,
-    LangID: locale.CurLang?.ID,
+    LangID: locale.AppLang?.LangID,
     State: state,
     Message: target.value.Message,
     NotifyMessage: {
