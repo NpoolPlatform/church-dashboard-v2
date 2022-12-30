@@ -21,8 +21,10 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useLocaleStore } from 'npool-cli-v2'
-import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { useChurchAppLangStore } from 'npool-cli-v4'
+import { appID } from 'src/api/app'
+import { getAppLangs } from 'src/api/g11n'
+import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {
   language: string
@@ -35,10 +37,11 @@ const updating = toRef(props, 'updating')
 
 const lang = ref(language.value)
 
-const locale = useLocaleStore()
-const languages = computed(() => Array.from(locale.Languages).map((el) => {
+const _lang = useChurchAppLangStore()
+const langs = computed(() => _lang.getAppLangsByAppID(appID.value))
+const languages = computed(() => Array.from(langs.value).map((el) => {
   return {
-    value: el.ID,
+    value: el.LangID,
     label: el.Name,
     icon: el.Logo
   }
@@ -49,10 +52,19 @@ const onUpdate = () => {
   emit('update:language', lang.value)
 }
 
+watch(appID, () => {
+  if (langs.value.length === 0) {
+    getAppLangs(0, 100)
+  }
+})
+
 onMounted(() => {
   if (!language.value) {
-    lang.value = locale.CurLang?.ID as string
     emit('update:language', lang.value)
+  }
+
+  if (langs.value.length === 0) {
+    getAppLangs(0, 100)
   }
 })
 </script>
