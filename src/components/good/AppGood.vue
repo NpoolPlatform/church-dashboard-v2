@@ -63,7 +63,7 @@
           :min='0'
           suffix='%'
         />
-        <!-- <q-input
+        <q-input
           class='commission-percent'
           v-model.number='target.TechnicalFeeRatio'
           :label='$t("MSG_TECHNICALFEE_RATIO")'
@@ -76,7 +76,7 @@
           :label='$t("MSG_ELECTRICITYFEE_RATIO")'
           type='number'
           :min='0'
-        /> -->
+        />
         <!-- <q-input
           class='commission-percent'
           v-model='target.DailyRewardAmount'
@@ -86,12 +86,12 @@
         /> -->
       </q-card-section>
       <q-card-section>
-        <div> <q-toggle dense v-model='openSaleActivity' :label='$t("MSG_OPEN_SALE")' /></div>
+        <!-- <div> <q-toggle dense v-model='openSaleActivity' :label='$t("MSG_OPEN_SALE")' /></div> -->
       </q-card-section>
       <q-card-section>
-        <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' :disabled='!openSaleActivity' /></div>
-        <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' :disabled='!openSaleActivity' /></div>
-        <!-- <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div> -->
+        <!-- <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' :disabled='!openSaleActivity' /></div> -->
+        <!-- <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' :disabled='!openSaleActivity' /></div> -->
+        <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div>
       </q-card-section>
       <q-card-section>
         <div>
@@ -132,7 +132,6 @@ const selectedGood = ref([] as Array<Good>)
 const appGood = useChurchAppGoodStore()
 const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
 
-const openSaleActivity = ref(false)
 const target = ref({} as AppGood)
 const showing = ref(false)
 const updating = ref(false)
@@ -153,7 +152,6 @@ const onCancel = () => {
 
 const onRowClick = (row: AppGood) => {
   target.value = { ...row }
-  openSaleActivity.value = target?.value?.SaleEndAt !== 0
   updating.value = true
   showing.value = true
 }
@@ -202,18 +200,12 @@ const updateTarget = computed(() => {
     DisplayIndex: target.value.DisplayIndex,
     PurchaseLimit: target.value.PurchaseLimit,
     CommissionPercent: target.value.CommissionPercent,
-    // TechnicalFeeRatio: target.value.TechnicalFeeRatio === 0 ? undefined as unknown as number : target.value.TechnicalFeeRatio,
-    // ElectricityFeeRatio: target.value.ElectricityFeeRatio === 0 ? undefined as unknown as number : target.value.ElectricityFeeRatio,
-    SaleStartAt: target.value.SaleStartAt,
-    SaleEndAt: target.value.SaleEndAt
-    // ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt,
+    TechnicalFeeRatio: target.value.TechnicalFeeRatio,
+    ElectricityFeeRatio: target.value.ElectricityFeeRatio,
+    ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
   }
 })
 const updateAppGood = (done: () => void) => {
-  if (!openSaleActivity.value) {
-    target.value.SaleStartAt = 0
-    target.value.SaleEndAt = 0
-  }
   appGood.updateAppGood({
     ...updateTarget.value,
     Message: {
