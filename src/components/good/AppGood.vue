@@ -77,17 +77,20 @@
           type='number'
           :min='0'
         /> -->
-        <q-input
+        <!-- <q-input
           class='commission-percent'
           v-model='target.DailyRewardAmount'
           :label='$t("MSG_DAILY_REWARD_AMOUNT")'
           type='number'
           :min='0'
-        />
+        /> -->
       </q-card-section>
       <q-card-section>
-        <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' /></div>
-        <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' /></div>
+        <div> <q-toggle dense v-model='openSaleActivity' :label='$t("MSG_OPEN_SALE")' /></div>
+      </q-card-section>
+      <q-card-section>
+        <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' :disabled='!openSaleActivity' /></div>
+        <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' :disabled='!openSaleActivity' /></div>
         <!-- <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div> -->
       </q-card-section>
       <q-card-section>
@@ -129,6 +132,7 @@ const selectedGood = ref([] as Array<Good>)
 const appGood = useChurchAppGoodStore()
 const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
 
+const openSaleActivity = ref(false)
 const target = ref({} as AppGood)
 const showing = ref(false)
 const updating = ref(false)
@@ -149,6 +153,7 @@ const onCancel = () => {
 
 const onRowClick = (row: AppGood) => {
   target.value = { ...row }
+  openSaleActivity.value = target?.value?.SaleEndAt !== 0
   updating.value = true
   showing.value = true
 }
@@ -189,7 +194,7 @@ const createAppGood = (done: () => void) => {
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
-    TargetAppID: appID.value,
+    TargetAppID: target?.value?.AppID,
     Online: target.value.Online,
     Visible: target.value.Visible,
     GoodName: target.value.GoodName,
@@ -199,25 +204,28 @@ const updateTarget = computed(() => {
     CommissionPercent: target.value.CommissionPercent,
     // TechnicalFeeRatio: target.value.TechnicalFeeRatio === 0 ? undefined as unknown as number : target.value.TechnicalFeeRatio,
     // ElectricityFeeRatio: target.value.ElectricityFeeRatio === 0 ? undefined as unknown as number : target.value.ElectricityFeeRatio,
-    SaleStartAt: target.value.SaleStartAt === 0 ? undefined as unknown as number : target.value.SaleStartAt,
-    SaleEndAt: target.value.SaleEndAt === 0 ? undefined as unknown as number : target.value.SaleEndAt,
+    SaleStartAt: target.value.SaleStartAt,
+    SaleEndAt: target.value.SaleEndAt
     // ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt,
-    DailyRewardAmount: target.value?.DailyRewardAmount.length === 0 ? undefined as unknown as string : target.value?.DailyRewardAmount
   }
 })
 const updateAppGood = (done: () => void) => {
+  if (!openSaleActivity.value) {
+    target.value.SaleStartAt = 0
+    target.value.SaleEndAt = 0
+  }
   appGood.updateAppGood({
     ...updateTarget.value,
     Message: {
       Error: {
-        Title: 'MSG_AUTHORIZE_GOOD',
-        Message: 'MSG_AUTHORIZE_GOOD_FAIL',
+        Title: 'MSG_UPDATE_GOOD',
+        Message: 'MSG_UPDATE_GOOD_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_AUTHORIZE_GOOD',
-        Message: 'MSG_AUTHORIZE_GOOD_SUCCESS',
+        Title: 'MSG_UPDATE_GOOD',
+        Message: 'MSG_UPDATE_GOOD_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
