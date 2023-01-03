@@ -5,6 +5,7 @@
     :title='$t("MSG_WITHDRAW_REVIEWS")'
     :rows='displayReviews'
     row-key='ID'
+    :columns='columns'
     :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as WithdrawReview)'
   />
@@ -52,7 +53,8 @@ import {
   useLocalUserStore,
   WithdrawReview,
   ReviewState,
-  useChurchAppCoinStore
+  useChurchAppCoinStore,
+  formatTime
 } from 'npool-cli-v4'
 import { getAppCoins } from 'src/api/coin'
 import { useLocalApplicationStore } from 'src/localstore'
@@ -175,4 +177,82 @@ const prepare = () => {
     getAppCoins(0, 500)
   }
 }
+
+const columns = computed(() => [
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    field: (row: WithdrawReview) => row.CoinName
+  },
+  {
+    name: 'CoinLogo',
+    label: t('MSG_COIN_LOGO'),
+    field: (row: WithdrawReview) => row.CoinLogo
+  },
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COIN_TYPE_ID'),
+    field: (row: WithdrawReview) => row.CoinTypeID
+  },
+  {
+    name: 'Amount',
+    label: t('MSG_AMOUNT'),
+    field: (row: WithdrawReview) => row.Amount
+  },
+  {
+    name: 'Address',
+    label: t('MSG_ADDRESS'),
+    field: (row: WithdrawReview) => row.Address
+  },
+  {
+    name: 'WithdrawState',
+    label: t('MSG_WITHDRAW_STATE'),
+    field: (row: WithdrawReview) => row.WithdrawState
+  },
+  {
+    name: 'State',
+    label: t('MSG_STATE'),
+    field: (row: WithdrawReview) => row.State
+  },
+  {
+    name: 'Trigger',
+    label: t('MSG_TRIGGER'),
+    field: (row: WithdrawReview) => row.Trigger
+  },
+  {
+    name: 'Message',
+    label: t('MSG_MESSAGE'),
+    field: (row: WithdrawReview) => row.Message
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATED_AT'),
+    field: (row: WithdrawReview) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: t('MSG_UPDATED_AT'),
+    field: (row: WithdrawReview) => formatTime(row.UpdatedAt)
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: WithdrawReview) => row.UserID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: WithdrawReview) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: WithdrawReview) => row.PhoneNO
+  },
+  {
+    name: 'KycState',
+    label: t('MSG_KYC_STATE'),
+    field: (row: WithdrawReview) => row.KycState
+  }
+])
 </script>
