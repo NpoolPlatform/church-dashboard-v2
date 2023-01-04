@@ -68,7 +68,9 @@
 <script setup lang='ts'>
 import { useAPIStore, NotificationType, ExpandAPI } from 'npool-cli-v2'
 import { useChurchAuthingStore, NotifyType, Auth } from 'npool-cli-v4'
+import { getAPIs } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
+import { useChurchAPIStore } from 'src/teststore/apis'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
@@ -117,7 +119,12 @@ watch(appID, () => {
   prepare()
 })
 
+const lapi = useChurchAPIStore()
 onMounted(() => {
+  if (lapi.APIs.APIs.length === 0) {
+    getAPIs(0, 500)
+  }
+
   api.getAPIs({
     Message: {
       Error: {
