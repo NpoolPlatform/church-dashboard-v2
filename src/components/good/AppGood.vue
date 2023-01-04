@@ -63,6 +63,35 @@
           :min='0'
           suffix='%'
         />
+        <q-input
+          class='commission-percent'
+          v-model.number='target.TechnicalFeeRatio'
+          :label='$t("MSG_TECHNICALFEE_RATIO")'
+          type='number'
+          :min='0'
+        />
+        <q-input
+          class='commission-percent'
+          v-model.number='target.ElectricityFeeRatio'
+          :label='$t("MSG_ELECTRICITYFEE_RATIO")'
+          type='number'
+          :min='0'
+        />
+        <!-- <q-input
+          class='commission-percent'
+          v-model='target.DailyRewardAmount'
+          :label='$t("MSG_DAILY_REWARD_AMOUNT")'
+          type='number'
+          :min='0'
+        /> -->
+      </q-card-section>
+      <q-card-section>
+        <!-- <div> <q-toggle dense v-model='openSaleActivity' :label='$t("MSG_OPEN_SALE")' /></div> -->
+      </q-card-section>
+      <q-card-section>
+        <!-- <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' :disabled='!openSaleActivity' /></div> -->
+        <!-- <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' :disabled='!openSaleActivity' /></div> -->
+        <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div>
       </q-card-section>
       <q-card-section>
         <div>
@@ -91,6 +120,7 @@ import { getAppGoods, getGoods } from 'src/api/good'
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -162,14 +192,17 @@ const createAppGood = (done: () => void) => {
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
-    TargetAppID: appID.value,
+    TargetAppID: target?.value?.AppID,
     Online: target.value.Online,
     Visible: target.value.Visible,
     GoodName: target.value.GoodName,
     Price: target.value.Price,
     DisplayIndex: target.value.DisplayIndex,
     PurchaseLimit: target.value.PurchaseLimit,
-    CommissionPercent: target.value.CommissionPercent
+    CommissionPercent: target.value.CommissionPercent,
+    TechnicalFeeRatio: target.value.TechnicalFeeRatio,
+    ElectricityFeeRatio: target.value.ElectricityFeeRatio,
+    ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
   }
 })
 const updateAppGood = (done: () => void) => {
@@ -177,14 +210,14 @@ const updateAppGood = (done: () => void) => {
     ...updateTarget.value,
     Message: {
       Error: {
-        Title: 'MSG_AUTHORIZE_GOOD',
-        Message: 'MSG_AUTHORIZE_GOOD_FAIL',
+        Title: 'MSG_UPDATE_GOOD',
+        Message: 'MSG_UPDATE_GOOD_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_AUTHORIZE_GOOD',
-        Message: 'MSG_AUTHORIZE_GOOD_SUCCESS',
+        Title: 'MSG_UPDATE_GOOD',
+        Message: 'MSG_UPDATE_GOOD_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
