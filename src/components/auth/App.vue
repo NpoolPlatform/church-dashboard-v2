@@ -156,6 +156,12 @@ const onCreateAuthClick = () => {
         Message: 'MSG_CREATE_APP_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_APP_AUTH',
+        Message: 'MSG_CREATE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
@@ -173,10 +179,16 @@ const onDeleteAuthClick = () => {
     ID: selectedAuth.value[0].ID,
     Message: {
       Error: {
-        Title: 'MSG_DELETEAPP_AUTH',
+        Title: 'MSG_DELETE_APP_AUTH',
         Message: 'MSG_DELETE_APP_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_DELETE_APP_AUTH',
+        Message: 'MSG_DELETE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
