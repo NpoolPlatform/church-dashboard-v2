@@ -72,6 +72,46 @@
         />
       </div>
     </template>
+    <template #body='props'>
+      <q-tr :props='props'>
+        <q-td key='ID' :props='props' :auto-width='false'>
+          {{ props.row.ID }}
+        </q-td>
+        <q-td key='Method' :props='props'>
+          {{ props.row.Method }}
+        </q-td>
+        <q-td key='MethodName' :props='props'>
+          {{ props.row.MethodName }}
+        </q-td>
+        <q-td key='Domains' :props='props'>
+          {{ props.row.Domains?.join(',') }}
+        </q-td>
+        <q-td key='PathPrefix' :props='props'>
+          {{ props.row.PathPrefix }}
+        </q-td>
+        <q-td key='Path' :props='props'>
+          {{ props.row.Path }}
+        </q-td>
+        <q-td key='Protocol' :props='props'>
+          {{ props.row.Protocol }}
+        </q-td>
+        <q-td key='ServiceName' :props='props'>
+          {{ props.row.ServiceName }}
+        </q-td>
+        <q-td key='Exported' :props='props'>
+          {{ props.row.Exported }}
+        </q-td>
+        <q-td key='Depracated' :props='props'>
+          <q-toggle dense v-model='props.row.Depracated' @update:model-value='onDeprecatedClick(props.row)' />
+        </q-td>
+        <q-td key='CreatedAt' :props='props'>
+          {{ formatTime(props.row.CreatedAt) }}
+        </q-td>
+        <q-td key='UpdatedAt' :props='props'>
+          {{ formatTime(props.row.UpdatedAt) }}
+        </q-td>
+      </q-tr>
+    </template>
   </q-table>
   <q-table
     :title='$t("MSG_ROLE_USERS")'
@@ -98,7 +138,7 @@ import {
   InvalidID,
   formatTime
 } from 'npool-cli-v4'
-import { getAPIs } from 'src/api/apis'
+import { getAPIs, updateAPI } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useChurchAPIStore } from 'src/teststore/apis'
 import { API } from 'src/teststore/apis/types'
@@ -244,6 +284,15 @@ onMounted(() => {
   prepare()
 })
 
+const onDeprecatedClick = (row: API) => {
+  updateAPI({ ...row }, (error: boolean) => {
+    if (error) {
+      console.log('error: ', error)
+      row.Depracated = !row.Depracated
+    }
+  })
+}
+
 const onCreateAuthClick = () => {
   if (selectedApi.value.length === 0) {
     return
@@ -340,62 +389,67 @@ const apiColumns = computed(() => [
   {
     name: 'ID',
     label: 'MSG_ID',
-    field: (row: API) => row.ID
+    field: 'ID'
   },
   {
     name: 'Method',
     label: 'MSG_METHOD',
-    field: (row: API) => row.Method
+    field: 'Method'
   },
   {
     name: 'MethodName',
     label: 'MSG_METHOD_NAME',
-    field: (row: API) => row.MethodName
+    field: 'MethodName'
   },
   {
     name: 'Domains',
     label: 'MSG_DOMAINS',
-    field: (row: API) => row.Domains?.join(',')
+    field: 'Domains'
   },
   {
     name: 'PathPrefix',
     label: 'MSG_PATH_PREFIX',
-    field: (row: API) => row.PathPrefix
+    field: 'PathPrefix'
   },
   {
     name: 'Path',
     label: 'MSG_PATH',
-    field: (row: API) => row.Path
+    field: 'Path'
   },
   {
     name: 'Protocol',
     label: 'MSG_PROTOCOL',
-    field: (row: API) => row.Protocol
+    field: 'Protocol'
   },
   {
     name: 'ServiceName',
     label: 'MSG_SERVICE_NAME',
-    field: (row: API) => row.ServiceName
+    field: 'ServiceName'
   },
   {
     name: 'Exported',
     label: 'MSG_EXPORTED',
-    field: (row: API) => row.Exported
+    field: 'Exported'
   },
   {
     name: 'Depracated',
     label: 'MSG_DEPRACATED',
-    field: (row: API) => row.Depracated
+    field: 'Depracated'
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
-    field: (row: API) => formatTime(row.CreatedAt)
+    field: 'CreatedAt'
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
-    field: (row: API) => formatTime(row.UpdatedAt)
+    field: 'UpdatedAt'
   }
 ])
 </script>
+<style lang='sass' scoped>
+.q-table__container
+  ::v-deep .q-table--col-auto-width
+    display: none
+</style>

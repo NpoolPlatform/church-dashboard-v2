@@ -16,3 +16,14 @@ export const getAPIs = (offset: number, limit: number) => {
     getAPIs(offset + limit, limit)
   })
 }
+
+export const updateAPI = (row: API, done: (error: boolean) => void) => {
+  api.updateAPI({
+    ID: row.ID,
+    Depracated: row.Depracated,
+    Message: {
+    }
+  }, (error: boolean) => {
+    done(error)
+  })
+}
