@@ -154,6 +154,12 @@ const getAppAuths = (offset: number, limit: number) => {
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (resp: Array<Auth>, error: boolean) => {
@@ -175,6 +181,12 @@ const getAppRoles = (offset: number, limit: number) => {
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_GET_APP_AUTHS',
+        Message: 'MSG_GET_APP_AUTHS_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (resp: Array<Role>, error: boolean) => {
@@ -259,6 +271,12 @@ const onCreateAuthClick = () => {
         Message: 'MSG_CREATE_APP_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_APP_AUTH',
+        Message: 'MSG_CREATE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
@@ -276,10 +294,16 @@ const onDeleteAuthClick = () => {
     ID: selectedAuth.value[0].ID,
     Message: {
       Error: {
-        Title: 'MSG_DELETEAPP_AUTH',
+        Title: 'MSG_DELETE_APP_AUTH',
         Message: 'MSG_DELETE_APP_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_DELETE_APP_AUTH',
+        Message: 'MSG_DELETE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
