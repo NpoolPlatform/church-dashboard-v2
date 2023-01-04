@@ -50,6 +50,7 @@
     :rows-per-page-options='[20]'
     selection='single'
     v-model:selected='selectedApi'
+    :columns='apiColumns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -77,9 +78,12 @@
 </template>
 
 <script setup lang='ts'>
-import { useAPIStore, NotificationType, ExpandAPI, Auth } from 'npool-cli-v2'
+import { ExpandAPI, Auth } from 'npool-cli-v2'
 import { formatTime, NotifyType, useChurchAuthingStore, User, useChurchUserStore } from 'npool-cli-v4'
+import { getAPIs } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
+import { useChurchAPIStore } from 'src/teststore/apis'
+import { API } from 'src/teststore/apis/types'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -95,8 +99,8 @@ const displayUsers = computed(() => users.value.filter((el) => el.EmailAddress?.
 const selectedUser = ref([] as Array<User>)
 const userLoading = ref(false)
 
-const api = useAPIStore()
-const apis = computed(() => api.APIs)
+const api = useChurchAPIStore()
+const apis = computed(() => api.APIs.APIs)
 const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
@@ -169,18 +173,9 @@ watch(appID, () => {
 })
 
 onMounted(() => {
-  api.getAPIs({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_API',
-        Message: 'MSG_GET_APIS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  if (apis.value.length === 0) {
+    getAPIs(0, 500)
+  }
 
   prepare()
 })
@@ -262,6 +257,59 @@ const columns = computed(() => [
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     field: (row: User) => formatTime(row.CreatedAt)
+  }
+])
+
+const apiColumns = computed(() => [
+  {
+    name: 'ID',
+    label: 'MSG_ID',
+    field: (row: API) => row.ID
+  },
+  {
+    name: 'Method',
+    label: 'MSG_METHOD',
+    field: (row: API) => row.Method
+  },
+  {
+    name: 'MethodName',
+    label: 'MSG_METHOD_NAME',
+    field: (row: API) => row.MethodName
+  },
+  {
+    name: 'Domains',
+    label: 'MSG_DOMAINS',
+    field: (row: API) => row.Domains?.join(',')
+  },
+  {
+    name: 'PathPrefix',
+    label: 'MSG_PATH_PREFIX',
+    field: (row: API) => row.PathPrefix
+  },
+  {
+    name: 'Path',
+    label: 'MSG_PATH',
+    field: (row: API) => row.Path
+  },
+  {
+    name: 'Protocol',
+    label: 'MSG_PROTOCOL',
+    field: (row: API) => row.Protocol
+  },
+  {
+    name: 'ServiceName',
+    label: 'MSG_SERVICE_NAME',
+    field: (row: API) => row.ServiceName
+  },
+  {
+    name: 'CreatedAt',
+    label: 'MSG_CREATED_AT',
+    field: (row: API) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: 'MSG_UPDATED_AT',
+    field: (row: API) => formatTime(row.UpdatedAt)
   }
 ])
 </script>

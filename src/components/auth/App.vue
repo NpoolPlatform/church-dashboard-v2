@@ -39,6 +39,7 @@
     :rows-per-page-options='[20]'
     selection='single'
     v-model:selected='selectedApi'
+    :columns='columns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -66,18 +67,19 @@
 </template>
 
 <script setup lang='ts'>
-import { useAPIStore, NotificationType, ExpandAPI } from 'npool-cli-v2'
+import { ExpandAPI, formatTime } from 'npool-cli-v2'
 import { useChurchAuthingStore, NotifyType, Auth } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useChurchAPIStore } from 'src/teststore/apis'
+import { API } from 'src/teststore/apis/types'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const api = useAPIStore()
-const apis = computed(() => api.APIs)
+const api = useChurchAPIStore()
+const apis = computed(() => api.APIs.APIs)
 const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
@@ -119,25 +121,10 @@ watch(appID, () => {
   prepare()
 })
 
-const lapi = useChurchAPIStore()
 onMounted(() => {
-  if (lapi.APIs.APIs.length === 0) {
+  if (apis.value.length === 0) {
     getAPIs(0, 500)
   }
-
-  api.getAPIs({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_API',
-        Message: 'MSG_GET_APIS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
   prepare()
 })
 
@@ -195,4 +182,57 @@ const onDeleteAuthClick = () => {
     // TODO
   })
 }
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: 'MSG_ID',
+    field: (row: API) => row.ID
+  },
+  {
+    name: 'Method',
+    label: 'MSG_METHOD',
+    field: (row: API) => row.Method
+  },
+  {
+    name: 'MethodName',
+    label: 'MSG_METHOD_NAME',
+    field: (row: API) => row.MethodName
+  },
+  {
+    name: 'Domains',
+    label: 'MSG_DOMAINS',
+    field: (row: API) => row.Domains?.join(',')
+  },
+  {
+    name: 'PathPrefix',
+    label: 'MSG_PATH_PREFIX',
+    field: (row: API) => row.PathPrefix
+  },
+  {
+    name: 'Path',
+    label: 'MSG_PATH',
+    field: (row: API) => row.Path
+  },
+  {
+    name: 'Protocol',
+    label: 'MSG_PROTOCOL',
+    field: (row: API) => row.Protocol
+  },
+  {
+    name: 'ServiceName',
+    label: 'MSG_SERVICE_NAME',
+    field: (row: API) => row.ServiceName
+  },
+  {
+    name: 'CreatedAt',
+    label: 'MSG_CREATED_AT',
+    field: (row: API) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: 'MSG_UPDATED_AT',
+    field: (row: API) => formatTime(row.UpdatedAt)
+  }
+])
 </script>
