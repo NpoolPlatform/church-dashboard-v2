@@ -378,6 +378,16 @@ const apiColumns = computed(() => [
     field: (row: API) => row.ServiceName
   },
   {
+    name: 'Exported',
+    label: 'MSG_EXPORTED',
+    field: (row: API) => row.Exported
+  },
+  {
+    name: 'Depracated',
+    label: 'MSG_DEPRACATED',
+    field: (row: API) => row.Depracated
+  },
+  {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     field: (row: API) => formatTime(row.CreatedAt)
