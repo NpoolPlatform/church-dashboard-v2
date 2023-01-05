@@ -4,8 +4,8 @@ import { API } from 'src/teststore/apis/types'
 const api = useChurchAPIStore()
 export const getAPIs = (offset: number, limit: number) => {
   api.getAPIs({
-    Exported: true,
-    Depracated: false,
+    // Exported: true,
+    // Depracated: false,
     Offset: offset,
     Limit: limit,
     Message: {}
