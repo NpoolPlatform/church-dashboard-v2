@@ -7,7 +7,6 @@
     :rows-per-page-options='[5]'
     selection='single'
     v-model:selected='selectedAuth'
-    class='table-row'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -38,9 +37,10 @@
     :rows='displayApis'
     row-key='ID'
     :rows-per-page-options='[20]'
-    selection='single'
     v-model:selected='selectedApi'
     :columns='columns'
+    selection='single'
+    @row-click='(evt, row, index) => onRowClick(row as API)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -59,62 +59,75 @@
           flat
           class='btn flat'
           :label='$t("MSG_AUTHORIZE")'
-          @click='onCreateAuthClick'
+          @click='onCreateAuthClick(selectedApi?.[0])'
           :disable='selectedApi.length === 0'
         />
       </div>
     </template>
-    <template #body='props'>
-      <q-tr :props='props'>
-        <q-td key='ID' :props='props' :auto-width='false'>
-          {{ props.row.ID }}
-        </q-td>
-        <q-td key='Method' :props='props'>
-          {{ props.row.Method }}
-        </q-td>
-        <q-td key='MethodName' :props='props'>
-          {{ props.row.MethodName }}
-        </q-td>
-        <q-td key='Domains' :props='props'>
-          {{ props.row.Domains?.join(',') }}
-        </q-td>
-        <q-td key='PathPrefix' :props='props'>
-          {{ props.row.PathPrefix }}
-        </q-td>
-        <q-td key='Path' :props='props'>
-          {{ props.row.Path }}
-        </q-td>
-        <q-td key='Protocol' :props='props'>
-          {{ props.row.Protocol }}
-        </q-td>
-        <q-td key='ServiceName' :props='props'>
-          {{ props.row.ServiceName }}
-        </q-td>
-        <q-td key='Exported' :props='props'>
-          {{ props.row.Exported }}
-        </q-td>
-        <q-td key='Depracated' :props='props'>
-          <q-toggle dense v-model='props.row.Depracated' @update:model-value='onDeprecatedClick(props.row)' />
-        </q-td>
-        <q-td key='CreatedAt' :props='props'>
-          {{ formatTime(props.row.CreatedAt) }}
-        </q-td>
-        <q-td key='UpdatedAt' :props='props'>
-          {{ formatTime(props.row.UpdatedAt) }}
-        </q-td>
-      </q-tr>
+  </q-table>
+
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <div>
+          <q-toggle dense v-model='target.Depracated' :label='$t("MSG_DEPRECATED")' />
+        </div>
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
+
+  <q-table
+    :title='$t("MSG_APIS")'
+    dense
+    :rows='displayOldApis'
+    row-key='ID'
+    :rows-per-page-options='[20]'
+    v-model:selected='selectedOldApis'
+    selection='single'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <div v-if='selectedOldApis.length === 0' class='column justify-center'>
+          <span class='warning'>{{ $t('MSG_SELECT_API') }}</span>
+        </div>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='oldApiPath'
+          :label='$t("MSG_PATH")'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_AUTHORIZE")'
+          @click='onCreateAuthClick(selectedOldApis?.[0])'
+          :disable='selectedOldApis.length === 0'
+        />
+      </div>
     </template>
   </q-table>
 </template>
 
 <script setup lang='ts'>
-import { ExpandAPI } from 'npool-cli-v2'
+import { ExpandAPI, NotificationType, useAPIStore } from 'npool-cli-v2'
 import { useChurchAuthingStore, NotifyType, Auth, formatTime } from 'npool-cli-v4'
-import { getAPIs, updateAPI } from 'src/api/apis'
+import { getAPIs } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useChurchAPIStore } from 'src/teststore/apis'
 import { API } from 'src/teststore/apis/types'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -162,31 +175,81 @@ watch(appID, () => {
   prepare()
 })
 
+const oldApi = useAPIStore()
+const oldApis = computed(() => oldApi.APIs)
+const selectedOldApis = ref([] as Array<ExpandAPI>)
+const oldApiPath = ref('')
+const displayOldApis = computed(() => oldApis.value.filter((api) => api.Path.includes(oldApiPath.value)))
+
 onMounted(() => {
   if (apis.value.length === 0) {
     getAPIs(0, 500)
   }
+  oldApi.getAPIs({
+    Message: {
+      Error: {
+        Title: 'MSG_GET_API',
+        Message: 'MSG_GET_APIS_FAIL',
+        Popup: true,
+        Type: NotificationType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
   prepare()
 })
 
-const onDeprecatedClick = (row: API) => {
-  updateAPI({ ...row }, (error: boolean) => {
-    if (error) {
-      console.log('error: ', error)
-      row.Depracated = !row.Depracated
+const target = ref({} as API)
+const showing = ref(false)
+const updating = ref(false)
+
+const onRowClick = (row: API) => {
+  target.value = { ...row }
+  updating.value = true
+  showing.value = true
+}
+
+const onMenuHide = () => {
+  target.value = {} as API
+  showing.value = false
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = () => {
+  api.updateAPI({
+    ID: target.value.ID,
+    Depracated: target.value.Depracated,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_API',
+        Message: 'MSG_UPDATE_API_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_API',
+        Message: 'MSG_UPDATE_API_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
+      }
     }
+  }, (error: boolean) => {
+    if (error) {
+      return
+    }
+    onMenuHide()
   })
 }
 
-const onCreateAuthClick = () => {
-  if (selectedApi.value.length === 0) {
-    return
-  }
-
+const onCreateAuthClick = (row: ExpandAPI) => {
   auth.createAppAuth({
     TargetAppID: appID.value,
-    Resource: selectedApi.value[0].Path,
-    Method: selectedApi.value[0].Method,
+    Resource: row.Path,
+    Method: row.Method,
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP_AUTH',
@@ -232,72 +295,66 @@ const onDeleteAuthClick = () => {
     // TODO
   })
 }
-
 const columns = computed(() => [
   {
     name: 'ID',
     label: 'MSG_ID',
-    field: 'ID'
+    field: (row: API) => row.ID
   },
   {
     name: 'Method',
     label: 'MSG_METHOD',
-    field: 'Method'
+    field: (row: API) => row.Method
   },
   {
     name: 'MethodName',
     label: 'MSG_METHOD_NAME',
-    field: 'MethodName'
+    field: (row: API) => row.MethodName
   },
   {
     name: 'Domains',
     label: 'MSG_DOMAINS',
-    field: 'Domains'
+    field: (row: API) => row.Domains?.join(',')
   },
   {
     name: 'PathPrefix',
     label: 'MSG_PATH_PREFIX',
-    field: 'PathPrefix'
+    field: (row: API) => row.PathPrefix
   },
   {
     name: 'Path',
     label: 'MSG_PATH',
-    field: 'Path'
+    field: (row: API) => row.Path
   },
   {
     name: 'Protocol',
     label: 'MSG_PROTOCOL',
-    field: 'Protocol'
+    field: (row: API) => row.Protocol
   },
   {
     name: 'ServiceName',
     label: 'MSG_SERVICE_NAME',
-    field: 'ServiceName'
+    field: (row: API) => row.ServiceName
   },
   {
     name: 'Exported',
     label: 'MSG_EXPORTED',
-    field: 'Exported'
+    field: (row: API) => row.Exported
   },
   {
     name: 'Depracated',
     label: 'MSG_DEPRACATED',
-    field: 'Depracated'
+    field: (row: API) => row.Depracated
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
-    field: 'CreatedAt'
+    field: (row: API) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
-    field: 'UpdatedAt'
+    field: (row: API) => formatTime(row.UpdatedAt)
   }
 ])
 </script>
-<style lang='sass' scoped>
-.q-table__container
-  ::v-deep .q-table--col-auto-width
-    display: none
-</style>
