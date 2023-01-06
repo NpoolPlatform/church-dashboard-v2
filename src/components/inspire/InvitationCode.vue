@@ -54,9 +54,10 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useChurchInvitationStore, InvitationCode } from 'npool-cli-v2'
 import { formatTime, NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
+import { useChurchInvitationCodeStore } from 'src/teststore/invitation/invitationcode'
+import { InvitationCode } from 'src/teststore/invitation/invitationcode/types'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -98,10 +99,9 @@ const columns = computed(() => [
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const invitation = useChurchInvitationStore()
-const codes = computed(() => {
-  return invitation.InvitationCodes.get(appID.value) ? invitation.InvitationCodes.get(appID.value) as Array<InvitationCode> : []
-})
+const invitationCode = useChurchInvitationCodeStore()
+const codes = computed(() => invitationCode.InvitationCodes.InvitationCodes)
+
 const codeLoading = ref(false)
 
 interface Code extends InvitationCode {
@@ -113,8 +113,8 @@ const userLoading = ref(false)
 const user = useChurchUserStore()
 const ecodes = computed(() => Array.from(codes.value).map((code: InvitationCode) => {
   const myCode = code as unknown as Code
-  myCode.EmailAddress = user.getUserByAppUserID(appID.value, code.UserID as string)?.EmailAddress
-  myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID as string)?.PhoneNO
+  myCode.EmailAddress = user.getUserByAppUserID(appID.value, code.UserID)?.EmailAddress
+  myCode.PhoneNO = user.getUserByAppUserID(appID.value, code.UserID)?.PhoneNO
   return myCode
 }))
 
@@ -157,24 +157,34 @@ const getAppUsers = (offset: number, limit: number) => {
     getAppUsers(offset + limit, limit)
   })
 }
-const prepare = () => {
-  invitation.getInvitationCodes({
+const getInvitationCodes = (offset: number, limit: number) => {
+  invitationCode.getAppInvitationCodes({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
         Title: t('MSG_GET_INVITATION_CODES'),
         Message: t('MSG_GET_INVITATION_CODES_FAIL'),
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    codeLoading.value = false
+  }, (error: boolean, rows: Array<InvitationCode>) => {
+    if (error || rows.length < limit) {
+      return
+    }
+    getInvitationCodes(offset + limit, limit)
   })
-
+}
+const prepare = () => {
   if (!user.Users.get(appID.value)) {
     userLoading.value = true
     getAppUsers(0, 500)
+  }
+
+  if (codes.value?.length === 0) {
+    getInvitationCodes(0, 100)
   }
 }
 
@@ -190,18 +200,18 @@ const onCreateInvitationCodeClick = () => {
   if (selectedUser.value.length === 0) {
     return
   }
-  invitation.createInvitationCode({
-    TargetAppID: appID.value,
+  invitationCode.createInvitationCode({
+    // TargetAppID: appID.value,
     TargetUserID: selectedUser.value[0].ID,
-    Info: {
-      UserID: selectedUser.value[0].ID
-    },
+    // Info: {
+    //   UserID: selectedUser.value[0].ID
+    // },
     Message: {
       Error: {
         Title: t('MSG_CREATE_INVITATION_CODE'),
         Message: t('MSG_CREATE_INVITATION_CODE_FAIL'),
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
   }, () => {

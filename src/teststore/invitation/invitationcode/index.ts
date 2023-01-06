@@ -11,7 +11,7 @@ import {
 } from './types'
 import { doActionWithError } from 'npool-cli-v4'
 
-export const useChurchInvitationCodeStore = defineStore('church-commission-v4', {
+export const useChurchInvitationCodeStore = defineStore('church-invitationcode-v4', {
   state: () => ({
     InvitationCodes: {
       InvitationCodes: [] as Array<InvitationCode>,
