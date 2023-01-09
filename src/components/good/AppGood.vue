@@ -77,6 +77,7 @@
           type='number'
           :min='0'
         />
+        <q-select :options='SettleTypes' v-model='target.CommissionSettleType' :label='$t("MSG_COMMISSION_SETTLE_TYPE")' />
         <!-- <q-input
           class='commission-percent'
           v-model='target.DailyRewardAmount'
@@ -111,7 +112,7 @@
 
 <script setup lang='ts'>
 import { useLocalApplicationStore } from 'src/localstore'
-import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime } from 'npool-cli-v4'
+import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime, SettleTypes } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAppGoods, getGoods } from 'src/api/good'
@@ -202,6 +203,7 @@ const updateTarget = computed(() => {
     CommissionPercent: target.value.CommissionPercent,
     TechnicalFeeRatio: target.value.TechnicalFeeRatio,
     ElectricityFeeRatio: target.value.ElectricityFeeRatio,
+    CommissionSettleType: target.value.CommissionSettleType,
     ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
   }
 })
