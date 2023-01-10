@@ -27,9 +27,8 @@
 </template>
 
 <script setup lang='ts'>
-import { InvitationCode } from 'npool-cli-v4'
+import { InvitationCode, useChurchInvitationCodeStore } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
-import { useChurchInvitationCodeStore } from 'src/teststore/invitation/invitationcode'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const code = useChurchInvitationCodeStore()

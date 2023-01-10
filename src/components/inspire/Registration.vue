@@ -27,9 +27,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, Registration } from 'npool-cli-v4'
+import { NotifyType, Registration, useChurchRegistrationStore } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
-import { useChurchRegistrationStore } from 'src/teststore/invitation/registration'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
