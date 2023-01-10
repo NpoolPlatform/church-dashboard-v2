@@ -229,30 +229,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'inspire/commission',
-        component: () => import('pages/inspire/Commission.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'inspire/commission/coin',
-        component: () => import('pages/inspire/CommissionCoin.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'auth/app',
         component: () => import('pages/auth/App.vue'),
         meta: {
@@ -555,18 +531,6 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'account/gasfeeder',
         component: () => import('pages/account/GasFeeder.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'inspire/purchase/amount',
-        component: () => import('pages/inspire/PurchaseAmount.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

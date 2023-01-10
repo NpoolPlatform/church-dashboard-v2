@@ -1,24 +1,25 @@
 import { defineStore } from 'pinia'
 import { API } from './const'
 import {
-  Registration,
   GetAppRegistrationsRequest,
-  GetAppRegistrationsResponse,
-  GetRegistrationsRequest,
-  GetRegistrationsResponse,
-  UpdateRegistrationRequest,
-  UpdateRegistrationResponse
+  GetAppRegistrationsResponse
 } from './types'
-import { doActionWithError } from 'npool-cli-v4'
+import { doActionWithError, Registration } from 'npool-cli-v4'
 
 export const useChurchRegistrationStore = defineStore('church-registration-v4', {
   state: () => ({
     Registrations: {
-      Registrations: [] as Array<Registration>,
+      Registrations: new Map<string, Array<Registration>>(),
       Total: 0
     }
   }),
   getters: {
+    getRegistrationsByAppID () {
+      return (appID: string) => {
+        const data = this.Registrations.Registrations.get(appID)
+        return !data ? [] as Array<Registration> : data
+      }
+    }
   },
   actions: {
     getAppRegistrations (req: GetAppRegistrationsRequest, done: (error: boolean, rows: Array<Registration>) => void) {
@@ -27,39 +28,12 @@ export const useChurchRegistrationStore = defineStore('church-registration-v4', 
         req,
         req.Message,
         (resp: GetAppRegistrationsResponse): void => {
-          this.Registrations.Registrations.push(...resp.Infos)
+          const data = this.getRegistrationsByAppID(req.TargetAppID)
+          data.push(...resp.Infos)
           this.Registrations.Total = resp.Total
           done(false, resp.Infos)
         }, () => {
           done(true, [] as Array<Registration>)
-        }
-      )
-    },
-    getRegistrations (req: GetRegistrationsRequest, done: (error: boolean, rows: Array<Registration>) => void) {
-      doActionWithError<GetRegistrationsRequest, GetRegistrationsResponse>(
-        API.GET_REGISTRATIONINVITATIONS,
-        req,
-        req.Message,
-        (resp: GetRegistrationsResponse): void => {
-          this.Registrations.Registrations.push(...resp.Infos)
-          this.Registrations.Total = resp.Total
-          done(false, resp.Infos)
-        }, () => {
-          done(true, [] as Array<Registration>)
-        }
-      )
-    },
-    updateRegistration (req: UpdateRegistrationRequest, done: (error: boolean, row: Registration) => void) {
-      doActionWithError<UpdateRegistrationRequest, UpdateRegistrationResponse>(
-        API.UPDATE_REGISTRATIONINVITATION,
-        req,
-        req.Message,
-        (resp: UpdateRegistrationResponse): void => {
-          this.Registrations.Registrations.push(resp.Info)
-          this.Registrations.Total += 1
-          done(false, resp.Info)
-        }, () => {
-          done(true, {} as Registration)
         }
       )
     }
