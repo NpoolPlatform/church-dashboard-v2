@@ -40,6 +40,7 @@
         <q-input type='number' v-model='target.HotWalletFeeAmount' :label='$t("MSG_HOT_WALLET_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.HotWalletAccountAmount' :label='$t("MSG_HOT_WALLET_ACCOUNT_AMOUNT")' />
         <q-input type='number' v-model='target.PaymentAccountCollectAmount' :label='$t("MSG_PAYMENT_ACCOUNT_COLLECT_AMOUNT")' />
+        <q-input type='number' v-model='target.LeastTransferAmount' :label='$t("MSG_LEAST_TRANSFER_AMOUNT")' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
@@ -112,6 +113,7 @@ const updateTarget = computed(() => {
     LowFeeAmount: target.value.LowFeeAmount,
     HotWalletFeeAmount: target.value.HotWalletFeeAmount,
     PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
+    LeastTransferAmount: target.value.LeastTransferAmount,
     StableUSD: target.value?.StableUSD,
     Disabled: target.value?.Disabled
   }
