@@ -35,7 +35,9 @@
         <q-input v-model='target.Name' :label='$t("MSG_APPLICATION_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
+        <q-input v-model.number='target.MaxTypedCouponsPerOrder' :label='$t("MSG_MAX_TYPED_COUPONS_PER_ORDER")' />
         <q-select :options='recaptchaMethods' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
+        <q-select :options='CreateInvitationCodeWhens' v-model='target.CreateInvitationCodeWhen' :label='$t("MSG_CREATE_INVITATION_CODE_WHEN")' />
       </q-card-section>
       <q-card-section>
         <div>
@@ -49,7 +51,7 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_AUTHORIZE")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -62,13 +64,113 @@ import {
   NotifyType,
   App,
   useLocalUserStore,
-  RecaptchaType
+  RecaptchaType,
+  CreateInvitationCodeWhens
 } from 'npool-cli-v4'
 import { UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
-import { computed, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+
+const recaptchaMethods = ref([
+  RecaptchaType.GoogleRecaptchaV3
+])
+
+const app = useChurchAppStore()
+const apps = computed(() => app.Apps.Apps)
+const appLoading = ref(false)
+
+const logined = useLocalUserStore()
+
+const target = ref({} as App)
+const showing = ref(false)
+const updating = ref(false)
+
+const onRowClick = (row: App) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+}
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as App
+}
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = (done: () => void) => {
+  updating.value ? updateApp(done) : createApp(done)
+}
+
+const createApp = (done: () => void) => {
+  app.createApp({
+    ...target.value,
+    CreatedBy: logined.User?.ID,
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_APP',
+        Message: 'MSG_CREATE_APP_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, (app: App, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const updateApp = (done: () => void) => {
+  const request = {
+    ID: target.value.ID,
+    Logo: target.value.Logo,
+    Description: target.value.Description,
+    SignupMethods: target.value.SignupMethods,
+    ExtSigninMethods: target.value.ExtSigninMethods,
+    RecaptchaMethod: target.value.RecaptchaMethod,
+    KycEnable: target.value.KycEnable,
+    SigninVerifyEnable: target.value.SigninVerifyEnable,
+    InvitationCodeMust: target.value.InvitationCodeMust,
+    CreateInvitationCodeWhen: target.value?.CreateInvitationCodeWhen,
+    MaxTypedCouponsPerOrder: target.value?.MaxTypedCouponsPerOrder,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_APP',
+        Message: 'MSG_UPDATE_APP_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_APP',
+        Message: 'MSG_UPDATE_APP_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  } as UpdateAppRequest
+  const origin = app.getAppByID(target.value.ID)
+  if (origin?.Name !== target.value.Name) { // don't send app name if not change
+    request.Name = target.value.Name
+  }
+  app.updateApp(request, (app: App, error: boolean) => {
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
 
 const columns = computed(() => [
   {
@@ -117,109 +219,4 @@ const columns = computed(() => [
     field: (row: App) => row.CreatedAt
   }
 ])
-
-const recaptchaMethods = ref([
-  RecaptchaType.GoogleRecaptchaV3
-])
-const app = useChurchAppStore()
-const apps = computed(() => app.Apps.Apps)
-const appLoading = ref(false)
-
-// dialog
-const showing = ref(false)
-const updating = ref(false)
-
-const logined = useLocalUserStore()
-
-const defaultAppValue = ref({ CreatedBy: logined.User?.ID } as App)
-const target = ref({ ...defaultAppValue.value })
-
-const onRowClick = (application: App) => {
-  showing.value = true
-  updating.value = true
-  target.value = { ...application }
-}
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-  target.value = { ...defaultAppValue.value }
-}
-const onMenuHide = () => {
-  showing.value = false
-  target.value = { ...defaultAppValue.value }
-}
-
-const createApp = () => {
-  app.createApp({
-    CreatedBy: target.value.CreatedBy,
-    Name: target.value.Name,
-    Logo: target.value.Logo,
-    Description: target.value.Description,
-    SignupMethods: target.value.SignupMethods,
-    KycEnable: target.value.KycEnable,
-    SigninVerifyEnable: target.value.SigninVerifyEnable,
-    InvitationCodeMust: target.value.InvitationCodeMust,
-    RecaptchaMethod: target.value.RecaptchaMethod,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_APP',
-        Message: 'MSG_CREATE_APP_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (app: App, error: boolean) => {
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
-}
-const updateApp = () => {
-  showing.value = false
-  const request = {
-    ID: target.value.ID,
-    Logo: target.value.Logo,
-    Description: target.value.Description,
-    SignupMethods: target.value.SignupMethods,
-    ExtSigninMethods: target.value.ExtSigninMethods,
-    RecaptchaMethod: target.value.RecaptchaMethod,
-    KycEnable: target.value.KycEnable,
-    SigninVerifyEnable: target.value.SigninVerifyEnable,
-    InvitationCodeMust: target.value.InvitationCodeMust,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_APP',
-        Message: 'MSG_UPDATE_APP_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_APP',
-        Message: 'MSG_UPDATE_APP_SUCCESS',
-        Popup: true,
-        Type: NotifyType.Success
-      }
-    }
-  } as UpdateAppRequest
-  const origin = app.getAppByID(target.value.ID)
-  if (origin?.Name !== target.value.Name) { // don't send app name if not change
-    request.Name = target.value.Name
-  }
-  app.updateApp(request, (app: App, error: boolean) => {
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
-}
-const onSubmit = () => {
-  updating.value ? updateApp() : createApp()
-}
-
-const onCancel = () => {
-  showing.value = false
-  updating.value = false
-}
-
 </script>

@@ -38,7 +38,9 @@
         <q-input type='number' v-model='target.CollectFeeAmount' :label='$t("MSG_COLLECT_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.LowFeeAmount' :label='$t("MSG_LOW_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.HotWalletFeeAmount' :label='$t("MSG_HOT_WALLET_FEE_AMOUNT")' />
+        <q-input type='number' v-model='target.HotWalletAccountAmount' :label='$t("MSG_HOT_WALLET_ACCOUNT_AMOUNT")' />
         <q-input type='number' v-model='target.PaymentAccountCollectAmount' :label='$t("MSG_PAYMENT_ACCOUNT_COLLECT_AMOUNT")' />
+        <q-input type='number' v-model='target.LeastTransferAmount' :label='$t("MSG_LEAST_TRANSFER_AMOUNT")' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
@@ -111,6 +113,7 @@ const updateTarget = computed(() => {
     LowFeeAmount: target.value.LowFeeAmount,
     HotWalletFeeAmount: target.value.HotWalletFeeAmount,
     PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
+    LeastTransferAmount: target.value.LeastTransferAmount,
     StableUSD: target.value?.StableUSD,
     Disabled: target.value?.Disabled
   }
@@ -124,6 +127,12 @@ const updateCoin = (done: () => void) => {
         Message: 'MSG_UPDATE_COIN_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_COIN',
+        Message: 'MSG_UPDATE_COIN_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (error: boolean) => {
