@@ -127,6 +127,12 @@ const updateCoin = (done: () => void) => {
         Message: 'MSG_UPDATE_COIN_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_COIN',
+        Message: 'MSG_UPDATE_COIN_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (error: boolean) => {
