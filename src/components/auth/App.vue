@@ -257,16 +257,6 @@ const columns = computed(() => [
     field: (row: API) => row.Method
   },
   {
-    name: 'MethodName',
-    label: 'MSG_METHOD_NAME',
-    field: (row: API) => row.MethodName
-  },
-  {
-    name: 'Domains',
-    label: 'MSG_DOMAINS',
-    field: (row: API) => row.Domains?.join(',')
-  },
-  {
     name: 'PathPrefix',
     label: 'MSG_PATH_PREFIX',
     field: (row: API) => row.PathPrefix
@@ -275,11 +265,6 @@ const columns = computed(() => [
     name: 'Path',
     label: 'MSG_PATH',
     field: (row: API) => row.Path
-  },
-  {
-    name: 'Protocol',
-    label: 'MSG_PROTOCOL',
-    field: (row: API) => row.Protocol
   },
   {
     name: 'ServiceName',
@@ -305,6 +290,21 @@ const columns = computed(() => [
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     field: (row: API) => formatTime(row.UpdatedAt)
+  },
+  {
+    name: 'MethodName',
+    label: 'MSG_METHOD_NAME',
+    field: (row: API) => row.MethodName
+  },
+  {
+    name: 'Domains',
+    label: 'MSG_DOMAINS',
+    field: (row: API) => row.Domains?.join(',')
+  },
+  {
+    name: 'Protocol',
+    label: 'MSG_PROTOCOL',
+    field: (row: API) => row.Protocol
   }
 ])
 </script>
