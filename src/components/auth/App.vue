@@ -219,7 +219,7 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onSubmit = () => {
+const onSubmit = (done: () => void) => {
   api.updateAPI({
     ID: target.value.ID,
     Depracated: target.value.Depracated,
@@ -238,6 +238,7 @@ const onSubmit = () => {
       }
     }
   }, (error: boolean) => {
+    done()
     if (error) {
       return
     }
