@@ -83,43 +83,10 @@
       </q-item>
     </q-card>
   </q-dialog>
-
-  <q-table
-    :title='$t("MSG_APIS")'
-    dense
-    :rows='displayOldApis'
-    row-key='ID'
-    :rows-per-page-options='[20]'
-    v-model:selected='selectedOldApis'
-    selection='single'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <div v-if='selectedOldApis.length === 0' class='column justify-center'>
-          <span class='warning'>{{ $t('MSG_SELECT_API') }}</span>
-        </div>
-        <q-input
-          dense
-          flat
-          class='small'
-          v-model='oldApiPath'
-          :label='$t("MSG_PATH")'
-        />
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_AUTHORIZE")'
-          @click='onCreateAuthClick(selectedOldApis?.[0])'
-          :disable='selectedOldApis.length === 0'
-        />
-      </div>
-    </template>
-  </q-table>
 </template>
 
 <script setup lang='ts'>
-import { ExpandAPI, NotificationType, useAPIStore } from 'npool-cli-v2'
+import { ExpandAPI } from 'npool-cli-v2'
 import { useChurchAuthingStore, NotifyType, Auth, formatTime } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
@@ -175,28 +142,10 @@ watch(appID, () => {
   prepare()
 })
 
-const oldApi = useAPIStore()
-const oldApis = computed(() => oldApi.APIs)
-const selectedOldApis = ref([] as Array<ExpandAPI>)
-const oldApiPath = ref('')
-const displayOldApis = computed(() => oldApis.value.filter((api) => api.Path.includes(oldApiPath.value)))
-
 onMounted(() => {
   if (apis.value.length === 0) {
     getAPIs(0, 500)
   }
-  oldApi.getAPIs({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_API',
-        Message: 'MSG_GET_APIS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
   prepare()
 })
 
