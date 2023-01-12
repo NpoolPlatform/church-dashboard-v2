@@ -303,14 +303,14 @@ const onCreateAuthClick = (row: ExpandAPI) => {
     Method: row.Method,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_APP_AUTHS',
-        Message: 'MSG_CREATE_APP_AUTHS_FAIL',
+        Title: 'MSG_CREATE_USER_AUTH',
+        Message: 'MSG_CREATE_USER_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_CREATE_APP_AUTHS',
-        Message: 'MSG_CREATE_APP_AUTHS_FAIL',
+        Title: 'MSG_CREATE_USER_AUTH',
+        Message: 'MSG_CREATE_USER_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Success
       }
