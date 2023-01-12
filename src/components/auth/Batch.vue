@@ -176,6 +176,12 @@ const onSubmitClick = () => {
             Message: 'MSG_CREATE_APP_USER_AUTH_FAIL',
             Popup: true,
             Type: NotifyType.Error
+          },
+          Info: {
+            Title: 'MSG_CREATE_APP_USER_AUTH',
+            Message: 'MSG_CREATE_APP_USER_AUTH_FAIL',
+            Popup: true,
+            Type: NotifyType.Success
           }
         }
       }, () => {
@@ -196,6 +202,12 @@ const onSubmitClick = () => {
             Message: 'MSG_CREATE_APP_ROLE_AUTH_FAIL',
             Popup: true,
             Type: NotifyType.Error
+          },
+          Info: {
+            Title: 'MSG_CREATE_APP_ROLE_AUTH',
+            Message: 'MSG_CREATE_APP_ROLE_AUTH_FAIL',
+            Popup: true,
+            Type: NotifyType.Success
           }
         }
       }, () => {
@@ -215,6 +227,12 @@ const onSubmitClick = () => {
           Message: 'MSG_CREATE_APP_AUTH_FAIL',
           Popup: true,
           Type: NotifyType.Error
+        },
+        Info: {
+          Title: 'MSG_CREATE_APP_AUTH',
+          Message: 'MSG_CREATE_APP_AUTH_FAIL',
+          Popup: true,
+          Type: NotifyType.Success
         }
       }
     }, () => {

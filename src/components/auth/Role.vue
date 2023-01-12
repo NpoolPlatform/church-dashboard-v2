@@ -19,9 +19,6 @@
   >
     <template #top-right>
       <div class='row indent flat'>
-        <div v-if='selectedApi.length === 0' class='column justify-center'>
-          <span class='warning'>{{ $t('MSG_SELECT_AUTH') }}</span>
-        </div>
         <q-input
           dense
           flat
@@ -48,6 +45,8 @@
     :rows-per-page-options='[20]'
     selection='single'
     v-model:selected='selectedApi'
+    :columns='apiColumns'
+    @row-click='(evt, row, index) => onRowClick(row as API)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -66,12 +65,29 @@
           flat
           class='btn flat'
           :label='$t("MSG_AUTHORIZE")'
-          @click='onCreateAuthClick'
+          @click='onCreateAuthClick(selectedApi?.[0])'
           :disable='selectedApi.length === 0 || selectedRole.length === 0'
         />
       </div>
     </template>
   </q-table>
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <div>
+          <q-toggle dense v-model='target.Depracated' :label='$t("MSG_DEPRECATED")' />
+        </div>
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
   <q-table
     :title='$t("MSG_ROLE_USERS")'
     dense
@@ -84,8 +100,6 @@
 
 <script setup lang='ts'>
 import {
-  useAPIStore,
-  NotificationType,
   ExpandAPI
 } from 'npool-cli-v2'
 import {
@@ -99,12 +113,17 @@ import {
   InvalidID,
   formatTime
 } from 'npool-cli-v4'
+import { getAPIs } from 'src/api/apis'
 import { useLocalApplicationStore } from 'src/localstore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { useChurchAPIStore } from 'src/teststore/apis'
+import { API } from 'src/teststore/apis/types'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -128,8 +147,8 @@ const displayUsers = computed(() => users.value.filter((user) => {
   return index >= 0
 }))
 
-const api = useAPIStore()
-const apis = computed(() => api.APIs)
+const api = useChurchAPIStore()
+const apis = computed(() => api.APIs.APIs)
 const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
@@ -223,27 +242,58 @@ watch(appID, () => {
 })
 
 onMounted(() => {
-  api.getAPIs({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_API',
-        Message: 'MSG_GET_APIS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-
+  if (apis.value.length === 0) {
+    getAPIs(0, 500)
+  }
   prepare()
 })
 
-const onCreateAuthClick = () => {
-  if (selectedApi.value.length === 0) {
-    return
-  }
+const target = ref({} as API)
+const showing = ref(false)
+const updating = ref(false)
 
+const onRowClick = (row: API) => {
+  target.value = { ...row }
+  updating.value = true
+  showing.value = true
+}
+
+const onMenuHide = () => {
+  target.value = {} as API
+  showing.value = false
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = () => {
+  api.updateAPI({
+    ID: target.value.ID,
+    Depracated: target.value.Depracated,
+    Message: {
+      Error: {
+        Title: 'MSG_UPDATE_API',
+        Message: 'MSG_UPDATE_API_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_API',
+        Message: 'MSG_UPDATE_API_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (error: boolean) => {
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
+}
+
+const onCreateAuthClick = (row: ExpandAPI) => {
   if (selectedRole.value.length === 0) {
     return
   }
@@ -251,14 +301,20 @@ const onCreateAuthClick = () => {
   auth.createAppAuth({
     TargetAppID: appID.value,
     RoleID: selectedRole.value[0].ID,
-    Resource: selectedApi.value[0].Path,
-    Method: selectedApi.value[0].Method,
+    Resource: row.Path,
+    Method: row.Method,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_APP_AUTH',
-        Message: 'MSG_CREATE_APP_AUTH_FAIL',
+        Title: 'MSG_CREATE_ROLE_AUTH',
+        Message: 'MSG_CREATE_ROLE_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_ROLE_AUTH',
+        Message: 'MSG_CREATE_ROLE_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
@@ -276,16 +332,23 @@ const onDeleteAuthClick = () => {
     ID: selectedAuth.value[0].ID,
     Message: {
       Error: {
-        Title: 'MSG_DELETEAPP_AUTH',
+        Title: 'MSG_DELETE_APP_AUTH',
         Message: 'MSG_DELETE_APP_AUTH_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_DELETE_APP_AUTH',
+        Message: 'MSG_DELETE_APP_AUTH_FAIL',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, () => {
     // TODO
   })
 }
+
 const columns = computed(() => [
   {
     name: 'AppID',
@@ -310,12 +373,75 @@ const columns = computed(() => [
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
-    field: (row: User) => row.Roles.join(',')
+    field: (row: User) => row.Roles?.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     field: (row: User) => formatTime(row.CreatedAt)
+  }
+])
+
+const apiColumns = computed(() => [
+  {
+    name: 'ID',
+    label: 'MSG_ID',
+    field: (row: API) => row.ID
+  },
+  {
+    name: 'Method',
+    label: 'MSG_METHOD',
+    field: (row: API) => row.Method
+  },
+  {
+    name: 'PathPrefix',
+    label: 'MSG_PATH_PREFIX',
+    field: (row: API) => row.PathPrefix
+  },
+  {
+    name: 'Path',
+    label: 'MSG_PATH',
+    field: (row: API) => row.Path
+  },
+  {
+    name: 'ServiceName',
+    label: 'MSG_SERVICE_NAME',
+    field: (row: API) => row.ServiceName
+  },
+  {
+    name: 'Exported',
+    label: 'MSG_EXPORTED',
+    field: (row: API) => row.Exported
+  },
+  {
+    name: 'Depracated',
+    label: 'MSG_DEPRACATED',
+    field: (row: API) => row.Depracated
+  },
+  {
+    name: 'CreatedAt',
+    label: 'MSG_CREATED_AT',
+    field: (row: API) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: 'MSG_UPDATED_AT',
+    field: (row: API) => formatTime(row.UpdatedAt)
+  },
+  {
+    name: 'MethodName',
+    label: 'MSG_METHOD_NAME',
+    field: (row: API) => row.MethodName
+  },
+  {
+    name: 'Domains',
+    label: 'MSG_DOMAINS',
+    field: (row: API) => row.Domains?.join(',')
+  },
+  {
+    name: 'Protocol',
+    label: 'MSG_PROTOCOL',
+    field: (row: API) => row.Protocol
   }
 ])
 </script>
