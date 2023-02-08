@@ -78,13 +78,13 @@
           :min='0'
         />
         <q-select :options='SettleTypes' v-model='target.CommissionSettleType' :label='$t("MSG_COMMISSION_SETTLE_TYPE")' />
-        <!-- <q-input
+        <q-input
           class='commission-percent'
           v-model='target.DailyRewardAmount'
           :label='$t("MSG_DAILY_REWARD_AMOUNT")'
           type='number'
           :min='0'
-        /> -->
+        />
       </q-card-section>
       <q-card-section>
         <!-- <div> <q-toggle dense v-model='openSaleActivity' :label='$t("MSG_OPEN_SALE")' /></div> -->
@@ -204,6 +204,7 @@ const updateTarget = computed(() => {
     TechnicalFeeRatio: target.value.TechnicalFeeRatio,
     ElectricityFeeRatio: target.value.ElectricityFeeRatio,
     CommissionSettleType: target.value.CommissionSettleType,
+    DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
     ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
   }
 })
