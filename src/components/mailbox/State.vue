@@ -69,23 +69,23 @@ const displayReadStates = computed(() => read.getStatesByID(appID.value, usernam
 
 watch(appID, () => {
   if (sendStates.value?.length === 0) {
-    getAppSendStates(0, 100, NotifChannel.ChannelSMS)
-    getAppSendStates(0, 100, NotifChannel.ChannelEmail)
+    getAppSendStates(0, 500, NotifChannel.ChannelSMS)
+    getAppSendStates(0, 500, NotifChannel.ChannelEmail)
   }
 
   if (readStates.value?.length === 0) {
-    getAppReadStates(0, 100)
+    getAppReadStates(0, 500)
   }
 })
 
 onMounted(() => {
   if (sendStates.value?.length === 0) {
-    getAppSendStates(0, 100, NotifChannel.ChannelSMS)
-    getAppSendStates(0, 100, NotifChannel.ChannelEmail)
+    getAppSendStates(0, 500, NotifChannel.ChannelSMS)
+    getAppSendStates(0, 500, NotifChannel.ChannelEmail)
   }
 
   if (readStates.value?.length === 0) {
-    getAppReadStates(0, 100)
+    getAppReadStates(0, 500)
   }
 })
 
