@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class='row announcement main'>
     <q-icon class='icon start' name='volume_up' />
     {{ announcement }}
@@ -53,4 +53,4 @@ onUnmounted(() => {
 </script>
 
 <style lang='sass' scoped>
-</style>
+</style> -->

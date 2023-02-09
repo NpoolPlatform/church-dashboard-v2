@@ -27,16 +27,16 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_NOTIF_TEMPLATE') }}</span>
+        <span>{{ $t('MSG_NOTIF_TEMPLATE') }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.Sender' :label='$t("MSG_SENDER")' />
-        <q-input v-model='target.Content' :label='$t("MSG_CONTENT")' type='textarea' />
         <q-select :options='EventTypes' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_EVENT_TYPES")' />
+        <LanguagePicker v-model:language='target.LangID' :updating='updating' />
       </q-card-section>
       <q-card-section>
-        <LanguagePicker v-model:language='target.LangID' :updating='updating' />
+        <q-input v-model='target.Content' :label='$t("MSG_CONTENT")' type='textarea' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton :loading='true' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { NotifyType } from 'npool-cli-v4'
 import { useChurchNotifTemplateStore } from 'src/teststore/third/notif'
 import { EventTypes, NotifTemplate } from 'src/teststore/third/notif/types'
@@ -87,6 +87,13 @@ const onCancel = () => {
 const onSubmit = (done: () => void) => {
   updating.value ? updateAppNotifTemplate(done) : createAppNotifTemplate(done)
 }
+
+watch(appID, () => {
+  if (notifTemplates.value?.length === 0) {
+    getAppNotifTemplate(0, 500)
+  }
+})
+
 onMounted(() => {
   if (notifTemplates.value?.length === 0) {
     getAppNotifTemplate(0, 500)
@@ -125,6 +132,12 @@ const createAppNotifTemplate = (done: () => void) => {
         Message: 'MSG_CREATE_NOTIF_TEMPLATE_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_NOTIF_TEMPLATE',
+        Message: 'MSG_CREATE_NOTIF_TEMPLATE_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -145,6 +158,12 @@ const updateAppNotifTemplate = (done: () => void) => {
         Message: 'MSG_UPDATE_NOTIF_TEMPLATE_FAIL',
         Popup: true,
         Type: NotifyType.Error
+      },
+      Info: {
+        Title: 'MSG_UPDATE_NOTIF_TEMPLATE',
+        Message: 'MSG_UPDATE_NOTIF_TEMPLATE_SUCCESS',
+        Popup: true,
+        Type: NotifyType.Success
       }
     }
   }, (error: boolean) => {
