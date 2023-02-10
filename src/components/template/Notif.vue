@@ -59,7 +59,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 
 const notif = useChurchNotifTemplateStore()
-const notifTemplates = computed(() => notif.getNotifTemplatesByAppID(appID.value))
+const notifTemplates = computed(() => notif.getNotifTemplatesByAppID(appID.value).sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -186,6 +186,11 @@ const columns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     field: (row: NotifTemplate) => row.AppID
+  },
+  {
+    name: 'LangID',
+    label: t('MSG_LANG_ID'),
+    field: (row: NotifTemplate) => row.LangID
   },
   {
     name: 'Title',
