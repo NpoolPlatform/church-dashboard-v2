@@ -5,143 +5,121 @@
     :title='$t("MSG_ANNOUNCEMENTS")'
     :rows='announcements'
     row-key='ID'
-    :loading='loading'
+    :columns='columns'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as Announcement)'
   >
     <template #top-right>
       <div class='row indent flat'>
-        <q-btn
+        <!-- <q-btn
           dense
           flat
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
-        />
+        /> -->
       </div>
     </template>
   </q-table>
-  <q-dialog
-    v-model='showing'
-    @hide='onMenuHide'
-    position='right'
-  >
-    <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_CREATE_COUNTRY') }}</span>
-      </q-card-section>
-      <q-card-section>
-        <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
-        <q-input v-model='target.Content' :label='$t("MSG_CONTENT")' />
-      </q-card-section>
-      <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
-      </q-item>
-    </q-card>
-  </q-dialog>
+  <AnnouncementUser />
 </template>
 
 <script setup lang='ts'>
-import { useChurchMailboxStore, NotificationType, Announcement, useAdminMailboxStore } from 'npool-cli-v2'
-import { computed, onMounted, watch, ref } from 'vue'
-import { useLocalApplicationStore } from '../../localstore'
+import { formatTime, NotifyType, useChurchAnnouncementStore, Announcement } from 'npool-cli-v4'
+import { appID } from 'src/api/app'
+import { computed, defineAsyncComponent, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
+const AnnouncementUser = defineAsyncComponent(() => import('src/components/mailbox/AnnouncementUser.vue'))
 
-const mailbox = useChurchMailboxStore()
-const amailbox = useAdminMailboxStore()
-const announcements = computed(() => mailbox.Announcements.get(appID.value) ? mailbox.Announcements.get(appID.value) : [])
-const loading = ref(true)
+const announcement = useChurchAnnouncementStore()
+const announcements = computed(() => announcement.getAnnouncementByAppID(appID.value))
 
-const prepare = () => {
-  loading.value = true
-  mailbox.getAnnouncements({
+watch(appID, () => {
+  if (announcements.value?.length === 0) {
+    getAppAnnouncements(0, 100)
+  }
+})
+
+onMounted(() => {
+  if (announcements.value?.length === 0) {
+    getAppAnnouncements(0, 100)
+  }
+})
+
+const getAppAnnouncements = (offset: number, limit: number) => {
+  announcement.getAppAnnouncements({
     TargetAppID: appID.value,
+    Offset: offset,
+    Limit: limit,
     Message: {
       Error: {
         Title: t('MSG_GET_ANNOUNCEMENTS'),
         Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
         Popup: true,
-        Type: NotificationType.Error
+        Type: NotifyType.Error
       }
     }
-  }, () => {
-    loading.value = false
+  }, (error: boolean, rows: Array<Announcement>) => {
+    if (error || rows.length < limit) {
+      return
+    }
+    getAppAnnouncements(offset + limit, limit)
   })
 }
 
-watch(appID, () => {
-  prepare()
-})
-
-onMounted(() => {
-  prepare()
-})
-
-const showing = ref(false)
-const updating = ref(false)
-const target = ref({} as unknown as Announcement)
-
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (announcement: Announcement) => {
-  showing.value = true
-  updating.value = true
-  target.value = announcement
-}
-
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {} as unknown as Announcement
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  if (updating.value) {
-    amailbox.updateAnnouncement({
-      Info: target.value,
-      Message: {
-        Error: {
-          Title: 'MSG_UPDATE_ANNOUNCEMENT',
-          Message: 'MSG_UPDATE_ANNOUNCEMENT_FAIL',
-          Popup: true,
-          Type: NotificationType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: Announcement) => row.ID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    field: (row: Announcement) => row.AppID
+  },
+  {
+    name: 'LangID',
+    label: t('MSG_LANG_ID'),
+    field: (row: Announcement) => row.LangID
+  },
+  {
+    name: 'Title',
+    label: t('MSG_TITLE'),
+    field: (row: Announcement) => row.Title
+  },
+  {
+    name: 'Type',
+    label: t('MSG_TYPE'),
+    field: (row: Announcement) => row.AnnouncementType
+  },
+  {
+    name: 'Content',
+    label: t('MSG_CONTENT'),
+    field: (row: Announcement) => row.Content
+  },
+  {
+    name: 'Channels',
+    label: t('MSG_CHANNELS'),
+    field: (row: Announcement) => row.Channels?.join(',')
+  },
+  {
+    name: 'SendChannel',
+    label: t('MSG_SEND_CHANNEL'),
+    field: (row: Announcement) => row.SendChannel
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATED_AT'),
+    field: (row: Announcement) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'END_AT',
+    label: t('MSG_END_AT'),
+    field: (row: Announcement) => formatTime(row.EndAt)
   }
-
-  mailbox.createAnnouncement({
-    TargetAppID: appID.value,
-    Info: target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_ANNOUNCEMENT',
-        Message: 'MSG_CREATE_ANNOUNCEMENT_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-const onCancel = () => {
-  showing.value = false
-}
-
+])
 </script>

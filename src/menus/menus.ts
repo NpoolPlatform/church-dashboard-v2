@@ -85,6 +85,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '事件通知模版',
+        caption: '管理事件通知模版',
+        icon: 'perm_identity',
+        target: '/notif/template',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
@@ -200,6 +209,15 @@ const MainDrawerMenus = [
       } as MenuItem, {
         menuId: uid(),
         label: '通知',
+        caption: '管理通知',
+        icon: 'perm_identity',
+        target: '/announcement/state',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem /* {
+        menuId: uid(),
+        label: '通知',
         caption: '管理应用内用户通知',
         icon: 'perm_identity',
         target: '/notification',
@@ -215,7 +233,7 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem
+      } as MenuItem */
     ]
   } as MenuItem, {
     menuId: uid(),
