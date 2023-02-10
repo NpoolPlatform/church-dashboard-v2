@@ -82,6 +82,11 @@ const columns = computed(() => [
     field: (row: Announcement) => row.AppID
   },
   {
+    name: 'LangID',
+    label: t('MSG_LANG_ID'),
+    field: (row: Announcement) => row.LangID
+  },
+  {
     name: 'Title',
     label: t('MSG_TITLE'),
     field: (row: Announcement) => row.Title
