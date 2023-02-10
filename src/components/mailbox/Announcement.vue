@@ -24,10 +24,8 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime, NotifyType } from 'npool-cli-v4'
+import { formatTime, NotifyType, useChurchAnnouncementStore, Announcement } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
-import { useChurchAnnouncementStore } from 'src/teststore/notif/announcement'
-import { Announcement } from 'src/teststore/notif/announcement/types'
 import { computed, defineAsyncComponent, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -87,6 +85,11 @@ const columns = computed(() => [
     name: 'Title',
     label: t('MSG_TITLE'),
     field: (row: Announcement) => row.Title
+  },
+  {
+    name: 'Type',
+    label: t('MSG_TYPE'),
+    field: (row: Announcement) => row.AnnouncementType
   },
   {
     name: 'Content',

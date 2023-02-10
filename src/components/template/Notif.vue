@@ -49,9 +49,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { formatTime, NotifyType } from 'npool-cli-v4'
-import { useChurchNotifTemplateStore } from 'src/teststore/third/notif'
-import { EventTypes, NotifTemplate } from 'src/teststore/third/notif/types'
+import { formatTime, NotifyType, useChurchNotifTemplateStore, EventTypes, NotifTemplate } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method

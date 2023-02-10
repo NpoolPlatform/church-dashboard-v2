@@ -42,14 +42,9 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime, NotifyType } from 'npool-cli-v4'
-import { useChurchSendStateStore } from 'src/teststore/notif/sendstate'
+import { formatTime, NotifyType, useChurchSendStateStore, SendState, NotifChannel, useChurchReadStateStore, ReadState } from 'npool-cli-v4'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { SendState } from 'src/teststore/notif/sendstate/types'
-import { NotifChannel } from 'src/teststore/notif/announcement/types'
-import { useChurchReadStateStore } from 'src/teststore/notif/readstate'
-import { ReadState } from 'src/teststore/notif/readstate/types'
 import { appID } from 'src/api/app'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method

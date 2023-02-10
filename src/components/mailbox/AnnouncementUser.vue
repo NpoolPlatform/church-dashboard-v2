@@ -22,10 +22,8 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime, NotifyType } from 'npool-cli-v4'
+import { formatTime, NotifyType, AnnouncementUser, useChurchAnnouncementUserStore } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
-import { useChurchAnnouncementUserStore } from 'src/teststore/notif/user'
-import { AnnouncementUser } from 'src/teststore/notif/user/types'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
