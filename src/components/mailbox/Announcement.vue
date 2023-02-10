@@ -20,6 +20,7 @@
       </div>
     </template>
   </q-table>
+  <AnnouncementUser />
 </template>
 
 <script setup lang='ts'>
@@ -27,11 +28,13 @@ import { formatTime, NotifyType } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
 import { useChurchAnnouncementStore } from 'src/teststore/notif/announcement'
 import { Announcement } from 'src/teststore/notif/announcement/types'
-import { computed, onMounted, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+const AnnouncementUser = defineAsyncComponent(() => import('src/components/mailbox/AnnouncementUser.vue'))
 
 const announcement = useChurchAnnouncementStore()
 const announcements = computed(() => announcement.getAnnouncementByAppID(appID.value))
