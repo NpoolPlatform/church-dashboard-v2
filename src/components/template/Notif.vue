@@ -2,12 +2,12 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_NOTIF_TEMPLATES")'
-    :rows='notifTemplates'
+    :title='$t("MSG_FRONTEND_TEMPLATES")'
+    :rows='frontendTemplates'
     row-key='ID'
     :rows-per-page-options='[20]'
     :columns='columns'
-    @row-click='(evt, row, index) => onRowClick(row as NotifTemplate)'
+    @row-click='(evt, row, index) => onRowClick(row as FrontendTemplate)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -28,7 +28,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_NOTIF_TEMPLATE') }}</span>
+        <span>{{ $t('MSG_FRONTEND_TEMPLATE') }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
@@ -49,7 +49,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { formatTime, NotifyType, useChurchNotifTemplateStore, EventTypes, NotifTemplate } from 'npool-cli-v4'
+import { formatTime, NotifyType, useChurchFrontendTemplateStore, EventTypes, FrontendTemplate } from 'npool-cli-v4'
 import { appID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -58,19 +58,19 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 
-const notif = useChurchNotifTemplateStore()
-const notifTemplates = computed(() => notif.getNotifTemplatesByAppID(appID.value).sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
+const notif = useChurchFrontendTemplateStore()
+const frontendTemplates = computed(() => notif.getFrontendTemplatesByAppID(appID.value).sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
 
 const showing = ref(false)
 const updating = ref(false)
 
-const target = ref({} as NotifTemplate)
+const target = ref({} as FrontendTemplate)
 
 const onMenuHide = () => {
-  target.value = {} as unknown as NotifTemplate
+  target.value = {} as FrontendTemplate
 }
 
-const onRowClick = (template: NotifTemplate) => {
+const onRowClick = (template: FrontendTemplate) => {
   target.value = { ...template }
   showing.value = true
   updating.value = true
@@ -87,57 +87,57 @@ const onCancel = () => {
 }
 
 const onSubmit = (done: () => void) => {
-  updating.value ? updateAppNotifTemplate(done) : createAppNotifTemplate(done)
+  updating.value ? updateAppFrontendTemplate(done) : createAppFrontendTemplate(done)
 }
 
 watch(appID, () => {
-  if (notifTemplates.value?.length === 0) {
-    getAppNotifTemplate(0, 500)
+  if (frontendTemplates.value?.length === 0) {
+    getAppFrontendTemplate(0, 500)
   }
 })
 
 onMounted(() => {
-  if (notifTemplates.value?.length === 0) {
-    getAppNotifTemplate(0, 500)
+  if (frontendTemplates.value?.length === 0) {
+    getAppFrontendTemplate(0, 500)
   }
 })
 
-const getAppNotifTemplate = (offset: number, limit: number) => {
-  notif.getAppNotifTemplates({
+const getAppFrontendTemplate = (offset: number, limit: number) => {
+  notif.getAppFrontendTemplates({
     TargetAppID: appID.value,
     Offset: offset,
     Limit: limit,
     Message: {
       Error: {
-        Title: 'MSG_GET_NOTIF_TEMPLATES',
-        Message: 'MSG_GET_NOTIF_TEMPLATES_FAIL',
+        Title: 'MSG_GET_FRONTEND_TEMPLATES',
+        Message: 'MSG_GET_FRONTEND_TEMPLATES_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<NotifTemplate>) => {
+  }, (error: boolean, rows: Array<FrontendTemplate>) => {
     if (error || rows.length < limit) {
       return
     }
-    getAppNotifTemplate(offset + limit, limit)
+    getAppFrontendTemplate(offset + limit, limit)
   })
 }
 
-const createAppNotifTemplate = (done: () => void) => {
-  notif.createAppNotifTemplate({
+const createAppFrontendTemplate = (done: () => void) => {
+  notif.createAppFrontendTemplate({
     ...target.value,
     TargetAppID: appID.value,
     TargetLangID: target.value.LangID,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_NOTIF_TEMPLATE',
-        Message: 'MSG_CREATE_NOTIF_TEMPLATE_FAIL',
+        Title: 'MSG_CREATE_FRONTEND_TEMPLATE',
+        Message: 'MSG_CREATE_FRONTEND_TEMPLATE_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_CREATE_NOTIF_TEMPLATE',
-        Message: 'MSG_CREATE_NOTIF_TEMPLATE_SUCCESS',
+        Title: 'MSG_CREATE_FRONTEND_TEMPLATE',
+        Message: 'MSG_CREATE_FRONTEND_TEMPLATE_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
@@ -149,21 +149,21 @@ const createAppNotifTemplate = (done: () => void) => {
     }
   })
 }
-const updateAppNotifTemplate = (done: () => void) => {
-  notif.updateAppNotifTemplate({
+const updateAppFrontendTemplate = (done: () => void) => {
+  notif.updateAppFrontendTemplate({
     ...target.value,
     TargetAppID: target.value?.AppID,
     TargetLangID: target.value.LangID,
     Message: {
       Error: {
-        Title: 'MSG_UPDATE_NOTIF_TEMPLATE',
-        Message: 'MSG_UPDATE_NOTIF_TEMPLATE_FAIL',
+        Title: 'MSG_UPDATE_FRONTEND_TEMPLATE',
+        Message: 'MSG_UPDATE_FRONTEND_TEMPLATE_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_UPDATE_NOTIF_TEMPLATE',
-        Message: 'MSG_UPDATE_NOTIF_TEMPLATE_SUCCESS',
+        Title: 'MSG_UPDATE_FRONTEND_TEMPLATE',
+        Message: 'MSG_UPDATE_FRONTEND_TEMPLATE_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
@@ -180,47 +180,47 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
-    field: (row: NotifTemplate) => row.ID
+    field: (row: FrontendTemplate) => row.ID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
-    field: (row: NotifTemplate) => row.AppID
+    field: (row: FrontendTemplate) => row.AppID
   },
   {
     name: 'LangID',
     label: t('MSG_LANG_ID'),
-    field: (row: NotifTemplate) => row.LangID
+    field: (row: FrontendTemplate) => row.LangID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
-    field: (row: NotifTemplate) => row.Title
+    field: (row: FrontendTemplate) => row.Title
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
-    field: (row: NotifTemplate) => row.Content
+    field: (row: FrontendTemplate) => row.Content
   },
   {
     name: 'Sender',
     label: t('MSG_SENDER'),
-    field: (row: NotifTemplate) => row.Sender
+    field: (row: FrontendTemplate) => row.Sender
   },
   {
     name: 'UsedFor',
     label: t('MSG_USED_FOR'),
-    field: (row: NotifTemplate) => row.UsedFor
+    field: (row: FrontendTemplate) => row.UsedFor
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
-    field: (row: NotifTemplate) => formatTime(row.CreatedAt)
+    field: (row: FrontendTemplate) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: t('MSG_UPDATED_AT'),
-    field: (row: NotifTemplate) => formatTime(row.UpdatedAt)
+    field: (row: FrontendTemplate) => formatTime(row.UpdatedAt)
   }
 ])
 </script>
