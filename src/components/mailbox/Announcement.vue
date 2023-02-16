@@ -102,9 +102,9 @@ const columns = computed(() => [
     field: (row: Announcement) => row.Content
   },
   {
-    name: 'Channels',
-    label: t('MSG_CHANNELS'),
-    field: (row: Announcement) => row.Channels?.join(',')
+    name: 'Channel',
+    label: t('MSG_CHANNEL'),
+    field: (row: Announcement) => row.Channel
   },
   {
     name: 'SendChannel',
