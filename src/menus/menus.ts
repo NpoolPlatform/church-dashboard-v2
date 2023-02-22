@@ -190,8 +190,8 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
-    label: '公告与通知',
-    caption: '管理公告与通知',
+    label: '公告与渠道',
+    caption: '管理公告与通知渠道',
     icon: 'pending',
     target: '/notification',
     level: 0,
@@ -206,7 +206,7 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, {
+      } as MenuItem, /* {
         menuId: uid(),
         label: '通知',
         caption: '管理通知',
@@ -215,7 +215,7 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
-      } as MenuItem, /* {
+      } as MenuItem, *//* {
         menuId: uid(),
         label: '通知',
         caption: '管理应用内用户通知',

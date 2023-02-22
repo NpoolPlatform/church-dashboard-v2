@@ -9,6 +9,7 @@
     :rows-per-page-options='[10]'
   />
   <AnnouncementUser />
+  <State />
 </template>
 
 <script setup lang='ts'>
@@ -21,6 +22,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const AnnouncementUser = defineAsyncComponent(() => import('src/components/mailbox/AnnouncementUser.vue'))
+const State = defineAsyncComponent(() => import('src/components/mailbox/State.vue'))
 
 const announcement = useChurchAnnouncementStore()
 const announcements = computed(() => announcement.announcements(appID.value))
