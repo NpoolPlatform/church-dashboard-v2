@@ -7,20 +7,9 @@
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[10]'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <!-- <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_CREATE")'
-          @click='onCreate'
-        /> -->
-      </div>
-    </template>
-  </q-table>
+  />
   <AnnouncementUser />
+  <State />
 </template>
 
 <script setup lang='ts'>
@@ -33,9 +22,10 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const AnnouncementUser = defineAsyncComponent(() => import('src/components/mailbox/AnnouncementUser.vue'))
+const State = defineAsyncComponent(() => import('src/components/mailbox/State.vue'))
 
 const announcement = useChurchAnnouncementStore()
-const announcements = computed(() => announcement.getAnnouncementByAppID(appID.value))
+const announcements = computed(() => announcement.announcements(appID.value))
 
 watch(appID, () => {
   if (announcements.value?.length === 0) {
@@ -102,23 +92,20 @@ const columns = computed(() => [
     field: (row: Announcement) => row.Content
   },
   {
-    name: 'Channels',
-    label: t('MSG_CHANNELS'),
-    field: (row: Announcement) => row.Channels?.join(',')
-  },
-  {
-    name: 'SendChannel',
-    label: t('MSG_SEND_CHANNEL'),
-    field: (row: Announcement) => row.SendChannel
+    name: 'Channel',
+    label: t('MSG_CHANNEL'),
+    field: (row: Announcement) => row.Channel
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
+    sortable: true,
     field: (row: Announcement) => formatTime(row.CreatedAt)
   },
   {
     name: 'END_AT',
     label: t('MSG_END_AT'),
+    sortable: true,
     field: (row: Announcement) => formatTime(row.EndAt)
   }
 ])
