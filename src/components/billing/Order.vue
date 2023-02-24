@@ -122,7 +122,7 @@ const displayOrders = computed(() => orders.value.filter((el) => {
   return display
 }))
 
-const soldUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAID).reduce((sum, b) => sum + b.Units, 0))
+const soldUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAID).reduce((sum, b) => sum + Number(b.Units), 0))
 const paymentTimeouts = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAYMENT_TIMEOUT).length)
 const paymentAmount = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAID).reduce((sum, b) => {
   const currency = Number(b.PaymentCoinUSDCurrency) > 0 ? Number(b.PaymentCoinUSDCurrency) : 1
@@ -136,7 +136,7 @@ const orderUsers = computed(() => {
     if (!u) {
       u = 0
     }
-    u += el.Units
+    u += Number(el.Units)
     users.set(el.UserID, u)
   })
   return users.size
