@@ -41,7 +41,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
-        <q-input
+        <!-- <q-input
           v-model.number='target.Sold'
           disable
           :label='$t("MSG_GOOD_SOLD")'
@@ -60,7 +60,7 @@
           :label='$t("MSG_GOOD_LOCKED")'
           type='number'
           :min='0'
-        />
+        /> -->
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:id='target.CoinTypeID' />
@@ -136,6 +136,7 @@ const onMenuHide = () => {
 const createGood = (done: () => void) => {
   good.createGood({
     ...target.value,
+    Total: `${target.value.Total}`,
     Message: {
       Error: {
         Title: t('MSG_CREATE_GOOD'),
@@ -180,6 +181,7 @@ const targetUpdate = computed(() => {
 const updateGood = (done: () => void) => {
   good.updateGood({
     ...targetUpdate.value,
+    Total: `${targetUpdate.value.Total}`,
     Message: {
       Error: {
         Title: t('MSG_UPDATE_GOOD'),

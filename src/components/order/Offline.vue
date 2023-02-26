@@ -38,7 +38,7 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -51,8 +51,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, useCoinStore } from 'npool-cli-v2'
-import { AppGood, NotifyType, useChurchAppGoodStore, useChurchOrderStore, useChurchUserStore, User, Order, OrderType } from 'npool-cli-v4'
+import { AppGood, NotifyType, useChurchAppGoodStore, useChurchOrderStore, useChurchUserStore, User, Order, OrderType, useChurchAppCoinStore } from 'npool-cli-v4'
+import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
 import { useLocalApplicationStore } from 'src/localstore'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
@@ -62,6 +62,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
@@ -75,7 +76,7 @@ interface MyGood {
 }
 const goods = computed(() => Array.from(appGoods.value.filter((el) => el.Online)).map((el) => {
   return {
-    label: el.GoodName,
+    label: `${el.GoodName} | ${el.GoodID}`,
     value: el
   } as MyGood
 }))
@@ -106,7 +107,7 @@ const selectedGood = ref(undefined as unknown as MyGood)
 const selectedUser = ref(undefined as unknown as MyUser)
 
 const units = ref(1)
-const maxUnits = computed(() => selectedGood.value?.value?.Total - (selectedGood.value?.value?.Locked) - (selectedGood.value?.value?.InService))
+const maxUnits = computed(() => Number(selectedGood.value?.value?.Total) - (Number(selectedGood.value?.value?.Locked)) - (Number(selectedGood.value?.value?.InService)))
 
 const showing = ref(false)
 
@@ -126,17 +127,20 @@ const onMenuHide = () => {
 
 const order = useChurchOrderStore()
 
-const onSubmit = () => {
+const onSubmit = (done: () => void) => {
   if (units.value > maxUnits.value) {
     console.log('purchase units', units.value, 'max units', maxUnits.value)
+    done()
     return
   }
   if (!selectedGood.value) {
     console.log('please select good')
+    done()
     return
   }
   if (!selectedUser.value) {
     console.log('please select user')
+    done()
     return
   }
 
@@ -144,7 +148,7 @@ const onSubmit = () => {
     TargetAppID: appID.value,
     TargetUserID: selectedUser.value.value.ID,
     GoodID: selectedGood.value.value.GoodID,
-    Units: units.value,
+    Units: `${units.value}`,
     PaymentCoinID: payCoinID.value,
     OrderType: OrderType.Offline,
     Message: {
@@ -156,6 +160,7 @@ const onSubmit = () => {
       }
     }
   }, (o : Order, error: boolean) => {
+    done()
     if (error) {
       return
     }
@@ -163,15 +168,17 @@ const onSubmit = () => {
   })
 }
 
-const coin = useCoinStore()
+const coin = useChurchAppCoinStore()
+const coins = computed(() => coin.getCoinsByAppID(appID.value))
+
 const payCoinID = computed(() => {
-  const index = coin.Coins.findIndex((el) => {
+  const index = coins.value.findIndex((el) => {
     return (el.ENV === selectedGood.value?.value.CoinEnv) && (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') || el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
   })
   if (index < 0) {
     return undefined as unknown as string
   }
-  return coin.Coins[index].ID
+  return coins.value[index].CoinTypeID
 })
 
 const prepare = () => {
@@ -186,17 +193,17 @@ watch(appID, () => {
 
 onMounted(() => {
   prepare()
-  coin.getCoins({
-    Message: {
-      Error: {
-        Title: 'MSG_GET_COINS',
-        Message: 'MSG_GET_COINS_FAIL',
-        Popup: true,
-        Type: NotificationType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+})
+
+watch(appID, () => {
+  if (coins.value?.length === 0) {
+    getAppCoins(0, 500)
+  }
+})
+
+onMounted(() => {
+  if (coins.value?.length === 0) {
+    getAppCoins(0, 500)
+  }
 })
 </script>
