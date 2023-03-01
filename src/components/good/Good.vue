@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_GOODS")'
-    :rows='goods'
+    :rows='displayGoods'
     row-key='ID'
     :rows-per-page-options='[10]'
     :columns='columns'
@@ -11,6 +11,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_GOOD_NAME")'
+        />
         <q-btn
           dense
           flat
@@ -103,6 +110,12 @@ const { t } = useI18n({ useScope: 'global' })
 
 const good = useChurchGoodStore()
 const goods = computed(() => Array.from(good.Goods.Goods))
+
+const username = ref('')
+const displayGoods = computed(() => {
+  const name = username.value?.toLowerCase()
+  return goods.value?.filter((el) => el.ID.toLowerCase().includes(name) || el.Unit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
+})
 
 const target = ref({} as Good)
 const showing = ref(false)
@@ -216,6 +229,11 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     field: (row: Good) => row.ID
+  },
+  {
+    name: 'Title',
+    label: t('MSG_GOOD_NAME'),
+    field: (row: Good) => row.Title
   },
   {
     name: 'GOODTYPE',

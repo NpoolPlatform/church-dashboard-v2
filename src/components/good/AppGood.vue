@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_GOODS")'
-    :rows='goods'
+    :rows='displayGoods'
     row-key='ID'
     :rows-per-page-options='[10]'
     selection='single'
@@ -12,6 +12,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_GOOD_NAME")'
+        />
         <div v-if='selectedGood.length === 0' class='column justify-center'>
           <span class='warning'>{{ $t('MSG_SELECT_GOOD') }}</span>
         </div>
@@ -129,6 +136,12 @@ const appID = computed(() => app.AppID)
 const good = useChurchGoodStore()
 const goods = computed(() => good.Goods.Goods)
 const selectedGood = ref([] as Array<Good>)
+
+const username = ref('')
+const displayGoods = computed(() => {
+  const name = username.value?.toLowerCase()
+  return goods.value?.filter((el) => el.ID.toLowerCase().includes(name) || el.Unit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
+})
 
 const appGood = useChurchAppGoodStore()
 const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
@@ -257,6 +270,11 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     field: (row: Good) => row.ID
+  },
+  {
+    name: 'Title',
+    label: t('MSG_GOOD_NAME'),
+    field: (row: Good) => row.Title
   },
   {
     name: 'GOODTYPE',
