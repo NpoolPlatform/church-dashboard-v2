@@ -116,6 +116,7 @@
         <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div>
       </q-card-section>
       <q-card-section>
+        <div><q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' /></div>
         <div><q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
         <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
         <div>
@@ -237,6 +238,7 @@ const updateTarget = computed(() => {
     ProductPage: target.value?.ProductPage,
     EnableProductPage: target.value?.EnableProductPage,
     EnablePurchase: target.value?.EnablePurchase,
+    EnableSetCommission: target.value?.EnableSetCommission,
     CancelMode: target.value?.CancelMode,
     CancellableBeforeStart: target.value?.CancellableBeforeStart,
     DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
