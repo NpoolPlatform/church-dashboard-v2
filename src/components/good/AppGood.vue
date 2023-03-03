@@ -61,7 +61,13 @@
       <q-card-section>
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
-        <!-- <q-input v-model='target.UserPurchaseLimit' :label='$t("MSG_USER_PURCHASE_LIMIT")' type='number' :min='0' /> -->
+        <q-input
+          v-if='updating'
+          v-model='target.UserPurchaseLimit'
+          :label='$t("MSG_USER_PURCHASE_LIMIT")'
+          type='number'
+          :min='0'
+        />
         <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
         <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
         <q-input
@@ -197,6 +203,7 @@ const createAppGood = (done: () => void) => {
     ...target.value,
     GoodID: selectedGood.value[0].ID,
     GoodName: selectedGood.value[0].Title,
+    UserPurchaseLimit: '10000',
     Message: {
       Error: {
         Title: 'MSG_AUTHORIZE_GOOD',
