@@ -61,7 +61,14 @@
       <q-card-section>
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
+        <q-input
+          v-model='target.UserPurchaseLimit'
+          :label='$t("MSG_USER_PURCHASE_LIMIT")'
+          type='number'
+          :min='0'
+        />
         <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
+        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
         <q-input
           class='commission-percent'
           v-model.number='target.CommissionPercent'
@@ -94,7 +101,19 @@
         />
       </q-card-section>
       <q-card-section>
-        <!-- <div> <q-toggle dense v-model='openSaleActivity' :label='$t("MSG_OPEN_SALE")' /></div> -->
+        <q-select
+          :options='CancelModes'
+          v-model='target.CancelMode'
+          :label='$t("MSG_CANCEL_MODE")'
+        />
+        <q-input
+          v-model.number='target.CancellableBeforeStart'
+          :label='$t("MSG_CANCELLABLE_BEFORE_START")'
+          type='number'
+          :min='0'
+          suffix='h'
+          :disable='target.CancelMode === CancelMode.UnCancellable'
+        />
       </q-card-section>
       <q-card-section>
         <!-- <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' :disabled='!openSaleActivity' /></div> -->
@@ -102,6 +121,9 @@
         <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div>
       </q-card-section>
       <q-card-section>
+        <div><q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' /></div>
+        <div><q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
+        <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
         <div>
           <q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' />
         </div>
@@ -119,7 +141,7 @@
 
 <script setup lang='ts'>
 import { useLocalApplicationStore } from 'src/localstore'
-import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime, SettleTypes } from 'npool-cli-v4'
+import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime, SettleTypes, CancelModes, CancelMode } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAppGoods, getGoods } from 'src/api/good'
@@ -180,6 +202,7 @@ const createAppGood = (done: () => void) => {
     ...target.value,
     GoodID: selectedGood.value[0].ID,
     GoodName: selectedGood.value[0].Title,
+    UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
     Message: {
       Error: {
         Title: 'MSG_AUTHORIZE_GOOD',
@@ -213,10 +236,17 @@ const updateTarget = computed(() => {
     Price: target.value.Price,
     DisplayIndex: target.value.DisplayIndex,
     PurchaseLimit: target.value.PurchaseLimit,
+    UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
     CommissionPercent: target.value.CommissionPercent,
     TechnicalFeeRatio: target.value.TechnicalFeeRatio,
     ElectricityFeeRatio: target.value.ElectricityFeeRatio,
     CommissionSettleType: target.value.CommissionSettleType,
+    ProductPage: target.value?.ProductPage,
+    EnableProductPage: target.value?.EnableProductPage,
+    EnablePurchase: target.value?.EnablePurchase,
+    EnableSetCommission: target.value?.EnableSetCommission,
+    CancelMode: target.value?.CancelMode,
+    CancellableBeforeStart: target.value?.CancellableBeforeStart,
     DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
     ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
   }
