@@ -248,7 +248,7 @@ const columns = computed(() => [
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
-    field: (row: Good) => row.Unit
+    field: (row: Good) => t(row.Unit)
   },
   {
     name: 'GOODTOTAL',
