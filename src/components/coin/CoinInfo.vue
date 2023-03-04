@@ -59,7 +59,7 @@
       <q-card-section v-if='!updating'>
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
         <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' />
-        <q-input v-model='target.ENV' :label='$t("MSG_COIN_ENV")' />
+        <q-select :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENV")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -77,6 +77,16 @@ import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+
+enum CoinEnvironment {
+  Test = 'test',
+  Main = 'main'
+}
+
+const CoinEnvironments = [
+  CoinEnvironment.Main,
+  CoinEnvironment.Test
+]
 
 const coin = useChurchCoinStore()
 const coins = computed(() => coin.Coins.Coins)
