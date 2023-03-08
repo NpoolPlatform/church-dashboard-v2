@@ -77,10 +77,10 @@
         <q-item-label>{{ $t('MSG_ORDER_STATE') }}: {{ currentOrder?.State }}</q-item-label>
       </q-item>
       <q-item class='row'>
-        <q-item-label> <span class='cancel-order-tip' v-if='currentOrder.OrderType !== OrderType.Offline'>Only Paid offline orders can be Canceled!</span></q-item-label>
+        <!-- <q-item-label> <span class='cancel-order-tip' v-if='currentOrder.OrderType !== OrderType.Offline'>Only Paid offline orders can be Canceled!</span></q-item-label> -->
       </q-item>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_CANCEL_ORDER")' @click='cancelOrder' :disable='currentOrder.OrderType !== OrderType.Offline || currentOrder.State !== OrderState.PAID' />
+        <q-btn class='btn round alt' :label='$t("MSG_CANCEL_ORDER")' @click='cancelOrder' :disable='getTargetAppGood(currentOrder.GoodID)?.CancelMode === CancelMode.UnCancellable' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -89,7 +89,7 @@
 
 <script setup lang='ts'>
 import { PriceCoinName } from 'npool-cli-v2'
-import { OrderState, useChurchAppGoodStore, useChurchOrderStore, OrderTypes, Order, NotifyType, formatTime, OrderType } from 'npool-cli-v4'
+import { OrderState, useChurchAppGoodStore, useChurchOrderStore, OrderTypes, Order, NotifyType, formatTime, CancelMode } from 'npool-cli-v4'
 import { getAppGoods } from 'src/api/good'
 import { getNAppOrders } from 'src/api/order'
 import { useLocalApplicationStore } from 'src/localstore'
@@ -100,6 +100,7 @@ const appID = computed(() => app.AppID)
 
 const good = useChurchAppGoodStore()
 const goods = computed(() => good.getGoodsByAppID(appID.value))
+const getTargetAppGood = computed(() => (goodID: string) => goods.value?.find((el) => el.GoodID === goodID))
 
 const goodID = ref('')
 const start = ref('')
