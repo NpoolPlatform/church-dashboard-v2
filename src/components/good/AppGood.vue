@@ -134,11 +134,6 @@
     </q-card>
   </q-dialog>
   <AppDefaultGood />
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>
