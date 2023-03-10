@@ -37,7 +37,7 @@ const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
 const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
     value: el.GoodID,
-    label: el.GoodName
+    label: `${el.GoodName} | ${el.GoodID}`
   }
 }))
 
