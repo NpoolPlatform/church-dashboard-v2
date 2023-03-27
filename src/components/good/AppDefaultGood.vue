@@ -8,6 +8,7 @@
     selection='single'
     :rows-per-page-options='[50]'
     :columns='appDefaultGoodsColumns'
+    @row-click='(evt, row, index) => onRowClick(row as AppDefaultGood)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -81,7 +82,6 @@ const onCancel = () => {
   onMenuHide()
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const onRowClick = (row: AppDefaultGood) => {
   target.value = { ...row }
   updating.value = true
@@ -120,7 +120,31 @@ const createAppDefaultGood = (done: () => void) => {
 }
 
 const updateAppDefaultGood = (done: () => void) => {
-  done()
+  appDefaultGood.updateAppDefaultGood({
+    ...target.value,
+    TargetAppID: target.value?.AppID,
+    Message: {
+      Error: {
+        Title: t('MSG_UPDATE_APP_DEFAULT_GOOD'),
+        Message: t('MSG_UPDATE_APP_DEFAULT_GOOD_FAIL'),
+        Popup: true,
+        Type: NotifyType.Error
+      },
+      Info: {
+        Title: t('MSG_UPDATE_APP_DEFAULT_GOOD'),
+        Message: t('MSG_UPDATE_APP_DEFAULT_GOOD_SUCCESS'),
+        Popup: true,
+        Type: NotifyType.Success
+      }
+    }
+  }, (row: AppDefaultGood, error: boolean) => {
+    console.log('row: ', row.ID)
+    done()
+    if (error) {
+      return
+    }
+    onMenuHide()
+  })
 }
 
 watch(appID, () => {
