@@ -44,6 +44,7 @@
         <q-input type='number' v-model='target.WithdrawFeeAmount' :label='$t("MSG_WITHDRAW_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.CollectFeeAmount' :label='$t("MSG_COLLECT_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.LowFeeAmount' :label='$t("MSG_LOW_FEE_AMOUNT")' />
+        <q-input type='number' v-model='target.HotLowFeeAmount' :label='$t("MSG_HOT_LOW_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.HotWalletFeeAmount' :label='$t("MSG_HOT_WALLET_FEE_AMOUNT")' />
         <q-input type='number' v-model='target.HotWalletAccountAmount' :label='$t("MSG_HOT_WALLET_ACCOUNT_AMOUNT")' />
         <q-input type='number' v-model='target.PaymentAccountCollectAmount' :label='$t("MSG_PAYMENT_ACCOUNT_COLLECT_AMOUNT")' />
@@ -138,6 +139,7 @@ const updateTarget = computed(() => {
     CollectFeeAmount: target.value.CollectFeeAmount,
     HotWalletAccountAmount: target.value.HotWalletAccountAmount,
     LowFeeAmount: target.value.LowFeeAmount,
+    HotLowFeeAmount: target.value.HotLowFeeAmount,
     HotWalletFeeAmount: target.value.HotWalletFeeAmount,
     PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
     LeastTransferAmount: target.value.LeastTransferAmount,
