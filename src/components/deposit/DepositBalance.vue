@@ -40,6 +40,7 @@
     :rows='displayGenerals'
     row-key='ID'
     :rows-per-page-options='[10]'
+    :columns='generalColumns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -67,6 +68,7 @@
     :rows='displayDetails'
     row-key='ID'
     :rows-per-page-options='[10]'
+    :columns='detailColumns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -93,6 +95,7 @@
     :rows='accounts'
     row-key='ID'
     :rows-per-page-options='[10]'
+    :columns='accountColumns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -149,7 +152,8 @@ import {
   useChurchGeneralStore,
   useChurchUserStore,
   User,
-  useChurchAppCoinStore
+  useChurchAppCoinStore,
+  Account
 } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { useI18n } from 'vue-i18n'
@@ -472,4 +476,174 @@ const getAppDetails = (offset: number, limit: number) => {
     getAppDetails(offset + limit, limit)
   })
 }
+
+const generalColumns = computed(() => [
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COIN_TYPE_ID'),
+    field: (row: General) => row.CoinTypeID
+  },
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    field: (row: General) => row.CoinName
+  },
+  {
+    name: 'CoinUnit',
+    label: t('MSG_COIN_UNIT'),
+    field: (row: General) => row.CoinUnit
+  },
+  {
+    name: 'Incoming',
+    label: t('MSG_INCOMING'),
+    field: (row: General) => row.Incoming
+  },
+  {
+    name: 'Outcoming',
+    label: t('MSG_OUT_COMING'),
+    field: (row: General) => row.Outcoming
+  },
+  {
+    name: 'Spendable',
+    label: t('MSG_SPENDABLE'),
+    field: (row: General) => row.Spendable
+  },
+  {
+    name: 'Locked',
+    label: t('MSG_LOCKED'),
+    field: (row: General) => row.Locked
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: General) => row.UserID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: General) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: General) => row.PhoneNO
+  },
+  {
+    name: 'CoinDisabled',
+    label: t('MSG_COIN_DISABLE'),
+    field: (row: General) => row.CoinDisabled
+  },
+  {
+    name: 'CoinDisplay',
+    label: t('MSG_COIN_DISPLAY'),
+    field: (row: General) => row.CoinDisplay
+  }
+])
+
+const detailColumns = computed(() => [
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COIN_TYPE_ID'),
+    field: (row: Detail) => row.CoinTypeID
+  },
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    field: (row: Detail) => row.CoinName
+  },
+  {
+    name: 'CoinUnit',
+    label: t('MSG_COIN_UNIT'),
+    field: (row: Detail) => row.CoinUnit
+  },
+  {
+    name: 'IOType',
+    label: t('MSG_IO_TYPE'),
+    field: (row: Detail) => row.IOType
+  },
+  {
+    name: 'IOSubType',
+    label: t('MSG_IO_SUB_TYPE'),
+    field: (row: Detail) => row.IOSubType
+  },
+  {
+    name: 'Amount',
+    label: t('MSG_AMOUNT'),
+    field: (row: Detail) => row.Amount
+  },
+  {
+    name: 'IOExtra',
+    align: 'left',
+    label: t('MSG_IO_EXTRA'),
+    field: (row: Detail) => row.IOExtra
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: Detail) => row.UserID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: Detail) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: Detail) => row.PhoneNO
+  }
+])
+
+const accountColumns = computed(() => [
+  {
+    name: 'AccountID',
+    label: t('MSG_ACCOUNT_ID'),
+    field: (row: Account) => row.AccountID
+  },
+  {
+    name: 'Address',
+    label: t('MSG_ADDRESS'),
+    field: (row: Account) => row.Address
+  },
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    field: (row: Account) => row.CoinName
+  },
+  {
+    name: 'CoinUnit',
+    label: t('MSG_COIN_UNIT'),
+    field: (row: Account) => row.CoinUnit
+  },
+  {
+    name: 'Active',
+    label: t('MSG_ACTIVE'),
+    field: (row: Account) => row.Active
+  },
+  {
+    name: 'Blocked',
+    label: t('MSG_BLOCKED'),
+    field: (row: Account) => row.Blocked
+  },
+  {
+    name: 'UsedFor',
+    label: t('MSG_USED_FOR'),
+    field: (row: Account) => row.UsedFor
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    field: (row: Account) => row.UserID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    field: (row: Detail) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    field: (row: Account) => row.PhoneNO
+  }
+])
 </script>
