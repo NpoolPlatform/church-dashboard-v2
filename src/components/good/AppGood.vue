@@ -44,11 +44,7 @@
     :rows-per-page-options='[10]'
     @row-click='(evt, row, index) => onRowClick(row as AppGood)'
   />
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
+
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -137,6 +133,7 @@
       </q-item>
     </q-card>
   </q-dialog>
+  <AppDefaultGood />
 </template>
 
 <script setup lang='ts'>
@@ -151,6 +148,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
+const AppDefaultGood = defineAsyncComponent(() => import('src/components/good/AppDefaultGood.vue'))
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
