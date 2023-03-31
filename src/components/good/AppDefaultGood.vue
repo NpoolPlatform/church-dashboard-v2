@@ -38,7 +38,7 @@
       </q-card-section>
       <q-card-section>
         <AppGoodSelector v-model:id='target.GoodID' />
-        <CoinPicker v-model:id='target.CoinTypeID' />
+        <CoinPicker v-model:id='target.CoinTypeID' v-model:updating='updating' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
