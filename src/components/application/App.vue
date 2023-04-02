@@ -36,6 +36,7 @@
         <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
         <q-input v-model.number='target.MaxTypedCouponsPerOrder' :label='$t("MSG_MAX_TYPED_COUPONS_PER_ORDER")' />
+        <q-input v-model='commitButtonTargets' :label='$t("MSG_COMMIT_BUTTON_TARGETS")' />
         <q-select :options='recaptchaMethods' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
         <q-select :options='CreateInvitationCodeWhens' v-model='target.CreateInvitationCodeWhen' :label='$t("MSG_CREATE_INVITATION_CODE_WHEN")' />
       </q-card-section>
@@ -48,6 +49,9 @@
         </div>
         <div>
           <q-toggle dense v-model='target.InvitationCodeMust' :label='$t("MSG_INVITATION_CODE_MUST")' />
+        </div>
+        <div>
+          <q-toggle dense v-model='target.Maintaining' :label='$t("MSG_MAINTAINING")' />
         </div>
       </q-card-section>
       <q-item class='row'>
@@ -91,6 +95,7 @@ const updating = ref(false)
 
 const onRowClick = (row: App) => {
   target.value = { ...row }
+  commitButtonTargets.value = row.CommitButtonTargets?.join(',')
   showing.value = true
   updating.value = true
 }
@@ -131,6 +136,7 @@ const createApp = (done: () => void) => {
   })
 }
 
+const commitButtonTargets = ref('')
 const updateApp = (done: () => void) => {
   const request = {
     ID: target.value.ID,
@@ -140,6 +146,8 @@ const updateApp = (done: () => void) => {
     ExtSigninMethods: target.value.ExtSigninMethods,
     RecaptchaMethod: target.value.RecaptchaMethod,
     KycEnable: target.value.KycEnable,
+    Maintaining: target.value.Maintaining,
+    CommitButtonTargets: commitButtonTargets.value?.split(','),
     SigninVerifyEnable: target.value.SigninVerifyEnable,
     InvitationCodeMust: target.value.InvitationCodeMust,
     CreateInvitationCodeWhen: target.value?.CreateInvitationCodeWhen,
