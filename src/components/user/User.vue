@@ -8,16 +8,48 @@
     :loading='userLoading'
     :rows-per-page-options='[20]'
     :columns='columns'
-  />
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_CREATE")'
+          @click='onCreate'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-card>
     <q-card-section class='bg-primary text-white'>
       {{ $t('MSG_ADVERTISEMENT_POSITION') }}
     </q-card-section>
   </q-card>
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <span>{{ $t('MSG_CREATE_ROLE') }}</span>
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model='target.EmailAddress' :label='$t("MSG_EMAIL_ADDRESS")' />
+        <q-input v-model='target.PhoneNO' :label='$t("MSG_PHONENO")' />
+        <q-input v-model='password' :label='$t("MSG_PASSWORD")' />
+      </q-card-section>
+      <q-item class='row'>
+        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchUserStore, User, formatTime } from 'npool-cli-v4'
+import { NotifyType, useChurchUserStore, User, formatTime, encryptPassword } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -30,6 +62,7 @@ const appID = computed(() => app.AppID)
 const user = useChurchUserStore()
 const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
 const userLoading = ref(false)
+const password = ref('')
 
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
@@ -99,4 +132,45 @@ const columns = computed(() => [
     field: (row: User) => formatTime(row.CreatedAt)
   }
 ])
+
+const showing = ref(false)
+const onCreate = () => {
+  showing.value = true
+}
+
+const target = ref({
+  TargetAppID: appID
+} as unknown as User)
+
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {
+    TargetAppID: appID
+  } as unknown as User
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = () => {
+  showing.value = false
+
+  user.createAppUser({
+    TargetAppID: appID.value,
+    EmailAddress: target.value.EmailAddress,
+    PhoneNO: target.value.PhoneNO,
+    PasswordHash: encryptPassword(password.value),
+    Message: {
+      Error: {
+        Title: 'MSG_CREATE_APP_USER',
+        Message: 'MSG_CREATE_APP_USER',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+}
 </script>
