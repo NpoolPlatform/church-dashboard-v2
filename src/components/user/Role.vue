@@ -49,13 +49,14 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, Role, useChurchRoleStore, useLocalUserStore } from 'npool-cli-v4'
+import { NotifyType, Role, useAdminRoleStore, useChurchRoleStore, useLocalUserStore } from 'npool-cli-v4'
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
+const arole = useAdminRoleStore()
 const role = useChurchRoleStore()
 const roles = computed(() => !role.Roles.get(appID.value) ? [] : role.Roles.get(appID.value))
 const roleLoading = ref(false)
@@ -115,20 +116,20 @@ const onSubmit = () => {
   showing.value = false
 
   if (updating.value) { // NEED UPDATE ROLE API
-    // role.updateRole({
-    //   Info: target.value,
-    //   Message: {
-    //     Error: {
-    //       Title: 'MSG_UPDATE_ROLE',
-    //       Message: 'MSG_UPDATE_ROLE_FAIL',
-    //       Popup: true,
-    //       Type: NotificationType.Error
-    //     }
-    //   }
-    // }, () => {
-    //   // TODO
-    // })
-    // return
+    arole.updateRole({
+      Info: target.value,
+      Message: {
+        Error: {
+          Title: 'MSG_UPDATE_ROLE',
+          Message: 'MSG_UPDATE_ROLE_FAIL',
+          Popup: true,
+          Type: NotifyType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+    return
   }
 
   role.createAppRole({
