@@ -214,6 +214,10 @@ const target = ref({
   TargetAppID: appID.value
 } as CreateAppUserDepositRequest)
 
+watch(appID, () => {
+  target.value.TargetAppID = appID.value
+})
+
 const deposit = useChurchDepositStore()
 const showing = ref(false)
 const amount = ref(undefined)
