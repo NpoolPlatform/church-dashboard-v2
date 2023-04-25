@@ -51,6 +51,7 @@
         <q-input type='number' v-model='target.LeastTransferAmount' :label='$t("MSG_LEAST_TRANSFER_AMOUNT")' />
       </q-card-section>
       <q-card-section v-if='updating'>
+        <div><q-toggle dense v-model='target.NeedMemo' :label='$t("MSG_MEMO")' /></div>
         <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
         <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_FOR_PAY")' /></div>
         <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_PRESALE")' /></div>
@@ -144,7 +145,8 @@ const updateTarget = computed(() => {
     PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
     LeastTransferAmount: target.value.LeastTransferAmount,
     StableUSD: target.value?.StableUSD,
-    Disabled: target.value?.Disabled
+    Disabled: target.value?.Disabled,
+    NeedMemo: target.value?.NeedMemo
   }
 })
 
