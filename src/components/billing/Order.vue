@@ -36,55 +36,62 @@
       />
     </template>
   </q-table>
+  <q-item><span>{{ $t('MSG_PAID') }}: {{ soldUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_WAIT_PAYMENT') }}: {{ waitPaymentUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_TIMEOUT') }}: {{ timeoutUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_USER_CANCELED') }}: {{ userCanceledUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_CANCELED') }}: {{ canceledUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_IN_SERVICE') }}: {{ inServiceUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_EXPIRED') }}: {{ expiredUnits }}</span></q-item>
+  <q-item><span>{{ $t('MSG_WAIT_START') }}: {{ waitStartUnits }}</span></q-item>
   <q-item>
-    <span>{{ $t('MSG_TOTAL_SOLD') }}: {{ soldUnits }}</span>
-  </q-item>
-  <q-item>
-    <span>{{ $t('MSG_PAYMENT_TIMEOUT') }}: {{ paymentTimeouts }}</span>
-  </q-item>
-  <q-item>
-    <span>{{ $t('MSG_PAYMENT_USDT_AMOUNT') }}: {{ paymentAmount }} {{ PriceCoinName }}</span>
-  </q-item>
-  <q-item>
-    <span>{{ $t('MSG_ORDER_USER_COUNT') }}: {{ orderUsers }}</span>
-  </q-item>
-  <q-dialog
-    v-model='orderInfoDialog'
-    @hide='onMenuHide'
-    position='right'
-  >
-    <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_ORDER_INFO') }}</span>
-      </q-card-section>
-      <q-card-section>
-        <q-item-label>{{ $t('MSG_ORDER_ID') }}: {{ currentOrder?.ID }}</q-item-label>
-        <q-item-label>{{ $t('MSG_USER_ID') }}: {{ currentOrder?.UserID }}</q-item-label>
-        <q-item-label>{{ $t('MSG_EMAIL_ADDRESS') }}: {{ currentOrder?.EmailAddress }}</q-item-label>
-        <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ currentOrder?.PhoneNO }}</q-item-label>
-        <q-item-label>{{ $t('MSG_COINTYPE_ID') }}: {{ currentOrder?.CoinTypeID }}</q-item-label>
-        <q-item-label>{{ $t('MSG_COINNAME') }}: {{ currentOrder?.CoinName }} {{ currentOrder?.Units }}</q-item-label>
-        <q-item-label>{{ $t('MSG_UNTITS') }}: {{ currentOrder?.Units }}</q-item-label>
-        <q-item-label>{{ $t('MSG_PAYMENT_AMOUNT') }}: {{ currentOrder?.PaymentAmount }}</q-item-label>
-        <q-item-label>{{ $t('MSG_CREATED_AT') }}: {{ formatTime(currentOrder?.CreatedAt) }}</q-item-label>
-      </q-card-section>
-      <q-card-section>
-        <q-item-label>{{ $t('MSG_GOOD_NAME') }}: {{ currentOrder?.GoodName }}</q-item-label>
-        <q-item-label>{{ $t('MSG_PERIOD_DAYS') }}: {{ currentOrder?.GoodServicePeriodDays }}</q-item-label>
-        <q-item-label>{{ $t('MSG_ORDER_TYPE') }}: {{ currentOrder?.OrderType }}</q-item-label>
-      </q-card-section>
-      <q-item class='row'>
-        <q-item-label>{{ $t('MSG_ORDER_STATE') }}: {{ currentOrder?.State }}</q-item-label>
-      </q-item>
-      <q-item class='row'>
+    <q-item>
+      <span>{{ $t('MSG_PAYMENT_TIMEOUT') }}: {{ paymentTimeouts }}</span>
+    </q-item>
+    <q-item>
+      <span>{{ $t('MSG_PAYMENT_USDT_AMOUNT') }}: {{ paymentAmount }} {{ PriceCoinName }}</span>
+    </q-item>
+    <q-item>
+      <span>{{ $t('MSG_ORDER_USER_COUNT') }}: {{ orderUsers }}</span>
+    </q-item>
+    <q-dialog
+      v-model='orderInfoDialog'
+      @hide='onMenuHide'
+      position='right'
+    >
+      <q-card class='popup-menu'>
+        <q-card-section>
+          <span>{{ $t('MSG_ORDER_INFO') }}</span>
+        </q-card-section>
+        <q-card-section>
+          <q-item-label>{{ $t('MSG_ORDER_ID') }}: {{ currentOrder?.ID }}</q-item-label>
+          <q-item-label>{{ $t('MSG_USER_ID') }}: {{ currentOrder?.UserID }}</q-item-label>
+          <q-item-label>{{ $t('MSG_EMAIL_ADDRESS') }}: {{ currentOrder?.EmailAddress }}</q-item-label>
+          <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ currentOrder?.PhoneNO }}</q-item-label>
+          <q-item-label>{{ $t('MSG_COINTYPE_ID') }}: {{ currentOrder?.CoinTypeID }}</q-item-label>
+          <q-item-label>{{ $t('MSG_COINNAME') }}: {{ currentOrder?.CoinName }} {{ currentOrder?.Units }}</q-item-label>
+          <q-item-label>{{ $t('MSG_UNTITS') }}: {{ currentOrder?.Units }}</q-item-label>
+          <q-item-label>{{ $t('MSG_PAYMENT_AMOUNT') }}: {{ currentOrder?.PaymentAmount }}</q-item-label>
+          <q-item-label>{{ $t('MSG_CREATED_AT') }}: {{ formatTime(currentOrder?.CreatedAt) }}</q-item-label>
+        </q-card-section>
+        <q-card-section>
+          <q-item-label>{{ $t('MSG_GOOD_NAME') }}: {{ currentOrder?.GoodName }}</q-item-label>
+          <q-item-label>{{ $t('MSG_PERIOD_DAYS') }}: {{ currentOrder?.GoodServicePeriodDays }}</q-item-label>
+          <q-item-label>{{ $t('MSG_ORDER_TYPE') }}: {{ currentOrder?.OrderType }}</q-item-label>
+        </q-card-section>
+        <q-item class='row'>
+          <q-item-label>{{ $t('MSG_ORDER_STATE') }}: {{ currentOrder?.State }}</q-item-label>
+        </q-item>
+        <q-item class='row'>
         <!-- <q-item-label> <span class='cancel-order-tip' v-if='currentOrder.OrderType !== OrderType.Offline'>Only Paid offline orders can be Canceled!</span></q-item-label> -->
-      </q-item>
-      <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_CANCEL_ORDER")' @click='cancelOrder' :disable='getTargetAppGood(currentOrder.GoodID)?.CancelMode === CancelMode.UnCancellable' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
-      </q-item>
-    </q-card>
-  </q-dialog>
+        </q-item>
+        <q-item class='row'>
+          <q-btn class='btn round alt' :label='$t("MSG_CANCEL_ORDER")' @click='cancelOrder' :disable='getTargetAppGood(currentOrder.GoodID)?.CancelMode === CancelMode.UnCancellable' />
+          <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        </q-item>
+      </q-card>
+    </q-dialog>
+  </q-item>
 </template>
 
 <script setup lang='ts'>
@@ -124,6 +131,14 @@ const displayOrders = computed(() => orders.value.filter((el) => {
 }))
 
 const soldUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAID).reduce((sum, b) => sum + Number(b.Units), 0))
+const waitPaymentUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.WAIT_PAYMENT).reduce((sum, b) => sum + Number(b.Units), 0))
+const timeoutUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAYMENT_TIMEOUT).reduce((sum, b) => sum + Number(b.Units), 0))
+const userCanceledUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.USER_CANCELED).reduce((sum, b) => sum + Number(b.Units), 0))
+const canceledUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.CANCELED).reduce((sum, b) => sum + Number(b.Units), 0))
+const inServiceUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.IN_SERVICE).reduce((sum, b) => sum + Number(b.Units), 0))
+const expiredUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.EXPIRED).reduce((sum, b) => sum + Number(b.Units), 0))
+const waitStartUnits = computed(() => displayOrders.value.filter((el) => el.State === OrderState.WAIT_START).reduce((sum, b) => sum + Number(b.Units), 0))
+
 const paymentTimeouts = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAYMENT_TIMEOUT).length)
 const paymentAmount = computed(() => displayOrders.value.filter((el) => el.State === OrderState.PAID).reduce((sum, b) => {
   const currency = Number(b.PaymentCoinUSDCurrency) > 0 ? Number(b.PaymentCoinUSDCurrency) : 1
