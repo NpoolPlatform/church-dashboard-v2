@@ -80,6 +80,7 @@
 
 <script setup lang='ts'>
 import { AppRoleUser, formatTime, NotifyType, Role, useChurchRoleStore, useChurchUserStore, User } from 'npool-cli-v4'
+import { DeleteAppRoleUserRequest } from 'npool-cli-v4/dist/store/church/appuser/role/types'
 
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -230,9 +231,10 @@ const onDeleteRoleUser = () => {
     return
   }
 
-  role.deleteAppRoleUser({
+  const req = {
+    ID: roleUsers.value?.[index].ID as string,
     TargetAppID: appID.value,
-    TargetUserID: roleUsers.value?.[index].ID as string,
+    TargetUserID: roleUsers.value?.[index].UserID as string,
     Message: {
       Error: {
         Title: 'MSG_DELETE_ROLE_USER',
@@ -241,7 +243,8 @@ const onDeleteRoleUser = () => {
         Type: NotifyType.Error
       }
     }
-  }, () => {
+  } as DeleteAppRoleUserRequest
+  role.deleteAppRoleUser(req, () => {
     // TODO
   })
 }
