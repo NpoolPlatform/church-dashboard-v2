@@ -137,7 +137,7 @@ const getAppWithdrawReviews = (offset: number, limit: number) => {
 const updateAppWithdrawReview = (done: () => void) => {
   review.updateAppWithdrawReview({
     TargetAppID: appID.value,
-    AppID: appID.value,
+    AppID: undefined as unknown as string,
     ReviewID: target.value.ReviewID,
     LangID: locale.AppLang?.LangID,
     UserID: logined.User?.ID,
