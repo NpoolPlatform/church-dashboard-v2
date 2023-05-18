@@ -232,7 +232,7 @@ const onDeleteRoleUser = () => {
 
   role.deleteAppRoleUser({
     TargetAppID: appID.value,
-    RoleUserID: roleUsers.value?.[index].ID as string,
+    TargetUserID: roleUsers.value?.[index].ID as string,
     Message: {
       Error: {
         Title: 'MSG_DELETE_ROLE_USER',
