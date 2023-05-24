@@ -396,11 +396,13 @@ const apiColumns = computed(() => [
   {
     name: 'PathPrefix',
     label: 'MSG_PATH_PREFIX',
+    sortable: true,
     field: (row: API) => row.PathPrefix
   },
   {
     name: 'Path',
     label: 'MSG_PATH',
+    sortable: true,
     field: (row: API) => row.Path
   },
   {
