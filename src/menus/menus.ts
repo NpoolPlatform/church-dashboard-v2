@@ -52,7 +52,16 @@ const MainDrawerMenus = [
         label: '币种汇率',
         caption: '管理币种汇率',
         icon: 'pending',
-        target: '/coin/feed',
+        target: '/coin/coinfeed',
+        level: 0,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '法币管理',
+        caption: '管理法币',
+        icon: 'pending',
+        target: '/coin/fiat',
         level: 0,
         sectionBegin: false,
         children: []

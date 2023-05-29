@@ -49,7 +49,7 @@ export const useFiatStore = defineStore('fiat-v4', {
         }
       )
     },
-    UpdateFiat (req: UpdateFiatRequest, done: (error: boolean, row: Fiat) => void) {
+    updateFiat (req: UpdateFiatRequest, done: (error: boolean, row: Fiat) => void) {
       doActionWithError<UpdateFiatRequest, UpdateFiatResponse>(
         API.UPDATE_FIAT,
         req,
