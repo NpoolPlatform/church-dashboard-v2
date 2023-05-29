@@ -1,3 +1,5 @@
+import { BaseRequest } from 'npool-cli-v4'
+
 /** @default "DefaultFeedType" */
 export enum CurrencyFeedType {
   DefaultFeedType = 'DefaultFeedType',
@@ -49,7 +51,7 @@ export interface Currency {
   UpdatedAt: number;
 }
 
-export interface GetCurrenciesRequest {
+export interface GetCoinFiatCurrenciesRequest extends BaseRequest {
   CoinTypeIDs: string[];
   /** @format int64 */
   StartAt: number;
@@ -61,7 +63,7 @@ export interface GetCurrenciesRequest {
   Limit: number;
 }
 
-export interface GetCurrenciesResponse {
+export interface GetCoinFiatCurrenciesResponse {
   Infos: Currency[];
   /** @format int64 */
   Total: number;

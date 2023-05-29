@@ -1,0 +1,35 @@
+import { defineStore } from 'pinia'
+import { API } from './const'
+import {
+  Currency,
+  GetCoinFiatCurrenciesRequest,
+  GetCoinFiatCurrenciesResponse
+} from './types'
+import { doActionWithError } from 'npool-cli-v4'
+
+export const useCoinFiatCurrencyHistoriesStore = defineStore('coinfiatcurrencyhistories-v4', {
+  state: () => ({
+    CurrencyHistories: {
+      CurrencyHistories: [] as Array<Currency>,
+      Total: 0
+    }
+  }),
+  getters: {
+  },
+  actions: {
+    getCoinFiatHistories (req: GetCoinFiatCurrenciesRequest, done: (error: boolean, rows: Array<Currency>) => void) {
+      doActionWithError<GetCoinFiatCurrenciesRequest, GetCoinFiatCurrenciesResponse>(
+        API.GET_COIN_FIAT_CURRENCY_HISTORIES,
+        req,
+        req.Message,
+        (resp: GetCoinFiatCurrenciesResponse): void => {
+          this.CurrencyHistories.CurrencyHistories.push(...resp.Infos)
+          this.CurrencyHistories.Total = resp.Total
+          done(false, resp.Infos)
+        }, () => {
+          done(true, [] as Array<Currency>)
+        }
+      )
+    }
+  }
+})
