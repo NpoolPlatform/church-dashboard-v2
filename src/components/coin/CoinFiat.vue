@@ -33,8 +33,8 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
-        <FiatPicker v-model:id='target.FiatID' />
+        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
+        <FiatPicker v-model:id='target.FiatID' label='MSG_FIAT_ID' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
