@@ -47,6 +47,15 @@ const MainDrawerMenus = [
         level: 0,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '币种汇率',
+        caption: '管理币种汇率',
+        icon: 'pending',
+        target: '/coin/feed',
+        level: 0,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
