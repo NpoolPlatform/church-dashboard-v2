@@ -11,7 +11,7 @@ import {
 } from './types'
 import { doActionWithError } from 'npool-cli-v4'
 
-export const useCoinCoinFiatStore = defineStore('coinCoinFiat-v4', {
+export const useCoinFiatStore = defineStore('coinCoinFiat-v4', {
   state: () => ({
     CoinFiats: {
       CoinFiats: [] as Array<CoinFiat>,
