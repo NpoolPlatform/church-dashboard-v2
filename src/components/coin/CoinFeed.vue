@@ -48,6 +48,7 @@
       </q-item>
     </q-card>
   </q-dialog>
+  <CoinFiat />
 </template>
 
 <script setup lang='ts'>
@@ -58,6 +59,7 @@ import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const CoinFiat = defineAsyncComponent(() => import('src/components/coin/CoinFiat.vue'))
 
 const feed = useCoinFeedStore()
 const feeds = computed(() => feed.Feeds.Feeds)
