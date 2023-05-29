@@ -37,7 +37,7 @@
         <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
         <q-input v-model='target.FeedCoinName' :label='$t("MSG_FEED_COIN_NAME")' />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='updating'>
         <div>
           <q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' />
         </div>

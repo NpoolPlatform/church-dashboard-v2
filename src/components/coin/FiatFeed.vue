@@ -2,11 +2,11 @@
   <q-table
     dense
     flat
-    :rows='displayFiats'
+    :rows='displayFeeds'
     row-key='ID'
-    :title='$t("MSG_FIATS")'
+    :title='$t("MSG_FIAT_FEEDS")'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as Fiat)'
+    @row-click='(evt, row, index) => onRowClick(row as Feed)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -34,9 +34,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
-        <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
-        <q-input v-model='target.Logo' :label='$t("MSG_LOGO")' />
+        <FiatPicker v-model:id='target.FiatID' :updating='updating' :label='"MSG_FIAT_ID"' />
+        <q-input v-model='target.FeedFiatName' :label='$t("MSG_FEED_FIAT_NAME")' />
+      </q-card-section>
+      <q-card-section v-if='updating'>
+        <div>
+          <q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' />
+        </div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -44,36 +48,35 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <FiatFeed />
 </template>
 
 <script setup lang='ts'>
 import { NotifyType } from 'npool-cli-v4'
-import { useFiatStore } from 'src/teststore/fiat'
-import { Fiat } from 'src/teststore/fiat/types'
+import { useFiatFeedStore } from 'src/teststore/fiat/currency/feed'
+import { Feed } from 'src/teststore/fiat/currency/feed/types'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-const FiatFeed = defineAsyncComponent(() => import('src/components/coin/FiatFeed.vue'))
+const FiatPicker = defineAsyncComponent(() => import('src/components/coin/FiatPicker.vue'))
 
-const fiat = useFiatStore()
-const fiats = computed(() => fiat.Fiats.Fiats)
+const feed = useFiatFeedStore()
+const feeds = computed(() => feed.Feeds.Feeds)
 
 const name = ref('')
-const displayFiats = computed(() => {
-  return fiats.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+const displayFeeds = computed(() => {
+  return feeds.value.filter((el) => el.FiatName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
 })
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as Fiat)
+const target = ref({} as Feed)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: Fiat) => {
+const onRowClick = (row: Feed) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -85,20 +88,20 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as Fiat
+  target.value = {} as Feed
 }
 
 const onSubmit = (done: () => void) => {
-  updating.value ? updateFiat(done) : createFiat(done)
+  updating.value ? updateFeed(done) : createFeed(done)
 }
 
-const createFiat = (done: () => void) => {
-  fiat.createFiat({
+const createFeed = (done: () => void) => {
+  feed.createFeed({
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_FIAT',
-        Message: 'MSG_CREATE_FIAT_FAIL',
+        Title: 'MSG_CREATE_FIAT_FEED',
+        Message: 'MSG_CREATE_FIAT_FEED_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
@@ -112,13 +115,15 @@ const createFiat = (done: () => void) => {
   })
 }
 
-const updateFiat = (done: () => void) => {
-  fiat.updateFiat({
-    ...target.value,
+const updateFeed = (done: () => void) => {
+  feed.updateFeed({
+    ID: target.value?.ID,
+    FeedFiatName: target.value?.FeedFiatName,
+    Disabled: target.value?.Disabled,
     Message: {
       Error: {
-        Title: 'MSG_UPDATE_FIAT',
-        Message: 'MSG_UPDATE_FIAT_FAIL',
+        Title: 'MSG_UPDATE_FIAT_FEED',
+        Message: 'MSG_UPDATE_FIAT_FEED_FAIL',
         Popup: true,
         Type: NotifyType.Error
       }
@@ -133,21 +138,21 @@ const updateFiat = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (fiat.Fiats.Fiats.length === 0) {
-    getFiats(0, 100)
+  if (feed.Feeds.Feeds.length === 0) {
+    getFeeds(0, 100)
   }
 })
 
-const getFiats = (offset: number, limit: number) => {
-  fiat.getFiats({
+const getFeeds = (offset: number, limit: number) => {
+  feed.getFeeds({
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Fiat[]) => {
+  }, (error: boolean, rows: Feed[]) => {
     if (error || rows.length === 0) {
       return
     }
-    getFiats(offset + limit, limit)
+    getFeeds(offset + limit, limit)
   })
 }
 </script>

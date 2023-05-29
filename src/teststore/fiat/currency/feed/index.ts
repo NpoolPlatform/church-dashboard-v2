@@ -11,7 +11,7 @@ import {
 } from './types'
 import { doActionWithError } from 'npool-cli-v4'
 
-export const useFeedStore = defineStore('fiatfeed-v4', {
+export const useFiatFeedStore = defineStore('fiatfeed-v4', {
   state: () => ({
     Feeds: {
       Feeds: [] as Array<Feed>,
@@ -49,7 +49,7 @@ export const useFeedStore = defineStore('fiatfeed-v4', {
         }
       )
     },
-    UpdateFeed (req: UpdateFeedRequest, done: (error: boolean, row: Feed) => void) {
+    updateFeed (req: UpdateFeedRequest, done: (error: boolean, row: Feed) => void) {
       doActionWithError<UpdateFeedRequest, UpdateFeedResponse>(
         API.UPDATE_FEED,
         req,
