@@ -40,17 +40,8 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '法币',
-        caption: '管理法币类型',
-        icon: 'pending',
-        target: '/fiat/type',
-        level: 0,
-        sectionBegin: false,
-        children: []
-      } as MenuItem, {
-        menuId: uid(),
-        label: '币种汇率源',
-        caption: '管理币种汇率源',
+        label: '币种汇率管理',
+        caption: '管理币种汇率',
         icon: 'pending',
         target: '/coin/coinfeed',
         level: 0,

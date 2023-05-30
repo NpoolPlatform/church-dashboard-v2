@@ -325,18 +325,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'fiat/type',
-        component: () => import('pages/coin/FiatCurrencyType.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'coin/coinfeed',
         component: () => import('pages/coin/CoinFeed.vue'),
         meta: {
