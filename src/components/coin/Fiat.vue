@@ -1,4 +1,5 @@
 <template>
+  <FiatFeed />
   <q-table
     dense
     flat
@@ -44,7 +45,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <FiatFeed />
 </template>
 
 <script setup lang='ts'>
