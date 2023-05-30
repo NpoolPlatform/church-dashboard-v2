@@ -361,6 +361,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'coin/history',
+        component: () => import('pages/coin/History.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'supply/devices',
         component: () => import('pages/supply/Device.vue'),
         meta: {

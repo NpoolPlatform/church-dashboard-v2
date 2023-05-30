@@ -65,6 +65,15 @@ const MainDrawerMenus = [
         level: 0,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '汇率历史',
+        caption: '查看汇率历史',
+        icon: 'pending',
+        target: '/coin/history',
+        level: 0,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
