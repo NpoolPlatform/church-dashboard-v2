@@ -7,15 +7,14 @@ import {
 } from './types'
 import { doActionWithError } from 'npool-cli-v4'
 
-export const useCurrencyHistoriesStore = defineStore('currencyhistories-v4', {
+export const useFiatCurrencyHistoryStore = defineStore('fiatcurrencyhistory-v4', {
   state: () => ({
     Histories: {
       Histories: [] as Array<Currency>,
       Total: 0
     }
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     getHistories (req: GetHistoriesRequest, done: (error: boolean, rows: Array<Currency>) => void) {
       doActionWithError<GetHistoriesRequest, GetHistoriesResponse>(
