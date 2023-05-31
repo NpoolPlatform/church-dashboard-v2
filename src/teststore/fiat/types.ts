@@ -10,9 +10,9 @@ export interface Fiat {
   /** @inject_tag: sql:"unit" */
   Unit: string;
   /** @inject_tag: sql:"created_at" */
-  CreatedAt: string;
+  CreatedAt: number;
   /** @inject_tag: sql:"updated_at" */
-  UpdatedAt: string;
+  UpdatedAt: number;
 }
 export interface CreateFiatRequest extends BaseRequest {
   Name: string;

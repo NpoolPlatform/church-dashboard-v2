@@ -7,6 +7,7 @@
     row-key='ID'
     :title='$t("MSG_FIATS")'
     :rows-per-page-options='[10]'
+    :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as Fiat)'
   >
     <template #top-right>
@@ -48,16 +49,20 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
+import { NotifyType, formatTime } from 'npool-cli-v4'
 import { useFiatStore } from 'src/teststore/fiat'
 import { Fiat } from 'src/teststore/fiat/types'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const FiatFeed = defineAsyncComponent(() => import('src/components/coin/FiatFeed.vue'))
 
 const fiat = useFiatStore()
-const fiats = computed(() => fiat.Fiats.Fiats)
+const fiats = computed(() => fiat.fiats())
 
 const name = ref('')
 const displayFiats = computed(() => {
@@ -150,4 +155,37 @@ const getFiats = (offset: number, limit: number) => {
     getFiats(offset + limit, limit)
   })
 }
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: Fiat) => row.ID
+  },
+  {
+    name: 'Name',
+    label: t('MSG_NAME'),
+    field: (row: Fiat) => row.Name
+  },
+  {
+    name: 'Unit',
+    label: t('MSG_UNIT'),
+    field: (row: Fiat) => row.Unit
+  },
+  {
+    name: 'Logo',
+    label: t('MSG_LOGO'),
+    field: (row: Fiat) => row.Logo
+  },
+  {
+    name: 'CreatedAt',
+    label: 'MSG_CREATED_AT',
+    field: (row: Fiat) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: 'MSG_UPDATED_AT',
+    field: (row: Fiat) => formatTime(row.UpdatedAt)
+  }
+])
 </script>

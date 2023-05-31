@@ -19,6 +19,9 @@ export const useFiatStore = defineStore('fiat-v4', {
     }
   }),
   getters: {
+    fiats () {
+      return () => this.Fiats.Fiats.sort((a, b) => a.UpdatedAt > b.UpdatedAt ? -1 : 1)
+    }
   },
   actions: {
     getFiats (req: GetFiatsRequest, done: (error: boolean, rows: Array<Fiat>) => void) {
