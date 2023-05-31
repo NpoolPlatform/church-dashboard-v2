@@ -20,7 +20,7 @@ export const useFiatStore = defineStore('fiat-v4', {
   }),
   getters: {
     fiats () {
-      return () => this.Fiats.Fiats.sort((a, b) => a.UpdatedAt > b.UpdatedAt ? -1 : 1)
+      return () => this.Fiats.Fiats.sort((a, b) => a.CreatedAt > b.CreatedAt ? -1 : 1)
     }
   },
   actions: {
