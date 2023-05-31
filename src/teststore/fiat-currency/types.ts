@@ -12,7 +12,6 @@ export interface FiatCurrencyType {
 
 /** @default "DefaultFeedType" */
 export enum FeedType {
-  DefaultFeedType = 'DefaultFeedType',
   CoinGecko = 'CoinGecko',
   CoinBase = 'CoinBase',
   StableUSDHardCode = 'StableUSDHardCode',

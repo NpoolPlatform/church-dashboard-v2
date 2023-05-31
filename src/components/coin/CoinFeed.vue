@@ -69,7 +69,7 @@ const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPi
 const CoinFiat = defineAsyncComponent(() => import('src/components/coin/CoinFiat.vue'))
 
 const feed = useCoinFeedStore()
-const feeds = computed(() => feed.Feeds.Feeds)
+const feeds = computed(() => feed.feeds())
 
 const name = ref('')
 const displayFeeds = computed(() => {
