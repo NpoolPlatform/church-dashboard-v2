@@ -6,6 +6,7 @@
     row-key='ID'
     :title='$t("MSG_COIN_FEEDS")'
     :rows-per-page-options='[10]'
+    :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as Feed)'
   >
     <template #top-right>
@@ -52,10 +53,14 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
+import { NotifyType, formatTime } from 'npool-cli-v4'
 import { useCoinFeedStore } from 'src/teststore/coin/currency/feed'
 import { Feed } from 'src/teststore/coin/currency/feed/types'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
@@ -157,4 +162,57 @@ const getFeeds = (offset: number, limit: number) => {
     getFeeds(offset + limit, limit)
   })
 }
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: Feed) => row.ID
+  },
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COIN_TYPE_ID'),
+    field: (row: Feed) => row.CoinTypeID
+  },
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    field: (row: Feed) => row.CoinName
+  },
+  {
+    name: 'CoinUnit',
+    label: t('MSG_COIN_UNIT'),
+    field: (row: Feed) => row.CoinUnit
+  },
+  {
+    name: 'CoinEnv',
+    label: t('MSG_COIN_ENV'),
+    field: (row: Feed) => row.CoinENV
+  },
+  {
+    name: 'FeedType',
+    label: t('MSG_FEED_TYPE'),
+    field: (row: Feed) => row.FeedType
+  },
+  {
+    name: 'FeedCoinName',
+    label: t('MSG_FEED_COIN_NAME'),
+    field: (row: Feed) => row.FeedCoinName
+  },
+  {
+    name: 'Disabled',
+    label: t('MSG_DISABLED'),
+    field: (row: Feed) => row.Disabled
+  },
+  {
+    name: 'CreatedAt',
+    label: 'MSG_CREATED_AT',
+    field: (row: Feed) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: 'MSG_UPDATED_AT',
+    field: (row: Feed) => formatTime(row.UpdatedAt)
+  }
+])
 </script>
