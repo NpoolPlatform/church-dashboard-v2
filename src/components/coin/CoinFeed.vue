@@ -37,6 +37,7 @@
       <q-card-section>
         <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
         <q-input v-model='target.FeedCoinName' :label='$t("MSG_FEED_COIN_NAME")' />
+        <q-select :options='Object.values(FeedType)' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
@@ -56,6 +57,7 @@
 import { NotifyType, formatTime } from 'npool-cli-v4'
 import { useCoinFeedStore } from 'src/teststore/coin/currency/feed'
 import { Feed } from 'src/teststore/coin/currency/feed/types'
+import { FeedType } from 'src/teststore/fiat-currency/types'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -71,7 +73,10 @@ const feeds = computed(() => feed.Feeds.Feeds)
 
 const name = ref('')
 const displayFeeds = computed(() => {
-  return feeds.value.filter((el) => el.CoinName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return feeds.value.filter((el) => el.CoinName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+    el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
+    el.CoinTypeID?.toLowerCase()?.includes(name.value?.toLowerCase())
+  )
 })
 
 const showing = ref(false)
