@@ -14,7 +14,6 @@ export interface Currency {
   /** @inject_tag: sql:"fiat_id" */
   FiatID: string;
   /** @inject_tag: sql:"feed_type" */
-  FeedTypeStr: string;
   FeedType: CurrencyFeedType;
   /** @inject_tag: sql:"fiat_name" */
   FiatName: string;

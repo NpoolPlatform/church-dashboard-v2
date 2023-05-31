@@ -20,7 +20,6 @@ export interface Feed {
   /** @inject_tag: sql:"fiat_unit" */
   FiatUnit: string;
   /** @inject_tag: sql:"feed_type" */
-  FeedTypeStr: string;
   FeedType: CurrencyFeedType;
   /** @inject_tag: sql:"feed_fiat_name" */
   FeedFiatName: string;

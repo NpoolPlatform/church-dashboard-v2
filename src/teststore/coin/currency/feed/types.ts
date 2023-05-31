@@ -9,34 +9,16 @@ export enum CurrencyFeedType {
 }
 
 export interface Feed {
-  /** @inject_tag: sql:"id" */
   ID: string;
-  /** @inject_tag: sql:"coin_type_id" */
   CoinTypeID: string;
-  /** @inject_tag: sql:"coin_name" */
   CoinName: string;
-  /** @inject_tag: sql:"coin_unit" */
   CoinUnit: string;
-  /** @inject_tag: sql:"coin_logo" */
   CoinLogo: string;
-  /** @inject_tag: sql:"coin_env" */
   CoinENV: string;
-  /** @inject_tag: sql:"feed_type" */
-  FeedTypeStr: string;
   FeedType: CurrencyFeedType;
-  /** @inject_tag: sql:"feed_coin_name" */
   FeedCoinName: string;
-  /** @inject_tag: sql:"disabled" */
   Disabled: boolean;
-  /**
-   * @inject_tag: sql:"created_at"
-   * @format int64
-   */
   CreatedAt: number;
-  /**
-   * @inject_tag: sql:"updated_at"
-   * @format int64
-   */
   UpdatedAt: number;
 }
 

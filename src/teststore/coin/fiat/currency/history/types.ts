@@ -36,8 +36,6 @@ export interface Currency {
   MarketValueHigh: string;
   /** @inject_tag: sql:"market_value_low" */
   MarketValueLow: string;
-  /** @inject_tag: sql:"feed_type" */
-  FeedTypeStr: string;
   FeedType: CurrencyFeedType;
   /**
    * @inject_tag: sql:"created_at"
