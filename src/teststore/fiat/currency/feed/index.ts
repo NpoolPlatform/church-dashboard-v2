@@ -19,6 +19,9 @@ export const useFiatFeedStore = defineStore('fiatfeed-v4', {
     }
   }),
   getters: {
+    feeds () {
+      return () => this.Feeds.Feeds.sort((a, b) => a.CreatedAt > b.CreatedAt ? -1 : 1)
+    }
   },
   actions: {
     getFeeds (req: GetFeedsRequest, done: (error: boolean, rows: Array<Feed>) => void) {

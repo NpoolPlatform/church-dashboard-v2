@@ -6,6 +6,7 @@
     row-key='ID'
     :title='$t("MSG_FIAT_FEEDS")'
     :rows-per-page-options='[10]'
+    :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as Feed)'
   >
     <template #top-right>
@@ -36,6 +37,7 @@
       <q-card-section>
         <FiatPicker v-model:id='target.FiatID' :updating='updating' :label='"MSG_FIAT_ID"' />
         <q-input v-model='target.FeedFiatName' :label='$t("MSG_FEED_FIAT_NAME")' />
+        <q-select :options='Object.values(FeedType)' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
@@ -51,20 +53,28 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
+import { NotifyType, formatTime } from 'npool-cli-v4'
 import { useFiatFeedStore } from 'src/teststore/fiat/currency/feed'
 import { Feed } from 'src/teststore/fiat/currency/feed/types'
+import { FeedType } from 'src/teststore/fiat-currency/types'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const FiatPicker = defineAsyncComponent(() => import('src/components/coin/FiatPicker.vue'))
 
 const feed = useFiatFeedStore()
-const feeds = computed(() => feed.Feeds.Feeds)
+const feeds = computed(() => feed.feeds())
 
 const name = ref('')
 const displayFeeds = computed(() => {
-  return feeds.value.filter((el) => el.FiatName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return feeds.value.filter((el) => el.FiatName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+    el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
+    el.FiatName?.toLowerCase()?.includes?.(name.value?.toLowerCase())
+  )
 })
 
 const showing = ref(false)
@@ -155,4 +165,52 @@ const getFeeds = (offset: number, limit: number) => {
     getFeeds(offset + limit, limit)
   })
 }
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    field: (row: Feed) => row.ID
+  },
+  {
+    name: 'FiatID',
+    label: t('MSG_FIAT_ID'),
+    field: (row: Feed) => row.FiatID
+  },
+  {
+    name: 'FiatName',
+    label: t('MSG_FIAT_NAME'),
+    field: (row: Feed) => row.FiatName
+  },
+  {
+    name: 'FiatUnit',
+    label: t('MSG_FIAT_UNIT'),
+    field: (row: Feed) => row.FiatUnit
+  },
+  {
+    name: 'FeedType',
+    label: t('MSG_FEED_TYPE'),
+    field: (row: Feed) => row.FeedType
+  },
+  {
+    name: 'FeedFiatName',
+    label: t('MSG_FEED_FIAT_NAME'),
+    field: (row: Feed) => row.FeedFiatName
+  },
+  {
+    name: 'Disabled',
+    label: t('MSG_DISABLED'),
+    field: (row: Feed) => row.Disabled
+  },
+  {
+    name: 'CreatedAt',
+    label: 'MSG_CREATED_AT',
+    field: (row: Feed) => formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: 'MSG_UPDATED_AT',
+    field: (row: Feed) => formatTime(row.UpdatedAt)
+  }
+])
 </script>

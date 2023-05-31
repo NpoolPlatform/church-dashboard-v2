@@ -21,8 +21,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useFiatFeedStore } from 'src/teststore/fiat/currency/feed'
-import { Feed } from 'src/teststore/fiat/currency/feed/types'
+import { useFiatStore } from 'src/teststore/fiat'
+import { Fiat } from 'src/teststore/fiat/types'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
@@ -43,18 +43,18 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const feed = useFiatFeedStore()
-const feeds = computed(() => Array.from(feed.Feeds.Feeds).map((el) => {
+const fiat = useFiatStore()
+const fiats = computed(() => Array.from(fiat.Fiats.Fiats).map((el) => {
   return {
     value: el.ID,
-    label: `${el.FiatName} | ${el.ID}`
+    label: `${el.Name} | ${el.ID}`
   }
 }))
-const displayFiats = ref(feeds.value)
+const displayFiats = ref(fiats.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayFiats.value = feeds.value.filter((el) => {
+    displayFiats.value = fiats.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
@@ -66,21 +66,22 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (feed.Feeds.Feeds.length === 0) {
-    getFeeds(0, 500)
+  if (fiat.Fiats.Fiats.length === 0) {
+    getFiats(0, 500)
   }
 })
 
-const getFeeds = (offset: number, limit: number) => {
-  feed.getFeeds({
+const getFiats = (offset: number, limit: number) => {
+  fiat.getFiats({
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Feed[]) => {
+  }, (error: boolean, rows: Fiat[]) => {
     if (error || rows.length === 0) {
       return
     }
-    getFeeds(offset + limit, limit)
+    getFiats(offset + limit, limit)
   })
 }
+
 </script>
