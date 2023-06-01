@@ -46,9 +46,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
-import { CoinFiat } from 'src/teststore/coin/fiat/types'
-import { useCoinFiatStore } from 'src/teststore/coin/fiat'
+import { NotifyType, useCoinFiatStore, CoinFiat } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))

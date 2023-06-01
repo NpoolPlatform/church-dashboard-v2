@@ -49,9 +49,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, formatTime } from 'npool-cli-v4'
-import { useFiatStore } from 'src/teststore/fiat'
-import { Fiat } from 'src/teststore/fiat/types'
+import { useFiatStore, NotifyType, formatTime, Fiat } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 

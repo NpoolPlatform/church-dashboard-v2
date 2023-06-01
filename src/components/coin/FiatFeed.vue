@@ -7,7 +7,7 @@
     :title='$t("MSG_FIAT_FEEDS")'
     :rows-per-page-options='[10]'
     :columns='columns'
-    @row-click='(evt, row, index) => onRowClick(row as Feed)'
+    @row-click='(evt, row, index) => onRowClick(row as FiatFeed)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -37,7 +37,7 @@
       <q-card-section>
         <FiatPicker v-model:id='target.FiatID' :updating='updating' :label='"MSG_FIAT_ID"' />
         <q-input v-model='target.FeedFiatName' :label='$t("MSG_FEED_FIAT_NAME")' />
-        <q-select :options='Object.values(FeedType)' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
+        <q-select :options='Object.values(CurrencyFeedType)' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
@@ -53,10 +53,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, formatTime } from 'npool-cli-v4'
-import { useFiatFeedStore } from 'src/teststore/fiat/currency/feed'
-import { Feed } from 'src/teststore/fiat/currency/feed/types'
-import { FeedType } from 'src/teststore/fiat-currency/types'
+import { NotifyType, formatTime, FiatFeed, useFiatFeedStore, CurrencyFeedType } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -79,14 +76,14 @@ const displayFeeds = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as Feed)
+const target = ref({} as FiatFeed)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: Feed) => {
+const onRowClick = (row: FiatFeed) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -98,7 +95,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as Feed
+  target.value = {} as FiatFeed
 }
 
 const onSubmit = (done: () => void) => {
@@ -158,7 +155,7 @@ const getFeeds = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Feed[]) => {
+  }, (error: boolean, rows: FiatFeed[]) => {
     if (error || rows.length === 0) {
       return
     }
@@ -170,47 +167,47 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
-    field: (row: Feed) => row.ID
+    field: (row: FiatFeed) => row.ID
   },
   {
     name: 'FiatID',
     label: t('MSG_FIAT_ID'),
-    field: (row: Feed) => row.FiatID
+    field: (row: FiatFeed) => row.FiatID
   },
   {
     name: 'FiatName',
     label: t('MSG_FIAT_NAME'),
-    field: (row: Feed) => row.FiatName
+    field: (row: FiatFeed) => row.FiatName
   },
   {
     name: 'FiatUnit',
     label: t('MSG_FIAT_UNIT'),
-    field: (row: Feed) => row.FiatUnit
+    field: (row: FiatFeed) => row.FiatUnit
   },
   {
     name: 'FeedType',
     label: t('MSG_FEED_TYPE'),
-    field: (row: Feed) => row.FeedType
+    field: (row: FiatFeed) => row.FeedType
   },
   {
     name: 'FeedFiatName',
     label: t('MSG_FEED_FIAT_NAME'),
-    field: (row: Feed) => row.FeedFiatName
+    field: (row: FiatFeed) => row.FeedFiatName
   },
   {
     name: 'Disabled',
     label: t('MSG_DISABLED'),
-    field: (row: Feed) => row.Disabled
+    field: (row: FiatFeed) => row.Disabled
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
-    field: (row: Feed) => formatTime(row.CreatedAt)
+    field: (row: FiatFeed) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
-    field: (row: Feed) => formatTime(row.UpdatedAt)
+    field: (row: FiatFeed) => formatTime(row.UpdatedAt)
   }
 ])
 </script>

@@ -46,12 +46,8 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useFiatCurrencyHistoryStore } from 'src/teststore/fiat/currency/history'
-import { Currency } from 'src/teststore/fiat/currency/history/types'
-import { useFiatStore } from 'src/teststore/fiat'
 import { useI18n } from 'vue-i18n'
-import { Fiat } from 'src/teststore/fiat/types'
-import { formatTime } from 'npool-cli-v4'
+import { formatTime, useFiatCurrencyHistoryStore, useFiatStore, Fiat, FiatCurrency } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -94,7 +90,7 @@ const getFiatCurrencyHistories = (offset: number, limit: number, startAt: number
     StartAt: startAt,
     EndAt: endAt,
     Message: {}
-  }, (error: boolean, rows: Currency[]) => {
+  }, (error: boolean, rows: FiatCurrency[]) => {
     if (error || rows.length === 0) {
       return
     }

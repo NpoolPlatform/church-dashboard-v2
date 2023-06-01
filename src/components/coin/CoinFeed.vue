@@ -7,7 +7,7 @@
     :title='$t("MSG_COIN_FEEDS")'
     :rows-per-page-options='[10]'
     :columns='columns'
-    @row-click='(evt, row, index) => onRowClick(row as Feed)'
+    @row-click='(evt, row, index) => onRowClick(row as CoinFeed)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -54,10 +54,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, formatTime } from 'npool-cli-v4'
-import { useCoinFeedStore } from 'src/teststore/coin/currency/feed'
-import { Feed } from 'src/teststore/coin/currency/feed/types'
-import { FeedType } from 'src/teststore/fiat-currency/types'
+import { NotifyType, formatTime, useCoinFeedStore, CoinFeed, FeedType } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -81,14 +78,14 @@ const displayFeeds = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as Feed)
+const target = ref({} as CoinFeed)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: Feed) => {
+const onRowClick = (row: CoinFeed) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -100,7 +97,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as Feed
+  target.value = {} as CoinFeed
 }
 
 const onSubmit = (done: () => void) => {
@@ -160,7 +157,7 @@ const getFeeds = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Feed[]) => {
+  }, (error: boolean, rows: CoinFeed[]) => {
     if (error || rows.length === 0) {
       return
     }
@@ -172,52 +169,52 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
-    field: (row: Feed) => row.ID
+    field: (row: CoinFeed) => row.ID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
-    field: (row: Feed) => row.CoinTypeID
+    field: (row: CoinFeed) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
-    field: (row: Feed) => row.CoinName
+    field: (row: CoinFeed) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
-    field: (row: Feed) => row.CoinUnit
+    field: (row: CoinFeed) => row.CoinUnit
   },
   {
     name: 'CoinEnv',
     label: t('MSG_COIN_ENV'),
-    field: (row: Feed) => row.CoinENV
+    field: (row: CoinFeed) => row.CoinENV
   },
   {
     name: 'FeedType',
     label: t('MSG_FEED_TYPE'),
-    field: (row: Feed) => row.FeedType
+    field: (row: CoinFeed) => row.FeedType
   },
   {
     name: 'FeedCoinName',
     label: t('MSG_FEED_COIN_NAME'),
-    field: (row: Feed) => row.FeedCoinName
+    field: (row: CoinFeed) => row.FeedCoinName
   },
   {
     name: 'Disabled',
     label: t('MSG_DISABLED'),
-    field: (row: Feed) => row.Disabled
+    field: (row: CoinFeed) => row.Disabled
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
-    field: (row: Feed) => formatTime(row.CreatedAt)
+    field: (row: CoinFeed) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
-    field: (row: Feed) => formatTime(row.UpdatedAt)
+    field: (row: CoinFeed) => formatTime(row.UpdatedAt)
   }
 ])
 </script>

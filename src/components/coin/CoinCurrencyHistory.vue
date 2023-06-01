@@ -22,9 +22,8 @@
 </template>
 
 <script setup lang='ts'>
+import { CoinCurrency, useCoinCurrencyHistoryStore } from 'npool-cli-v4'
 import { computed, ref, defineProps, toRef, watch } from 'vue'
-import { Currency } from 'src/teststore/coin/currency/history/types'
-import { useCoinCurrencyHistoryStore } from 'src/teststore/coin/currency/history'
 interface Props {
   ids: string[]
 }
@@ -55,7 +54,7 @@ const getCoinCurrencyHistories = (offset: number, limit: number, startAt: number
     StartAt: startAt,
     EndAt: endAt,
     Message: {}
-  }, (error: boolean, rows: Currency[]) => {
+  }, (error: boolean, rows: CoinCurrency[]) => {
     if (error || rows.length === 0) {
       return
     }

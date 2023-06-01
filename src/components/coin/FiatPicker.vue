@@ -21,8 +21,7 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useFiatStore } from 'src/teststore/fiat'
-import { Fiat } from 'src/teststore/fiat/types'
+import { useFiatStore, Fiat } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 
 interface Props {
