@@ -2,6 +2,28 @@
   <q-table
     dense
     flat
+    :rows='displayCoins'
+    row-key='ID'
+    :title='$t("MSG_COINS")'
+    selection='multiple'
+    v-model:selected='selectedCoins'
+    :rows-per-page-options='[10]'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='name'
+          :label='$t("MSG_COINNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
     :rows='displayCoinFiats'
     row-key='ID'
     :title='$t("MSG_COIN_FIATS")'
@@ -13,7 +35,7 @@
           dense
           flat
           class='small'
-          v-model='name'
+          v-model='name1'
           :label='$t("MSG")'
         />
         <q-btn
@@ -46,8 +68,9 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useCoinFiatStore, CoinFiat } from 'npool-cli-v4'
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { NotifyType, useCoinFiatStore, CoinFiat, useChurchCoinStore, Coin } from 'npool-cli-v4'
+import { getCoins } from 'src/api/coin'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
@@ -56,9 +79,9 @@ const FiatPicker = defineAsyncComponent(() => import('src/components/coin/FiatPi
 const coinFiat = useCoinFiatStore()
 const coinFiats = computed(() => coinFiat.CoinFiats.CoinFiats)
 
-const name = ref('')
+const name1 = ref('')
 const displayCoinFiats = computed(() => {
-  return coinFiats.value.filter((el) => el.CoinName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.FiatName?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return coinFiats.value.filter((el) => el.CoinName?.toLowerCase()?.includes?.(name1.value?.toLowerCase()) || el.FiatName?.toLowerCase()?.includes(name1.value?.toLowerCase()))
 })
 
 const showing = ref(false)
@@ -130,15 +153,37 @@ const deleteCoinFiat = (done: () => void) => {
   })
 }
 
+const coin = useChurchCoinStore()
+const coins = computed(() => coin.Coins.Coins)
+
+const name = ref('')
+const displayCoins = computed(() => {
+  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+})
+
+const selectedCoins = ref([] as Array<Coin>)
+
+const ids = computed(() => {
+  const _ids = [] as Array<string>
+  selectedCoins.value?.forEach((el) => _ids.push(el.ID))
+  return _ids
+})
+
 onMounted(() => {
-  if (coinFiat.CoinFiats.CoinFiats.length === 0) {
-    getCoinFiats(0, 100)
+  if (coin.Coins.Coins.length === 0) {
+    getCoins(0, 500)
   }
 })
 
+watch(ids, () => {
+  if (selectedCoins.value?.length > 0) {
+    coinFiat.$reset()
+    getCoinFiats(0, 100)
+  }
+})
 const getCoinFiats = (offset: number, limit: number) => {
   coinFiat.getCoinFiats({
-    CoinTypeIDs: [], // TODO
+    CoinTypeIDs: ids.value,
     Offset: offset,
     Limit: limit,
     Message: {}
