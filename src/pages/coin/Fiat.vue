@@ -1,11 +1,11 @@
 <template>
-  <FiatCurrencyType />
+  <Fiat />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const FiatCurrencyType = defineAsyncComponent(() => import('src/components/coin/FiatCurrencyType.vue'))
+const Fiat = defineAsyncComponent(() => import('src/components/coin/Fiat.vue'))
 
 </script>
 

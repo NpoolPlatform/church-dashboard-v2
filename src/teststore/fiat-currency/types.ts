@@ -12,7 +12,6 @@ export interface FiatCurrencyType {
 
 /** @default "DefaultFeedType" */
 export enum FeedType {
-  DefaultFeedType = 'DefaultFeedType',
   CoinGecko = 'CoinGecko',
   CoinBase = 'CoinBase',
   StableUSDHardCode = 'StableUSDHardCode',
@@ -24,7 +23,6 @@ export interface FiatCurrency {
   /** @inject_tag: sql:"fiat_currency_type_id" */
   FiatCurrencyTypeID: string;
   /** @inject_tag: sql:"feed_type" */
-  FeedTypeStr: string;
   FeedType: FeedType;
   /** @inject_tag: sql:"fiat_currency_name" */
   FiatCurrencyName: string;
