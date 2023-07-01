@@ -1,11 +1,11 @@
 <template>
-  <EmailSubscriber />
+  <AppSubscribe />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const EmailSubscriber = defineAsyncComponent(() => import('src/components/subscriber/EmailSubscriber.vue'))
+const AppSubscribe = defineAsyncComponent(() => import('src/components/subscriber/AppSubscribe.vue'))
 
 </script>
 

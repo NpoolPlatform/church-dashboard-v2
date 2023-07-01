@@ -681,10 +681,10 @@ const MainDrawerMenus = [
     children: [
       {
         menuId: uid(),
-        label: '邮件订阅',
-        caption: '查看邮件订阅用户',
+        label: 'APP订阅授权',
+        caption: '管理APP订阅授权',
         icon: 'format_list_numbered',
-        target: '/subscribe/email',
+        target: '/app/subscribe',
         level: 1,
         sectionBegin: false,
         children: []

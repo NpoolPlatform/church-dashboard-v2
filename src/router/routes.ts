@@ -745,8 +745,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'subscribe/email',
-        component: () => import('pages/subscriber/EmailSubscriber.vue'),
+        path: 'app/subscribe',
+        component: () => import('pages/subscriber/AppSubscribe.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
