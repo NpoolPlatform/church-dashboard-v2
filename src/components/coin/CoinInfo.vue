@@ -57,6 +57,7 @@
         <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_PRESALE")' /></div>
         <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLED")' /></div>
         <div><q-toggle dense v-model='target.StableUSD' :label='$t("MSG_STABLEUSD")' /></div>
+        <div><q-toggle dense v-model='target.CheckNewAddressBalance' :label='$t("MSG_CHECK_NEW_ADDRESS_BALANCE")' /></div>
       </q-card-section>
       <q-card-section v-if='!updating'>
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
@@ -146,7 +147,8 @@ const updateTarget = computed(() => {
     LeastTransferAmount: target.value.LeastTransferAmount,
     StableUSD: target.value?.StableUSD,
     Disabled: target.value?.Disabled,
-    NeedMemo: target.value?.NeedMemo
+    NeedMemo: target.value?.NeedMemo,
+    CheckNewAddressBalance: target.value?.CheckNewAddressBalance
   }
 })
 
