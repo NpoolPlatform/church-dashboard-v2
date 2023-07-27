@@ -118,8 +118,8 @@ const target = computed(() => {
     DefaultToUsername: myTarget.value.DefaultToUsername,
     UsedFor: myTarget.value.UsedFor,
     Sender: myTarget.value.Sender,
-    ReplyTos: myTarget.value.ReplyTos?.split(','),
-    CCTos: myTarget.value.CCTos?.split(','),
+    ReplyTos: myTarget.value?.ReplyTos?.length === 0 ? [] : myTarget.value?.ReplyTos?.split(','),
+    CCTos: myTarget.value?.CCTos?.length === 0 ? [] : myTarget.value?.CCTos?.split(','),
     Subject: myTarget.value.Subject,
     Body: myTarget.value.Body
   } as EmailTemplate
