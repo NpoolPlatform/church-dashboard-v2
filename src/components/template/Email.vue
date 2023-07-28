@@ -54,7 +54,7 @@
 <script setup lang='ts'>
 import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType, UsedFor } from 'npool-cli-v4'
+import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType, UsedFor, validateEmailAddress } from 'npool-cli-v4'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
@@ -172,6 +172,27 @@ const getAppEmailTemplates = (offset: number, limit: number) => {
 }
 
 const createAppEmailTemplate = (done: () => void) => {
+  let flag = false
+  if (myTarget.value?.ReplyTos?.length > 0) {
+    myTarget.value?.ReplyTos?.split(',')?.forEach((el) => {
+      if (!validateEmailAddress(el)) {
+        console.log('invalid email address', el)
+        flag = true
+      }
+    })
+  }
+  if (myTarget.value?.CCTos?.length > 0) {
+    myTarget.value?.CCTos?.split(',')?.forEach((el) => {
+      if (!validateEmailAddress(el)) {
+        console.log('invalid email address', el)
+        flag = true
+      }
+    })
+  }
+  if (flag) {
+    done()
+    return
+  }
   templates.createAppEmailTemplate({
     TargetAppID: appID.value,
     TargetLangID: myTarget.value.LangID,
@@ -192,6 +213,27 @@ const createAppEmailTemplate = (done: () => void) => {
   })
 }
 const updateAppEmailTemplate = (done: () => void) => {
+  let flag = false
+  if (myTarget.value?.ReplyTos?.length > 0) {
+    myTarget.value?.ReplyTos?.split(',')?.forEach((el) => {
+      if (!validateEmailAddress(el)) {
+        console.log('invalid email address', el)
+        flag = true
+      }
+    })
+  }
+  if (myTarget.value?.CCTos?.length > 0) {
+    myTarget.value?.CCTos?.split(',')?.forEach((el) => {
+      if (!validateEmailAddress(el)) {
+        console.log('invalid email address', el)
+        flag = true
+      }
+    })
+  }
+  if (flag) {
+    done()
+    return
+  }
   templates.updateAppEmailTemplate({
     TargetAppID: appID.value,
     TargetLangID: myTarget.value.LangID,
