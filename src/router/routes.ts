@@ -301,8 +301,20 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'thirdparty',
+        path: 'oauththirdparty',
         component: () => import('pages/oauth/ThirdParty.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'appoauththirdparty',
+        component: () => import('pages/oauth/AppThirdParty.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
