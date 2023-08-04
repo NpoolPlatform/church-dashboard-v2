@@ -13,6 +13,15 @@ const MainDrawerMenus = [
     children: []
   } as MenuItem, {
     menuId: uid(),
+    label: '第三方登录',
+    caption: '管理第三方登录',
+    icon: 'pending',
+    target: '/thirdparty',
+    level: 0,
+    sectionBegin: false,
+    children: []
+  } as MenuItem, {
+    menuId: uid(),
     label: '币种',
     caption: '币种管理',
     icon: 'pending',
