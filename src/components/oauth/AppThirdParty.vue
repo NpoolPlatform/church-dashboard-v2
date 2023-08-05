@@ -4,9 +4,9 @@
     flat
     :rows='displayThirdParties'
     row-key='ID'
-    :title='$t("MSG_OAUTH_THIRD_PARTIES")'
+    :title='$t("MSG_APP_OAUTH_THIRD_PARTIES")'
     :rows-per-page-options='[10]'
-    @row-click='(evt, row, index) => onRowClick(row as OAuthThirdParty)'
+    @row-click='(evt, row, index) => onRowClick(row as AppOAuthThirdParty)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -34,12 +34,16 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-select :options='SignMethodTypes' v-model='target.ClientName' :label='$t("MSG_CLIENT_NAME")' />
-        <q-input v-model='target.ClientLogoURL' :label='$t("MSG_CLIENT_LOGO_URL")' />
-        <q-input v-model='target.ClientOAuthURL' :label='$t("MSG_CLIENT_OAUTH_URL")' />
-        <q-input v-model='target.ResponseType' :label='$t("MSG_RESPONSE_TYPE")' />
-        <q-input v-model='target.ClientOAuthURL' :label='$t("MSG_CLIENT_OAUTH_URL")' />
-        <q-input v-model='target.Scope' :label='$t("MSG_SCOPE")' />
+        <q-select
+          :options='thirdParties'
+          v-model='target.ThirdPartyID'
+          :label='$t("MSG_CLIENT_NAME")'
+          emit-value
+          map-options
+        />
+        <q-input v-model='target.ClientID' :label='$t("MSG_CLIENT_ID")' />
+        <q-input v-model='target.ClientSecret' :label='$t("MSG_CLIENT_SECRET")' />
+        <q-input v-model='target.CallbackURL' :label='$t("MSG_CALLBACK_URL")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -50,18 +54,33 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, SignMethodTypes } from 'npool-cli-v4'
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { useOAuthThirdPartyStore, OAuthThirdParty } from 'src/teststore/appuser/oauth/thirdparty'
+import { NotifyType } from 'npool-cli-v4'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
+import { useAppOAuthThirdPartyStore, AppOAuthThirdParty } from 'src/teststore/appuser/oauth/appthirdparty'
+import { useLocalApplicationStore } from 'src/localstore'
+import { useOAuthThirdPartyStore } from 'src/teststore/appuser/oauth/thirdparty'
+
+const app = useLocalApplicationStore()
+const appID = computed(() => app.AppID)
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
+const appThirdParty = useAppOAuthThirdPartyStore()
+const appThirdParties = computed(() => appThirdParty.AppOAuthThirdParties.get(appID.value) as Array<AppOAuthThirdParty>)
 const thirdParty = useOAuthThirdPartyStore()
-const thirdParties = computed(() => thirdParty.OAuthThirdParties)
+const thirdParties = computed(() => thirdParty.OAuthThirdParties.map((el) => {
+  return {
+    label: el.ClientName,
+    value: el.ID
+  }
+}))
 
 const clientName = ref('')
 const displayThirdParties = computed(() => {
-  return thirdParties.value.filter((el) => {
+  if (!appThirdParties.value) {
+    return []
+  }
+  return appThirdParties.value.filter((el) => {
     return el.ClientName?.toLowerCase()?.includes?.(clientName.value?.toLowerCase()) ||
            el.ID?.toLowerCase()?.includes(clientName.value?.toLowerCase())
   })
@@ -69,14 +88,14 @@ const displayThirdParties = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as OAuthThirdParty)
+const target = ref({} as AppOAuthThirdParty)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: OAuthThirdParty) => {
+const onRowClick = (row: AppOAuthThirdParty) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -88,7 +107,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as OAuthThirdParty
+  target.value = {} as AppOAuthThirdParty
 }
 
 const onSubmit = (done: () => void) => {
@@ -96,18 +115,19 @@ const onSubmit = (done: () => void) => {
 }
 
 const createCoin = (done: () => void) => {
-  thirdParty.createOAuthThirdParty({
+  appThirdParty.createAppOAuthThirdParty({
+    TargetAppID: appID.value,
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_OAUTH_THIRD_PARTY',
-        Message: 'MSG_CREATE_OAUTH_THIRD_PARTY_FAIL',
+        Title: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY',
+        Message: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_CREATE_OAUTH_THIRD_PARTY',
-        Message: 'MSG_CREATE_OAUTH_THIRD_PARTY_FAIL',
+        Title: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY',
+        Message: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
         Type: NotifyType.Success
       }
@@ -122,18 +142,19 @@ const createCoin = (done: () => void) => {
 }
 
 const updateCoin = (done: () => void) => {
-  thirdParty.updateOAuthThirdParty({
+  appThirdParty.updateAppOAuthThirdParty({
+    TargetAppID: appID.value,
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_UPDATE_OAUTH_THIRD_PARTY',
-        Message: 'MSG_UPDATE_OAUTH_THIRD_PARTY_FAIL',
+        Title: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY',
+        Message: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_UPDATE_OAUTH_THIRD_PARTY',
-        Message: 'MSG_UPDATE_OAUTH_THIRD_PARTY_FAIL',
+        Title: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY',
+        Message: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
         Type: NotifyType.Success
       }
@@ -147,22 +168,53 @@ const updateCoin = (done: () => void) => {
   })
 }
 
-onMounted(() => {
-  if (thirdParties.value.length === 0) {
-    thirdParty.getOAuthThirdParties({
-      Offset: 0,
-      Limit: 20,
-      Message: {
-        Error: {
-          Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
-          Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
-          Popup: true,
-          Type: NotifyType.Error
-        }
+watch(appID, () => {
+  appThirdParty.getAppOAuthThirdParties({
+    TargetAppID: appID.value,
+    Offset: 0,
+    Limit: 20,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
+        Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
       }
-    }, () => {
-      // TODO
-    })
-  }
+    }
+  }, () => {
+    // TODO
+  })
+})
+
+onMounted(() => {
+  appThirdParty.getAppOAuthThirdParties({
+    TargetAppID: appID.value,
+    Offset: 0,
+    Limit: 20,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
+        Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
+  thirdParty.getOAuthThirdParties({
+    Offset: 0,
+    Limit: 20,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
+        Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
+        Popup: true,
+        Type: NotifyType.Error
+      }
+    }
+  }, () => {
+    // TODO
+  })
 })
 </script>

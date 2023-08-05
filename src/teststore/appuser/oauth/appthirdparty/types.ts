@@ -1,7 +1,7 @@
 import { BaseRequest } from 'npool-cli-v4'
 
 export interface AppOAuthThirdParty {
-  ID?: string
+  ID: string
   AppID: string
   ThirdPartyID: string
   ClientID: string

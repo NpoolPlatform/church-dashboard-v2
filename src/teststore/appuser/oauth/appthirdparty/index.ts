@@ -3,9 +3,9 @@ import { APIS as APIEnum } from './const'
 import { doActionWithError } from 'npool-cli-v4'
 import { AppOAuthThirdParty, CreateAppOAuthThirdPartyRequest, CreateAppOAuthThirdPartyResponse, DeleteAppOAuthThirdPartyRequest, DeleteAppOAuthThirdPartyResponse, GetAppOAuthThirdPartiesRequest, GetAppOAuthThirdPartiesResponse, UpdateAppOAuthThirdPartyRequest, UpdateAppOAuthThirdPartyResponse } from './types'
 
-export const useAppOAuthThirdPartyStore = defineStore('app-subscribe', {
+export const useAppOAuthThirdPartyStore = defineStore('app-oauth-third-party', {
   state: () => ({
-    AppThirdParties: new Map<string, Array<AppOAuthThirdParty>>()
+    AppOAuthThirdParties: new Map<string, Array<AppOAuthThirdParty>>()
   }),
   getters: {
   },
@@ -16,12 +16,12 @@ export const useAppOAuthThirdPartyStore = defineStore('app-subscribe', {
         req,
         req.Message,
         (resp: CreateAppOAuthThirdPartyResponse): void => {
-          let thirdParties = this.AppThirdParties.get(req.TargetAppID)
+          let thirdParties = this.AppOAuthThirdParties.get(req.TargetAppID)
           if (!thirdParties) {
             thirdParties = [] as Array<AppOAuthThirdParty>
           }
           thirdParties.push(resp.Info)
-          this.AppThirdParties.set(req.TargetAppID, thirdParties)
+          this.AppOAuthThirdParties.set(req.TargetAppID, thirdParties)
           done(false, resp.Info)
         }, () => {
           done(true)
@@ -34,13 +34,13 @@ export const useAppOAuthThirdPartyStore = defineStore('app-subscribe', {
         req,
         req.Message,
         (resp: UpdateAppOAuthThirdPartyResponse): void => {
-          let thirdParties = this.AppThirdParties.get(req.TargetAppID)
+          let thirdParties = this.AppOAuthThirdParties.get(req.TargetAppID)
           if (!thirdParties) {
             thirdParties = [] as Array<AppOAuthThirdParty>
           }
           const index = thirdParties.findIndex((el) => el.ID === req.ID)
           thirdParties.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0, resp.Info)
-          this.AppThirdParties.set(req.TargetAppID, thirdParties)
+          this.AppOAuthThirdParties.set(req.TargetAppID, thirdParties)
           done(false, resp.Info)
         }, () => {
           done(true)
@@ -49,11 +49,11 @@ export const useAppOAuthThirdPartyStore = defineStore('app-subscribe', {
     },
     getAppOAuthThirdParties (req: GetAppOAuthThirdPartiesRequest, done: (error: boolean, rows?: Array<AppOAuthThirdParty>) => void) {
       doActionWithError<GetAppOAuthThirdPartiesRequest, GetAppOAuthThirdPartiesResponse>(
-        APIEnum.GET_APP_OAUTH_THIRD_PARTIES,
+        APIEnum.GET_APP_APP_OAUTH_THIRD_PARTIES,
         req,
         req.Message,
         (resp: GetAppOAuthThirdPartiesResponse): void => {
-          this.AppThirdParties.set(req.TargetAppID, resp.Infos)
+          this.AppOAuthThirdParties.set(req.TargetAppID, resp.Infos)
           done(false, resp.Infos)
         }, () => {
           done(true)
@@ -66,13 +66,13 @@ export const useAppOAuthThirdPartyStore = defineStore('app-subscribe', {
         req,
         req.Message,
         (resp: DeleteAppOAuthThirdPartyResponse): void => {
-          let thirdParties = this.AppThirdParties.get(req.TargetAppID)
+          let thirdParties = this.AppOAuthThirdParties.get(req.TargetAppID)
           if (!thirdParties) {
             thirdParties = [] as Array<AppOAuthThirdParty>
           }
           const index = thirdParties.findIndex((el) => el.ID === req.ID)
           thirdParties.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
-          this.AppThirdParties.set(req.TargetAppID, thirdParties)
+          this.AppOAuthThirdParties.set(req.TargetAppID, thirdParties)
           done(false, resp.Info)
         }, () => {
           done(true)
@@ -81,3 +81,5 @@ export const useAppOAuthThirdPartyStore = defineStore('app-subscribe', {
     }
   }
 })
+
+export * from './types'
