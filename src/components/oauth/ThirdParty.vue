@@ -38,7 +38,7 @@
         <q-input v-model='target.ClientLogoURL' :label='$t("MSG_CLIENT_LOGO_URL")' />
         <q-input v-model='target.ClientOAuthURL' :label='$t("MSG_CLIENT_OAUTH_URL")' />
         <q-input v-model='target.ResponseType' :label='$t("MSG_RESPONSE_TYPE")' />
-        <q-input v-model='target.ClientOAuthURL' :label='$t("MSG_CLIENT_OAUTH_URL")' />
+        <q-input v-model='target.ClientTag' :label='$t("MSG_CLIENT_TAG")' />
         <q-input v-model='target.Scope' :label='$t("MSG_SCOPE")' />
       </q-card-section>
       <q-item class='row'>
