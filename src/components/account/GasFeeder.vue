@@ -5,7 +5,7 @@
     :rows='displayGasProvider'
     :title='$t("MSG_GAS_FEEDER")'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
   >
     <template #top>

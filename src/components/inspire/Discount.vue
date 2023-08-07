@@ -2,12 +2,12 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_COUPONS")'
+    :title='$t("MSG_DISCOUNTS")'
     :rows='coupons'
     row-key='ID'
     :loading='loading'
     ::rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as FixAmountCoupon)'
+    @row-click='(evt, row, index) => onRowClick(row as DiscountCoupon)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -28,15 +28,14 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_COUPON') }}</span>
+        <span>{{ $t('MSG_CREATE_DISCOUNT') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
         <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
         <q-input type='number' v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' :suffix='$t("MSG_DAYS")' />
-        <q-input type='number' v-model='target.Denomination' :label='$t("MSG_COUPON_CIRCULATION")' suffix='%' />
+        <q-input type='number' v-model='target.Discount' :label='$t("MSG_COUPON_CIRCULATION")' suffix='%' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -47,47 +46,41 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime } from 'npool-cli-v2'
+import {
+  NotificationType,
+  formatTime,
+  DiscountCoupon,
+  useChurchDiscountStore,
+  useDiscountStore
+} from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
-import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
-import { useCouponStore, CouponType, Coupon, CouponTypes } from 'src/teststore/inspire/coupon'
-import { useRoute } from 'vue-router'
+import { useLocalUserStore } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-interface Query {
-  couponType: CouponType
-}
-
-const route = useRoute()
-const query = computed(() => route.query as unknown as Query)
-const couponType = computed(() => query.value.couponType)
-
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const coupon = useCouponStore()
-const coupons = computed(() => coupon.coupons(appID.value, couponType.value))
+const coupon = useChurchDiscountStore()
+const acoupon = useDiscountStore()
+const coupons = computed(() => coupon.Discounts.get(appID.value) ? coupon.Discounts.get(appID.value) : [])
 const loading = ref(true)
 
 const logined = useLocalUserStore()
 
 const prepare = () => {
   loading.value = true
-  coupon.getAppCoupons({
+  coupon.getDiscounts({
     TargetAppID: appID.value,
-    CouponType: couponType.value,
-    Offset: 0,
-    Limit: 100,
     Message: {
       Error: {
-        Title: t('MSG_GET_COUPONS'),
-        Message: t('MSG_GET_COUPONS_FAIL'),
+        Title: t('MSG_GET_DISCOUNTS'),
+        Message: t('MSG_GET_DISCOUNTS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: NotificationType.Error
       }
     }
   }, () => {
@@ -106,12 +99,12 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  IssuedBy: logined.User?.ID
-} as unknown as Coupon)
+  ReleaseByUserID: logined.User?.ID
+} as unknown as DiscountCoupon)
 const start = computed({
-  get: () => formatTime(target.value.StartAt, true)?.replace(/\//g, '-'),
+  get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
   set: (val) => {
-    target.value.StartAt = new Date(val).getTime() / 1000
+    target.value.Start = new Date(val).getTime() / 1000
   }
 })
 
@@ -120,7 +113,7 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (coupon: Coupon) => {
+const onRowClick = (coupon: DiscountCoupon) => {
   showing.value = true
   updating.value = true
   target.value = coupon
@@ -129,35 +122,28 @@ const onRowClick = (coupon: Coupon) => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    IssuedBy: logined.User?.ID
-  } as unknown as Coupon
+    ReleaseByUserID: logined.User?.ID
+  } as unknown as DiscountCoupon
 }
 
 const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    coupon.updateCoupon({
-      ID: target.value.ID,
-      TargetAppID: appID.value,
-      Denomination: target.value.Denomination,
-      Circulation: target.value.Circulation,
-      StartAt: target.value.StartAt,
-      DurationDays: target.value.DurationDays,
-      Message: target.value.Message,
-      Name: target.value.Name,
-      NotifyMessage: {
+    acoupon.updateDiscount({
+      Info: target.value,
+      Message: {
         Error: {
-          Title: 'MSG_UPDATE_COUPON',
-          Message: 'MSG_UPDATE_COUPON_FAIL',
+          Title: 'MSG_UPDATE_DISCOUNT',
+          Message: 'MSG_UPDATE_DISCOUNT_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: NotificationType.Error
         },
         Info: {
-          Title: 'MSG_UPDATE_COUPON',
-          Message: 'MSG_UPDATE_COUPON_SUCCESS',
+          Title: 'MSG_UPDATE_DISCOUNT',
+          Message: 'MSG_UPDATE_DISCOUNT_SUCCESS',
           Popup: true,
-          Type: NotifyType.Success
+          Type: NotificationType.Success
         }
       }
     }, () => {
@@ -166,27 +152,21 @@ const onSubmit = () => {
     return
   }
 
-  coupon.createCoupon({
+  coupon.createDiscount({
     TargetAppID: appID.value,
-    CouponType: couponType.value,
-    Denomination: target.value.Denomination,
-    Circulation: target.value.Circulation,
-    StartAt: target.value.StartAt,
-    DurationDays: target.value.DurationDays,
-    Message: target.value.Message,
-    Name: target.value.Name,
-    NotifyMessage: {
+    Info: target.value,
+    Message: {
       Error: {
-        Title: 'MSG_CREATE_COUPON',
-        Message: 'MSG_CREATE_COUPON_FAIL',
+        Title: 'MSG_CREATE_DISCOUNT',
+        Message: 'MSG_CREATE_DISCOUNT_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: NotificationType.Error
       },
       Info: {
-        Title: 'MSG_CREATE_COUPON',
-        Message: 'MSG_CREATE_COUPON_SUCCESS',
+        Title: 'MSG_CREATE_DISCOUNT',
+        Message: 'MSG_CREATE_DISCOUNT_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: NotificationType.Success
       }
     }
   }, () => {

@@ -6,7 +6,7 @@
     :rows='(apps as never)'
     row-key='ID'
     :loading='appLoading'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as App)'
     :columns='columns'
   >

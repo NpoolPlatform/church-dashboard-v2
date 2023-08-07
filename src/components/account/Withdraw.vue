@@ -6,7 +6,7 @@
     :rows='displayWithdrawAddress'
     row-key='ID'
     :columns='withdrawColumns'
-    :rows-per-page-options='[20]'
+    ::rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Account)'
   >
     <template #top>

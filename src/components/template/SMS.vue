@@ -6,7 +6,7 @@
     :rows='smss'
     row-key='ID'
     :loading='smsLoading'
-    :rows-per-page-options='[20]'
+    ::rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as SMSTemplate)'
   >
     <template #top-right>

@@ -5,7 +5,7 @@
     :title='$t("MSG_REGISTRATION")'
     :rows='displayRegistrations'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

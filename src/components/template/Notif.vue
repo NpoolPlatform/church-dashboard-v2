@@ -5,7 +5,7 @@
     :title='$t("MSG_FRONTEND_TEMPLATES")'
     :rows='frontendTemplates'
     row-key='ID'
-    :rows-per-page-options='[20]'
+    ::rows-per-page-options='[100]'
     :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as FrontendTemplate)'
   >

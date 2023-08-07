@@ -7,7 +7,7 @@
     :title='$t("MSG_COINS")'
     selection='multiple'
     v-model:selected='selectedCoins'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

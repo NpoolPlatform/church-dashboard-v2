@@ -5,7 +5,7 @@
     :title='$t("MSG_APP_COUNTRIES")'
     :rows='countries'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     v-model:selected='selectedCountries'
     selection='single'
   >
