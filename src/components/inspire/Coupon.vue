@@ -31,6 +31,7 @@
         <span>{{ $t('MSG_CREATE_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
+        <q-select :options='CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
         <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
@@ -51,7 +52,7 @@ import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
 import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
-import { useCouponStore, CouponType, Coupon } from 'src/teststore/inspire/coupon'
+import { useCouponStore, CouponType, Coupon, CouponTypes } from 'src/teststore/inspire/coupon'
 import { useRoute } from 'vue-router'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method

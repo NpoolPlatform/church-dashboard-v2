@@ -5,6 +5,7 @@ export enum CouponType {
   Discount = 'Discount',
   SpecialOffer = 'SpecialOffer',
 }
+export const CouponTypes = Object.values(CouponType)
 
 export enum CouponConstraint {
   Normal = 'Normal',
