@@ -158,31 +158,37 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: Fiat) => row.ID
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
+    sortable: true,
     field: (row: Fiat) => row.Name
   },
   {
     name: 'Unit',
     label: t('MSG_UNIT'),
+    sortable: true,
     field: (row: Fiat) => row.Unit
   },
   {
     name: 'Logo',
     label: t('MSG_LOGO'),
+    sortable: true,
     field: (row: Fiat) => row.Logo
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
+    sortable: true,
     field: (row: Fiat) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
+    sortable: true,
     field: (row: Fiat) => formatTime(row.UpdatedAt)
   }
 ])

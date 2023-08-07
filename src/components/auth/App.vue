@@ -249,11 +249,13 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: 'MSG_ID',
+    sortable: true,
     field: (row: API) => row.ID
   },
   {
     name: 'Method',
     label: 'MSG_METHOD',
+    sortable: true,
     field: (row: API) => row.Method
   },
   {
@@ -271,41 +273,49 @@ const columns = computed(() => [
   {
     name: 'ServiceName',
     label: 'MSG_SERVICE_NAME',
+    sortable: true,
     field: (row: API) => row.ServiceName
   },
   {
     name: 'Exported',
     label: 'MSG_EXPORTED',
+    sortable: true,
     field: (row: API) => row.Exported
   },
   {
     name: 'Depracated',
     label: 'MSG_DEPRACATED',
+    sortable: true,
     field: (row: API) => row.Depracated
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
+    sortable: true,
     field: (row: API) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
+    sortable: true,
     field: (row: API) => formatTime(row.UpdatedAt)
   },
   {
     name: 'MethodName',
     label: 'MSG_METHOD_NAME',
+    sortable: true,
     field: (row: API) => row.MethodName
   },
   {
     name: 'Domains',
     label: 'MSG_DOMAINS',
+    sortable: true,
     field: (row: API) => row.Domains?.join(',')
   },
   {
     name: 'Protocol',
     label: 'MSG_PROTOCOL',
+    sortable: true,
     field: (row: API) => row.Protocol
   }
 ])

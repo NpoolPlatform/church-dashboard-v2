@@ -42,41 +42,49 @@ const withdrawColumns = computed(() => [
   {
     name: 'CoinTypeID',
     label: t('MSG_COINTYPE_ID'),
+    sortable: true,
     field: (row: Withdraw) => row.CoinTypeID
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
+    sortable: true,
     field: (row: Withdraw) => row.Address
   },
   {
     name: 'CoinName',
     label: t('MSG_COINNAME'),
+    sortable: true,
     field: (row: Withdraw) => row.CoinName
   },
   {
     name: 'CoinLogo',
     label: t('MSG_COIN_LOGO'),
+    sortable: true,
     field: (row: Withdraw) => row.CoinLogo
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: Withdraw) => row.CoinUnit
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: Withdraw) => formatTime(row.CreatedAt)
   },
   {
     name: 'Message',
     label: t('MSG_MESSAGE'),
+    sortable: true,
     field: (row: Withdraw) => row.Message
   },
   {
     name: 'State',
     label: t('MSG_STATE'),
+    sortable: true,
     field: (row: Withdraw) => row.State
   }
 ])

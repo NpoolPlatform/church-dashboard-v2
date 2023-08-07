@@ -175,31 +175,37 @@ const columns = computed(() => [
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
+    sortable: true,
     field: (row: User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: User) => formatTime(row.CreatedAt)
   }
 ])
@@ -490,61 +496,73 @@ const generalColumns = computed(() => [
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: General) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: General) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: General) => row.CoinUnit
   },
   {
     name: 'Incoming',
     label: t('MSG_INCOMING'),
+    sortable: true,
     field: (row: General) => row.Incoming
   },
   {
     name: 'Outcoming',
     label: t('MSG_OUT_COMING'),
+    sortable: true,
     field: (row: General) => row.Outcoming
   },
   {
     name: 'Spendable',
     label: t('MSG_SPENDABLE'),
+    sortable: true,
     field: (row: General) => row.Spendable
   },
   {
     name: 'Locked',
     label: t('MSG_LOCKED'),
+    sortable: true,
     field: (row: General) => row.Locked
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: General) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: General) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: General) => row.PhoneNO
   },
   {
     name: 'CoinDisabled',
     label: t('MSG_COIN_DISABLE'),
+    sortable: true,
     field: (row: General) => row.CoinDisabled
   },
   {
     name: 'CoinDisplay',
     label: t('MSG_COIN_DISPLAY'),
+    sortable: true,
     field: (row: General) => row.CoinDisplay
   }
 ])
@@ -553,52 +571,62 @@ const detailColumns = computed(() => [
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: Detail) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: Detail) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: Detail) => row.CoinUnit
   },
   {
     name: 'IOType',
     label: t('MSG_IO_TYPE'),
+    sortable: true,
     field: (row: Detail) => row.IOType
   },
   {
     name: 'IOSubType',
     label: t('MSG_IO_SUB_TYPE'),
+    sortable: true,
     field: (row: Detail) => row.IOSubType
   },
   {
     name: 'Amount',
     label: t('MSG_AMOUNT'),
+    sortable: true,
     field: (row: Detail) => row.Amount
   },
   {
     name: 'IOExtra',
     align: 'left',
     label: t('MSG_IO_EXTRA'),
+    sortable: true,
     field: (row: Detail) => row.IOExtra
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: Detail) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: Detail) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: Detail) => row.PhoneNO
   }
 ])
@@ -607,51 +635,61 @@ const accountColumns = computed(() => [
   {
     name: 'AccountID',
     label: t('MSG_ACCOUNT_ID'),
+    sortable: true,
     field: (row: Account) => row.AccountID
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
+    sortable: true,
     field: (row: Account) => row.Address
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: Account) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: Account) => row.CoinUnit
   },
   {
     name: 'Active',
     label: t('MSG_ACTIVE'),
+    sortable: true,
     field: (row: Account) => row.Active
   },
   {
     name: 'Blocked',
     label: t('MSG_BLOCKED'),
+    sortable: true,
     field: (row: Account) => row.Blocked
   },
   {
     name: 'UsedFor',
     label: t('MSG_USED_FOR'),
+    sortable: true,
     field: (row: Account) => row.UsedFor
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: Account) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: Detail) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: Account) => row.PhoneNO
   }
 ])
