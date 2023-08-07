@@ -1,25 +1,12 @@
 import { BaseRequest } from 'npool-cli-v4'
-
-/** @default "DefaultCouponType" */
-export enum CouponType {
-  DefaultCouponType = 'DefaultCouponType',
-  FixAmount = 'FixAmount',
-  Discount = 'Discount',
-  SpecialOffer = 'SpecialOffer',
-  ThresholdFixAmount = 'ThresholdFixAmount',
-  ThresholdDiscount = 'ThresholdDiscount',
-  GoodFixAmount = 'GoodFixAmount',
-  GoodDiscount = 'GoodDiscount',
-  GoodThresholdFixAmount = 'GoodThresholdFixAmount',
-  GoodThresholdDiscount = 'GoodThresholdDiscount',
-}
+import { CouponConstraint, CouponType } from '../types'
 
 export interface Coupon {
   ID: string;
   CouponType: CouponType;
   AppID: string;
   UserID: string;
-  Value: string;
+  Denomination: string;
   Circulation: string;
   /** @format int64 */
   StartAt: number;
@@ -35,9 +22,12 @@ export interface Coupon {
   Used: boolean;
   /** @format int64 */
   UsedAt: number;
-  UsedByOrderID: string;
-  GoodID: string;
-  Threshold: string;
+  UsedByOrderID?: string;
+  GoodID?: string;
+  Threshold?: string;
+  Allocated?: string
+  CouponConstraint: CouponConstraint
+  Random: boolean
   /** @format int64 */
   CreatedAt: number;
   /** @format int64 */

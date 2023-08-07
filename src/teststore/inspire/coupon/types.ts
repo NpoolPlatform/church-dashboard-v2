@@ -1,81 +1,79 @@
 import { BaseRequest, MyRequest } from 'npool-cli-v4'
 
-/** @default "DefaultCouponType" */
 export enum CouponType {
-  DefaultCouponType = 'DefaultCouponType',
   FixAmount = 'FixAmount',
   Discount = 'Discount',
   SpecialOffer = 'SpecialOffer',
-  ThresholdFixAmount = 'ThresholdFixAmount',
-  ThresholdDiscount = 'ThresholdDiscount',
-  GoodFixAmount = 'GoodFixAmount',
-  GoodDiscount = 'GoodDiscount',
-  GoodThresholdFixAmount = 'GoodThresholdFixAmount',
-  GoodThresholdDiscount = 'GoodThresholdDiscount',
+}
+
+export enum CouponConstraint {
+  Normal = 'Normal',
+  PaymentThreshold = 'PaymentThreshold',
+  GoodOnly = 'GoodOnly',
+  GoodThreshold = 'GoodThreshold'
 }
 
 export interface Coupon {
   ID: string;
   CouponType: CouponType;
   AppID: string;
-  Value: string;
+  Denomination: string;
   Circulation: string;
-  ReleasedByUserID: string;
+  IssuedBy: string;
   /** @format int64 */
   StartAt: number;
   /** @format int64 */
   DurationDays: number;
   Message: string;
   Name: string;
-  UserID: string;
-  GoodID: string;
-  Threshold: string;
+  UserID?: string;
+  GoodID?: string;
+  Threshold?: string;
   Allocated: string;
+  CouponConstraint: CouponConstraint
+  Random: boolean
   /** @format int64 */
   CreatedAt: number;
   /** @format int64 */
   UpdatedAt: number;
 }
 
-export interface CreateCouponPoolRequest extends MyRequest {
-  AppID: string
-  UserID: string
+export interface CreateCouponRequest extends MyRequest {
   TargetAppID: string
   CouponType: string
-  Value: string
+  Denomination: string
   Circulation: string
   StartAt: number
   DurationDays: number
   Message: string
   Name: string
-  TargetUserID: string
-  GoodID: string
+  TargetUserID?: string
+  GoodID?: string
   Threshold?: string
 }
 
-export interface CreateCouponPoolResponse {
+export interface CreateCouponResponse {
   Info: Coupon;
 }
 
-export interface GetCouponPoolsRequest extends BaseRequest{
-  CouponType: CouponType;
+export interface GetCouponsRequest extends BaseRequest{
+  CouponType?: CouponType;
   /** @format int32 */
   Offset: number;
   /** @format int32 */
   Limit: number;
 }
 
-export interface GetCouponPoolsResponse {
+export interface GetCouponsResponse {
   Infos: Coupon[];
   /** @format int64 */
   Total: number;
 }
 
-export interface UpdateCouponPoolRequest extends MyRequest {
+export interface UpdateCouponRequest extends MyRequest {
   ID: string;
   TargetAppID: string;
-  CouponType: CouponType;
-  Value: string;
+  Denomination: string;
   Circulation: string;
   /** @format int64 */
   StartAt: number;
@@ -83,25 +81,25 @@ export interface UpdateCouponPoolRequest extends MyRequest {
   DurationDays: number;
   Message: string;
   Name: string;
-  TargetUserID: string;
-  GoodID: string;
-  Threshold: string;
+  TargetUserID?: string;
+  GoodID?: string;
+  Threshold?: string;
 }
 
-export interface UpdateCouponPoolResponse {
+export interface UpdateCouponResponse {
   Info: Coupon;
 }
 
-export interface GetAppCouponPoolsRequest extends BaseRequest {
+export interface GetAppCouponsRequest extends BaseRequest {
   TargetAppID: string;
-  CouponType: CouponType;
+  CouponType?: CouponType;
   /** @format int32 */
   Offset: number;
   /** @format int32 */
   Limit: number;
 }
 
-export interface GetAppCouponPoolsResponse {
+export interface GetAppCouponsResponse {
   Infos: Coupon[];
   /** @format int64 */
   Total: number;
