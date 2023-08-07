@@ -5,7 +5,7 @@
     :title='$t("MSG_INVITATION_CODES")'
     :rows='displayCodes'
     row-key='ID'
-    :rows-per-page-options='[20]'
+    ::rows-per-page-options='[100]'
     :columns='invitationCodeColumns'
   >
     <template #top-right>

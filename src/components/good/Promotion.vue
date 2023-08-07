@@ -6,7 +6,7 @@
     :rows='appGoods'
     row-key='ID'
     :columns='appGoodsColumns'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedGood'
   />
@@ -17,7 +17,7 @@
     :rows='promotions'
     :columns='columns'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Promotion)'
   >
     <template #top-right>

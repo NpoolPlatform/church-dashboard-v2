@@ -4,7 +4,7 @@
     dense
     :rows='displayAuths'
     row-key='ID'
-    :rows-per-page-options='[5]'
+    ::rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedAuth'
   >
@@ -36,7 +36,7 @@
     dense
     :rows='displayApis'
     row-key='ID'
-    :rows-per-page-options='[20]'
+    ::rows-per-page-options='[100]'
     v-model:selected='selectedApi'
     :columns='columns'
     selection='single'

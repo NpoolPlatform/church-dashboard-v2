@@ -5,7 +5,7 @@
     :rows='displayFeeds'
     row-key='ID'
     :title='$t("MSG_FIAT_FEEDS")'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as FiatFeed)'
   >

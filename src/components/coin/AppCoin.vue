@@ -6,7 +6,7 @@
     row-key='ID'
     selection='multiple'
     :title='$t("MSG_APP_COINS")'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     v-model:selected='selectedCoin'
     :columns='coinColumns'
   >

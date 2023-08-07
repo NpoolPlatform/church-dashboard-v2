@@ -5,7 +5,7 @@
     :title='$t("MSG_ANNOUNCEMENT_SENDSTATES")'
     :rows='displayStates'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     :columns='columns'
   >
     <template #top-right>
@@ -25,7 +25,7 @@
     :title='$t("MSG_ANNOUNCEMENT_READSTATES")'
     :rows='displayReadStates'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     :columns='readStatesColumns'
   >
     <template #top-right>

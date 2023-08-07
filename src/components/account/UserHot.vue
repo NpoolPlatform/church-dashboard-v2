@@ -5,7 +5,7 @@
     :rows='displayUserBenefitHots'
     :title='$t("MSG_USER_BENEFIT_HOTS")'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
   >
     <template #top>

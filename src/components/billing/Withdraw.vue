@@ -6,7 +6,7 @@
     :rows='withdraws'
     row-key='ID'
     :columns='withdrawColumns'
-    :rows-per-page-options='[10]'
+    ::rows-per-page-options='[100]'
   />
 </template>
 

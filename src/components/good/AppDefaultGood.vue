@@ -6,7 +6,7 @@
     :rows='appDefaultGoods'
     row-key='ID'
     selection='single'
-    :rows-per-page-options='[50]'
+    ::rows-per-page-options='[100]'
     :columns='appDefaultGoodsColumns'
     @row-click='(evt, row, index) => onRowClick(row as AppDefaultGood)'
   >
