@@ -4,6 +4,7 @@ interface MenuItem {
   caption: string
   icon: string
   target: string
+  query?: Record<string, string>
   level: number
   sectionBegin: boolean
   children: Array<MenuItem>

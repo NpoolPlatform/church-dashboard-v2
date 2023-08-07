@@ -637,32 +637,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'inspire/fixamount',
-        component: () => import('pages/inspire/FixAmount.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'inspire/discount',
-        component: () => import('pages/inspire/Discount.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'inspire/special/offer',
-        component: () => import('pages/inspire/SpecialOffer.vue'),
+        path: 'inspire/coupon',
+        component: () => import('pages/inspire/Coupon.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

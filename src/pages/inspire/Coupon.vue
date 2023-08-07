@@ -1,11 +1,11 @@
 <template>
-  <SpecialOffer />
+  <Coupon />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const SpecialOffer = defineAsyncComponent(() => import('src/components/inspire/SpecialOffer.vue'))
+const Coupon = defineAsyncComponent(() => import('src/components/inspire/Coupon.vue'))
 
 </script>
 

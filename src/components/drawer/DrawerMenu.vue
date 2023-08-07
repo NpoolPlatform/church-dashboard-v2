@@ -81,7 +81,8 @@ const onItemClick = () => {
 
   menus.MainBreadcrumbs.push(menu.value)
   if (children.value.length === 0) {
-    void router.push(menu.value.target)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    void router.push({ path: menu.value.target, query: menu.value.query })
   }
 }
 

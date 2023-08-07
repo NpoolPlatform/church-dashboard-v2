@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_DISCOUNTS")'
+    :title='$t("MSG_COUPONS")'
     :rows='coupons'
     row-key='ID'
     :loading='loading'
@@ -28,7 +28,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_DISCOUNT') }}</span>
+        <span>{{ $t('MSG_CREATE_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
@@ -52,15 +52,24 @@ import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
 import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
 import { useCouponStore, CouponType, Coupon } from 'src/teststore/inspire/coupon'
+import { useRoute } from 'vue-router'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+interface Query {
+  couponType: CouponType
+}
+
+const route = useRoute()
+const query = computed(() => route.query as unknown as Query)
+const couponType = computed(() => query.value.couponType)
 
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
 const coupon = useCouponStore()
-const coupons = computed(() => coupon.coupons(appID.value, CouponType.Discount))
+const coupons = computed(() => coupon.coupons(appID.value, couponType.value))
 const loading = ref(true)
 
 const logined = useLocalUserStore()
@@ -69,13 +78,13 @@ const prepare = () => {
   loading.value = true
   coupon.getAppCoupons({
     TargetAppID: appID.value,
-    CouponType: CouponType.Discount,
+    CouponType: couponType.value,
     Offset: 0,
     Limit: 100,
     Message: {
       Error: {
-        Title: t('MSG_GET_DISCOUNTS'),
-        Message: t('MSG_GET_DISCOUNTS_FAIL'),
+        Title: t('MSG_GET_COUPONS'),
+        Message: t('MSG_GET_COUPONS_FAIL'),
         Popup: true,
         Type: NotifyType.Error
       }
@@ -138,14 +147,14 @@ const onSubmit = () => {
       Name: target.value.Name,
       NotifyMessage: {
         Error: {
-          Title: 'MSG_UPDATE_DISCOUNT',
-          Message: 'MSG_UPDATE_DISCOUNT_FAIL',
+          Title: 'MSG_UPDATE_COUPON',
+          Message: 'MSG_UPDATE_COUPON_FAIL',
           Popup: true,
           Type: NotifyType.Error
         },
         Info: {
-          Title: 'MSG_UPDATE_DISCOUNT',
-          Message: 'MSG_UPDATE_DISCOUNT_SUCCESS',
+          Title: 'MSG_UPDATE_COUPON',
+          Message: 'MSG_UPDATE_COUPON_SUCCESS',
           Popup: true,
           Type: NotifyType.Success
         }
@@ -158,7 +167,7 @@ const onSubmit = () => {
 
   coupon.createCoupon({
     TargetAppID: appID.value,
-    CouponType: CouponType.Discount,
+    CouponType: couponType.value,
     Denomination: target.value.Denomination,
     Circulation: target.value.Circulation,
     StartAt: target.value.StartAt,
@@ -167,14 +176,14 @@ const onSubmit = () => {
     Name: target.value.Name,
     NotifyMessage: {
       Error: {
-        Title: 'MSG_CREATE_DISCOUNT',
-        Message: 'MSG_CREATE_DISCOUNT_FAIL',
+        Title: 'MSG_CREATE_COUPON',
+        Message: 'MSG_CREATE_COUPON_FAIL',
         Popup: true,
         Type: NotifyType.Error
       },
       Info: {
-        Title: 'MSG_CREATE_DISCOUNT',
-        Message: 'MSG_CREATE_DISCOUNT_SUCCESS',
+        Title: 'MSG_CREATE_COUPON',
+        Message: 'MSG_CREATE_COUPON_SUCCESS',
         Popup: true,
         Type: NotifyType.Success
       }
