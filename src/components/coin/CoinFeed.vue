@@ -169,51 +169,61 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: CoinFeed) => row.ID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: CoinFeed) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: CoinFeed) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: CoinFeed) => row.CoinUnit
   },
   {
     name: 'CoinEnv',
     label: t('MSG_COIN_ENV'),
+    sortable: true,
     field: (row: CoinFeed) => row.CoinENV
   },
   {
     name: 'FeedType',
     label: t('MSG_FEED_TYPE'),
+    sortable: true,
     field: (row: CoinFeed) => row.FeedType
   },
   {
     name: 'FeedCoinName',
     label: t('MSG_FEED_COIN_NAME'),
+    sortable: true,
     field: (row: CoinFeed) => row.FeedCoinName
   },
   {
     name: 'Disabled',
     label: t('MSG_DISABLED'),
+    sortable: true,
     field: (row: CoinFeed) => row.Disabled
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
+    sortable: true,
     field: (row: CoinFeed) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
+    sortable: true,
     field: (row: CoinFeed) => formatTime(row.UpdatedAt)
   }
 ])

@@ -185,31 +185,37 @@ const appDefaultGoodsColumns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: AppDefaultGood) => row.ID
   },
   {
     name: 'GoodID',
     label: t('MSG_GOOD_ID'),
+    sortable: true,
     field: (row: AppDefaultGood) => row.GoodID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: AppDefaultGood) => row.CoinTypeID
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: AppDefaultGood) => row.CoinUnit
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
+    sortable: true,
     field: (row: AppDefaultGood) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: t('MSG_UPDATED_AT'),
+    sortable: true,
     field: (row: AppDefaultGood) => formatTime(row.UpdatedAt)
   }
 ])

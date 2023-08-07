@@ -64,36 +64,43 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: Announcement) => row.ID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: Announcement) => row.AppID
   },
   {
     name: 'LangID',
     label: t('MSG_LANG_ID'),
+    sortable: true,
     field: (row: Announcement) => row.LangID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
+    sortable: true,
     field: (row: Announcement) => row.Title
   },
   {
     name: 'Type',
     label: t('MSG_TYPE'),
+    sortable: true,
     field: (row: Announcement) => row.AnnouncementType
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
+    sortable: true,
     field: (row: Announcement) => row.Content
   },
   {
     name: 'Channel',
     label: t('MSG_CHANNEL'),
+    sortable: true,
     field: (row: Announcement) => row.Channel
   },
   {

@@ -167,46 +167,55 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: FiatFeed) => row.ID
   },
   {
     name: 'FiatID',
     label: t('MSG_FIAT_ID'),
+    sortable: true,
     field: (row: FiatFeed) => row.FiatID
   },
   {
     name: 'FiatName',
     label: t('MSG_FIAT_NAME'),
+    sortable: true,
     field: (row: FiatFeed) => row.FiatName
   },
   {
     name: 'FiatUnit',
     label: t('MSG_FIAT_UNIT'),
+    sortable: true,
     field: (row: FiatFeed) => row.FiatUnit
   },
   {
     name: 'FeedType',
     label: t('MSG_FEED_TYPE'),
+    sortable: true,
     field: (row: FiatFeed) => row.FeedType
   },
   {
     name: 'FeedFiatName',
     label: t('MSG_FEED_FIAT_NAME'),
+    sortable: true,
     field: (row: FiatFeed) => row.FeedFiatName
   },
   {
     name: 'Disabled',
     label: t('MSG_DISABLED'),
+    sortable: true,
     field: (row: FiatFeed) => row.Disabled
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
+    sortable: true,
     field: (row: FiatFeed) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
+    sortable: true,
     field: (row: FiatFeed) => formatTime(row.UpdatedAt)
   }
 ])
