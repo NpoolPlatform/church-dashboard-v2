@@ -6,7 +6,7 @@
     :rows='appUsers'
     row-key='ID'
     :loading='userLoading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     :columns='columns'
   >
     <template #top-right>

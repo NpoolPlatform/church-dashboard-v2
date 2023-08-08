@@ -6,7 +6,7 @@
     :rows='displayDirectBenefitAccounts'
     row-key='ID'
     :columns='directBenefitColumns'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Account)'
   >
     <template #top>

@@ -6,7 +6,7 @@
     :rows='displayFiats'
     row-key='ID'
     :title='$t("MSG_FIATS")'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as Fiat)'
   >

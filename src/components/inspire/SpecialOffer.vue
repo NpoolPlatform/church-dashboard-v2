@@ -5,7 +5,7 @@
     :title='$t("MSG_USERS")'
     :rows='displayUsers'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedUser'
     :columns='columns'
@@ -37,7 +37,7 @@
     :rows='displayCoupons'
     row-key='ID'
     :loading='loading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as UserSpecialOffer)'
   >
     <template #top-right>

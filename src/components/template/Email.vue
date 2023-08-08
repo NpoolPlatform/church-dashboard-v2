@@ -6,7 +6,7 @@
     :rows='emails'
     row-key='ID'
     :loading='emailLoading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as MyEmailTemplate)'
   >
     <template #top-right>

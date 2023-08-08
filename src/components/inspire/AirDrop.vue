@@ -6,7 +6,7 @@
     :rows='displayUsers'
     row-key='ID'
     :loading='loading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='multiple'
     v-model:selected='selectedUsers'
     :columns='columns'

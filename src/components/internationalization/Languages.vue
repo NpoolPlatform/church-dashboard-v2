@@ -5,7 +5,7 @@
     :title='$t("MSG_LANGUAGES")'
     :rows='langs'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Lang)'
   >
     <template #top-right>

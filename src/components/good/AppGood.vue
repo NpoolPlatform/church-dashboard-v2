@@ -5,7 +5,7 @@
     :title='$t("MSG_GOODS")'
     :rows='displayGoods'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='single'
     :columns='columns'
     v-model:selected='selectedGood'
@@ -41,7 +41,7 @@
     :columns='appGoodsColumns'
     row-key='ID'
     selection='single'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as AppGood)'
   />
 

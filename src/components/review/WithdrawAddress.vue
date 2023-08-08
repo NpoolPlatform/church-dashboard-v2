@@ -5,7 +5,7 @@
     :title='$t("MSG_WITHDRAW_ADDRESS_REVIEWS")'
     :rows='withdrawAddress'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
   />
 </template>
 

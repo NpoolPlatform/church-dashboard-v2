@@ -6,7 +6,7 @@
     :rows='announcements'
     row-key='ID'
     :columns='columns'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
   />
   <AnnouncementUser />
   <State />
