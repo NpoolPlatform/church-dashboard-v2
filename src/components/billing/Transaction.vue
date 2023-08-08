@@ -25,7 +25,7 @@ onMounted(() => {
   }
 })
 
-const getTxs = (offset : number, limit: number) => {
+const getTxs = (offset: number, limit: number) => {
   tx.getTxs({
     Offset: offset,
     Limit: limit,
@@ -42,7 +42,7 @@ const getTxs = (offset : number, limit: number) => {
       loading.value = false
       return
     }
-    getTxs(offset, offset + limit)
+    getTxs(offset + limit, limit)
   })
 }
 
