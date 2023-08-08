@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='loading'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as FixAmountCoupon)'
+    @row-click='(evt, row, index) => onRowClick(row as Coupon)'
   >
     <template #top-right>
       <div class='row indent flat'>
