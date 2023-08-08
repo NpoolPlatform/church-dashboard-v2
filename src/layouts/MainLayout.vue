@@ -91,4 +91,7 @@ onMounted(() => {
 </script>
 
 <style lang='sass' scoped>
+.q-page-container
+  ::v-deep .q-table__container
+    padding-bottom: 60px
 </style>

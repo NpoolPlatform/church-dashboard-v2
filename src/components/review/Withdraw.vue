@@ -9,11 +9,6 @@
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as WithdrawReview)'
   />
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
