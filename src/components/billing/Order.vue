@@ -6,7 +6,7 @@
     :rows='displayOrders'
     row-key='ID'
     :columns='columns'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Order)'
   >
     <template #top-right>

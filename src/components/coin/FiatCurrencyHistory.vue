@@ -5,7 +5,7 @@
     :rows='displayFiats'
     row-key='ID'
     :title='$t("MSG_FIATS")'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='multiple'
     v-model:selected='selectedFiats'
     :columns='columns'
@@ -28,7 +28,7 @@
     :rows='displayHistories'
     row-key='ID'
     :title='$t("MSG_FIAT_CURRENCY_HISTORIES")'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

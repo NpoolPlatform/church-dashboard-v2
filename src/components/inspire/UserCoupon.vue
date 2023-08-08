@@ -6,7 +6,7 @@
     :rows='displayUsers'
     row-key='ID'
     :loading='loading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='multiple'
     v-model:selected='selectedUsers'
     :columns='columns'
@@ -37,7 +37,7 @@
     :title='$t("MSG_USER_COUPONS")'
     :rows='displayCoupons'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

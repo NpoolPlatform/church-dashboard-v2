@@ -4,7 +4,7 @@
     dense
     :rows='displayUsers'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedUser'
     :loading='userLoading'
@@ -15,7 +15,7 @@
     dense
     :rows='displayAuths'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedAuth'
   >
@@ -47,7 +47,7 @@
     dense
     :rows='displayApis'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedApi'
     :columns='apiColumns'

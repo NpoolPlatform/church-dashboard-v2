@@ -6,7 +6,7 @@
     :rows='channels'
     row-key='ID'
     :columns='columns'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

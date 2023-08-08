@@ -5,7 +5,7 @@
     :rows='displayHistories'
     row-key='ID'
     :title='$t("MSG_COIN_CURRENCY_HISTORIES")'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

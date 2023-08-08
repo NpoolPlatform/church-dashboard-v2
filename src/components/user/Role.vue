@@ -6,7 +6,7 @@
     :rows='roles'
     row-key='ID'
     :loading='roleLoading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Role)'
   >
     <template #top-right>

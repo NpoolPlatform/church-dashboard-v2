@@ -6,7 +6,7 @@
     :rows='displayUsers'
     row-key='ID'
     :loading='userLoading'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedUser'
     :columns='columns'
@@ -39,7 +39,7 @@
     :title='$t("MSG_GENERALS")'
     :rows='displayGenerals'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     :columns='generalColumns'
   >
     <template #top-right>
@@ -67,7 +67,7 @@
     :title='$t("MSG_DETAILS")'
     :rows='displayDetails'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     :columns='detailColumns'
   >
     <template #top-right>
@@ -94,7 +94,7 @@
     :title='$t("MSG_DEPOSIT_ACCOUNTS")'
     :rows='accounts'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     :columns='accountColumns'
   >
     <template #top-right>

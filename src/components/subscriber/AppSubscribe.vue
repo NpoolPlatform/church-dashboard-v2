@@ -5,7 +5,7 @@
     :title='$t("MSG_APP_SUBSCRIBE")'
     :rows='appSubscribes'
     row-key='ID'
-    ::rows-per-page-options='[100]'
+    :rows-per-page-options='[100]'
     v-model:selected='selectedAppSubscribe'
     selection='single'
   >
