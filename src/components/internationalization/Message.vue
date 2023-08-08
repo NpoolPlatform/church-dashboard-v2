@@ -5,7 +5,7 @@
     :title='$t("MSG_APP_MESSAGES")'
     :rows='displayAppMsgs'
     row-key='ID'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Message)'
     v-model:selected='selectedMessages'
     selection='single'
@@ -77,7 +77,7 @@
     flat
     :title='$t("MSG_LOADED_MESSAGES")'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     :rows='loadedMessages'
   >
     <template #top-right>
@@ -107,11 +107,6 @@
       </div>
     </template>
   </q-table>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 
   <q-dialog
     v-model='batchCreating'

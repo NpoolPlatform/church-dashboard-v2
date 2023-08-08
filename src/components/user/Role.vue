@@ -6,7 +6,7 @@
     :rows='roles'
     row-key='ID'
     :loading='roleLoading'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Role)'
   >
     <template #top-right>
@@ -21,11 +21,6 @@
       </div>
     </template>
   </q-table>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'

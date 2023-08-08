@@ -5,7 +5,7 @@
     :rows='displayThirdParties'
     row-key='ID'
     :title='$t("MSG_APP_OAUTH_THIRD_PARTIES")'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as AppOAuthThirdParty)'
   >
     <template #top-right>

@@ -5,7 +5,7 @@
     :rows='displayPaymentCollector'
     :title='$t("MSG_PAYMENT_COLLECTOR")'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
   >
     <template #top>

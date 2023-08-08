@@ -4,7 +4,7 @@
     dense
     :rows='displayUsers'
     row-key='ID'
-    :rows-per-page-options='[5]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedUser'
     :loading='userLoading'
@@ -15,7 +15,7 @@
     dense
     :rows='displayAuths'
     row-key='ID'
-    :rows-per-page-options='[5]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedAuth'
   >
@@ -47,7 +47,7 @@
     dense
     :rows='displayApis'
     row-key='ID'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedApi'
     :columns='apiColumns'
@@ -297,31 +297,37 @@ const columns = computed(() => [
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
+    sortable: true,
     field: (row: User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: User) => formatTime(row.CreatedAt)
   }
 ])
@@ -330,11 +336,13 @@ const apiColumns = computed(() => [
   {
     name: 'ID',
     label: 'MSG_ID',
+    sortable: true,
     field: (row: API) => row.ID
   },
   {
     name: 'Method',
     label: 'MSG_METHOD',
+    sortable: true,
     field: (row: API) => row.Method
   },
   {
@@ -352,41 +360,49 @@ const apiColumns = computed(() => [
   {
     name: 'ServiceName',
     label: 'MSG_SERVICE_NAME',
+    sortable: true,
     field: (row: API) => row.ServiceName
   },
   {
     name: 'Exported',
     label: 'MSG_EXPORTED',
+    sortable: true,
     field: (row: API) => row.Exported
   },
   {
     name: 'Depracated',
     label: 'MSG_DEPRACATED',
+    sortable: true,
     field: (row: API) => row.Depracated
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
+    sortable: true,
     field: (row: API) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
+    sortable: true,
     field: (row: API) => formatTime(row.UpdatedAt)
   },
   {
     name: 'MethodName',
     label: 'MSG_METHOD_NAME',
+    sortable: true,
     field: (row: API) => row.MethodName
   },
   {
     name: 'Domains',
     label: 'MSG_DOMAINS',
+    sortable: true,
     field: (row: API) => row.Domains?.join(',')
   },
   {
     name: 'Protocol',
     label: 'MSG_PROTOCOL',
+    sortable: true,
     field: (row: API) => row.Protocol
   }
 ])

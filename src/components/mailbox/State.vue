@@ -5,7 +5,7 @@
     :title='$t("MSG_ANNOUNCEMENT_SENDSTATES")'
     :rows='displayStates'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     :columns='columns'
   >
     <template #top-right>
@@ -25,7 +25,7 @@
     :title='$t("MSG_ANNOUNCEMENT_READSTATES")'
     :rows='displayReadStates'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     :columns='readStatesColumns'
   >
     <template #top-right>
@@ -131,46 +131,55 @@ const columns = computed(() => [
   {
     name: 'AnnouncementID',
     label: t('MSG_ANNOUNCEMENT_ID'),
+    sortable: true,
     field: (row: SendState) => row.AnnouncementID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: SendState) => row.AppID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
+    sortable: true,
     field: (row: SendState) => row.Title
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
+    sortable: true,
     field: (row: SendState) => row.Content
   },
   {
     name: 'Channel',
     label: t('MSG_CHANNEL'),
+    sortable: true,
     field: (row: SendState) => row.Channel
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: SendState) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: SendState) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: SendState) => row.PhoneNO
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
+    sortable: true,
     field: (row: SendState) => formatTime(row.CreatedAt)
   }
 ])
@@ -179,41 +188,49 @@ const readStatesColumns = computed(() => [
   {
     name: 'AnnouncementID',
     label: t('MSG_ANNOUNCEMENT_ID'),
+    sortable: true,
     field: (row: ReadState) => row.AnnouncementID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: ReadState) => row.AppID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
+    sortable: true,
     field: (row: ReadState) => row.Title
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
+    sortable: true,
     field: (row: ReadState) => row.Content
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: ReadState) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: ReadState) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: ReadState) => row.PhoneNO
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
+    sortable: true,
     field: (row: ReadState) => formatTime(row.CreatedAt)
   }
 ])

@@ -6,7 +6,7 @@
     :rows='displayWithdrawAddress'
     row-key='ID'
     :columns='withdrawColumns'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Account)'
   >
     <template #top>
@@ -94,71 +94,85 @@ const withdrawColumns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: Account) => row.ID
   },
   {
     name: 'ID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: Account) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: Account) => row.UserID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_DESCRIPTION'),
+    sortable: true,
     field: (row: Account) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: Account) => row.CoinName
   },
   {
     name: 'AccountID',
     label: t('MSG_ACCOUNT_ID'),
+    sortable: true,
     field: (row: Account) => row.AccountID
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
+    sortable: true,
     field: (row: Account) => row.Address
   },
   {
     name: 'UsedFor',
     label: t('MSG_USED_FOR'),
+    sortable: true,
     field: (row: Account) => row.UsedFor
   },
   {
     name: 'Labels',
     label: t('MSG_LABELS'),
+    sortable: true,
     field: (row: Account) => row.Labels?.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: Account) => row.CreatedAt
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: Account) => row.EmailAddress
   },
   {
     name: 'PhoneNo',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: Account) => row.PhoneNO
   },
   {
     name: 'Active',
     label: t('MSG_ACTIVE'),
+    sortable: true,
     field: (row: Account) => row.Active
   },
   {
     name: 'BLOCKED',
     label: t('MSG_BLOCKED'),
+    sortable: true,
     field: (row: Account) => row.Blocked
   }
 ])

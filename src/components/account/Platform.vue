@@ -5,7 +5,7 @@
     :rows='displayPlatformAccounts'
     :title='$t("MSG_PLATFORM_ADDRESSES")'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
   >
     <template #top>
