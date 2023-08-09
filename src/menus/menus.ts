@@ -623,15 +623,6 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: '空投',
-      caption: '给指定用户空投代金券',
-      icon: 'format_list_numbered',
-      target: '/inspire/airdrop',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, {
-      menuId: uid(),
       label: '邀请关系',
       caption: '查看用户邀请关系',
       icon: 'format_list_numbered',
