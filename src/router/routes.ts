@@ -661,18 +661,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'inspire/user/coupon',
-        component: () => import('pages/inspire/UserCoupon.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'inspire/registration',
         component: () => import('pages/inspire/Registration.vue'),
         meta: {

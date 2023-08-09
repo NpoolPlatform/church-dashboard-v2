@@ -632,15 +632,6 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: '用户的券',
-      caption: '查看用户持有代金券',
-      icon: 'format_list_numbered',
-      target: '/inspire/user/coupon',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, {
-      menuId: uid(),
       label: '邀请关系',
       caption: '查看用户邀请关系',
       icon: 'format_list_numbered',
