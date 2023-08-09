@@ -649,18 +649,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'inspire/event/coupon',
-        component: () => import('pages/inspire/EventCoupon.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'inspire/airdrop',
         component: () => import('pages/inspire/AirDrop.vue'),
         meta: {

@@ -623,15 +623,6 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: '事件',
-      caption: '管理自动触发发券事件',
-      icon: 'format_list_numbered',
-      target: '/inspire/event/coupon',
-      level: 1,
-      sectionBegin: false,
-      children: []
-    } as MenuItem, {
-      menuId: uid(),
       label: '空投',
       caption: '给指定用户空投代金券',
       icon: 'format_list_numbered',
