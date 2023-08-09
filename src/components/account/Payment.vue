@@ -5,7 +5,7 @@
     :title='$t("MSG_GOOD_PAYMENT_ADDRESSES")'
     :rows='displayAccounts'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as PaymentAccount)'
   >
     <template #top>

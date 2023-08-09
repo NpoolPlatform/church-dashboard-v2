@@ -4,7 +4,7 @@
     dense
     :rows='displayAuths'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -30,7 +30,7 @@
     dense
     :rows='displayLoadedAuths'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

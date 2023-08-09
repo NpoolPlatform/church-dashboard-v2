@@ -6,7 +6,7 @@
     :rows='contacts'
     row-key='ID'
     :loading='contactsLoading'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Contact)'
   >
     <template #top-right>

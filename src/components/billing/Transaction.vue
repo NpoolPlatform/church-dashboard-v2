@@ -6,55 +6,26 @@
     :rows='transactions'
     :loading='loading'
     row-key='ID'
-    v-model:pagination='pagination'
-    @request='handlePageChange'
+    :rows-per-page-options='[100]'
   />
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchTxStore } from 'npool-cli-v4'
-import { Pagination } from 'src/localstore/pagination/type'
+import { NotifyType, Tx, useChurchTxStore } from 'npool-cli-v4'
 import { computed, onMounted, ref } from 'vue'
 
 const tx = useChurchTxStore()
 const transactions = computed(() => tx.Txs.Txs)
 
-const pagination = ref({
-  sortBy: 'ID',
-  descending: false,
-  page: 1,
-  rowsPerPage: 20,
-  rowsNumber: 10
-})
-
 const loading = ref(false)
 
-const prepare = () => {
-  if (transactions.value.length === 0) {
-    getTxs(pagination.value.page - 1, pagination.value.rowsPerPage)
-  }
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const handlePageChange = (row: any) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const page = row?.pagination as Pagination
-  pagination.value = { ...page }
-  console.log('page: ', page)
-  tx.$reset()
-  loading.value = true
-  getTxs((pagination.value.page - 1) * pagination.value.rowsPerPage, pagination.value.rowsPerPage)
-}
-
 onMounted(() => {
-  prepare()
+  if (transactions.value.length === 0) {
+    getTxs(0, 100)
+  }
 })
 
-const getTxs = (offset : number, limit: number) => {
+const getTxs = (offset: number, limit: number) => {
   tx.getTxs({
     Offset: offset,
     Limit: limit,
@@ -66,12 +37,12 @@ const getTxs = (offset : number, limit: number) => {
         Type: NotifyType.Error
       }
     }
-  }, (error: boolean) => {
-    loading.value = false
-    if (error) {
+  }, (error: boolean, rows: Array<Tx>) => {
+    if (error || rows?.length === 0) {
+      loading.value = false
       return
     }
-    pagination.value.rowsNumber = tx.Txs.Total
+    getTxs(offset + limit, limit)
   })
 }
 

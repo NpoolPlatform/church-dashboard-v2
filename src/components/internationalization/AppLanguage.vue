@@ -5,7 +5,7 @@
     :title='$t("MSG_APP_LANGUAGES")'
     :rows='langs'
     row-key='LangID'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     v-model:selected='selectedAppLangs'
     selection='single'
   >

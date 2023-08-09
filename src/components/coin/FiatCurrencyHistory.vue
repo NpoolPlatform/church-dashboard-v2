@@ -5,7 +5,7 @@
     :rows='displayFiats'
     row-key='ID'
     :title='$t("MSG_FIATS")'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     selection='multiple'
     v-model:selected='selectedFiats'
     :columns='columns'
@@ -28,7 +28,7 @@
     :rows='displayHistories'
     row-key='ID'
     :title='$t("MSG_FIAT_CURRENCY_HISTORIES")'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -121,31 +121,37 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: Fiat) => row.ID
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
+    sortable: true,
     field: (row: Fiat) => row.Name
   },
   {
     name: 'Unit',
     label: t('MSG_UNIT'),
+    sortable: true,
     field: (row: Fiat) => row.Unit
   },
   {
     name: 'Logo',
     label: t('MSG_LOGO'),
+    sortable: true,
     field: (row: Fiat) => row.Logo
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
+    sortable: true,
     field: (row: Fiat) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
+    sortable: true,
     field: (row: Fiat) => formatTime(row.UpdatedAt)
   }
 ])

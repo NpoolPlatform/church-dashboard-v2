@@ -5,7 +5,7 @@
     :title='$t("MSG_GOODS")'
     :rows='displayGoods'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as Good)'
   >
@@ -85,11 +85,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>
@@ -228,66 +223,79 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: Good) => row.ID
   },
   {
     name: 'Title',
     label: t('MSG_GOOD_NAME'),
+    sortable: true,
     field: (row: Good) => row.Title
   },
   {
     name: 'GOODTYPE',
     label: t('MSG_GOOD_TYPE'),
+    sortable: true,
     field: (row: Good) => row.GoodType
   },
   {
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
+    sortable: true,
     field: (row: Good) => row.Price
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
+    sortable: true,
     field: (row: Good) => t(row.Unit)
   },
   {
     name: 'GOODTOTAL',
     label: t('MSG_GOOD_TOTAL'),
+    sortable: true,
     field: (row: Good) => row.Total
   },
   {
     name: 'GOODSOLD',
     label: t('MSG_GOOD_SOLD'),
+    sortable: true,
     field: (row: Good) => row.Sold
   },
   {
     name: 'GOODLOCKED',
     label: t('MSG_GOOD_LOCKED'),
+    sortable: true,
     field: (row: Good) => row.Locked
   },
   {
     name: 'GOODINSERVICE',
     label: t('MSG_GOOD_INSERVICE'),
+    sortable: true,
     field: (row: Good) => row.InService
   },
   {
     name: 'COINNAME',
     label: t('MSG_COINNAME'),
+    sortable: true,
     field: (row: Good) => row.CoinName
   },
   {
     name: 'BENEFITTYPE',
     label: t('MSG_BENEFITTYPE'),
+    sortable: true,
     field: (row: Good) => row.BenefitType
   },
   {
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
+    sortable: true,
     field: (row: Good) => formatTime(row.StartAt)
   },
   {
     name: 'CREATEDAT',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: Good) => formatTime(row.CreatedAt)
   }
 ])

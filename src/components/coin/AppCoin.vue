@@ -6,7 +6,7 @@
     row-key='ID'
     selection='multiple'
     :title='$t("MSG_APP_COINS")'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     v-model:selected='selectedCoin'
     :columns='coinColumns'
   >
@@ -37,11 +37,6 @@
       </div>
     </template>
   </q-table>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -213,96 +208,115 @@ const coinColumns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: AppCoin) => row.ID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: AppCoin) => row.AppID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: AppCoin) => row.CoinTypeID
   },
   {
     name: 'Name',
     label: t('MSG_APP_COIN_NAME'),
+    sortable: true,
     field: (row: AppCoin) => row.Name
   },
   {
     name: 'DisplayNames',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: AppCoin) => row.DisplayNames.join(',')
   },
   {
     name: 'Logo',
     label: t('MSG_LOGO'),
+    sortable: true,
     field: (row: AppCoin) => row.Logo
   },
   {
     name: 'Unit',
     label: t('MSG_UNIT'),
+    sortable: true,
     field: (row: AppCoin) => row.Unit
   },
   {
     name: 'Presale',
     label: t('MSG_PRESALE'),
+    sortable: true,
     field: (row: AppCoin) => row.Presale
   },
   {
     name: 'ReservedAmount',
     label: t('MSG_RESERVED_AMOUNT'),
+    sortable: true,
     field: (row: AppCoin) => row.ReservedAmount
   },
   {
     name: 'ForPay',
     label: t('MSG_FOR_PAY'),
+    sortable: true,
     field: (row: AppCoin) => row.ForPay
   },
   {
     name: 'ProductPage',
     label: t('MSG_PRODUCT_PAGE'),
+    sortable: true,
     field: (row: AppCoin) => row.ProductPage
   },
   {
     name: 'ENV',
     label: t('MSG_ENV'),
+    sortable: true,
     field: (row: AppCoin) => row.ENV
   },
   {
     name: 'MarketValue',
     label: t('MSG_MARKET_VALUE'),
+    sortable: true,
     field: (row: AppCoin) => row.MarketValue
   },
   {
     name: 'SettleValue',
     label: t('MSG_SETTLE_VALUE'),
+    sortable: true,
     field: (row: AppCoin) => row.SettleValue
   },
   {
     name: 'SettlePercent',
     label: t('MSG_SETTLE_PERCENT'),
+    sortable: true,
     field: (row: AppCoin) => row.SettlePercent
   },
   {
     name: 'SettleTips',
     label: t('MSG_SETTLE_TIPS'),
+    sortable: true,
     field: (row: AppCoin) => row.SettleTips.join(',')
   },
   {
     name: 'DailyRewardAmount',
     label: t('MSG_DAILY_REWARD_AMOUNT'),
+    sortable: true,
     field: (row: AppCoin) => row.DailyRewardAmount
   },
   {
     name: 'Display',
     label: t('MSG_DISPLAY'),
+    sortable: true,
     field: (row: AppCoin) => row.Display
   },
   {
     name: 'DisplayIndex',
     label: t('MSG_DISPLAY_INDEX'),
+    sortable: true,
     field: (row: AppCoin) => row.DisplayIndex
   }
 ])

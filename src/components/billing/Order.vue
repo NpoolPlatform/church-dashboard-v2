@@ -6,7 +6,7 @@
     :rows='displayOrders'
     row-key='ID'
     :columns='columns'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Order)'
   >
     <template #top-right>
@@ -220,116 +220,139 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: Order) => row.ID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: Order) => row.AppID
   },
   {
     name: 'GoodID',
     label: t('MSG_GOOD_ID'),
+    sortable: true,
     field: (row: Order) => row.GoodID
   },
   {
     name: 'GoodName',
     label: t('MSG_GOOD_NAME'),
+    sortable: true,
     field: (row: Order) => row.GoodName
   },
   {
     name: 'GoodUnit',
     label: t('MSG_GOOD_UNIT'),
+    sortable: true,
     field: (row: Order) => row.GoodUnit
   },
   {
     name: 'GoodUnitPrice',
     label: t('MSG_GOOD_UNIT_PRICE'),
+    sortable: true,
     field: (row: Order) => row.GoodUnitPrice
   },
   {
     name: 'GoodValue',
     label: t('MSG_GOOD_VALUE'),
+    sortable: true,
     field: (row: Order) => row.GoodValue
   },
   {
     name: 'Units',
     label: t('MSG_UNITS'),
+    sortable: true,
     field: (row: Order) => row.Units
   },
   {
     name: 'PaymentID',
     label: t('MSG_PAYMENT_ID'),
+    sortable: true,
     field: (row: Order) => row.PaymentID
   },
   {
     name: 'PaymentCoinTypeID',
     label: t('MSG_PAYMENT_COINTYPE_ID'),
+    sortable: true,
     field: (row: Order) => row.PaymentCoinTypeID
   },
   {
     name: 'PaymentCoinName',
     label: t('MSG_PAYMENT_COINNAME'),
+    sortable: true,
     field: (row: Order) => row.PaymentCoinName
   },
   {
     name: 'PaymentCoinUnit',
     label: t('MSG_PAYMENT_COIN_UNIT'),
+    sortable: true,
     field: (row: Order) => row.PaymentCoinUnit
   },
   {
     name: 'CoinPresale',
     label: t('MSG_COIN_PRESALE'),
+    sortable: true,
     field: (row: Order) => row.CoinPresale
   },
   {
     name: 'PaymentAddress',
     label: t('MSG_PAYMENT_ADDRESS'),
+    sortable: true,
     field: (row: Order) => row.PaymentAddress
   },
   {
     name: 'PaymentCoinUSDCurrency',
     label: t('MSG_PAYMENT_COIN_USD_CURRENCY'),
+    sortable: true,
     field: (row: Order) => row.PaymentCoinUSDCurrency
   },
   {
     name: 'PaymentLiveUSDCurrency',
     label: t('MSG_PAYMENT_LIVE_USD_CURRENCY'),
+    sortable: true,
     field: (row: Order) => row.PaymentLiveUSDCurrency
   },
   {
     name: 'PaymentLocalUSDCurrency',
     label: t('MSG_PAYMENT_LOCAL_USD_CURRENCY'),
+    sortable: true,
     field: (row: Order) => row.PaymentLocalUSDCurrency
   },
   {
     name: 'PaymentAmount',
     label: t('MSG_PAYMENT_AMOUNT'),
+    sortable: true,
     field: (row: Order) => row.PaymentAmount
   },
   {
     name: 'Type',
     label: t('MSG_TYPE'),
+    sortable: true,
     field: (row: Order) => row.OrderType
   },
   {
     name: 'State',
     label: t('MSG_CONTENT'),
+    sortable: true,
     field: (row: Order) => row.State
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: Order) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: Order) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: Order) => row.PhoneNO
   },
   {

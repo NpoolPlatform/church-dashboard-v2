@@ -6,7 +6,7 @@
     :rows='devices'
     :columns='columns'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as DeviceInfo)'
   >
     <template #top-right>
@@ -42,11 +42,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>
@@ -155,36 +150,43 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: DeviceInfo) => row.ID
   },
   {
     name: 'MANUFACTURER',
     label: t('MSG_MANUFACTURER'),
+    sortable: true,
     field: (row: DeviceInfo) => row.Manufacturer
   },
   {
     name: 'POWERCOMSUPTION',
     label: t('MSG_POWERCOMSUPTION'),
+    sortable: true,
     field: (row: DeviceInfo) => row.PowerComsuption
   },
   {
     name: 'SHIPMENTAT',
     label: t('MSG_SHIPMENT_AT'),
+    sortable: true,
     field: (row: DeviceInfo) => row.ShipmentAt
   },
   {
     name: 'Type',
     label: t('MSG_TYPE'),
+    sortable: true,
     field: (row: DeviceInfo) => row.Type
   },
   {
     name: 'CREATED_AT',
     label: t('MSG_CREATED_AT'),
+    sortable: true,
     field: (row: DeviceInfo) => formatTime(row.CreatedAt)
   },
   {
     name: 'UPDATED_AT',
     label: t('MSG_UPDATED_AT'),
+    sortable: true,
     field: (row: DeviceInfo) => formatTime(row.UpdatedAt)
   }
 ])

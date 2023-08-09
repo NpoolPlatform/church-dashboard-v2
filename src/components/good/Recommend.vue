@@ -5,7 +5,7 @@
     :title='$t("MSG_APP_GOODS")'
     :rows='appGoods'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     selection='single'
     :columns='appGoodsColumns'
     v-model:selected='selectedGood'
@@ -17,7 +17,7 @@
     :title='$t("MSG_APP_GOOD_RECOMMENDS")'
     :rows='recommends'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Recommend)'
   >
     <template #top-right>
@@ -57,11 +57,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>
@@ -197,76 +192,91 @@ const appGoodsColumns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: AppGood) => row.ID
   },
   {
     name: 'GOODID',
     label: t('MSG_GOODID'),
+    sortable: true,
     field: (row: AppGood) => row.GoodID
   },
   {
     name: 'GOODNAME',
     label: t('MSG_GOODNAME'),
+    sortable: true,
     field: (row: AppGood) => row.GoodName
   },
   {
     name: 'GOODTYPE',
     label: t('MSG_GOOD_TYPE'),
+    sortable: true,
     field: (row: AppGood) => row.GoodType
   },
   {
     name: 'ONLINE',
     label: t('MSG_ONLINE'),
+    sortable: true,
     field: (row: AppGood) => row.Online
   },
   {
     name: 'VISIBLE',
     label: t('MSG_VISIBLE'),
+    sortable: true,
     field: (row: AppGood) => row.Visible
   },
   {
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
+    sortable: true,
     field: (row: AppGood) => row.Price
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
+    sortable: true,
     field: (row: AppGood) => row.Unit
   },
   {
     name: 'GOODTOTAL',
     label: t('MSG_GOOD_TOTAL'),
+    sortable: true,
     field: (row: AppGood) => row.Total
   },
   {
     name: 'GOODSOLD',
     label: t('MSG_GOOD_SOLD'),
+    sortable: true,
     field: (row: AppGood) => row.Sold
   },
   {
     name: 'GOODLOCKED',
     label: t('MSG_GOOD_LOCKED'),
+    sortable: true,
     field: (row: AppGood) => row.Locked
   },
   {
     name: 'GOODINSERVICE',
     label: t('MSG_GOOD_INSERVICE'),
+    sortable: true,
     field: (row: AppGood) => row.InService
   },
   {
     name: 'COINNAME',
     label: t('MSG_COINNAME'),
+    sortable: true,
     field: (row: AppGood) => row.CoinName
   },
   {
     name: 'BENEFITTYPE',
     label: t('MSG_BENEFITTYPE'),
+    sortable: true,
     field: (row: AppGood) => row.BenefitType
   },
   {
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
+    sortable: true,
     field: (row: AppGood) => formatTime(row.StartAt)
   }
 ])

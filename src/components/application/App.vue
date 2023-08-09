@@ -6,7 +6,7 @@
     :rows='(apps as never)'
     row-key='ID'
     :loading='appLoading'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as App)'
     :columns='columns'
   >
@@ -184,46 +184,55 @@ const columns = computed(() => [
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: App) => row.ID
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
+    sortable: true,
     field: (row: App) => row.Name
   },
   {
     name: 'Description',
     label: t('MSG_DESCRIPTION'),
+    sortable: true,
     field: (row: App) => row.Description
   },
   {
     name: 'InvitationCodeMust',
     label: t('MSG_INVITATIONCODEMUST'),
+    sortable: true,
     field: (row: App) => row.InvitationCodeMust
   },
   {
     name: 'KycEnable',
     label: t('MSG_KYC_ENABLE'),
+    sortable: true,
     field: (row: App) => row.KycEnable
   },
   {
     name: 'RecaptchaMethod',
     label: t('MSG_RECAPTCHA_METHOD'),
+    sortable: true,
     field: (row: App) => row.RecaptchaMethod
   },
   {
     name: 'SigninVerifyEnable',
     label: t('MSG_SIGNIN_VERIFY_ENABLE'),
+    sortable: true,
     field: (row: App) => row.SigninVerifyEnable
   },
   {
     name: 'CreatedBy',
     label: t('MSG_CREATEDBY'),
+    sortable: true,
     field: (row: App) => row.CreatedBy
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: App) => row.CreatedAt
   }
 ])

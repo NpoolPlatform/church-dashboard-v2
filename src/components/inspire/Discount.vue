@@ -2,12 +2,12 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_ACTIVITYS")'
-    :rows='activities'
+    :title='$t("MSG_DISCOUNTS")'
+    :rows='coupons'
     row-key='ID'
     :loading='loading'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Activity)'
+    @row-click='(evt, row, index) => onRowClick(row as DiscountCoupon)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -28,13 +28,14 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_ACTIVITY') }}</span>
+        <span>{{ $t('MSG_CREATE_DISCOUNT') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Name' :label='$t("MSG_ACTIVITY_NAME")' />
+        <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
+        <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
-        <q-input type='date' v-model='end' :label='$t("MSG_END")' />
-        <q-toggle v-model='target.SystemActivity' :label='$t("MSG_SYSTEM_ACTIVITY")' />
+        <q-input type='number' v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' :suffix='$t("MSG_DAYS")' />
+        <q-input type='number' v-model='target.Discount' :label='$t("MSG_COUPON_CIRCULATION")' suffix='%' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -45,7 +46,13 @@
 </template>
 
 <script setup lang='ts'>
-import { NotificationType, Activity, useChurchActivityStore, useAdminActivityStore, formatTime } from 'npool-cli-v2'
+import {
+  NotificationType,
+  formatTime,
+  DiscountCoupon,
+  useChurchDiscountStore,
+  useDiscountStore
+} from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
@@ -57,21 +64,21 @@ const { t } = useI18n({ useScope: 'global' })
 const app = useLocalApplicationStore()
 const appID = computed(() => app.AppID)
 
-const activity = useChurchActivityStore()
-const aactivity = useAdminActivityStore()
-const activities = computed(() => activity.Activities.get(appID.value) ? activity.Activities.get(appID.value) : [])
+const coupon = useChurchDiscountStore()
+const acoupon = useDiscountStore()
+const coupons = computed(() => coupon.Discounts.get(appID.value) ? coupon.Discounts.get(appID.value) : [])
 const loading = ref(true)
 
 const logined = useLocalUserStore()
 
 const prepare = () => {
   loading.value = true
-  activity.getActivities({
+  coupon.getDiscounts({
     TargetAppID: appID.value,
     Message: {
       Error: {
-        Title: t('MSG_GET_ACTIVITIES'),
-        Message: t('MSG_GET_ACTIVITIES_FAIL'),
+        Title: t('MSG_GET_DISCOUNTS'),
+        Message: t('MSG_GET_DISCOUNTS_FAIL'),
         Popup: true,
         Type: NotificationType.Error
       }
@@ -92,18 +99,12 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  CreatedBy: logined.User?.ID
-} as unknown as Activity)
+  ReleaseByUserID: logined.User?.ID
+} as unknown as DiscountCoupon)
 const start = computed({
   get: () => formatTime(target.value.Start, true)?.replace(/\//g, '-'),
   set: (val) => {
     target.value.Start = new Date(val).getTime() / 1000
-  }
-})
-const end = computed({
-  get: () => formatTime(target.value.End, true)?.replace(/\//g, '-'),
-  set: (val) => {
-    target.value.End = new Date(val).getTime() / 1000
   }
 })
 
@@ -112,29 +113,37 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (activity: Activity) => {
+const onRowClick = (coupon: DiscountCoupon) => {
   showing.value = true
   updating.value = true
-  target.value = activity
+  target.value = coupon
 }
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as unknown as Activity
+  target.value = {
+    ReleaseByUserID: logined.User?.ID
+  } as unknown as DiscountCoupon
 }
 
 const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    aactivity.updateActivity({
+    acoupon.updateDiscount({
       Info: target.value,
       Message: {
         Error: {
-          Title: 'MSG_UPDATE_ACTIVITY',
-          Message: 'MSG_UPDATE_ACTIVITY_FAIL',
+          Title: 'MSG_UPDATE_DISCOUNT',
+          Message: 'MSG_UPDATE_DISCOUNT_FAIL',
           Popup: true,
           Type: NotificationType.Error
+        },
+        Info: {
+          Title: 'MSG_UPDATE_DISCOUNT',
+          Message: 'MSG_UPDATE_DISCOUNT_SUCCESS',
+          Popup: true,
+          Type: NotificationType.Success
         }
       }
     }, () => {
@@ -143,15 +152,21 @@ const onSubmit = () => {
     return
   }
 
-  activity.createActivity({
+  coupon.createDiscount({
     TargetAppID: appID.value,
     Info: target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_ACTIVITY',
-        Message: 'MSG_CREATE_ACTIVITY_FAIL',
+        Title: 'MSG_CREATE_DISCOUNT',
+        Message: 'MSG_CREATE_DISCOUNT_FAIL',
         Popup: true,
         Type: NotificationType.Error
+      },
+      Info: {
+        Title: 'MSG_CREATE_DISCOUNT',
+        Message: 'MSG_CREATE_DISCOUNT_SUCCESS',
+        Popup: true,
+        Type: NotificationType.Success
       }
     }
   }, () => {

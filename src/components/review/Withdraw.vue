@@ -6,14 +6,9 @@
     :rows='displayReviews'
     row-key='ID'
     :columns='columns'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as WithdrawReview)'
   />
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -182,76 +177,91 @@ const columns = computed(() => [
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: WithdrawReview) => row.CoinName
   },
   {
     name: 'CoinLogo',
     label: t('MSG_COIN_LOGO'),
+    sortable: true,
     field: (row: WithdrawReview) => row.CoinLogo
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: WithdrawReview) => row.CoinTypeID
   },
   {
     name: 'Amount',
     label: t('MSG_AMOUNT'),
+    sortable: true,
     field: (row: WithdrawReview) => row.Amount
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
+    sortable: true,
     field: (row: WithdrawReview) => row.Address
   },
   {
     name: 'WithdrawState',
     label: t('MSG_WITHDRAW_STATE'),
+    sortable: true,
     field: (row: WithdrawReview) => row.WithdrawState
   },
   {
     name: 'State',
     label: t('MSG_STATE'),
+    sortable: true,
     field: (row: WithdrawReview) => row.State
   },
   {
     name: 'Trigger',
     label: t('MSG_TRIGGER'),
+    sortable: true,
     field: (row: WithdrawReview) => row.Trigger
   },
   {
     name: 'Message',
     label: t('MSG_MESSAGE'),
+    sortable: true,
     field: (row: WithdrawReview) => row.Message
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
+    sortable: true,
     field: (row: WithdrawReview) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: t('MSG_UPDATED_AT'),
+    sortable: true,
     field: (row: WithdrawReview) => formatTime(row.UpdatedAt)
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: WithdrawReview) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: WithdrawReview) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: WithdrawReview) => row.PhoneNO
   },
   {
     name: 'KycState',
     label: t('MSG_KYC_STATE'),
+    sortable: true,
     field: (row: WithdrawReview) => row.KycState
   }
 ])

@@ -6,7 +6,7 @@
     :rows='mails'
     row-key='ID'
     :loading='mailLoading'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

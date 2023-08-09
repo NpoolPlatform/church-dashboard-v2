@@ -43,11 +43,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>

@@ -5,7 +5,7 @@
     :title='$t("MSG_COUNTRIES")'
     :rows='countries'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as Country)'
   >
     <template #top-right>
@@ -55,7 +55,7 @@
     :title='$t("MSG_LOADED_COUNTRIES")'
     row-key='ID'
     :rows='loadedCountries'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
   >
     <template #top-right>
       <div class='row indent flat'>

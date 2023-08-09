@@ -5,7 +5,7 @@
     :title='$t("MSG_ROLE_USERS")'
     :rows='displayRoleUsers'
     row-key='ID'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     selection='single'
     :role-user-loading='roleUserLoading'
     v-model:selected='selectedRoleUser'
@@ -36,7 +36,7 @@
     :rows='roles'
     row-key='ID'
     :loading='roleLoading'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedRole'
   />
@@ -47,7 +47,7 @@
     :rows='displayUsers'
     row-key='ID'
     :loading='userLoading'
-    :rows-per-page-options='[10]'
+    :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedUser'
     :columns='columns'
@@ -71,11 +71,6 @@
       </div>
     </template>
   </q-table>
-  <q-card>
-    <q-card-section class='bg-primary text-white'>
-      {{ $t('MSG_ADVERTISEMENT_POSITION') }}
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang='ts'>
@@ -252,31 +247,37 @@ const columns = computed(() => [
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
+    sortable: true,
     field: (row: User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
     field: (row: User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
+    sortable: true,
     field: (row: User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
+    sortable: true,
     field: (row: User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
+    sortable: true,
     field: (row: User) => formatTime(row.CreatedAt)
   }
 ])
