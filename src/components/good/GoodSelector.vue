@@ -26,7 +26,7 @@ import { useLocalApplicationStore } from 'src/localstore/application'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {
-  id: string
+  id: string | undefined
 }
 
 const props = defineProps<Props>()
@@ -50,7 +50,7 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:id', id: string | undefined): void}>()
 const onUpdate = () => {
   emit('update:id', target.value)
 }

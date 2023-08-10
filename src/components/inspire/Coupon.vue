@@ -31,12 +31,20 @@
         <span>{{ $t('MSG_CREATE_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
+        <q-select :options='CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' disable />
+        <q-select :options='CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_COUPONCONSTRAINT")' />
         <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
         <q-input type='number' v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' :suffix='$t("MSG_DAYS")' />
-        <q-input type='number' v-model='target.Denomination' :label='$t("MSG_COUPON_CIRCULATION")' suffix='%' />
+        <q-input v-model='target.Denomination' :label='$t("MSG_COUPON_DENOMINATION")' suffix='%' />
+        <q-input v-model='target.Circulation' :label='$t("MSG_COUPON_CIRCULATION")' suffix='$ | Pcs' />
+        <q-input v-model='target.Threshold' :label='$t("MSG_COUPON_THRESHOLD")' suffix='$' />
+        <q-toggle v-model='target.Random' :label='$t("MSG_COUPON_RANDOM")' />
+        <GoodSelector v-model:id='target.GoodID' />
+      </q-card-section>
+      <q-card-section v-if='target.CouponType === CouponType.SpecialOffer'>
+        <q-item-label>{{ $t('MSG_SPECIAL_OFFSET_NOT_IMPLEMENTED') }}</q-item-label>
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -48,12 +56,14 @@
 
 <script setup lang='ts'>
 import { formatTime } from 'npool-cli-v2'
-import { computed, onMounted, watch, ref } from 'vue'
+import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
 import { useLocalApplicationStore } from '../../localstore'
 import { useI18n } from 'vue-i18n'
 import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
-import { useCouponStore, CouponType, Coupon, CouponTypes } from 'src/teststore/inspire/coupon'
+import { useCouponStore, CouponType, Coupon, CouponTypes, CouponConstraints } from 'src/teststore/inspire/coupon'
 import { useRoute } from 'vue-router'
+
+const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -106,13 +116,19 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  IssuedBy: logined.User?.ID
+  IssuedBy: logined.User?.ID,
+  CouponType: couponType.value,
+  Random: false
 } as unknown as Coupon)
+
 const start = computed({
   get: () => formatTime(target.value.StartAt, true)?.replace(/\//g, '-'),
   set: (val) => {
     target.value.StartAt = new Date(val).getTime() / 1000
   }
+})
+watch(couponType, () => {
+  target.value.CouponType = couponType.value
 })
 
 const onCreate = () => {
@@ -129,7 +145,9 @@ const onRowClick = (coupon: Coupon) => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    IssuedBy: logined.User?.ID
+    IssuedBy: logined.User?.ID,
+    CouponType: couponType.value,
+    Random: false
   } as unknown as Coupon
 }
 
@@ -146,6 +164,10 @@ const onSubmit = () => {
       DurationDays: target.value.DurationDays,
       Message: target.value.Message,
       Name: target.value.Name,
+      Threshold: target.value.Threshold,
+      Random: target.value.Random,
+      CouponConstraint: target.value.CouponConstraint,
+      GoodID: target.value.GoodID,
       NotifyMessage: {
         Error: {
           Title: 'MSG_UPDATE_COUPON',
@@ -175,6 +197,10 @@ const onSubmit = () => {
     DurationDays: target.value.DurationDays,
     Message: target.value.Message,
     Name: target.value.Name,
+    Threshold: target.value.Threshold,
+    Random: target.value.Random,
+    CouponConstraint: target.value.CouponConstraint,
+    GoodID: target.value.GoodID,
     NotifyMessage: {
       Error: {
         Title: 'MSG_CREATE_COUPON',

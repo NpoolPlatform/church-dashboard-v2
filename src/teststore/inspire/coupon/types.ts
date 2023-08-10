@@ -13,6 +13,7 @@ export enum CouponConstraint {
   GoodOnly = 'GoodOnly',
   GoodThreshold = 'GoodThreshold'
 }
+export const CouponConstraints = Object.values(CouponConstraint)
 
 export interface Coupon {
   ID: string;
@@ -51,6 +52,8 @@ export interface CreateCouponRequest extends MyRequest {
   TargetUserID?: string
   GoodID?: string
   Threshold?: string
+  Random: boolean
+  CouponConstraint: CouponConstraint
 }
 
 export interface CreateCouponResponse {
@@ -85,6 +88,8 @@ export interface UpdateCouponRequest extends MyRequest {
   TargetUserID?: string;
   GoodID?: string;
   Threshold?: string;
+  Random: boolean
+  CouponConstraint: CouponConstraint
 }
 
 export interface UpdateCouponResponse {
