@@ -129,6 +129,7 @@ const start = computed({
 })
 watch(couponType, () => {
   target.value.CouponType = couponType.value
+  prepare()
 })
 
 const onCreate = () => {
