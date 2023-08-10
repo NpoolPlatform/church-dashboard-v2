@@ -88,7 +88,10 @@ const getAppRegistrations = (offset: number, limit: number) => {
       }
     }
   }, (error: boolean, rows: Array<Registration>) => {
-    if (error || rows.length < limit) {
+    if (error) {
+      return
+    }
+    if (!rows.length) {
       return
     }
     getAppRegistrations(offset + limit, limit)
