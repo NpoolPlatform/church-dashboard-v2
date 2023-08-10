@@ -86,6 +86,10 @@ const loading = ref(true)
 const logined = useLocalUserStore()
 
 const prepare = () => {
+  if (coupons.value.length > 0) {
+    loading.value = true
+    return
+  }
   loading.value = true
   coupon.getAppCoupons({
     TargetAppID: appID.value,
