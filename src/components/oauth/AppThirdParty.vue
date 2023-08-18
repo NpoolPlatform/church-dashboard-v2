@@ -7,6 +7,8 @@
     :title='$t("MSG_APP_OAUTH_THIRD_PARTIES")'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as AppOAuthThirdParty)'
+    v-model:selected='selectedThirdParty'
+    selection='single'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -23,6 +25,13 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -89,6 +98,32 @@ const displayThirdParties = computed(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as AppOAuthThirdParty)
+
+const selectedThirdParty = ref([] as Array<AppOAuthThirdParty>)
+const onDelete = () => {
+  selectedThirdParty.value.forEach((el) => {
+    appThirdParty.deleteAppOAuthThirdParty({
+      ID: el.ID,
+      TargetAppID: el.AppID,
+      Message: {
+        Error: {
+          Title: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY',
+          Message: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY_FAIL',
+          Popup: true,
+          Type: NotifyType.Error
+        },
+        Info: {
+          Title: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY',
+          Message: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY_FAIL',
+          Popup: true,
+          Type: NotifyType.Success
+        }
+      }
+    }, () => {
+      // TODO
+    })
+  })
+}
 
 const onCreate = () => {
   showing.value = true
