@@ -12,7 +12,7 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        sh (returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin command quasar
           rc=$?
@@ -42,9 +42,23 @@ pipeline {
       }
     }
 
+    stage('Generate docker image for feature') {
+      when {
+        expression { BUILD_TARGET == 'true' }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh(returnStdout: false, script: '''
+          feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
+          docker build -t $DOCKER_REGISTRY/entropypool/church-dashboard-v2:$feature_name .
+        '''.stripIndent())
+      }
+    }
+
     stage('Generate docker image for development') {
       when {
         expression { BUILD_TARGET == 'true' }
+        expression { BRANCH_NAME == 'master' }
       }
       steps {
         sh 'docker build -t $DOCKER_REGISTRY/entropypool/church-dashboard-v2:latest .'
@@ -56,7 +70,7 @@ pipeline {
         expression { TAG_PATCH == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -94,7 +108,7 @@ pipeline {
         expression { TAG_MINOR == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -124,7 +138,7 @@ pipeline {
         expression { TAG_MAJOR == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -155,7 +169,7 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
           git reset --hard
@@ -178,13 +192,42 @@ pipeline {
       }
     }
 
+    stage('Release docker image for feature') {
+      when {
+        expression { RELEASE_TARGET == 'true' }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh(returnStdout: false, script: '''
+          feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
+          set +e
+          docker images | grep church-dashboard-v2 | grep $feature_name
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            docker push $DOCKER_REGISTRY/entropypool/church-dashboard-v2:$feature_name
+          fi
+          images=`docker images | grep entropypool | grep church-dashboard-v2 | grep none | awk '{ print $3 }'`
+          for image in $images; do
+            docker rmi $image -f
+          done
+        '''.stripIndent())
+      }
+    }
+
     stage('Release docker image for development') {
       when {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
-        sh 'docker push $DOCKER_REGISTRY/entropypool/church-dashboard-v2:latest'
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
+          set +e
+          docker images | grep church-dashboard-v2 | grep latest
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            docker push $DOCKER_REGISTRY/entropypool/church-dashboard-v2:latest
+          fi
           images=`docker images | grep entropypool | grep church-dashboard-v2 | grep none | awk '{ print $3 }'`
           for image in $images; do
             docker rmi $image -f
@@ -240,10 +283,27 @@ pipeline {
       }
     }
 
+    stage('Deploy for feature') {
+      when {
+        expression { DEPLOY_TARGET == 'true' }
+        expression { TARGET_ENV ==~ /.*development.*/ }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh(returnStdout: false, script: '''
+          feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
+          sed -i "s/church-dashboard-v2:latest/church-dashboard-v2:$feature_name/g" k8s/01-church-dashboard-v2.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml
+          kubectl apply -k k8s
+        '''.stripIndent())
+      }
+    }
+
     stage('Deploy for development') {
       when {
         expression { DEPLOY_TARGET == 'true' }
         expression { TARGET_ENV ==~ /.*development.*/ }
+        expression { BRANCH_NAME == 'master' }
       }
       steps {
         sh 'sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml'
@@ -258,7 +318,7 @@ pipeline {
         expression { TARGET_ENV ==~ /.*testing.*/ }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
 
@@ -278,7 +338,7 @@ pipeline {
         expression { TARGET_ENV ==~ /.*production.*/ }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
 
