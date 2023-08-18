@@ -12,7 +12,7 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        sh (returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin command quasar
           rc=$?
@@ -70,7 +70,7 @@ pipeline {
         expression { TAG_PATCH == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -108,7 +108,7 @@ pipeline {
         expression { TAG_MINOR == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -138,7 +138,7 @@ pipeline {
         expression { TAG_MAJOR == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -169,7 +169,7 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
           git reset --hard
@@ -220,8 +220,14 @@ pipeline {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
-        sh 'docker push $DOCKER_REGISTRY/entropypool/church-dashboard-v2:latest'
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
+          set +e
+          docker images | grep church-dashboard-v2 | grep latest
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            docker push $DOCKER_REGISTRY/entropypool/church-dashboard-v2:latest
+          fi
           images=`docker images | grep entropypool | grep church-dashboard-v2 | grep none | awk '{ print $3 }'`
           for image in $images; do
             docker rmi $image -f
@@ -312,7 +318,7 @@ pipeline {
         expression { TARGET_ENV ==~ /.*testing.*/ }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
 
@@ -332,7 +338,7 @@ pipeline {
         expression { TARGET_ENV ==~ /.*production.*/ }
       }
       steps {
-        sh(returnStdout: true, script: '''
+        sh(returnStdout: false, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
 
