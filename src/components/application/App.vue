@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='appLoading'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as App)'
+    @row-click='(evt, row, index) => onRowClick(row as app.App)'
     :columns='columns'
   >
     <template #top-right>
@@ -37,8 +37,8 @@
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
         <q-input v-model.number='target.MaxTypedCouponsPerOrder' :label='$t("MSG_MAX_TYPED_COUPONS_PER_ORDER")' />
         <q-input v-model='commitButtonTargets' :label='$t("MSG_COMMIT_BUTTON_TARGETS")' />
-        <q-select :options='recaptchaMethods' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
-        <q-select :options='CreateInvitationCodeWhens' v-model='target.CreateInvitationCodeWhen' :label='$t("MSG_CREATE_INVITATION_CODE_WHEN")' />
+        <q-select :options='appuserbase.RecaptchaTypes' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
+        <q-select :options='appuserbase.CreateInvitationCodeWhens' v-model='target.CreateInvitationCodeWhen' :label='$t("MSG_CREATE_INVITATION_CODE_WHEN")' />
       </q-card-section>
       <q-card-section>
         <div>
@@ -63,37 +63,26 @@
 </template>
 
 <script setup lang='ts'>
-import {
-  useChurchAppStore,
-  NotifyType,
-  App,
-  useLocalUserStore,
-  RecaptchaType,
-  CreateInvitationCodeWhens
-} from 'npool-cli-v4'
-import { UpdateAppRequest } from 'npool-cli-v4/dist/store/church/appuser/app/types'
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { user, notify, app, appuserbase } from 'src/npoolstore'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const recaptchaMethods = ref([
-  RecaptchaType.GoogleRecaptchaV3
-])
-
-const app = useChurchAppStore()
-const apps = computed(() => app.Apps.Apps)
+const _app = app.useApplicationStore()
+const apps = computed(() => _app.Apps)
 const appLoading = ref(false)
 
-const logined = useLocalUserStore()
+const logined = user.useLocalUserStore()
 
-const target = ref({} as App)
+const target = ref({} as app.App)
 const showing = ref(false)
 const updating = ref(false)
 
-const onRowClick = (row: App) => {
+const onRowClick = (row: app.App) => {
   target.value = { ...row }
   commitButtonTargets.value = row.CommitButtonTargets?.join(',')
   showing.value = true
@@ -105,7 +94,7 @@ const onCreate = () => {
 }
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as App
+  target.value = {} as app.App
 }
 const onCancel = () => {
   onMenuHide()
@@ -116,7 +105,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const createApp = (done: () => void) => {
-  app.createApp({
+  _app.createApp({
     ...target.value,
     CreatedBy: logined.User?.ID,
     Message: {
@@ -124,10 +113,10 @@ const createApp = (done: () => void) => {
         Title: 'MSG_CREATE_APP',
         Message: 'MSG_CREATE_APP_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (app: App, error: boolean) => {
+  }, (app: app.App, error: boolean) => {
     done()
     if (error) {
       return
@@ -157,21 +146,21 @@ const updateApp = (done: () => void) => {
         Title: 'MSG_UPDATE_APP',
         Message: 'MSG_UPDATE_APP_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_APP',
         Message: 'MSG_UPDATE_APP_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  } as UpdateAppRequest
-  const origin = app.getAppByID(target.value.ID)
+  } as app.UpdateAppRequest
+  const origin = _app.getApp(target.value.ID)
   if (origin?.Name !== target.value.Name) { // don't send app name if not change
     request.Name = target.value.Name
   }
-  app.updateApp(request, (app: App, error: boolean) => {
+  _app.updateApp(request, (app: app.App, error: boolean) => {
     done()
     if (error) {
       return
@@ -185,55 +174,55 @@ const columns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: App) => row.ID
+    field: (row: app.App) => row.ID
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
     sortable: true,
-    field: (row: App) => row.Name
+    field: (row: app.App) => row.Name
   },
   {
     name: 'Description',
     label: t('MSG_DESCRIPTION'),
     sortable: true,
-    field: (row: App) => row.Description
+    field: (row: app.App) => row.Description
   },
   {
     name: 'InvitationCodeMust',
     label: t('MSG_INVITATIONCODEMUST'),
     sortable: true,
-    field: (row: App) => row.InvitationCodeMust
+    field: (row: app.App) => row.InvitationCodeMust
   },
   {
     name: 'KycEnable',
     label: t('MSG_KYC_ENABLE'),
     sortable: true,
-    field: (row: App) => row.KycEnable
+    field: (row: app.App) => row.KycEnable
   },
   {
     name: 'RecaptchaMethod',
     label: t('MSG_RECAPTCHA_METHOD'),
     sortable: true,
-    field: (row: App) => row.RecaptchaMethod
+    field: (row: app.App) => row.RecaptchaMethod
   },
   {
     name: 'SigninVerifyEnable',
     label: t('MSG_SIGNIN_VERIFY_ENABLE'),
     sortable: true,
-    field: (row: App) => row.SigninVerifyEnable
+    field: (row: app.App) => row.SigninVerifyEnable
   },
   {
     name: 'CreatedBy',
     label: t('MSG_CREATEDBY'),
     sortable: true,
-    field: (row: App) => row.CreatedBy
+    field: (row: app.App) => row.CreatedBy
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: App) => row.CreatedAt
+    field: (row: app.App) => row.CreatedAt
   }
 ])
 </script>

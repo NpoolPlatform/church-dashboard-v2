@@ -1,9 +1,9 @@
-import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
 import { AppID } from './app'
+import { user, notify } from 'src/npoolstore'
 
-const user = useChurchUserStore()
+const _user = user.useUserStore()
 export const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
+  _user.getAppUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -12,10 +12,10 @@ export const getAppUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_USERS',
         Message: 'MSG_GET_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<User>, error: boolean) => {
+  }, (resp: Array<user.User>, error: boolean) => {
     if (error || resp.length < limit) {
       return
     }
