@@ -52,15 +52,12 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType, UsedFor, validateEmailAddress } from 'npool-cli-v4'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
-
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 interface MyEmailTemplate {
   ID: string
@@ -76,7 +73,7 @@ interface MyEmailTemplate {
 
 const templates = useChurchEmailTemplateStore()
 const appEmails = computed(() => {
-  return templates.EmailTemplates.EmailTemplates.get(appID.value) ? templates.EmailTemplates.EmailTemplates.get(appID.value) as Array<EmailTemplate> : []
+  return templates.EmailTemplates.EmailTemplates.get(AppID.value) ? templates.EmailTemplates.EmailTemplates.get(AppID.value) as Array<EmailTemplate> : []
 })
 const emails = computed(() => Array.from(appEmails.value).map((el) => {
   return {
@@ -94,12 +91,12 @@ const emails = computed(() => Array.from(appEmails.value).map((el) => {
 const emailLoading = ref(false)
 
 const prepare = () => {
-  if (!templates.EmailTemplates.EmailTemplates.get(appID.value)) {
+  if (!templates.EmailTemplates.EmailTemplates.get(AppID.value)) {
     getAppEmailTemplates(0, 500)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -151,7 +148,7 @@ const onCancel = () => {
 
 const getAppEmailTemplates = (offset: number, limit: number) => {
   templates.getAppEmailTemplates({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -200,7 +197,7 @@ const createAppEmailTemplate = (done: () => void) => {
     return
   }
   templates.createAppEmailTemplate({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: myTarget.value.LangID,
     ...target.value,
     Message: {
@@ -247,7 +244,7 @@ const updateAppEmailTemplate = (done: () => void) => {
     return
   }
   templates.updateAppEmailTemplate({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: myTarget.value.LangID,
     ...target.value,
     Message: {

@@ -47,27 +47,24 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useChurchSMSTemplateStore, SMSTemplate, NotifyType, UsedFors } from 'npool-cli-v4'
 
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const templates = useChurchSMSTemplateStore()
-const smss = computed(() => templates.SMSTemplates.SMSTemplates.get(appID.value) ? templates.SMSTemplates.SMSTemplates.get(appID.value) : [])
+const smss = computed(() => templates.SMSTemplates.SMSTemplates.get(AppID.value) ? templates.SMSTemplates.SMSTemplates.get(AppID.value) : [])
 const smsLoading = ref(false)
 
 const prepare = () => {
-  if (!templates.SMSTemplates.SMSTemplates.get(appID.value)) {
+  if (!templates.SMSTemplates.SMSTemplates.get(AppID.value)) {
     getAppSMSTemplates(0, 500)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -106,7 +103,7 @@ const onSubmit = (done: () => void) => {
 
 const getAppSMSTemplates = (offset: number, limit: number) => {
   templates.getAppSMSTemplates({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -128,7 +125,7 @@ const getAppSMSTemplates = (offset: number, limit: number) => {
 
 const createAppSMSTemplate = (done: () => void) => {
   templates.createAppSMSTemplate({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: target.value.LangID,
     ...target.value,
     NotifyMessage: {
@@ -149,7 +146,7 @@ const createAppSMSTemplate = (done: () => void) => {
 
 const updateAppSMSTemplate = (done: () => void) => {
   templates.updateAppSMSTemplate({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: target.value.LangID,
     ...target.value,
     NotifyMessage: {

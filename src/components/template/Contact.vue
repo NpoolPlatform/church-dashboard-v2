@@ -46,26 +46,23 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useChurchContactStore, Contact, NotifyType, UsedFors, SignMethodTypes } from 'npool-cli-v4'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const templates = useChurchContactStore()
-const contacts = computed(() => templates.Contacts.Contacts.get(appID.value) ? templates.Contacts.Contacts.get(appID.value) : [])
+const contacts = computed(() => templates.Contacts.Contacts.get(AppID.value) ? templates.Contacts.Contacts.get(AppID.value) : [])
 const contactsLoading = ref(false)
 
 const prepare = () => {
-  if (!templates.Contacts.Contacts.get(appID.value)) {
+  if (!templates.Contacts.Contacts.get(AppID.value)) {
     getAppContacts(0, 500)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -104,7 +101,7 @@ const onCancel = () => {
 
 const getAppContacts = (offset: number, limit: number) => {
   templates.getAppContacts({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -126,7 +123,7 @@ const getAppContacts = (offset: number, limit: number) => {
 
 const updateAppContact = (done: () => void) => {
   templates.updateAppContact({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     Message: {
       Error: {
@@ -146,7 +143,7 @@ const updateAppContact = (done: () => void) => {
 
 const createAppContact = (done: () => void) => {
   templates.createAppContact({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     Message: {
       Error: {

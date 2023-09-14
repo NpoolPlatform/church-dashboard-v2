@@ -49,9 +49,9 @@
 import { AppGood, NotifyType, useChurchAppGoodStore, useChurchOrderStore, useChurchUserStore, User, Order, OrderType, useChurchAppCoinStore } from 'npool-cli-v4'
 import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
-import { useLocalApplicationStore } from 'src/localstore'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { AppID } from 'src/api/app'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -59,11 +59,8 @@ const { t } = useI18n({ useScope: 'global' })
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const good = useChurchAppGoodStore()
-const appGoods = computed(() => good.getGoodsByAppID(appID.value))
+const appGoods = computed(() => good.getGoodsByAppID(AppID.value))
 
 interface MyGood {
   label: string
@@ -82,7 +79,7 @@ interface MyUser {
 }
 
 const user = useChurchUserStore()
-const users = computed(() => Array.from(user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : []).map((el) => {
+const users = computed(() => Array.from(user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : []).map((el) => {
   return {
     label: el.EmailAddress?.length ? el.EmailAddress : el.PhoneNO,
     value: el
@@ -140,7 +137,7 @@ const onSubmit = (done: () => void) => {
   }
 
   order.createAppUserOrder({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.ID,
     GoodID: selectedGood.value.value.GoodID,
     Units: `${units.value}`,
@@ -164,7 +161,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.getCoinsByAppID(appID.value))
+const coins = computed(() => coin.getCoinsByAppID(AppID.value))
 
 const payCoinID = computed(() => {
   const index = coins.value.findIndex((el) => {
@@ -182,7 +179,7 @@ const prepare = () => {
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -190,7 +187,7 @@ onMounted(() => {
   prepare()
 })
 
-watch(appID, () => {
+watch(AppID, () => {
   if (coins.value?.length === 0) {
     getAppCoins(0, 500)
   }

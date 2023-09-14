@@ -98,18 +98,15 @@ import { PriceCoinName } from 'npool-cli-v2'
 import { OrderState, useChurchAppGoodStore, useChurchOrderStore, OrderTypes, Order, NotifyType, formatTime, CancelMode } from 'npool-cli-v4'
 import { getAppGoods } from 'src/api/good'
 import { getNAppOrders } from 'src/api/order'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const good = useChurchAppGoodStore()
-const goods = computed(() => good.getGoodsByAppID(appID.value))
+const goods = computed(() => good.getGoodsByAppID(AppID.value))
 const getTargetAppGood = computed(() => (goodID: string) => goods.value?.find((el) => el.GoodID === goodID))
 
 const goodID = ref('')
@@ -118,7 +115,7 @@ const end = ref('')
 const selectedOrderType = ref('ALL')
 
 const order = useChurchOrderStore()
-const orders = computed(() => order.getOrdersByAppID(appID.value))
+const orders = computed(() => order.getOrdersByAppID(AppID.value))
 const displayOrders = computed(() => orders.value.filter((el) => {
   let display = el.GoodID.includes(goodID.value)
   if (start.value.length) {
@@ -181,7 +178,7 @@ const onCancel = () => {
 const cancelOrder = () => {
   orderInfoDialog.value = false
   order.updateAppUserOrder({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ID: currentOrder.value.ID,
     TargetUserID: currentOrder.value.UserID,
     PaymentID: currentOrder.value.PaymentID,
@@ -199,7 +196,7 @@ const cancelOrder = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

@@ -56,7 +56,7 @@
 
 <script setup lang='ts'>
 import { NotifyType, useChurchAppLangStore, AppLang } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
@@ -64,7 +64,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const LanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/LanguagePicker.vue'))
 
 const lang = useChurchAppLangStore()
-const langs = computed(() => lang.getAppLangsByAppID(appID.value))
+const langs = computed(() => lang.getAppLangsByAppID(AppID.value))
 
 const selectedAppLangs = ref([] as Array<AppLang>)
 const target = ref({} as AppLang)
@@ -89,7 +89,7 @@ const onCancel = () => {
 
 const onAuthorize = (done: () => void) => {
   lang.createAppLang({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: target.value?.LangID,
     Main: target.value?.Main,
     Message: {
@@ -141,7 +141,7 @@ const onDelete = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   if (langs.value.length === 0) {
     getAppLangs(0, 100)
   }

@@ -71,7 +71,7 @@
 
 <script setup lang='ts'>
 import { useChurchAppCoinStore, NotifyType, AppCoin } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { getAppCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -83,7 +83,7 @@ const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPi
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.getCoinsByAppID(appID.value))
+const coins = computed(() => coin.getCoinsByAppID(AppID.value))
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -143,7 +143,7 @@ const updateAppCoin = (done: () => void) => {
 
 const createAppCoin = (done: () => void) => {
   coin.createAppCoin({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     Message: {
       Error: {
@@ -192,7 +192,7 @@ watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
   }
 })
 
-watch(appID, () => {
+watch(AppID, () => {
   if (coins.value?.length === 0) {
     getAppCoins(0, 500)
   }

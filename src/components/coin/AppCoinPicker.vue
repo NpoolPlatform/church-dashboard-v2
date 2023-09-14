@@ -22,7 +22,7 @@
 </template>
 <script setup lang='ts'>
 import { useChurchAppCoinStore } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { getAppCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
@@ -37,7 +37,7 @@ const updating = toRef(props, 'updating')
 const target = ref(id.value)
 
 const coin = useChurchAppCoinStore()
-const coins = computed(() => Array.from(coin.getCoinsByAppID(appID.value).filter((el) => !el.Disabled)).map((el) => {
+const coins = computed(() => Array.from(coin.getCoinsByAppID(AppID.value).filter((el) => !el.Disabled)).map((el) => {
   return {
     value: el.CoinTypeID,
     label: `${el.Name} | ${el.CoinTypeID}`
@@ -59,13 +59,13 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (coin.getCoinsByAppID(appID.value).length === 0) {
+  if (coin.getCoinsByAppID(AppID.value).length === 0) {
     getAppCoins(0, 500)
   }
 })
 
-watch(appID, () => {
-  if (coin.getCoinsByAppID(appID.value).length === 0) {
+watch(AppID, () => {
+  if (coin.getCoinsByAppID(AppID.value).length === 0) {
     getAppCoins(0, 500)
   }
 })

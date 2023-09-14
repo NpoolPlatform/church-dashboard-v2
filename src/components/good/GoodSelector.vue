@@ -22,7 +22,7 @@
 <script setup lang='ts'>
 import { useChurchGoodStore } from 'npool-cli-v4'
 import { getGoods } from 'src/api/good'
-import { useLocalApplicationStore } from 'src/localstore/application'
+import { AppID } from 'src/api/app'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {
@@ -55,10 +55,7 @@ const onUpdate = () => {
   emit('update:id', target.value)
 }
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

@@ -1,11 +1,11 @@
 import { Account, NotifyType, useChurchUserAccountStore, useChurchPlatformAccountStore, PlatformAccount, useChurchPaymentAccountStore, useChurchGoodBenefitAccountStore, PaymentAccount, GoodBenefitAccount } from 'npool-cli-v4'
-import { appID } from './app'
+import { AppID } from './app'
 
 const account = useChurchUserAccountStore()
 
 export const getNAppUserAccounts = (offset: number, limit: number) => {
   account.getNAppUserAccounts({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -26,7 +26,7 @@ export const getNAppUserAccounts = (offset: number, limit: number) => {
 
 export const getAppDepositAccounts = (offset: number, limit: number) => {
   account.getAppDepositAccounts({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {}

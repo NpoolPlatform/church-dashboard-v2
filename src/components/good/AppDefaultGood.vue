@@ -47,7 +47,7 @@
 import { AppDefaultGood, formatTime, NotifyType, useChurchAppDefaultGoodStore } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -57,7 +57,7 @@ const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPi
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 
 const appDefaultGood = useChurchAppDefaultGoodStore()
-const appDefaultGoods = computed(() => appDefaultGood.getGoodsByAppID(appID.value))
+const appDefaultGoods = computed(() => appDefaultGood.getGoodsByAppID(AppID.value))
 
 const target = ref({} as AppDefaultGood)
 const showing = ref(false)
@@ -89,7 +89,7 @@ const onSubmit = (done: () => void) => {
 
 const createAppDefaultGood = (done: () => void) => {
   appDefaultGood.createAppDefaultGood({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     Message: {
       Error: {
@@ -142,7 +142,7 @@ const updateAppDefaultGood = (done: () => void) => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -158,7 +158,7 @@ const prepare = () => {
 
 const getAppDefaultGoods = (offset: number, limit: number) => {
   appDefaultGood.getAppDefaultGoods({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

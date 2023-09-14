@@ -133,7 +133,7 @@
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useChurchMessageStore, formatTime, NotifyType, Message, useLocaleStore, MessageReq } from 'npool-cli-v4'
 import { getAppMessages } from 'src/api/g11n'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 
 import saveAs from 'file-saver'
 
@@ -141,7 +141,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
 const message = useChurchMessageStore()
-const messages = computed(() => message.getMessagesByAppID(appID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
+const messages = computed(() => message.getMessagesByAppID(AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
 
 const messageID = ref('')
 const displayAppMsgs = computed(() => messages.value.filter((msg) => msg.MessageID?.toLowerCase().includes(messageID.value?.toLowerCase()) || msg.Message?.toLowerCase()?.includes(messageID.value?.toLowerCase())))
@@ -199,7 +199,7 @@ const onSubmit = (done: () => void) => {
 
 const createAppMessage = (done: () => void) => {
   message.createAppMessage({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: targetLangID.value,
     ...target.value,
     NotifyMessage: {
@@ -228,7 +228,7 @@ const createAppMessage = (done: () => void) => {
 const updateTarget = computed(() => {
   return {
     ID: target?.value?.ID,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: target?.value.LangID,
     Lang: target?.value?.Lang,
     MessageID: target?.value?.MessageID,
@@ -266,7 +266,7 @@ const updateAppMessage = (done: () => void) => {
 const onDelete = () => {
   message.deleteAppMessage({
     ID: exportMessages?.value[0].ID,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     NotifyMessage: {
       Error: {
         Title: 'MSG_DELETE_MESSAGE',
@@ -305,7 +305,7 @@ const uploadFile = (evt: Event) => {
 const importMessages = computed(() => {
   return Array.from(selectedMessages.value).map((el) => {
     return {
-      AppID: appID.value,
+      AppID: AppID.value,
       MessageID: el.MessageID,
       Message: el.Message,
       GetIndex: el.GetIndex,
@@ -330,7 +330,7 @@ const onBatchCancel = () => {
 
 const onBatchSubmit = (done: () => void) => {
   message.createAppMessages({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: langID.value,
     Infos: importMessages.value,
     Message: {
@@ -362,7 +362,7 @@ const prepare = () => {
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

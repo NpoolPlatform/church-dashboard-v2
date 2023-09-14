@@ -137,7 +137,7 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime, SettleTypes, CancelModes, CancelMode } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -150,9 +150,6 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const AppDefaultGood = defineAsyncComponent(() => import('src/components/good/AppDefaultGood.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const good = useChurchGoodStore()
 const goods = computed(() => good.Goods.Goods)
 const selectedGood = ref([] as Array<Good>)
@@ -164,7 +161,7 @@ const displayGoods = computed(() => {
 })
 
 const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
+const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
 
 const target = ref({} as AppGood)
 const showing = ref(false)
@@ -196,7 +193,7 @@ const onSubmit = (done: () => void) => {
 
 const createAppGood = (done: () => void) => {
   appGood.createAppGood({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     GoodID: selectedGood.value[0].ID,
     GoodName: selectedGood.value[0].Title,
@@ -275,7 +272,7 @@ const updateAppGood = (done: () => void) => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

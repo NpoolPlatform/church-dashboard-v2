@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { useChurchAppGoodStore, AppGood, Recommend, NotifyType, useLocalUserStore, useChurchRecommendStore, formatTime } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -70,15 +70,12 @@ const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
+const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
 const selectedGood = ref([] as Array<AppGood>)
 
 const recommend = useChurchRecommendStore()
-const recommends = computed(() => recommend.getRecommendsByAppID(appID.value))
+const recommends = computed(() => recommend.getRecommendsByAppID(AppID.value))
 
 const logined = useLocalUserStore()
 const target = ref({
@@ -117,7 +114,7 @@ const onSubmit = (done: () => void) => {
 
 const createAppRecommend = (done: () => void) => {
   recommend.createAppRecommend({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -144,7 +141,7 @@ const createAppRecommend = (done: () => void) => {
 
 const updateAppRecommend = (done: () => void) => {
   recommend.updateAppRecommend({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ID: target.value.ID,
     Message: target.value.Message,
     RecommendIndex: target.value.RecommendIndex,
@@ -171,7 +168,7 @@ const updateAppRecommend = (done: () => void) => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

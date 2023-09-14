@@ -76,23 +76,20 @@
 <script setup lang='ts'>
 import { AppRoleUser, formatTime, NotifyType, Role, useChurchRoleStore, useChurchUserStore, User } from 'npool-cli-v4'
 import { DeleteAppRoleUserRequest } from 'npool-cli-v4/dist/store/church/appuser/role/types'
-
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const role = useChurchRoleStore()
-const roles = computed(() => role.Roles.get(appID.value) ? role.Roles.get(appID.value) : [])
+const roles = computed(() => role.Roles.get(AppID.value) ? role.Roles.get(AppID.value) : [])
 const roleLoading = ref(false)
 const selectedRole = ref([] as Array<Role>)
 
 const user = useChurchUserStore()
-const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
+const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
 const userLoading = ref(false)
 const selectedUser = ref([] as Array<User>)
 
@@ -107,7 +104,7 @@ const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAd
 
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -129,7 +126,7 @@ const getAppUsers = (offset: number, limit: number) => {
 
 const getAppRoles = (offset: number, limit: number) => {
   role.getAppRoles({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -149,23 +146,23 @@ const getAppRoles = (offset: number, limit: number) => {
   })
 }
 const prepare = () => {
-  if (!role.Roles.get(appID.value)) {
+  if (!role.Roles.get(AppID.value)) {
     roleLoading.value = true
     getAppRoles(0, 100)
   }
-  if (!user.Users.get(appID.value)) {
+  if (!user.Users.get(AppID.value)) {
     userLoading.value = true
     getAppUsers(0, 500)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
 const getAppRoleUsers = (offset: number, limit: number) => {
   role.getAppRoleUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     RoleID: selectedRole.value[0]?.ID,
@@ -200,7 +197,7 @@ const onAddRoleUser = () => {
     return
   }
   role.createAppRoleUser({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetUserID: selectedUser.value[0].ID,
     RoleID: selectedRole.value[0].ID,
     Message: {
@@ -228,7 +225,7 @@ const onDeleteRoleUser = () => {
 
   const req = {
     ID: roleUsers.value?.[index].ID as string,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetUserID: roleUsers.value?.[index].UserID as string,
     Message: {
       Error: {

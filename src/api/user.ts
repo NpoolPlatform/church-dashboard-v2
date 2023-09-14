@@ -1,10 +1,10 @@
 import { NotifyType, useChurchUserStore, User } from 'npool-cli-v4'
-import { appID } from './app'
+import { AppID } from './app'
 
 const user = useChurchUserStore()
 export const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

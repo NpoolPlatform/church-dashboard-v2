@@ -24,7 +24,7 @@
 
 <script setup lang='ts'>
 import { formatTime, NotifyType, useChurchNotifChannelStore, TNotifChannel as NotifChannel } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -32,9 +32,9 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const channel = useChurchNotifChannelStore()
-const channels = computed(() => channel.getNotifChannelByAppID(appID.value))
+const channels = computed(() => channel.getNotifChannelByAppID(AppID.value))
 
-watch(appID, () => {
+watch(AppID, () => {
   if (channels.value?.length === 0) {
     getAppNotifChannels(0, 100)
   }
@@ -48,7 +48,7 @@ onMounted(() => {
 
 const getAppNotifChannels = (offset: number, limit: number) => {
   channel.getAppNotifChannels({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

@@ -89,15 +89,12 @@
 import { ExpandAPI } from 'npool-cli-v2'
 import { useChurchAuthingStore, NotifyType, Auth, formatTime } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { useChurchAPIStore } from 'src/teststore/apis'
 import { API } from 'src/teststore/apis/types'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const api = useChurchAPIStore()
 const apis = computed(() => api.APIs.APIs)
@@ -106,14 +103,14 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = useChurchAuthingStore()
-const auths = computed(() => auth.Auths.get(appID.value) ? auth.Auths.get(appID.value) : [])
+const auths = computed(() => auth.Auths.get(AppID.value) ? auth.Auths.get(AppID.value) : [])
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<Auth>)
 
 const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -138,7 +135,7 @@ const prepare = () => {
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -197,7 +194,7 @@ const onSubmit = (done: () => void) => {
 
 const onCreateAuthClick = (row: ExpandAPI) => {
   auth.createAppAuth({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Resource: row.Path,
     Method: row.Method,
     Message: {
@@ -225,7 +222,7 @@ const onDeleteAuthClick = () => {
   }
 
   auth.deleteAppAuth({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ID: selectedAuth.value[0].ID,
     Message: {
       Error: {

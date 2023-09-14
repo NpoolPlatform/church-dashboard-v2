@@ -48,7 +48,7 @@
 
 <script setup lang='ts'>
 import { useChurchAppCoinDescriptionStore, CoinDescription, NotifyType, CoinDescriptionUsedFors } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { getAppCoinDescriptions } from 'src/api/coin'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 
@@ -56,7 +56,7 @@ const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPi
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const description = useChurchAppCoinDescriptionStore()
-const descriptions = computed(() => description.getCoinsByAppID(appID.value))
+const descriptions = computed(() => description.getCoinsByAppID(AppID.value))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -118,7 +118,7 @@ const onSubmit = (done: () => void) => {
 
 const createCoinDescription = (done: () => void) => {
   description.createAppCoinDescription({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -137,7 +137,7 @@ const createCoinDescription = (done: () => void) => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

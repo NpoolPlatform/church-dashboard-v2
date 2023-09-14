@@ -46,18 +46,16 @@
 <script setup lang='ts'>
 import { useChurchMailboxStore, NotificationType, Mail, useChurchUsersStore, AppUser, UserInfo } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
-import { useLocalApplicationStore } from '../../localstore'
+import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const user = useChurchUsersStore()
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const mailbox = useChurchMailboxStore()
-const mails = computed(() => mailbox.Mails.get(appID.value) ? mailbox.Mails.get(appID.value) : [])
+const mails = computed(() => mailbox.Mails.get(AppID.value) ? mailbox.Mails.get(AppID.value) : [])
 const mailLoading = ref(true)
 
 interface MyUser {
@@ -65,7 +63,7 @@ interface MyUser {
   value: AppUser
 }
 
-const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<UserInfo> : [])
+const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<UserInfo> : [])
 const users = computed(() => Array.from(appUsers.value).map((el) => {
   return {
     label: el.User.EmailAddress?.length ? el.User.EmailAddress : el.User.PhoneNO,
@@ -78,7 +76,7 @@ const selectedToUser = ref(undefined as unknown as MyUser)
 const prepare = () => {
   mailLoading.value = true
   mailbox.getMails({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_MAILS'),
@@ -92,7 +90,7 @@ const prepare = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -122,7 +120,7 @@ const onSubmit = () => {
   showing.value = false
 
   mailbox.createMail({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetUserID: target.value.FromUserID,
     Info: target.value,
     Message: {

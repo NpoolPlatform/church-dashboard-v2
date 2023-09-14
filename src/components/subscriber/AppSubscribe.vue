@@ -50,28 +50,24 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalApplicationStore } from 'src/localstore'
 import { computed, onMounted, watch, ref } from 'vue'
-import { useAppSubscribeStore } from 'src/teststore/appsubscribe'
 import { App, NotifyType, useChurchAppStore } from 'npool-cli-v4'
-import { AppSubscribe } from 'src/teststore/appsubscribe/types'
+import { appsubscribe } from 'src/npoolstore'
+import { AppID } from 'src/api/app'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
-const appSubscribe = useAppSubscribeStore()
-const appSubscribes = computed(() => appSubscribe.AppSubscribes.get(appID.value) ? appSubscribe.AppSubscribes.get(appID.value) : [])
+const appSubscribe = appsubscribe.useAppSubscribeStore()
+const appSubscribes = computed(() => appSubscribe.AppSubscribes.get(AppID.value) ? appSubscribe.AppSubscribes.get(AppID.value) : [])
 
 const _app = useChurchAppStore()
 const apps = computed(() => _app.Apps.Apps)
 
 const targetApp = ref(undefined as unknown as App)
 const subscribeApp = ref(undefined as unknown as App)
-const selectedAppSubscribe = ref([] as Array<AppSubscribe>)
+const selectedAppSubscribe = ref([] as Array<appsubscribe.AppSubscribe>)
 
 const prepare = () => {
   appSubscribe.getAppSubscribes({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: 0,
     Limit: 100,
     Message: {
@@ -87,7 +83,7 @@ const prepare = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

@@ -45,23 +45,21 @@
 
 <script setup lang='ts'>
 import { NotifyType, useChurchUserStore, User, formatTime, encryptPassword } from 'npool-cli-v4'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const user = useChurchUserStore()
-const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
+const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
 const userLoading = ref(false)
 const password = ref('')
 
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -88,7 +86,7 @@ const prepare = () => {
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -140,13 +138,13 @@ const onCreate = () => {
 }
 
 const target = ref({
-  TargetAppID: appID
+  TargetAppID: AppID
 } as unknown as User)
 
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    TargetAppID: appID
+    TargetAppID: AppID
   } as unknown as User
 }
 
@@ -158,7 +156,7 @@ const onSubmit = () => {
   showing.value = false
 
   user.createAppUser({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     EmailAddress: target.value.EmailAddress,
     PhoneNO: target.value.PhoneNO,
     PasswordHash: encryptPassword(password.value),

@@ -24,7 +24,7 @@
 
 <script setup lang='ts'>
 import { formatTime, InvitationCode, useChurchInvitationCodeStore } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -32,14 +32,14 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const code = useChurchInvitationCodeStore()
-const codes = computed(() => code.getInvitationCodesByAppID(appID.value))
+const codes = computed(() => code.getInvitationCodesByAppID(AppID.value))
 
 const _code = ref('')
 const displayCodes = computed(() => codes.value.filter((el) => {
   return el.EmailAddress?.includes(_code.value) || el.InvitationCode?.includes(_code.value) || el.PhoneNO?.includes(_code.value)
 }))
 
-watch(appID, () => {
+watch(AppID, () => {
   if (codes.value.length === 0) {
     getAppInvitationCodes(0, 500)
   }
@@ -53,7 +53,7 @@ onMounted(() => {
 
 const getAppInvitationCodes = (offset: number, limit: number) => {
   code.getAppInvitationCodes({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {}

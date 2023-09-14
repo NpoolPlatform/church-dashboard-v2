@@ -1,10 +1,10 @@
 import { NotifyType, useChurchLedgerWithdrawStore, Withdraw } from 'npool-cli-v4'
-import { appID } from './app'
+import { AppID } from './app'
 
 const withdraw = useChurchLedgerWithdrawStore()
 export const getAppWithdraws = (offset: number, limit: number) => {
   withdraw.getAppWithdraws({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

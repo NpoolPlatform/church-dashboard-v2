@@ -47,19 +47,16 @@
 <script setup lang='ts'>
 import { NotificationType, Activity, useChurchActivityStore, useAdminActivityStore, formatTime } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref } from 'vue'
-import { useLocalApplicationStore } from '../../localstore'
+import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import { useLocalUserStore } from 'npool-cli-v4'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const activity = useChurchActivityStore()
 const aactivity = useAdminActivityStore()
-const activities = computed(() => activity.Activities.get(appID.value) ? activity.Activities.get(appID.value) : [])
+const activities = computed(() => activity.Activities.get(AppID.value) ? activity.Activities.get(AppID.value) : [])
 const loading = ref(true)
 
 const logined = useLocalUserStore()
@@ -67,7 +64,7 @@ const logined = useLocalUserStore()
 const prepare = () => {
   loading.value = true
   activity.getActivities({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_ACTIVITIES'),
@@ -81,7 +78,7 @@ const prepare = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -144,7 +141,7 @@ const onSubmit = () => {
   }
 
   activity.createActivity({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Info: target.value,
     Message: {
       Error: {

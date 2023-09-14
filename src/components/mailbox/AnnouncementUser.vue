@@ -23,7 +23,7 @@
 
 <script setup lang='ts'>
 import { formatTime, NotifyType, AnnouncementUser, useChurchAnnouncementUserStore } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -31,12 +31,12 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n({ useScope: 'global' })
 
 const announcementUser = useChurchAnnouncementUserStore()
-const announcementUsers = computed(() => announcementUser.getAnnouncementUserByAppID(appID.value))
+const announcementUsers = computed(() => announcementUser.getAnnouncementUserByAppID(AppID.value))
 
 const username = ref('')
-const displayAnnouncementUsers = computed(() => announcementUser.getAnnouncementUsersByID(appID.value, username.value?.toLowerCase()))
+const displayAnnouncementUsers = computed(() => announcementUser.getAnnouncementUsersByID(AppID.value, username.value?.toLowerCase()))
 
-watch(appID, () => {
+watch(AppID, () => {
   if (announcementUsers.value?.length === 0) {
     getAppAnnouncementUsers(0, 100)
   }
@@ -50,7 +50,7 @@ onMounted(() => {
 
 const getAppAnnouncementUsers = (offset: number, limit: number) => {
   announcementUser.getAppAnnouncementUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

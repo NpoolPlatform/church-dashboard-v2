@@ -12,7 +12,7 @@
 
 <script setup lang='ts'>
 import { getAppWithdraws } from 'src/api/ledger'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, watch } from 'vue'
 import { formatTime, useChurchLedgerWithdrawStore, Withdraw } from 'npool-cli-v4'
 import { useI18n } from 'vue-i18n'
@@ -20,17 +20,14 @@ import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const withdraw = useChurchLedgerWithdrawStore()
-const withdraws = computed(() => withdraw.getWithdrawsByAppID(appID.value))
+const withdraws = computed(() => withdraw.getWithdrawsByAppID(AppID.value))
 
 const prepare = () => {
   getAppWithdraws(0, 500)
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

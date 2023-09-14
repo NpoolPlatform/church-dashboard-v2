@@ -23,7 +23,7 @@
         <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ target?.PhoneNO }}</q-item-label>
       </q-card-section>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.getCoinByID(appID, target.CoinTypeID)?.Name }}</q-item-label>
+        <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.getCoinByID(AppID, target.CoinTypeID)?.Name }}</q-item-label>
         <q-item-label>{{ $t('MSG_AMOUNT') }}: {{ target?.Amount }}</q-item-label>
         <q-item-label>{{ $t('MSG_MESSAGE') }}: {{ target?.Trigger }}</q-item-label>
         <q-item-label>{{ $t('MSG_MESSAGE') }}: {{ target?.State }}</q-item-label>
@@ -52,7 +52,7 @@ import {
   formatTime
 } from 'npool-cli-v4'
 import { getAppCoins } from 'src/api/coin'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -61,18 +61,15 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.getCoinsByAppID(appID.value))
+const coins = computed(() => coin.getCoinsByAppID(AppID.value))
 
 const review = useChurchWithdrawReviewStore()
 const locale = useLocaleStore()
 const logined = useLocalUserStore()
 
 const displayReviews = computed(() => {
-  return review.WithdrawReviews.WithdrawReviews.get(appID.value) ? review.WithdrawReviews.WithdrawReviews.get(appID.value) : []
+  return review.WithdrawReviews.WithdrawReviews.get(AppID.value) ? review.WithdrawReviews.WithdrawReviews.get(AppID.value) : []
 })
 
 const showing = ref(false)
@@ -112,7 +109,7 @@ const getAppWithdrawReviews = (offset: number, limit: number) => {
   review.getAppWithdrawReviews({
     Offset: offset,
     Limit: limit,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: t('MSG_GET_WITHDRAW_REVIEWS'),
@@ -131,7 +128,7 @@ const getAppWithdrawReviews = (offset: number, limit: number) => {
 
 const updateAppWithdrawReview = (done: () => void) => {
   review.updateAppWithdrawReview({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     AppID: undefined as unknown as string,
     ReviewID: target.value.ReviewID,
     LangID: locale.AppLang?.LangID,
@@ -159,12 +156,12 @@ onMounted(() => {
   prepare()
 })
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
 const prepare = () => {
-  if (!review.WithdrawReviews.WithdrawReviews.get(appID.value)) {
+  if (!review.WithdrawReviews.WithdrawReviews.get(AppID.value)) {
     getAppWithdrawReviews(0, 500)
   }
 

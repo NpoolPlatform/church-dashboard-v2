@@ -45,22 +45,19 @@
 
 <script setup lang='ts'>
 import { NotifyType, Role, useAdminRoleStore, useChurchRoleStore, useLocalUserStore } from 'npool-cli-v4'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
-
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const arole = useAdminRoleStore()
 const role = useChurchRoleStore()
-const roles = computed(() => !role.Roles.get(appID.value) ? [] : role.Roles.get(appID.value))
+const roles = computed(() => !role.Roles.get(AppID.value) ? [] : role.Roles.get(AppID.value))
 const roleLoading = ref(false)
 
 const logined = useLocalUserStore()
 
 const getAppRoles = (offset: number, limit: number) => {
   role.getAppRoles({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -81,13 +78,13 @@ const getAppRoles = (offset: number, limit: number) => {
 }
 
 const prepare = () => {
-  if (!role.Roles.get(appID.value)) {
+  if (!role.Roles.get(AppID.value)) {
     roleLoading.value = true
     getAppRoles(0, 100)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -98,7 +95,7 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({
-  AppID: appID,
+  AppID: AppID,
   CreatedBy: logined.User?.ID
 } as unknown as Role)
 
@@ -128,7 +125,7 @@ const onSubmit = () => {
   }
 
   role.createAppRole({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     RoleName: target.value.Role,
     Default: target.value.Default,
     Description: target.value.Description,
@@ -154,7 +151,7 @@ const onRowClick = (role: Role) => {
 const onMenuHide = () => {
   showing.value = false
   target.value = {
-    AppID: appID,
+    AppID: AppID,
     CreatedBy: logined.User?.ID
   } as unknown as Role
 }

@@ -1,5 +1,5 @@
 import { AppGood, DeviceInfo, Good, NotifyType, Promotion, Recommend, useChurchAppGoodStore, useChurchDeviceInfoStore, useChurchGoodStore, useChurchPromotionStore, useChurchRecommendStore } from 'npool-cli-v4'
-import { appID } from './app'
+import { AppID } from './app'
 
 const good = useChurchGoodStore()
 
@@ -28,7 +28,7 @@ export const getAppGoods = (offset: number, limit: number) => {
   appGood.getAppGoods({
     Offset: offset,
     Limit: limit,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_GOODS',
@@ -50,7 +50,7 @@ export const getAppPromotions = (offset: number, limit: number) => {
   promotion.getAppPromotions({
     Offset: offset,
     Limit: limit,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_GOOD_PROMOTIONS',
@@ -72,7 +72,7 @@ export const getAppRecommends = (offset: number, limit: number) => {
   recommend.getAppRecommends({
     Offset: offset,
     Limit: limit,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_GOOD_RECOMMENDS',

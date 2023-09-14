@@ -57,7 +57,7 @@
 <script setup lang='ts'>
 import { formatTime } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
-import { useLocalApplicationStore } from '../../localstore'
+import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
 import { useCouponStore, CouponType, Coupon, CouponTypes, CouponConstraints } from 'src/teststore/inspire/coupon'
@@ -76,11 +76,8 @@ const route = useRoute()
 const query = computed(() => route.query as unknown as Query)
 const couponType = computed(() => query.value.couponType)
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const coupon = useCouponStore()
-const coupons = computed(() => coupon.coupons(appID.value, couponType.value))
+const coupons = computed(() => coupon.coupons(AppID.value, couponType.value))
 const loading = ref(true)
 
 const logined = useLocalUserStore()
@@ -92,7 +89,7 @@ const prepare = () => {
   }
   loading.value = true
   coupon.getAppCoupons({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     CouponType: couponType.value,
     Offset: 0,
     Limit: 100,
@@ -109,7 +106,7 @@ const prepare = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -162,7 +159,7 @@ const onSubmit = () => {
   if (updating.value) {
     coupon.updateCoupon({
       ID: target.value.ID,
-      TargetAppID: appID.value,
+      TargetAppID: AppID.value,
       Denomination: target.value.Denomination,
       Circulation: target.value.Circulation,
       StartAt: target.value.StartAt,
@@ -194,7 +191,7 @@ const onSubmit = () => {
   }
 
   coupon.createCoupon({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     CouponType: couponType.value,
     Denomination: target.value.Denomination,
     Circulation: target.value.Circulation,

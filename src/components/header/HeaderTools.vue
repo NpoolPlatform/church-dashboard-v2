@@ -12,12 +12,12 @@
       <q-list>
         <q-item
           dense
-          v-for='app in applications'
-          :key='app.ID'
+          v-for='_app in applications.values()'
+          :key='_app.ID'
           clickable
-          @click='onAppSelected(app)'
+          @click='onAppSelected(_app)'
         >
-          {{ app.Name }}
+          {{ _app.Name }}
         </q-item>
       </q-list>
     </q-btn-dropdown>
@@ -32,8 +32,9 @@
 <script setup lang='ts'>
 import { useMailboxStore } from 'npool-cli-v2'
 import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
-import { useLocalApplicationStore } from 'src/localstore'
-import { App, useChurchAppStore, useLocalUserStore, NotifyType } from 'npool-cli-v4'
+import { AppID } from 'src/api/app'
+import { App, useLocalUserStore, NotifyType } from 'npool-cli-v4'
+import { app } from 'src/npoolstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
 import bellMsg from '../../assets/bell-msg.svg'
@@ -48,14 +49,13 @@ const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/Lang
 const loginedUser = useLocalUserStore()
 const logined = computed(() => loginedUser.logined)
 
-const application = useChurchAppStore()
-const localapplication = useLocalApplicationStore()
+const application = app.useApplicationStore()
 
-const applications = computed(() => application.Apps.Apps)
+const applications = computed(() => application.Apps)
 const selectedApp = computed({
-  get: () => applications.value.find((el) => el.ID === localapplication.AppID) as App,
+  get: () => application.getApp(AppID.value) as App,
   set: (val: App) => {
-    localapplication.AppID = val.ID
+    application.AppID = val.ID
   }
 })
 
@@ -70,7 +70,7 @@ watch(logined, () => {
   if (!logined.value) {
     return
   }
-  if (application.Apps.Apps.length === 0) {
+  if (applications.value.size === 0) {
     getApps(0, 500)
   }
 })
@@ -79,7 +79,7 @@ onMounted(() => {
   if (!logined.value) {
     return
   }
-  if (application.Apps.Apps.length === 0) {
+  if (applications.value.size === 0) {
     getApps(0, 500)
   }
 })

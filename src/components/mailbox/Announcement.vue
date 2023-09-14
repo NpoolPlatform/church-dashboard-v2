@@ -14,7 +14,7 @@
 
 <script setup lang='ts'>
 import { formatTime, NotifyType, useChurchAnnouncementStore, Announcement } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { computed, defineAsyncComponent, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -25,9 +25,9 @@ const AnnouncementUser = defineAsyncComponent(() => import('src/components/mailb
 const State = defineAsyncComponent(() => import('src/components/mailbox/State.vue'))
 
 const announcement = useChurchAnnouncementStore()
-const announcements = computed(() => announcement.announcements(appID.value))
+const announcements = computed(() => announcement.announcements(AppID.value))
 
-watch(appID, () => {
+watch(AppID, () => {
   if (announcements.value?.length === 0) {
     getAppAnnouncements(0, 100)
   }
@@ -41,7 +41,7 @@ onMounted(() => {
 
 const getAppAnnouncements = (offset: number, limit: number) => {
   announcement.getAppAnnouncements({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

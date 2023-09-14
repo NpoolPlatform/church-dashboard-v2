@@ -51,7 +51,7 @@
 
 <script setup lang='ts'>
 import { NotifyType, useChurchAppCountryStore, AppCountry } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { getAppCountries } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
@@ -59,7 +59,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const CountryPicker = defineAsyncComponent(() => import('src/components/internationalization/CountryPicker.vue'))
 
 const country = useChurchAppCountryStore()
-const countries = computed(() => country.getCountriesByAppID(appID.value))
+const countries = computed(() => country.getCountriesByAppID(AppID.value))
 
 const selectedCountries = ref([] as Array<AppCountry>)
 
@@ -80,7 +80,7 @@ const onCancel = () => {
 
 const onAuthorize = (done: () => void) => {
   country.createAppCountry({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     CountryID: countryID.value,
     Message: {
       Error: {
@@ -131,7 +131,7 @@ const onDelete = () => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   if (countries.value.length === 0) {
     getAppCountries(0, 100)
   }

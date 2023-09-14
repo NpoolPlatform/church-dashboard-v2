@@ -62,7 +62,7 @@
 <script setup lang='ts'>
 import { useChurchAppGoodStore, AppGood, useChurchPromotionStore, Promotion, NotifyType, formatTime } from 'npool-cli-v4'
 import { getAppGoods, getAppPromotions } from 'src/api/good'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -71,15 +71,12 @@ const { t } = useI18n({ useScope: 'global' })
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(appID.value))
+const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
 const selectedGood = ref([] as Array<AppGood>)
 
 const promotion = useChurchPromotionStore()
-const promotions = computed(() => promotion.getPromotionsByAppID(appID.value))
+const promotions = computed(() => promotion.getPromotionsByAppID(AppID.value))
 
 const target = ref({} as Promotion)
 const showing = ref(false)
@@ -112,7 +109,7 @@ const onSubmit = (done: () => void) => {
 
 const createAppPromotion = (done: () => void) => {
   promotion.createAppPromotion({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -139,7 +136,7 @@ const createAppPromotion = (done: () => void) => {
 
 const updateAppPromotion = (done: () => void) => {
   promotion.updateAppPromotion({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -164,7 +161,7 @@ const updateAppPromotion = (done: () => void) => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

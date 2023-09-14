@@ -33,19 +33,17 @@ import {
   useChurchUserAccountStore
 } from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
-import { useLocalApplicationStore } from 'src/localstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { AppID } from 'src/api/app'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const account = useChurchUserAccountStore()
-const directBenefitAccounts = computed(() => account.directBenefitAddress(appID.value))
+const directBenefitAccounts = computed(() => account.directBenefitAddress(AppID.value))
 
 const blocked = ref(null)
 const active = ref(null)
@@ -75,7 +73,7 @@ const onRowClick = (row: Account) => {
   target.value = { ...row }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -84,7 +82,7 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!account.UserAccounts.UserAccounts.get(appID.value)) {
+  if (!account.UserAccounts.UserAccounts.get(AppID.value)) {
     getNAppUserAccounts(0, 500)
   }
 }

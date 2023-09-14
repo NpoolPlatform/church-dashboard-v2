@@ -57,26 +57,23 @@
 
 <script setup lang='ts'>
 import { NotifyType, KYCReview, KYCReviewState, ImageType, DocumentType, useChurchKycStore, User, useChurchUserStore, useLocaleStore } from 'npool-cli-v4'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const disableUpdateBtn = computed(() => (review: KYCReview) => review.ReviewState === KYCReviewState.Approved || review.ReviewState === KYCReviewState.Rejected)
 const kyc = useChurchKycStore()
 const locale = useLocaleStore()
 
-const displayReviews = computed(() => !kyc.KycReviews.KycReviews.get(appID.value) ? [] as Array<KYCReview> : kyc.KycReviews.KycReviews.get(appID.value))
+const displayReviews = computed(() => !kyc.KycReviews.KycReviews.get(AppID.value) ? [] as Array<KYCReview> : kyc.KycReviews.KycReviews.get(AppID.value))
 const reviewLoading = ref(false)
 
 const getAppKycReviews = (offset: number, limit: number) => {
   kyc.getAppKycReviews({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -96,17 +93,17 @@ const getAppKycReviews = (offset: number, limit: number) => {
   })
 }
 const prepare = () => {
-  if (!kyc.KycReviews.KycReviews.get(appID.value)) {
+  if (!kyc.KycReviews.KycReviews.get(AppID.value)) {
     reviewLoading.value = true
     getAppKycReviews(0, 500)
   }
-  if (!user.Users.get(appID.value)) {
+  if (!user.Users.get(AppID.value)) {
     reviewLoading.value = true
     getAppUsers(0, 500)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -127,12 +124,12 @@ const onMenuHide = () => {
 }
 
 const getTargetUser = (userID: string) => {
-  const u = user.Users.get(appID.value)?.find((ul) => ul.ID === userID)
+  const u = user.Users.get(AppID.value)?.find((ul) => ul.ID === userID)
   return !u ? {} as User : u
 }
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -157,7 +154,7 @@ const onRowClick = (row: KYCReview) => {
   targetUser.value = { ...getTargetUser(row.UserID) }
   showing.value = true
   kyc.getAppUserKYCImage({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetUserID: row.UserID,
     ImageType: ImageType.FrontImg,
     Message: {
@@ -170,7 +167,7 @@ const onRowClick = (row: KYCReview) => {
     }
   }, target.value.KycID, () => {
     kyc.getAppUserKYCImage({
-      TargetAppID: appID.value,
+      TargetAppID: AppID.value,
       TargetUserID: row.UserID,
       ImageType: ImageType.SelfieImg,
       Message: {
@@ -187,7 +184,7 @@ const onRowClick = (row: KYCReview) => {
         return
       }
       kyc.getAppUserKYCImage({
-        TargetAppID: appID.value,
+        TargetAppID: AppID.value,
         TargetUserID: row.UserID,
         ImageType: ImageType.BackImg,
         Message: {
@@ -212,7 +209,7 @@ const updateReview = (state: KYCReviewState) => {
   }
 
   kyc.updateAppKycReview({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ReviewID: target.value?.ReviewID,
     LangID: locale.AppLang?.LangID,
     State: state,

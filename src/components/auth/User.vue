@@ -99,7 +99,7 @@
 import { ExpandAPI, Auth } from 'npool-cli-v2'
 import { formatTime, NotifyType, useChurchAuthingStore, User, useChurchUserStore } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { useChurchAPIStore } from 'src/teststore/apis'
 import { API } from 'src/teststore/apis/types'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
@@ -110,11 +110,8 @@ const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const user = useChurchUserStore()
-const users = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
+const users = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)))
 const selectedUser = ref([] as Array<User>)
@@ -127,7 +124,7 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auths = computed(() => {
-  return auth.Auths.get(appID.value) ? auth.Auths.get(appID.value)?.filter((al) => {
+  return auth.Auths.get(AppID.value) ? auth.Auths.get(AppID.value)?.filter((al) => {
     return al.UserID === selectedUser.value[0]?.ID
   }) : []
 })
@@ -137,7 +134,7 @@ const selectedAuth = ref([] as Array<Auth>)
 
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -161,7 +158,7 @@ const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
     Offset: offset,
     Limit: limit,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Message: {
       Error: {
         Title: 'MSG_GET_APP_AUTHS',
@@ -179,17 +176,17 @@ const getAppAuths = (offset: number, limit: number) => {
 }
 
 const prepare = () => {
-  if (!user.Users.get(appID.value)) {
+  if (!user.Users.get(AppID.value)) {
     userLoading.value = true
     getAppUsers(0, 500)
   }
 
-  if (!auth.Auths.get(appID.value)) {
+  if (!auth.Auths.get(AppID.value)) {
     getAppAuths(0, 100)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -248,7 +245,7 @@ const onSubmit = () => {
 
 const onCreateAuthClick = (row: ExpandAPI) => {
   auth.createAppAuth({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetUserID: selectedUser.value[0]?.ID,
     Resource: row.Path,
     Method: row.Method,
@@ -273,7 +270,7 @@ const onCreateAuthClick = (row: ExpandAPI) => {
 
 const onDeleteAuthClick = () => {
   auth.deleteAppAuth({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ID: selectedAuth.value[0].ID as string,
     Message: {
       Error: {

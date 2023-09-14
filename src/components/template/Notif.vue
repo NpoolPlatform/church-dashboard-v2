@@ -49,7 +49,7 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { formatTime, NotifyType, useChurchFrontendTemplateStore, EventTypes, FrontendTemplate } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -58,7 +58,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 
 const notif = useChurchFrontendTemplateStore()
-const frontendTemplates = computed(() => notif.getFrontendTemplatesByAppID(appID.value).sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
+const frontendTemplates = computed(() => notif.getFrontendTemplatesByAppID(AppID.value).sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -89,7 +89,7 @@ const onSubmit = (done: () => void) => {
   updating.value ? updateAppFrontendTemplate(done) : createAppFrontendTemplate(done)
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   if (frontendTemplates.value?.length === 0) {
     getAppFrontendTemplate(0, 500)
   }
@@ -103,7 +103,7 @@ onMounted(() => {
 
 const getAppFrontendTemplate = (offset: number, limit: number) => {
   notif.getAppFrontendTemplates({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -125,7 +125,7 @@ const getAppFrontendTemplate = (offset: number, limit: number) => {
 const createAppFrontendTemplate = (done: () => void) => {
   notif.createAppFrontendTemplate({
     ...target.value,
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     TargetLangID: target.value.LangID,
     Message: {
       Error: {

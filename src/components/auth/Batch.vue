@@ -70,15 +70,14 @@
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
 import { formatTime } from 'npool-cli-v2'
-import { NotifyType, useChurchAuthingStore, Auth, useChurchAppStore, App } from 'npool-cli-v4'
-import { useLocalApplicationStore } from 'src/localstore'
+import { NotifyType, useChurchAuthingStore, Auth, App } from 'npool-cli-v4'
+import { AppID } from 'src/api/app'
+import { app } from 'src/npoolstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-const application = useChurchAppStore()
+const application = app.useApplicationStore()
 
-const auths = computed(() => auth.Auths.get(appID.value))
+const auths = computed(() => auth.Auths.get(AppID.value))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 
@@ -90,7 +89,7 @@ const auth = useChurchAuthingStore()
 
 const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -109,12 +108,12 @@ const getAppAuths = (offset: number, limit: number) => {
   })
 }
 const prepare = () => {
-  if (!auth.Auths.get(appID.value)) {
+  if (!auth.Auths.get(AppID.value)) {
     getAppAuths(0, 100)
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -128,7 +127,7 @@ interface SavedAuths {
 }
 
 const onExportClick = () => {
-  const myApp = application.Apps.Apps.find((el) => el.ID === appID.value)
+  const myApp = application.getApp(AppID.value)
   const blob = new Blob([JSON.stringify({
     Application: myApp,
     Auths: auths.value
@@ -153,9 +152,7 @@ const onFileLoaded = (evt: Event) => {
     const reader = new FileReader()
     reader.onload = () => {
       const loaded = JSON.parse(reader.result as string) as SavedAuths
-      const index = application.Apps.Apps.findIndex((el) => el.ID === loaded.Application.ID)
-      application.Apps.Apps.splice(index, index < 0 ? 0 : 1, loaded.Application)
-      app.AppID = loaded.Application.ID
+      application.AppID = loaded.Application.ID
       loadedAuths.value = loaded.Auths
     }
     reader.readAsText(filename)

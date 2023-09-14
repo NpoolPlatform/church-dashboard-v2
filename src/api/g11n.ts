@@ -11,7 +11,7 @@ import {
   useChurchMessageStore,
   Message
 } from 'npool-cli-v4'
-import { appID } from './app'
+import { AppID } from './app'
 
 const country = useChurchCountryStore()
 export const getCountries = (offset: number, limit: number) => {
@@ -37,7 +37,7 @@ export const getCountries = (offset: number, limit: number) => {
 const appCountry = useChurchAppCountryStore()
 export const getAppCountries = (offset: number, limit: number) => {
   appCountry.getAppCountries({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -80,7 +80,7 @@ export const getLangs = (offset: number, limit: number) => {
 const appLang = useChurchAppLangStore()
 export const getAppLangs = (offset: number, limit: number) => {
   appLang.getAppLangs({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -101,7 +101,7 @@ export const getAppLangs = (offset: number, limit: number) => {
 const message = useChurchMessageStore()
 export const getAppMessages = (offset: number, limit: number) => {
   message.getAppMessages({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     NotifyMessage: {

@@ -155,7 +155,7 @@ import {
   useChurchAppCoinStore,
   Account
 } from 'npool-cli-v4'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import saveAs from 'file-saver'
 import { getAppDepositAccounts } from 'src/api/account'
@@ -206,17 +206,14 @@ const columns = computed(() => [
 ])
 
 const coin = useChurchAppCoinStore()
-const selectedCoin = computed(() => coin.getCoinByID(appID.value, target.value?.CoinTypeID))
-
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
+const selectedCoin = computed(() => coin.getCoinByID(AppID.value, target.value?.CoinTypeID))
 
 const target = ref({
-  TargetAppID: appID.value
+  TargetAppID: AppID.value
 } as CreateAppUserDepositRequest)
 
-watch(appID, () => {
-  target.value.TargetAppID = appID.value
+watch(AppID, () => {
+  target.value.TargetAppID = AppID.value
 })
 
 const deposit = useChurchDepositStore()
@@ -274,7 +271,7 @@ const onMenuHide = () => {
 }
 
 const user = useChurchUserStore()
-const appUsers = computed(() => user.Users.get(appID.value) ? user.Users.get(appID.value) as Array<User> : [])
+const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
 const username = ref('')
 const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
 const selectedUser = ref([] as Array<User>)
@@ -283,19 +280,19 @@ const userLoading = ref(false)
 
 const detailUsername = ref('')
 const detail = useChurchDetailStore()
-const displayDetails = computed(() => !detail.Details.Details.get(appID.value) ? [] : detail.Details.Details.get(appID.value)?.filter((el) => {
+const displayDetails = computed(() => !detail.Details.Details.get(AppID.value) ? [] : detail.Details.Details.get(AppID.value)?.filter((el) => {
   return el.EmailAddress?.includes(detailUsername.value) || el.PhoneNO?.includes(detailUsername.value)
 }))
 
 const generalUsername = ref('')
 const general = useChurchGeneralStore()
-const displayGenerals = computed(() => !general.Generals.Generals.get(appID.value) ? [] : general.Generals.Generals.get(appID.value)?.filter((el) => {
+const displayGenerals = computed(() => !general.Generals.Generals.get(AppID.value) ? [] : general.Generals.Generals.get(AppID.value)?.filter((el) => {
   return el.EmailAddress?.includes(generalUsername.value) || el.PhoneNO?.includes(generalUsername.value)
 }))
 
 const accountUsername = ref('')
 const account = useChurchUserAccountStore()
-const accounts = computed(() => account.getDepositAccountsByAppID(appID.value).filter((el) => {
+const accounts = computed(() => account.getDepositAccountsByAppID(AppID.value).filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
 
@@ -347,7 +344,7 @@ const generalsExport = () => {
   })
 
   const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
-  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Generals-' +
+  const filename = application.Apps.Apps.find((el) => el.ID === AppID.value)?.Name as string + '-Generals-' +
                    formatTime(new Date().getTime() / 1000) +
                    '.csv'
   saveAs(blob, filename)
@@ -409,7 +406,7 @@ const detailsExport = () => {
 
   const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  const filename = application.Apps.Apps.find((el) => el.ID === appID.value)?.Name as string + '-Details-' + (new Date().getTime() / 1000) + '.csv'
+  const filename = application.Apps.Apps.find((el) => el.ID === AppID.value)?.Name as string + '-Details-' + (new Date().getTime() / 1000) + '.csv'
   saveAs(blob, filename)
 }
 
@@ -418,13 +415,13 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!user.Users.get(appID.value)) {
+  if (!user.Users.get(AppID.value)) {
     getAppUsers(0, 500)
   }
-  if (!detail.Details.Details.get(appID.value)) {
+  if (!detail.Details.Details.get(AppID.value)) {
     getAppDetails(0, 500)
   }
-  if (!general.Generals.Generals.get(appID.value)) {
+  if (!general.Generals.Generals.get(AppID.value)) {
     getAppGenerals(0, 500)
   }
   if (accounts.value.length === 0) {
@@ -432,13 +429,13 @@ const prepare = () => {
   }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
 const getAppUsers = (offset: number, limit: number) => {
   user.getAppUsers({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
@@ -459,7 +456,7 @@ const getAppUsers = (offset: number, limit: number) => {
 
 const getAppGenerals = (offset: number, limit: number) => {
   general.getAppGenerals({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {}
@@ -473,7 +470,7 @@ const getAppGenerals = (offset: number, limit: number) => {
 
 const getAppDetails = (offset: number, limit: number) => {
   detail.getAppDetails({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

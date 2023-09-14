@@ -1,11 +1,11 @@
 import { NotifyType, Order, useChurchOrderStore } from 'npool-cli-v4'
-import { appID } from './app'
+import { AppID } from './app'
 
 const order = useChurchOrderStore()
 
 export const getNAppOrders = (offset: number, limit: number) => {
   order.getNAppOrders({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

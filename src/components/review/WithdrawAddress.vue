@@ -14,16 +14,13 @@ import {
   useChurchUserAccountStore
 } from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, watch } from 'vue'
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const account = useChurchUserAccountStore()
-const withdrawAddress = computed(() => account.withdrawAddress(appID.value))
+const withdrawAddress = computed(() => account.withdrawAddress(AppID.value))
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 

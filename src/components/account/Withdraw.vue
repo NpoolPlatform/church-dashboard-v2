@@ -33,7 +33,7 @@ import {
   useChurchUserAccountStore
 } from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -42,11 +42,8 @@ const { t } = useI18n({ useScope: 'global' })
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
-
 const account = useChurchUserAccountStore()
-const withdrawAddress = computed(() => account.withdrawAddress(appID.value))
+const withdrawAddress = computed(() => account.withdrawAddress(AppID.value))
 
 const blocked = ref(null)
 const active = ref(null)
@@ -76,7 +73,7 @@ const onRowClick = (row: Account) => {
   target.value = { ...row }
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   prepare()
 })
 
@@ -85,7 +82,7 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!account.UserAccounts.UserAccounts.get(appID.value)) {
+  if (!account.UserAccounts.UserAccounts.get(AppID.value)) {
     getNAppUserAccounts(0, 500)
   }
 }

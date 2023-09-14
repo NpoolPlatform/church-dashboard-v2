@@ -30,14 +30,14 @@
 
 <script setup lang='ts'>
 import { NotifyType, Registration, useChurchRegistrationStore } from 'npool-cli-v4'
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const registration = useChurchRegistrationStore()
-const registrations = computed(() => registration.getRegistrationsByAppID(appID.value))
+const registrations = computed(() => registration.getRegistrationsByAppID(AppID.value))
 
 const invitee = ref('')
 const inviter = ref('')
@@ -63,7 +63,7 @@ const displayRegistrations = computed(() => registrations.value.filter((el) => {
   return display
 }))
 
-watch(appID, () => {
+watch(AppID, () => {
   if (registrations.value.length === 0) {
     getAppRegistrations(0, 500)
   }
@@ -77,7 +77,7 @@ onMounted(() => {
 
 const getAppRegistrations = (offset: number, limit: number) => {
   registration.getAppRegistrations({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {

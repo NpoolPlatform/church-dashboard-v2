@@ -66,16 +66,13 @@
 import { NotifyType } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useAppOAuthThirdPartyStore, AppOAuthThirdParty } from 'src/teststore/appuser/oauth/appthirdparty'
-import { useLocalApplicationStore } from 'src/localstore'
+import { AppID } from 'src/api/app'
 import { useOAuthThirdPartyStore } from 'src/teststore/appuser/oauth/thirdparty'
-
-const app = useLocalApplicationStore()
-const appID = computed(() => app.AppID)
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const appThirdParty = useAppOAuthThirdPartyStore()
-const appThirdParties = computed(() => appThirdParty.AppOAuthThirdParties.get(appID.value) as Array<AppOAuthThirdParty>)
+const appThirdParties = computed(() => appThirdParty.AppOAuthThirdParties.get(AppID.value) as Array<AppOAuthThirdParty>)
 const thirdParty = useOAuthThirdPartyStore()
 const thirdParties = computed(() => thirdParty.OAuthThirdParties.map((el) => {
   return {
@@ -151,7 +148,7 @@ const onSubmit = (done: () => void) => {
 
 const createCoin = (done: () => void) => {
   appThirdParty.createAppOAuthThirdParty({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     Message: {
       Error: {
@@ -178,7 +175,7 @@ const createCoin = (done: () => void) => {
 
 const updateCoin = (done: () => void) => {
   appThirdParty.updateAppOAuthThirdParty({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     ...target.value,
     Message: {
       Error: {
@@ -203,9 +200,9 @@ const updateCoin = (done: () => void) => {
   })
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   appThirdParty.getAppOAuthThirdParties({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: 0,
     Limit: 20,
     Message: {
@@ -223,7 +220,7 @@ watch(appID, () => {
 
 onMounted(() => {
   appThirdParty.getAppOAuthThirdParties({
-    TargetAppID: appID.value,
+    TargetAppID: AppID.value,
     Offset: 0,
     Limit: 20,
     Message: {

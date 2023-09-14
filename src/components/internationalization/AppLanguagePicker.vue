@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang='ts'>
-import { appID } from 'src/api/app'
+import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
 import { useChurchAppLangStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
@@ -45,7 +45,7 @@ const myLabel = computed(() => {
 const target = ref(id.value)
 
 const lang = useChurchAppLangStore()
-const _langs = computed(() => lang.getAppLangsByAppID(appID.value))
+const _langs = computed(() => lang.getAppLangsByAppID(AppID.value))
 const langs = computed(() => Array.from(_langs.value).map((el) => {
   return {
     value: el.LangID,
@@ -67,7 +67,7 @@ const onUpdate = () => {
   emit('update:id', target.value)
 }
 
-watch(appID, () => {
+watch(AppID, () => {
   if (_langs.value.length === 0) {
     getAppLangs(0, 100)
   }
