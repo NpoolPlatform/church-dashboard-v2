@@ -6,7 +6,7 @@
     row-key='ID'
     :title='$t("MSG_APP_OAUTH_THIRD_PARTIES")'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as AppOAuthThirdParty)'
+    @row-click='(evt, row, index) => onRowClick(row as appoauththirdparty.AppOAuthThirdParty)'
     v-model:selected='selectedThirdParty'
     selection='single'
   >
@@ -65,15 +65,14 @@
 <script setup lang='ts'>
 import { NotifyType } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { useAppOAuthThirdPartyStore, AppOAuthThirdParty } from 'src/teststore/appuser/oauth/appthirdparty'
 import { AppID } from 'src/api/app'
-import { useOAuthThirdPartyStore } from 'src/teststore/appuser/oauth/thirdparty'
+import { appoauththirdparty, oauththirdparty } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const appThirdParty = useAppOAuthThirdPartyStore()
-const appThirdParties = computed(() => appThirdParty.AppOAuthThirdParties.get(AppID.value) as Array<AppOAuthThirdParty>)
-const thirdParty = useOAuthThirdPartyStore()
+const appThirdParty = appoauththirdparty.useAppOAuthThirdPartyStore()
+const appThirdParties = computed(() => appThirdParty.AppOAuthThirdParties.get(AppID.value) as Array<appoauththirdparty.AppOAuthThirdParty>)
+const thirdParty = oauththirdparty.useOAuthThirdPartyStore()
 const thirdParties = computed(() => thirdParty.OAuthThirdParties.map((el) => {
   return {
     label: el.ClientName,
@@ -94,9 +93,9 @@ const displayThirdParties = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as AppOAuthThirdParty)
+const target = ref({} as appoauththirdparty.AppOAuthThirdParty)
 
-const selectedThirdParty = ref([] as Array<AppOAuthThirdParty>)
+const selectedThirdParty = ref([] as Array<appoauththirdparty.AppOAuthThirdParty>)
 const onDelete = () => {
   selectedThirdParty.value.forEach((el) => {
     appThirdParty.deleteAppOAuthThirdParty({
@@ -127,7 +126,7 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (row: AppOAuthThirdParty) => {
+const onRowClick = (row: appoauththirdparty.AppOAuthThirdParty) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -139,7 +138,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as AppOAuthThirdParty
+  target.value = {} as appoauththirdparty.AppOAuthThirdParty
 }
 
 const onSubmit = (done: () => void) => {

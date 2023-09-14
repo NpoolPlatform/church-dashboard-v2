@@ -115,8 +115,7 @@ import {
 } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
 import { AppID } from 'src/api/app'
-import { useChurchAPIStore } from 'src/teststore/apis'
-import { API } from 'src/teststore/apis/types'
+import { npoolapi } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -144,8 +143,8 @@ const displayUsers = computed(() => users.value.filter((user) => {
   return index >= 0
 }))
 
-const api = useChurchAPIStore()
-const apis = computed(() => api.APIs.APIs)
+const api = npoolapi.useNpoolAPIStore()
+const apis = computed(() => api.APIs)
 const selectedApi = ref([] as Array<ExpandAPI>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
@@ -245,18 +244,18 @@ onMounted(() => {
   prepare()
 })
 
-const target = ref({} as API)
+const target = ref({} as npoolapi.API)
 const showing = ref(false)
 const updating = ref(false)
 
-const onRowClick = (row: API) => {
+const onRowClick = (row: npoolapi.API) => {
   target.value = { ...row }
   updating.value = true
   showing.value = true
 }
 
 const onMenuHide = () => {
-  target.value = {} as API
+  target.value = {} as npoolapi.API
   showing.value = false
 }
 
@@ -390,73 +389,73 @@ const apiColumns = computed(() => [
     name: 'ID',
     label: 'MSG_ID',
     sortable: true,
-    field: (row: API) => row.ID
+    field: (row: npoolapi.API) => row.ID
   },
   {
     name: 'Method',
     label: 'MSG_METHOD',
     sortable: true,
-    field: (row: API) => row.Method
+    field: (row: npoolapi.API) => row.Method
   },
   {
     name: 'PathPrefix',
     label: 'MSG_PATH_PREFIX',
     sortable: true,
-    field: (row: API) => row.PathPrefix
+    field: (row: npoolapi.API) => row.PathPrefix
   },
   {
     name: 'Path',
     label: 'MSG_PATH',
     sortable: true,
-    field: (row: API) => row.Path
+    field: (row: npoolapi.API) => row.Path
   },
   {
     name: 'ServiceName',
     label: 'MSG_SERVICE_NAME',
     sortable: true,
-    field: (row: API) => row.ServiceName
+    field: (row: npoolapi.API) => row.ServiceName
   },
   {
     name: 'Exported',
     label: 'MSG_EXPORTED',
     sortable: true,
-    field: (row: API) => row.Exported
+    field: (row: npoolapi.API) => row.Exported
   },
   {
     name: 'Depracated',
     label: 'MSG_DEPRACATED',
     sortable: true,
-    field: (row: API) => row.Depracated
+    field: (row: npoolapi.API) => row.Depracated
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     sortable: true,
-    field: (row: API) => formatTime(row.CreatedAt)
+    field: (row: npoolapi.API) => formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     sortable: true,
-    field: (row: API) => formatTime(row.UpdatedAt)
+    field: (row: npoolapi.API) => formatTime(row.UpdatedAt)
   },
   {
     name: 'MethodName',
     label: 'MSG_METHOD_NAME',
     sortable: true,
-    field: (row: API) => row.MethodName
+    field: (row: npoolapi.API) => row.MethodName
   },
   {
     name: 'Domains',
     label: 'MSG_DOMAINS',
     sortable: true,
-    field: (row: API) => row.Domains?.join(',')
+    field: (row: npoolapi.API) => row.Domains?.join(',')
   },
   {
     name: 'Protocol',
     label: 'MSG_PROTOCOL',
     sortable: true,
-    field: (row: API) => row.Protocol
+    field: (row: npoolapi.API) => row.Protocol
   }
 ])
 </script>

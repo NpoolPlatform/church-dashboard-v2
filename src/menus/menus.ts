@@ -1,6 +1,6 @@
 import { uid } from 'quasar'
 import { MenuItem } from 'src/localstore'
-import { CouponType } from 'src/teststore/inspire/coupon'
+import { coupon } from 'src/npoolstore'
 
 const MainDrawerMenus = [
   {
@@ -597,7 +597,7 @@ const MainDrawerMenus = [
       caption: '管理定额代金券',
       icon: 'format_list_numbered',
       target: '/inspire/coupon',
-      query: { couponType: CouponType.FixAmount },
+      query: { couponType: coupon.CouponType.FixAmount },
       level: 1,
       sectionBegin: false,
       children: []
@@ -607,7 +607,7 @@ const MainDrawerMenus = [
       caption: '管理折扣代金券',
       icon: 'format_list_numbered',
       target: '/inspire/coupon',
-      query: { couponType: CouponType.Discount },
+      query: { couponType: coupon.CouponType.Discount },
       level: 1,
       sectionBegin: false,
       children: []
@@ -617,7 +617,7 @@ const MainDrawerMenus = [
       caption: '管理定向用户代金券',
       icon: 'format_list_numbered',
       target: '/inspire/coupon',
-      query: { couponType: CouponType.SpecialOffer },
+      query: { couponType: coupon.CouponType.SpecialOffer },
       level: 1,
       sectionBegin: false,
       children: []

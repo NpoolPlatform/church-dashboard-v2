@@ -6,7 +6,7 @@
     row-key='ID'
     :title='$t("MSG_OAUTH_THIRD_PARTIES")'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as OAuthThirdParty)'
+    @row-click='(evt, row, index) => onRowClick(row as oauththirdparty.OAuthThirdParty)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -52,11 +52,11 @@
 <script setup lang='ts'>
 import { NotifyType, SignMethodTypes } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { useOAuthThirdPartyStore, OAuthThirdParty } from 'src/teststore/appuser/oauth/thirdparty'
+import { oauththirdparty } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const thirdParty = useOAuthThirdPartyStore()
+const thirdParty = oauththirdparty.useOAuthThirdPartyStore()
 const thirdParties = computed(() => thirdParty.OAuthThirdParties)
 
 const clientName = ref('')
@@ -69,14 +69,14 @@ const displayThirdParties = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as OAuthThirdParty)
+const target = ref({} as oauththirdparty.OAuthThirdParty)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: OAuthThirdParty) => {
+const onRowClick = (row: oauththirdparty.OAuthThirdParty) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -88,7 +88,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as OAuthThirdParty
+  target.value = {} as oauththirdparty.OAuthThirdParty
 }
 
 const onSubmit = (done: () => void) => {

@@ -1,7 +1,6 @@
-import { useChurchAPIStore } from 'src/teststore/apis'
-import { API } from 'src/teststore/apis/types'
+import { npoolapi } from 'src/npoolstore'
 
-const api = useChurchAPIStore()
+const api = npoolapi.useNpoolAPIStore()
 export const getAPIs = (offset: number, limit: number) => {
   api.getAPIs({
     // Exported: true,
@@ -9,7 +8,7 @@ export const getAPIs = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Array<API>) => {
+  }, (error: boolean, rows: Array<npoolapi.API>) => {
     if (error || rows.length < limit) {
       return
     }
@@ -17,7 +16,7 @@ export const getAPIs = (offset: number, limit: number) => {
   })
 }
 
-export const updateAPI = (row: API, done: (error: boolean) => void) => {
+export const updateAPI = (row: npoolapi.API, done: (error: boolean) => void) => {
   api.updateAPI({
     ID: row.ID,
     Depracated: row.Depracated,

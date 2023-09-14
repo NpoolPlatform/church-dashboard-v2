@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='loading'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Coupon)'
+    @row-click='(evt, row, index) => onRowClick(row as coupon.Coupon)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -31,8 +31,8 @@
         <span>{{ $t('MSG_CREATE_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' disable />
-        <q-select :options='CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_COUPONCONSTRAINT")' />
+        <q-select :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' disable />
+        <q-select :options='coupon.CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_COUPONCONSTRAINT")' />
         <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
         <q-input type='date' v-model='start' :label='$t("MSG_START")' />
@@ -43,7 +43,7 @@
         <q-toggle v-model='target.Random' :label='$t("MSG_COUPON_RANDOM")' />
         <GoodSelector v-model:id='target.GoodID' />
       </q-card-section>
-      <q-card-section v-if='target.CouponType === CouponType.SpecialOffer'>
+      <q-card-section v-if='target.CouponType === coupon.CouponType.SpecialOffer'>
         <q-item-label>{{ $t('MSG_SPECIAL_OFFSET_NOT_IMPLEMENTED') }}</q-item-label>
       </q-card-section>
       <q-item class='row'>
@@ -60,7 +60,7 @@ import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
 import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
-import { useCouponStore, CouponType, Coupon, CouponTypes, CouponConstraints } from 'src/teststore/inspire/coupon'
+import { coupon } from 'src/npoolstore'
 import { useRoute } from 'vue-router'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
@@ -69,15 +69,15 @@ const GoodSelector = defineAsyncComponent(() => import('src/components/good/Good
 const { t } = useI18n({ useScope: 'global' })
 
 interface Query {
-  couponType: CouponType
+  couponType: coupon.CouponType
 }
 
 const route = useRoute()
 const query = computed(() => route.query as unknown as Query)
 const couponType = computed(() => query.value.couponType)
 
-const coupon = useCouponStore()
-const coupons = computed(() => coupon.coupons(AppID.value, couponType.value))
+const _coupon = coupon.useCouponStore()
+const coupons = computed(() => _coupon.coupons(AppID.value, couponType.value))
 const loading = ref(true)
 
 const logined = useLocalUserStore()
@@ -88,7 +88,7 @@ const prepare = () => {
     return
   }
   loading.value = true
-  coupon.getAppCoupons({
+  _coupon.getAppCoupons({
     TargetAppID: AppID.value,
     CouponType: couponType.value,
     Offset: 0,
@@ -120,7 +120,7 @@ const target = ref({
   IssuedBy: logined.User?.ID,
   CouponType: couponType.value,
   Random: false
-} as unknown as Coupon)
+} as unknown as coupon.Coupon)
 
 const start = computed({
   get: () => formatTime(target.value.StartAt, true)?.replace(/\//g, '-'),
@@ -138,7 +138,7 @@ const onCreate = () => {
   updating.value = false
 }
 
-const onRowClick = (coupon: Coupon) => {
+const onRowClick = (coupon: coupon.Coupon) => {
   showing.value = true
   updating.value = true
   target.value = coupon
@@ -150,14 +150,14 @@ const onMenuHide = () => {
     IssuedBy: logined.User?.ID,
     CouponType: couponType.value,
     Random: false
-  } as unknown as Coupon
+  } as unknown as coupon.Coupon
 }
 
 const onSubmit = () => {
   showing.value = false
 
   if (updating.value) {
-    coupon.updateCoupon({
+    _coupon.updateCoupon({
       ID: target.value.ID,
       TargetAppID: AppID.value,
       Denomination: target.value.Denomination,
@@ -190,7 +190,7 @@ const onSubmit = () => {
     return
   }
 
-  coupon.createCoupon({
+  _coupon.createCoupon({
     TargetAppID: AppID.value,
     CouponType: couponType.value,
     Denomination: target.value.Denomination,
