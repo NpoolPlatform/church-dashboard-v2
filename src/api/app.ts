@@ -1,9 +1,9 @@
-import { useApplicationStore } from 'src/npoolstore/appuser/app'
+import { app } from 'src/npoolstore'
 import { AppID as myAppID } from 'src/const/const'
 import { computed } from 'vue'
 
-const app = useApplicationStore()
-if (!app.AppID) {
-  app.AppID = myAppID
+const myApp = app.useMyApplicationStore()
+if (!myApp.AppID) {
+  myApp.AppID = myAppID
 }
-export const AppID = computed(() => app.AppID)
+export const AppID = computed(() => myApp.AppID)
