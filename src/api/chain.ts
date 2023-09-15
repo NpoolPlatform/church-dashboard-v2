@@ -1,8 +1,8 @@
-import { NotifyType, Tx, useChurchTxStore } from 'npool-cli-v4'
+import { tx, notify } from 'src/npoolstore'
 
-const tx = useChurchTxStore()
+const _tx = tx.useTxStore()
 export const getTxs = (offset : number, limit: number) => {
-  tx.getTxs({
+  _tx.getTxs({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -10,11 +10,11 @@ export const getTxs = (offset : number, limit: number) => {
         Title: 'MSG_GET_COINS',
         Message: 'MSG_GET_COINS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, txs: Array<Tx>) => {
-    if (error || txs.length < limit) {
+  }, (error: boolean, txs: Array<tx.Tx>) => {
+    if (error || txs.length === 0) {
       return
     }
     getTxs(offset + limit, limit)

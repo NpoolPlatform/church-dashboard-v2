@@ -1,10 +1,10 @@
-import { NotifyType, Order, useChurchOrderStore } from 'npool-cli-v4'
 import { AppID } from './app'
+import { order, notify } from 'src/npoolstore'
 
-const order = useChurchOrderStore()
+const _order = order.useOrderStore()
 
 export const getNAppOrders = (offset: number, limit: number) => {
-  order.getNAppOrders({
+  _order.getNAppOrders({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -13,11 +13,11 @@ export const getNAppOrders = (offset: number, limit: number) => {
         Title: 'MSG_GET_ORDERS',
         Message: 'MSG_GET_ORDERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (orders: Array<Order>, error: boolean) => {
-    if (error || orders.length < limit) {
+  }, (error: boolean, orders?: Array<order.Order>) => {
+    if (error || !orders?.length) {
       return
     }
     getNAppOrders(offset + limit, limit)

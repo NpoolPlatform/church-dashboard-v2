@@ -1,7 +1,7 @@
-import { Account, NotifyType, useChurchUserAccountStore, useChurchPlatformAccountStore, PlatformAccount, useChurchPaymentAccountStore, useChurchGoodBenefitAccountStore, PaymentAccount, GoodBenefitAccount } from 'npool-cli-v4'
 import { AppID } from './app'
+import { useraccount, notify, accountbase, goodbenefitaccount, platformaccount, paymentaccount } from 'src/npoolstore'
 
-const account = useChurchUserAccountStore()
+const account = useraccount.useUserAccountStore()
 
 export const getNAppUserAccounts = (offset: number, limit: number) => {
   account.getNAppUserAccounts({
@@ -13,11 +13,11 @@ export const getNAppUserAccounts = (offset: number, limit: number) => {
         Title: 'MSG_GET_WITHDRAW_ADDRESS_REVIEWS',
         Message: 'MSG_GET_WITHDRAW_ADDRESS_REVIEWS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (accounts: Array<Account>, error: boolean) => {
-    if (error || accounts.length < limit) {
+  }, (error: boolean, accounts?: Array<accountbase.Account>) => {
+    if (error || !accounts?.length) {
       return
     }
     getNAppUserAccounts(offset + limit, limit)
@@ -30,15 +30,15 @@ export const getAppDepositAccounts = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (accounts: Array<Account>, error: boolean) => {
-    if (error || accounts.length < limit) {
+  }, (error: boolean, accounts?: Array<accountbase.Account>) => {
+    if (error || !accounts?.length) {
       return
     }
     getAppDepositAccounts(offset + limit, limit)
   })
 }
 
-const platform = useChurchPlatformAccountStore()
+const platform = platformaccount.usePlatformAccountStore()
 export const getPlatformAccounts = (offset: number, limit: number) => {
   platform.getPlatformAccounts({
     Offset: offset,
@@ -48,18 +48,18 @@ export const getPlatformAccounts = (offset: number, limit: number) => {
         Title: 'MSG_GET_ACCOUNTS',
         Message: 'MSG_GET_ACCOUNTS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (accounts: Array<PlatformAccount>, error: boolean) => {
-    if (error || accounts.length < limit) {
+  }, (error: boolean, accounts?: Array<platformaccount.Account>) => {
+    if (error || !accounts?.length) {
       return
     }
     getNAppUserAccounts(offset + limit, limit)
   })
 }
 
-const payment = useChurchPaymentAccountStore()
+const payment = paymentaccount.usePaymentAccountStore()
 export const getPaymentAccounts = (offset: number, limit: number) => {
   payment.getPaymentAccounts({
     Offset: offset,
@@ -69,20 +69,20 @@ export const getPaymentAccounts = (offset: number, limit: number) => {
         Title: 'MSG_GET_PAYMENT_ACCOUNTS',
         Message: 'MSG_GET_PAYMENT_ACCOUNTS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (accounts: Array<PaymentAccount>, error: boolean) => {
-    if (error || accounts.length < limit) {
+  }, (error: boolean, accounts?: Array<paymentaccount.Account>) => {
+    if (error || !accounts?.length) {
       return
     }
     getPaymentAccounts(offset + limit, limit)
   })
 }
 
-const gb = useChurchGoodBenefitAccountStore()
+const goodbenefit = goodbenefitaccount.useGoodBenefitAccountStore()
 export const getGoodBenefitAccounts = (offset: number, limit: number) => {
-  gb.getGoodBenefitAccounts({
+  goodbenefit.getGoodBenefitAccounts({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -90,11 +90,11 @@ export const getGoodBenefitAccounts = (offset: number, limit: number) => {
         Title: 'MSG_GET_GOODBENEFIT_ACCOUNTS',
         Message: 'MSG_GET_GOODBENEFIT_ACCOUNTS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (accounts: Array<GoodBenefitAccount>, error: boolean) => {
-    if (error || accounts.length < limit) {
+  }, (error: boolean, accounts?: Array<goodbenefitaccount.Account>) => {
+    if (error || !accounts?.length) {
       return
     }
     getGoodBenefitAccounts(offset + limit, limit)

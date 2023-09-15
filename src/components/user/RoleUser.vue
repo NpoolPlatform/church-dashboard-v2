@@ -74,36 +74,35 @@
 </template>
 
 <script setup lang='ts'>
-import { AppRoleUser, formatTime, NotifyType, Role, useChurchRoleStore, useChurchUserStore, User } from 'npool-cli-v4'
-import { DeleteAppRoleUserRequest } from 'npool-cli-v4/dist/store/church/appuser/role/types'
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { role, user, notify, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const role = useChurchRoleStore()
-const roles = computed(() => role.Roles.get(AppID.value) ? role.Roles.get(AppID.value) : [])
+const _role = role.useRoleStore()
+const roles = computed(() => _role.roles(AppID.value))
 const roleLoading = ref(false)
-const selectedRole = ref([] as Array<Role>)
+const selectedRole = ref([] as Array<role.Role>)
 
-const user = useChurchUserStore()
-const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
+const _user = user.useUserStore()
+const appUsers = computed(() => _user.appUsers(AppID.value))
 const userLoading = ref(false)
-const selectedUser = ref([] as Array<User>)
+const selectedUser = ref([] as Array<user.User>)
 
 const roleUserLoading = ref(false)
 const roleUsername = ref('')
-const roleUsers = computed(() => selectedRole.value.length > 0 ? role.AppRoleUsers.get(selectedRole.value[0].ID) : [] as Array<AppRoleUser>)
+const roleUsers = computed(() => _role.roleUsers(AppID.value, selectedRole.value[0].ID))
 const displayRoleUsers = computed(() => roleUsers.value?.filter((el) => el.EmailAddress?.includes(roleUsername.value) || el.PhoneNO?.includes(roleUsername.value)))
-const selectedRoleUser = ref([] as Array<User>)
+const selectedRoleUser = ref([] as Array<user.User>)
 
 const username = ref('')
 const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
 
 const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
+  _user.getAppUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -112,11 +111,11 @@ const getAppUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_USERS',
         Message: 'MSG_GET_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (users: Array<User>, error: boolean) => {
-    if (error || users.length < limit) {
+  }, (error: boolean, users?: Array<user.User>) => {
+    if (error || !users?.length) {
       userLoading.value = false
       return
     }
@@ -125,7 +124,7 @@ const getAppUsers = (offset: number, limit: number) => {
 }
 
 const getAppRoles = (offset: number, limit: number) => {
-  role.getAppRoles({
+  _role.getAppRoles({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -134,11 +133,11 @@ const getAppRoles = (offset: number, limit: number) => {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (roles: Array<Role>, error: boolean) => {
-    if (error || roles.length < limit) {
+  }, (error: boolean, roles?: Array<role.Role>) => {
+    if (error || !roles?.length) {
       roleLoading.value = false
       return
     }
@@ -146,11 +145,11 @@ const getAppRoles = (offset: number, limit: number) => {
   })
 }
 const prepare = () => {
-  if (!role.Roles.get(AppID.value)) {
+  if (!roles.value.length) {
     roleLoading.value = true
     getAppRoles(0, 100)
   }
-  if (!user.Users.get(AppID.value)) {
+  if (!appUsers.value.length) {
     userLoading.value = true
     getAppUsers(0, 500)
   }
@@ -161,7 +160,7 @@ watch(AppID, () => {
 })
 
 const getAppRoleUsers = (offset: number, limit: number) => {
-  role.getAppRoleUsers({
+  _role.getAppRoleUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -171,11 +170,11 @@ const getAppRoleUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_ROLE_USERS',
         Message: 'MSG_GET_ROLE_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (roleUsers: Array<AppRoleUser>, error: boolean) => {
-    if (error || roleUsers.length < limit) {
+  }, (error: boolean, roleUsers?: Array<role.AppRoleUser>) => {
+    if (error || !roleUsers?.length) {
       roleUserLoading.value = false
       return
     }
@@ -183,7 +182,7 @@ const getAppRoleUsers = (offset: number, limit: number) => {
   })
 }
 watch(selectedRole, () => {
-  if (selectedRole.value.length > 0 && !role.AppRoleUsers.get(selectedRole.value[0].ID)) {
+  if (selectedRole.value.length > 0 && !roleUsers.value.length) {
     roleUserLoading.value = true
     getAppRoleUsers(0, 500)
   }
@@ -196,7 +195,7 @@ const onAddRoleUser = () => {
   if (selectedRole.value.length === 0 || selectedUser.value.length === 0) {
     return
   }
-  role.createAppRoleUser({
+  _role.createAppRoleUser({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value[0].ID,
     RoleID: selectedRole.value[0].ID,
@@ -205,7 +204,7 @@ const onAddRoleUser = () => {
         Title: 'MSG_ADD_ROLE_USER',
         Message: 'MSG_ADD_ROLE_USER_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -224,19 +223,19 @@ const onDeleteRoleUser = () => {
   }
 
   const req = {
-    ID: roleUsers.value?.[index].ID as string,
+    ID: roleUsers.value?.[index].ID,
     TargetAppID: AppID.value,
-    TargetUserID: roleUsers.value?.[index].UserID as string,
+    TargetUserID: roleUsers.value?.[index].UserID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_ROLE_USER',
         Message: 'MSG_DELETE_ROLE_USER_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  } as DeleteAppRoleUserRequest
-  role.deleteAppRoleUser(req, () => {
+  } as role.DeleteAppRoleUserRequest
+  _role.deleteAppRoleUser(req, () => {
     // TODO
   })
 }
@@ -245,37 +244,37 @@ const columns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: User) => row.AppID
+    field: (row: user.User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: User) => row.ID
+    field: (row: user.User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: User) => row.EmailAddress
+    field: (row: user.User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: User) => row.PhoneNO
+    field: (row: user.User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
     sortable: true,
-    field: (row: User) => row.Roles.join(',')
+    field: (row: user.User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: User) => formatTime(row.CreatedAt)
+    field: (row: user.User) => utils.formatTime(row.CreatedAt)
   }
 ])
 </script>

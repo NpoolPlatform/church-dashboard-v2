@@ -8,8 +8,8 @@ export const getAPIs = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Array<npoolapi.API>) => {
-    if (error || rows.length < limit) {
+  }, (error: boolean, rows?: Array<npoolapi.API>) => {
+    if (error || !rows?.length) {
       return
     }
     getAPIs(offset + limit, limit)

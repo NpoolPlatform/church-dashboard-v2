@@ -8,7 +8,7 @@
       <q-card-section v-if='!updating'>
         <CoinPicker v-model:id='target.CoinTypeID' />
         <q-input v-if='hiddenAddress ' v-model='target.Address' :label='$t("MSG_ADDRESS")' />
-        <q-select :options='AccountUsedFors' v-model='target.UsedFor' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
+        <q-select :options='accountbase.AccountUsedFors' v-model='target.UsedFor' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
@@ -48,8 +48,8 @@
 </template>
 
 <script setup lang='ts'>
-import { AccountUsedFor, AccountUsedFors, NotifyType, PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits } from 'vue'
+import { accountbase, platformaccount, notify } from 'src/npoolstore'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -57,7 +57,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 interface Props {
   visible: boolean
   update: boolean
-  account: PlatformAccount
+  account: platformaccount.Account
 }
 
 const props = defineProps<Props>()
@@ -78,7 +78,7 @@ const onMenuHide = () => {
 }
 
 const hiddenAddress = computed(() => {
-  const whitelist = [AccountUsedFor.GasProvider, AccountUsedFor.UserBenefitHot]
+  const whitelist = [accountbase.AccountUsedFor.GasProvider, accountbase.AccountUsedFor.UserBenefitHot]
   const found = whitelist.find((el) => el === target.value.UsedFor)
   return !found
 })
@@ -91,7 +91,7 @@ const onSubmit = (done: () => void) => {
   updating.value ? updatePlatformAccount(done) : createPlatformAccount(done)
 }
 
-const platform = useChurchPlatformAccountStore()
+const platform = platformaccount.usePlatformAccountStore()
 
 const updateTarget = computed(() => {
   return {
@@ -110,15 +110,15 @@ const updatePlatformAccount = (done: () => void) => {
       Error: {
         Title: 'MSG_UPDATE_PLATFORM_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_PLATFORM_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (account: PlatformAccount, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -134,15 +134,15 @@ const createPlatformAccount = (done: () => void) => {
       Error: {
         Title: 'MSG_CREATE_PLATFORM_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_PLATFORM_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (account: PlatformAccount, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
