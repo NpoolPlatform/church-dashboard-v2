@@ -73,7 +73,7 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const _app = app.useApplicationStore()
-const apps = computed(() => _app.Apps)
+const apps = computed(() => _app.apps())
 const appLoading = ref(false)
 
 const logined = user.useLocalUserStore()
