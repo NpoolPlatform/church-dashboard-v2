@@ -55,12 +55,10 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime } from 'npool-cli-v2'
 import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
 import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
-import { useLocalUserStore, NotifyType } from 'npool-cli-v4'
-import { coupon } from 'src/npoolstore'
+import { coupon, user, notify, utils } from 'src/npoolstore'
 import { useRoute } from 'vue-router'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
@@ -80,7 +78,7 @@ const _coupon = coupon.useCouponStore()
 const coupons = computed(() => _coupon.coupons(AppID.value, couponType.value))
 const loading = ref(true)
 
-const logined = useLocalUserStore()
+const logined = user.useLocalUserStore()
 
 const prepare = () => {
   if (coupons.value.length > 0) {
@@ -98,7 +96,7 @@ const prepare = () => {
         Title: t('MSG_GET_COUPONS'),
         Message: t('MSG_GET_COUPONS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -123,7 +121,7 @@ const target = ref({
 } as unknown as coupon.Coupon)
 
 const start = computed({
-  get: () => formatTime(target.value.StartAt, true)?.replace(/\//g, '-'),
+  get: () => utils.formatTime(target.value.StartAt, true)?.replace(/\//g, '-'),
   set: (val) => {
     target.value.StartAt = new Date(val).getTime() / 1000
   }
@@ -175,13 +173,13 @@ const onSubmit = () => {
           Title: 'MSG_UPDATE_COUPON',
           Message: 'MSG_UPDATE_COUPON_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         },
         Info: {
           Title: 'MSG_UPDATE_COUPON',
           Message: 'MSG_UPDATE_COUPON_SUCCESS',
           Popup: true,
-          Type: NotifyType.Success
+          Type: notify.NotifyType.Success
         }
       }
     }, () => {
@@ -208,13 +206,13 @@ const onSubmit = () => {
         Title: 'MSG_CREATE_COUPON',
         Message: 'MSG_CREATE_COUPON_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_COUPON',
         Message: 'MSG_CREATE_COUPON_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {

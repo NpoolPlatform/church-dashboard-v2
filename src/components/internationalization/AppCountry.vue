@@ -50,18 +50,18 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchAppCountryStore, AppCountry } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { getAppCountries } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { appcountry, notify } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CountryPicker = defineAsyncComponent(() => import('src/components/internationalization/CountryPicker.vue'))
 
-const country = useChurchAppCountryStore()
-const countries = computed(() => country.getCountriesByAppID(AppID.value))
+const country = appcountry.useAppCountryStore()
+const countries = computed(() => country.countries(AppID.value))
 
-const selectedCountries = ref([] as Array<AppCountry>)
+const selectedCountries = ref([] as Array<appcountry.Country>)
 
 const countryID = ref('')
 const showing = ref(false)
@@ -87,13 +87,13 @@ const onAuthorize = (done: () => void) => {
         Title: 'MSG_AUTHORIZE_COUNTRY',
         Message: 'MSG_AUTHORIZE_COUNTRY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_AUTHORIZE_COUNTRY',
         Message: 'MSG_AUTHORIZE_COUNTRY_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -114,13 +114,13 @@ const onDelete = () => {
         Title: 'MSG_DELETE_COUNTRY',
         Message: 'MSG_DELETE_COUNTRY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_DELETE_COUNTRY',
         Message: 'MSG_DELETE_COUNTRY_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -132,13 +132,13 @@ const onDelete = () => {
 }
 
 watch(AppID, () => {
-  if (countries.value.length === 0) {
+  if (!countries.value.length) {
     getAppCountries(0, 100)
   }
 })
 
 onMounted(() => {
-  if (countries.value.length === 0) {
+  if (!countries.value.length) {
     getAppCountries(0, 100)
   }
 })

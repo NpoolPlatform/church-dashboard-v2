@@ -6,7 +6,7 @@
     :rows='locations'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as VendorLocation)'
+    @row-click='(evt, row, index) => onRowClick(row as vendorlocation.VendorLocation)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -44,19 +44,19 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchVendorLocationStore, VendorLocation } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { vendorlocation, notify } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const vendor = useChurchVendorLocationStore()
-const locations = computed(() => vendor.VendorLocations.VendorLocations)
+const vendor = vendorlocation.useVendorLocationStore()
+const locations = computed(() => vendor.vendorLocations())
 
-const target = ref({} as VendorLocation)
+const target = ref({} as vendorlocation.VendorLocation)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -66,14 +66,14 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (row: VendorLocation) => {
+const onRowClick = (row: vendorlocation.VendorLocation) => {
   updating.value = true
   showing.value = true
   target.value = { ...row }
 }
 
 const onMenuHide = () => {
-  target.value = {} as VendorLocation
+  target.value = {} as vendorlocation.VendorLocation
   showing.value = false
 }
 
@@ -94,16 +94,16 @@ const createVendorLocation = (done: () => void) => {
         Title: t('MSG_CREATE_VENDOR_LOCATION'),
         Message: t('MSG_CREATE_VENDOR_LOCATION_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: t('MSG_CREATE_VENDOR_LOCATION'),
         Message: t('MSG_CREATE_VENDOR_LOCATION_SUCCESS'),
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (v: VendorLocation, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -120,16 +120,16 @@ const updateVendorLocation = (done: () => void) => {
         Title: t('MSG_UPDATE_VENDOR_LOCATION'),
         Message: t('MSG_UPDATE_VENDOR_LOCATION_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: t('MSG_UPDATE_VENDOR_LOCATION'),
         Message: t('MSG_UPDATE_VENDOR_LOCATION_SUCCESS'),
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (v: VendorLocation, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -139,8 +139,8 @@ const updateVendorLocation = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (vendor.VendorLocations.VendorLocations.length === 0) {
-    getVendorLocations(0, 500)
+  if (!locations.value.length) {
+    getVendorLocations(0, 100)
   }
 })
 
@@ -153,11 +153,11 @@ const getVendorLocations = (offset: number, limit: number) => {
         Title: t('MSG_GET_VENDOR_LOCATIONS'),
         Message: t('MSG_GET_VENDOR_LOCATIONS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (vendorLocations: Array<VendorLocation>, error: boolean) => {
-    if (error || vendorLocations.length < limit) {
+  }, (error: boolean, vendorLocations?: Array<vendorlocation.VendorLocation>) => {
+    if (error || !vendorLocations?.length) {
       return
     }
     getVendorLocations(offset + limit, limit)

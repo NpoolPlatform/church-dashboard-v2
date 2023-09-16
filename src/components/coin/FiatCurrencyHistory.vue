@@ -47,26 +47,27 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { formatTime, useFiatCurrencyHistoryStore, useFiatStore, Fiat, FiatCurrency } from 'npool-cli-v4'
+import { fiatcurrencyhistory, fiat, fiatcurrency, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const fiat = useFiatStore()
-const fiats = computed(() => fiat.fiats())
+const _fiat = fiat.useFiatStore()
+const fiats = computed(() => _fiat.fiats())
 
 const name = ref('')
-const displayFiats = computed(() => {
-  return fiats.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
-})
+const displayFiats = computed(() => fiats.value.filter((el) => {
+  return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+        el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+}))
 
-const selectedFiats = ref([] as Array<Fiat>)
-const fch = useFiatCurrencyHistoryStore()
-const fchs = computed(() => fch.Histories.Histories)
+const selectedFiats = ref([] as Array<fiat.Fiat>)
+const history = fiatcurrencyhistory.useFiatCurrencyHistoryStore()
+const histories = computed(() => history.histories())
 
 const name1 = ref('')
 const displayHistories = computed(() => {
-  return fchs.value.filter((el) => el.FiatName?.toLowerCase()?.includes?.(name1.value?.toLowerCase()))
+  return histories.value.filter((el) => el.FiatName?.toLowerCase()?.includes?.(name1.value?.toLowerCase()))
 })
 
 const ids = computed(() => {
@@ -77,21 +78,21 @@ const ids = computed(() => {
 
 watch(ids, () => {
   if (selectedFiats.value?.length > 0) {
-    fch.$reset()
+    history.$reset()
     getFiatCurrencyHistories(0, 100, 0, Math.ceil(Date.now() / 1000))
   }
 })
 
 const getFiatCurrencyHistories = (offset: number, limit: number, startAt: number, endAt: number) => {
-  fch.getHistories({
+  history.getFiatCurrencyHistories({
     FiatIDs: ids.value,
     Offset: offset,
     Limit: limit,
     StartAt: startAt,
     EndAt: endAt,
     Message: {}
-  }, (error: boolean, rows: FiatCurrency[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: fiatcurrency.FiatCurrency[]) => {
+    if (error || !rows?.length) {
       return
     }
     getFiatCurrencyHistories(offset + limit, limit, startAt, endAt)
@@ -99,18 +100,18 @@ const getFiatCurrencyHistories = (offset: number, limit: number, startAt: number
 }
 
 onMounted(() => {
-  if (fiat.Fiats.Fiats.length === 0) {
+  if (!fiats.value.length) {
     getFiats(0, 100)
   }
 })
 
 const getFiats = (offset: number, limit: number) => {
-  fiat.getFiats({
+  _fiat.getFiats({
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Fiat[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: fiat.Fiat[]) => {
+    if (error || !rows?.length) {
       return
     }
     getFiats(offset + limit, limit)
@@ -122,37 +123,37 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: Fiat) => row.ID
+    field: (row: fiat.Fiat) => row.ID
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
     sortable: true,
-    field: (row: Fiat) => row.Name
+    field: (row: fiat.Fiat) => row.Name
   },
   {
     name: 'Unit',
     label: t('MSG_UNIT'),
     sortable: true,
-    field: (row: Fiat) => row.Unit
+    field: (row: fiat.Fiat) => row.Unit
   },
   {
     name: 'Logo',
     label: t('MSG_LOGO'),
     sortable: true,
-    field: (row: Fiat) => row.Logo
+    field: (row: fiat.Fiat) => row.Logo
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     sortable: true,
-    field: (row: Fiat) => formatTime(row.CreatedAt)
+    field: (row: fiat.Fiat) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     sortable: true,
-    field: (row: Fiat) => formatTime(row.UpdatedAt)
+    field: (row: fiat.Fiat) => utils.formatTime(row.UpdatedAt)
   }
 ])
 </script>

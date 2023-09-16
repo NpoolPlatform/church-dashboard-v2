@@ -51,18 +51,17 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, watch, ref } from 'vue'
-import { App, NotifyType, useChurchAppStore } from 'npool-cli-v4'
-import { appsubscribe } from 'src/npoolstore'
+import { appsubscribe, app, notify } from 'src/npoolstore'
 import { AppID } from 'src/api/app'
 
 const appSubscribe = appsubscribe.useAppSubscribeStore()
 const appSubscribes = computed(() => appSubscribe.AppSubscribes.get(AppID.value) ? appSubscribe.AppSubscribes.get(AppID.value) : [])
 
-const _app = useChurchAppStore()
-const apps = computed(() => _app.Apps.Apps)
+const _app = app.useApplicationStore()
+const apps = computed(() => _app.apps())
 
-const targetApp = ref(undefined as unknown as App)
-const subscribeApp = ref(undefined as unknown as App)
+const targetApp = ref(undefined as unknown as app.App)
+const subscribeApp = ref(undefined as unknown as app.App)
 const selectedAppSubscribe = ref([] as Array<appsubscribe.AppSubscribe>)
 
 const prepare = () => {
@@ -75,7 +74,7 @@ const prepare = () => {
         Title: 'MSG_GET_EMAIL_SUBSCRIBERS',
         Message: 'MSG_GET_EMAIL_SUBSCRIBERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -96,11 +95,11 @@ const getApps = (offset: number, limit: number) => {
         Title: 'MSG_GET_APPS',
         Message: 'MSG_GET_APPS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (apps: Array<App>, error: boolean) => {
-    if (error || apps.length < limit) {
+  }, (error: boolean, apps?: Array<app.App>) => {
+    if (error || !apps?.length) {
       return
     }
     getApps(offset + limit, limit)
@@ -126,7 +125,7 @@ const onDelete = () => {
           Title: 'MSG_CREATE_APP_SUBSCRIBE',
           Message: 'MSG_CREATE_APP_SUBSCRIBE_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         }
       }
     }, () => {
@@ -153,7 +152,7 @@ const onSubmit = () => {
         Title: 'MSG_CREATE_APP_SUBSCRIBE',
         Message: 'MSG_CREATE_APP_SUBSCRIBE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {

@@ -30,11 +30,9 @@
 </template>
 
 <script setup lang='ts'>
-import { useMailboxStore } from 'npool-cli-v2'
 import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
-import { AppID } from 'src/api/app'
-import { App, useLocalUserStore, NotifyType } from 'npool-cli-v4'
-import { app } from 'src/npoolstore'
+import { AppID, myAppID } from 'src/api/app'
+import { app, notif, user, localapp, notify } from 'src/npoolstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
 import bellMsg from '../../assets/bell-msg.svg'
@@ -46,23 +44,23 @@ const AvatarDropdown = defineAsyncComponent(() => import('src/components/avatar/
 const HeaderToolBtn = defineAsyncComponent(() => import('src/components/header/HeaderToolBtn.vue'))
 const LangSwitcher = defineAsyncComponent(() => import('src/components/lang/LangSwitcher.vue'))
 
-const loginedUser = useLocalUserStore()
+const loginedUser = user.useLocalUserStore()
 const logined = computed(() => loginedUser.logined)
 
+const localApplication = localapp.useLocalApplicationStore()
 const application = app.useApplicationStore()
-
 const applications = computed(() => application.Apps)
 const selectedApp = computed({
-  get: () => application.getApp(AppID.value) as App,
-  set: (val: App) => {
-    application.AppID = val.ID
+  get: () => application.app(AppID.value) as app.App,
+  set: (val: app.App) => {
+    localApplication.MyAppID = val.ID
   }
 })
 
-const mailbox = useMailboxStore()
-const bellIcon = computed(() => mailbox.Notifications.length > 0 ? bellMsg : bellNoMsg)
+const mailbox = notif.useNotifStore()
+const bellIcon = computed(() => mailbox.notifs(myAppID, loginedUser.loginedUserID) ? bellMsg : bellNoMsg)
 
-const onAppSelected = (app: App) => {
+const onAppSelected = (app: app.App) => {
   selectedApp.value = app
 }
 
@@ -92,11 +90,11 @@ const getApps = (offset: number, limit: number) => {
         Title: 'MSG_GET_APPS',
         Message: 'MSG_GET_APPS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (apps: Array<App>, error: boolean) => {
-    if (error || apps.length < limit) {
+  }, (error: boolean, apps?: Array<app.App>) => {
+    if (error || !apps?.length) {
       return
     }
     getApps(offset + limit, limit)

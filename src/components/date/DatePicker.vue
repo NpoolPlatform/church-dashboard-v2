@@ -7,8 +7,9 @@
   />
 </template>
 <script lang='ts' setup>
-import { formatTime } from 'npool-cli-v4'
 import { defineProps, defineEmits, toRef, ref, onMounted } from 'vue'
+import { utils } from 'src/npoolstore'
+
 interface Props {
   date: number
   label: string
@@ -28,7 +29,7 @@ const onChange = () => {
 
 onMounted(() => {
   if (date.value) {
-    target.value = formatTime(date.value, true)?.replace(/\//g, '-')
+    target.value = utils.formatTime(date.value, true)?.replace(/\//g, '-')
   }
 })
 </script>

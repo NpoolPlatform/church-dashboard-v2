@@ -7,7 +7,7 @@
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as WithdrawReview)'
+    @row-click='(evt, row, index) => onRowClick(row as withdrawreview.WithdrawReview)'
   />
   <q-dialog
     v-model='showing'
@@ -23,7 +23,7 @@
         <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ target?.PhoneNO }}</q-item-label>
       </q-card-section>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.getCoinByID(AppID, target.CoinTypeID)?.Name }}</q-item-label>
+        <q-item-label>{{ $t('MSG_COIN_TYPE') }}: {{ coin?.coin(AppID, target.CoinTypeID)?.Name }}</q-item-label>
         <q-item-label>{{ $t('MSG_AMOUNT') }}: {{ target?.Amount }}</q-item-label>
         <q-item-label>{{ $t('MSG_MESSAGE') }}: {{ target?.Trigger }}</q-item-label>
         <q-item-label>{{ $t('MSG_MESSAGE') }}: {{ target?.State }}</q-item-label>
@@ -32,8 +32,8 @@
         <q-input v-model='target.Message' :label='$t("MSG_COMMENT")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton :loading='true' :label='$t("MSG_APPROVE")' @click='onApprove' :disabled='target.State === ReviewState.Rejected' />
-        <LoadingButton :loading='true' :label='$t("MSG_REJECT")' @click='onReject' :disabled='target.State === ReviewState.Rejected' />
+        <LoadingButton :loading='true' :label='$t("MSG_APPROVE")' @click='onApprove' :disabled='target.State === reviewbase.ReviewState.Rejected' />
+        <LoadingButton :loading='true' :label='$t("MSG_REJECT")' @click='onReject' :disabled='target.State === reviewbase.ReviewState.Rejected' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -41,52 +41,43 @@
 </template>
 
 <script setup lang='ts'>
-import {
-  useLocaleStore,
-  NotifyType,
-  useChurchWithdrawReviewStore,
-  useLocalUserStore,
-  WithdrawReview,
-  ReviewState,
-  useChurchAppCoinStore,
-  formatTime
-} from 'npool-cli-v4'
 import { getAppCoins } from 'src/api/coin'
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { appcoin, _locale, withdrawreview, user, reviewbase, notify, utils } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.getCoinsByAppID(AppID.value))
+const coin = appcoin.useAppCoinStore()
+const coins = computed(() => coin.coins(AppID.value))
 
-const review = useChurchWithdrawReviewStore()
-const locale = useLocaleStore()
-const logined = useLocalUserStore()
+const review = withdrawreview.useWithdrawReviewStore()
+const locale = _locale.useLocaleStore()
+const logined = user.useLocalUserStore()
 
 const displayReviews = computed(() => {
-  return review.WithdrawReviews.WithdrawReviews.get(AppID.value) ? review.WithdrawReviews.WithdrawReviews.get(AppID.value) : []
+  return review.reviews(AppID.value)
 })
 
 const showing = ref(false)
-const target = ref({} as WithdrawReview)
+const target = ref({} as withdrawreview.WithdrawReview)
 
 const onMenuHide = () => {
-  target.value = {} as WithdrawReview
+  target.value = {} as withdrawreview.WithdrawReview
   showing.value = false
 }
 
-const onRowClick = (withdrawReview: WithdrawReview) => {
+const onRowClick = (withdrawReview: withdrawreview.WithdrawReview) => {
   target.value = { ...withdrawReview }
   showing.value = true
 }
 
 const onApprove = (done: () => void) => {
-  target.value.State = ReviewState.Approved
+  target.value.State = reviewbase.ReviewState.Approved
   updateAppWithdrawReview(done)
 }
 
@@ -96,7 +87,7 @@ const onReject = (done: () => void) => {
     done()
     return
   }
-  target.value.State = ReviewState.Rejected
+  target.value.State = reviewbase.ReviewState.Rejected
   updateAppWithdrawReview(done)
 }
 
@@ -115,11 +106,11 @@ const getAppWithdrawReviews = (offset: number, limit: number) => {
         Title: t('MSG_GET_WITHDRAW_REVIEWS'),
         Message: t('MSG_GET_WITHDRAW_REVIEWS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (reviews: Array<WithdrawReview>, error: boolean) => {
-    if (error || reviews.length === 0) {
+  }, (error: boolean, reviews?: Array<withdrawreview.WithdrawReview>) => {
+    if (error || !reviews?.length) {
       return
     }
     getAppWithdrawReviews(offset + limit, limit)
@@ -140,10 +131,10 @@ const updateAppWithdrawReview = (done: () => void) => {
         Title: t('MSG_UPDATE_WITHDRAW_REVIEW'),
         Message: t('MSG_UPDATE_WITHDRAW_REVIEW_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (review: WithdrawReview, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -161,8 +152,8 @@ watch(AppID, () => {
 })
 
 const prepare = () => {
-  if (!review.WithdrawReviews.WithdrawReviews.get(AppID.value)) {
-    getAppWithdrawReviews(0, 500)
+  if (!review.reviews(AppID.value).length) {
+    getAppWithdrawReviews(0, 100)
   }
 
   if (coins.value.length === 0) {
@@ -175,91 +166,91 @@ const columns = computed(() => [
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: WithdrawReview) => row.CoinName
+    field: (row: withdrawreview.WithdrawReview) => row.CoinName
   },
   {
     name: 'CoinLogo',
     label: t('MSG_COIN_LOGO'),
     sortable: true,
-    field: (row: WithdrawReview) => row.CoinLogo
+    field: (row: withdrawreview.WithdrawReview) => row.CoinLogo
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
     sortable: true,
-    field: (row: WithdrawReview) => row.CoinTypeID
+    field: (row: withdrawreview.WithdrawReview) => row.CoinTypeID
   },
   {
     name: 'Amount',
     label: t('MSG_AMOUNT'),
     sortable: true,
-    field: (row: WithdrawReview) => row.Amount
+    field: (row: withdrawreview.WithdrawReview) => row.Amount
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
     sortable: true,
-    field: (row: WithdrawReview) => row.Address
+    field: (row: withdrawreview.WithdrawReview) => row.Address
   },
   {
     name: 'WithdrawState',
     label: t('MSG_WITHDRAW_STATE'),
     sortable: true,
-    field: (row: WithdrawReview) => row.WithdrawState
+    field: (row: withdrawreview.WithdrawReview) => row.WithdrawState
   },
   {
     name: 'State',
     label: t('MSG_STATE'),
     sortable: true,
-    field: (row: WithdrawReview) => row.State
+    field: (row: withdrawreview.WithdrawReview) => row.State
   },
   {
     name: 'Trigger',
     label: t('MSG_TRIGGER'),
     sortable: true,
-    field: (row: WithdrawReview) => row.Trigger
+    field: (row: withdrawreview.WithdrawReview) => row.Trigger
   },
   {
     name: 'Message',
     label: t('MSG_MESSAGE'),
     sortable: true,
-    field: (row: WithdrawReview) => row.Message
+    field: (row: withdrawreview.WithdrawReview) => row.Message
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: WithdrawReview) => formatTime(row.CreatedAt)
+    field: (row: withdrawreview.WithdrawReview) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: t('MSG_UPDATED_AT'),
     sortable: true,
-    field: (row: WithdrawReview) => formatTime(row.UpdatedAt)
+    field: (row: withdrawreview.WithdrawReview) => utils.formatTime(row.UpdatedAt)
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: WithdrawReview) => row.UserID
+    field: (row: withdrawreview.WithdrawReview) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: WithdrawReview) => row.EmailAddress
+    field: (row: withdrawreview.WithdrawReview) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: WithdrawReview) => row.PhoneNO
+    field: (row: withdrawreview.WithdrawReview) => row.PhoneNO
   },
   {
     name: 'KycState',
     label: t('MSG_KYC_STATE'),
     sortable: true,
-    field: (row: WithdrawReview) => row.KycState
+    field: (row: withdrawreview.WithdrawReview) => row.KycState
   }
 ])
 </script>

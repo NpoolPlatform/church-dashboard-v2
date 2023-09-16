@@ -18,10 +18,10 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useChurchAppGoodStore } from 'npool-cli-v4'
 import { getAppGoods } from 'src/api/good'
 import { AppID } from 'src/api/app'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
+import { appgood } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -31,8 +31,8 @@ const props = defineProps<Props>()
 const goodID = toRef(props, 'id')
 const target = ref(goodID.value)
 
-const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
+const appGood = appgood.useAppGoodStore()
+const appGoods = computed(() => appGood.goods(AppID.value))
 
 const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {

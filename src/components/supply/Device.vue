@@ -7,7 +7,7 @@
     :columns='columns'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as DeviceInfo)'
+    @row-click='(evt, row, index) => onRowClick(row as deviceinfo.DeviceInfo)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -45,10 +45,10 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchDeviceInfoStore, DeviceInfo, formatTime } from 'npool-cli-v4'
 import { getDeviceInfos } from 'src/api/good'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { deviceinfo, notify, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -56,10 +56,10 @@ const { t } = useI18n({ useScope: 'global' })
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const deviceInfo = useChurchDeviceInfoStore()
-const devices = computed(() => deviceInfo.DeviceInfos.DeviceInfos)
+const deviceInfo = deviceinfo.useDeviceInfoStore()
+const devices = computed(() => deviceInfo.deviceInfos())
 
-const target = ref({} as DeviceInfo)
+const target = ref({} as deviceinfo.DeviceInfo)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -68,7 +68,7 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (row: DeviceInfo) => {
+const onRowClick = (row: deviceinfo.DeviceInfo) => {
   updating.value = true
   showing.value = true
   target.value = { ...row }
@@ -84,7 +84,7 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as DeviceInfo
+  target.value = {} as deviceinfo.DeviceInfo
   showing.value = false
 }
 
@@ -96,16 +96,16 @@ const updateDevice = (done: () => void) => {
         Title: t('MSG_UPDATE_DEVICE'),
         Message: t('MSG_UPDATE_DEVICE_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: t('MSG_UPDATE_DEVICE'),
         Message: t('MSG_UPDATE_DEVICE_SUCCESS'),
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (d: DeviceInfo, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -122,16 +122,16 @@ const createDevice = (done: () => void) => {
         Title: t('MSG_CREATE_DEVICE'),
         Message: t('MSG_CREATE_DEVICE_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: t('MSG_CREATE_DEVICE'),
         Message: t('MSG_CREATE_DEVICE_SUCCESS'),
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (d: DeviceInfo, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -141,8 +141,8 @@ const createDevice = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (deviceInfo.DeviceInfos.DeviceInfos.length === 0) {
-    getDeviceInfos(0, 500)
+  if (!devices.value.length) {
+    getDeviceInfos(0, 100)
   }
 })
 
@@ -151,43 +151,43 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: DeviceInfo) => row.ID
+    field: (row: deviceinfo.DeviceInfo) => row.ID
   },
   {
     name: 'MANUFACTURER',
     label: t('MSG_MANUFACTURER'),
     sortable: true,
-    field: (row: DeviceInfo) => row.Manufacturer
+    field: (row: deviceinfo.DeviceInfo) => row.Manufacturer
   },
   {
     name: 'POWERCOMSUPTION',
     label: t('MSG_POWERCOMSUPTION'),
     sortable: true,
-    field: (row: DeviceInfo) => row.PowerComsuption
+    field: (row: deviceinfo.DeviceInfo) => row.PowerComsuption
   },
   {
     name: 'SHIPMENTAT',
     label: t('MSG_SHIPMENT_AT'),
     sortable: true,
-    field: (row: DeviceInfo) => row.ShipmentAt
+    field: (row: deviceinfo.DeviceInfo) => row.ShipmentAt
   },
   {
     name: 'Type',
     label: t('MSG_TYPE'),
     sortable: true,
-    field: (row: DeviceInfo) => row.Type
+    field: (row: deviceinfo.DeviceInfo) => row.Type
   },
   {
     name: 'CREATED_AT',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: DeviceInfo) => formatTime(row.CreatedAt)
+    field: (row: deviceinfo.DeviceInfo) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UPDATED_AT',
     label: t('MSG_UPDATED_AT'),
     sortable: true,
-    field: (row: DeviceInfo) => formatTime(row.UpdatedAt)
+    field: (row: deviceinfo.DeviceInfo) => utils.formatTime(row.UpdatedAt)
   }
 ])
 </script>

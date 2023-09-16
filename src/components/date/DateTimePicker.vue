@@ -35,8 +35,9 @@
   <div style='height: 20px' />
 </template>
 <script lang='ts' setup>
-import { formatTime } from 'npool-cli-v4'
 import { defineProps, defineEmits, toRef, ref, onMounted, watch } from 'vue'
+import { utils } from 'src/npoolstore'
+
 interface Props {
   date: number
   label?: string
@@ -62,7 +63,7 @@ watch(target, () => {
 
 onMounted(() => {
   if (date.value) {
-    target.value = formatTime(date.value + 60 * new Date().getTimezoneOffset(), false)?.replace(/\//g, '-')
+    target.value = utils.formatTime(date.value + 60 * new Date().getTimezoneOffset(), false)?.replace(/\//g, '-')
   }
 })
 </script>

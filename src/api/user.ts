@@ -15,8 +15,8 @@ export const getAppUsers = (offset: number, limit: number) => {
         Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<user.User>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<user.User>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppUsers(offset + limit, limit)

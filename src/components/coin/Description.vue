@@ -36,7 +36,7 @@
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' type='textarea' />
       </q-card-section>
       <q-card-section>
-        <q-select dense :options='CoinDescriptionUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
+        <q-select dense :options='appcoindescription.CoinDescriptionUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -47,20 +47,20 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchAppCoinDescriptionStore, CoinDescription, NotifyType, CoinDescriptionUsedFors } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { getAppCoinDescriptions } from 'src/api/coin'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
+import { notify, appcoindescription } from 'src/npoolstore'
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const description = useChurchAppCoinDescriptionStore()
-const descriptions = computed(() => description.getCoinsByAppID(AppID.value))
+const description = appcoindescription.useCoinDescriptionStore()
+const descriptions = computed(() => description.descriptions(AppID.value))
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as CoinDescription)
+const target = ref({} as appcoindescription.CoinDescription)
 
 const onCreate = () => {
   showing.value = true
@@ -79,7 +79,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as CoinDescription
+  target.value = {} as appcoindescription.CoinDescription
 }
 
 const onSubmit = (done: () => void) => {
@@ -125,7 +125,7 @@ const createCoinDescription = (done: () => void) => {
         Title: 'MSG_CREATE_DESCRIPTION',
         Message: 'MSG_CREATE_DESCRIPTION_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -146,8 +146,8 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (descriptions.value.length === 0) {
-    getAppCoinDescriptions(0, 500)
+  if (!descriptions.value?.length) {
+    getAppCoinDescriptions(0, 100)
   }
 }
 

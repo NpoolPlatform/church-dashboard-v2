@@ -42,7 +42,7 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as AppGood)'
+    @row-click='(evt, row, index) => onRowClick(row as appgood.Good)'
   />
 
   <q-dialog
@@ -87,7 +87,6 @@
           type='number'
           :min='0'
         />
-        <q-select :options='SettleTypes' v-model='target.CommissionSettleType' :label='$t("MSG_COMMISSION_SETTLE_TYPE")' />
         <q-input
           class='commission-percent'
           v-model='target.DailyRewardAmount'
@@ -98,7 +97,7 @@
       </q-card-section>
       <q-card-section>
         <q-select
-          :options='CancelModes'
+          :options='appgood.CancelModes'
           v-model='target.CancelMode'
           :label='$t("MSG_CANCEL_MODE")'
         />
@@ -108,7 +107,7 @@
           type='number'
           :min='0'
           suffix='h'
-          :disable='target.CancelMode === CancelMode.UnCancellable'
+          :disable='appGood.cancelable(AppID, target.ID)'
         />
       </q-card-section>
       <q-card-section>
@@ -138,10 +137,10 @@
 
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
-import { Good, NotifyType, useChurchGoodStore, useChurchAppGoodStore, AppGood, formatTime, SettleTypes, CancelModes, CancelMode } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAppGoods, getGoods } from 'src/api/good'
+import { good, notify, appgood, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -150,9 +149,9 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const AppDefaultGood = defineAsyncComponent(() => import('src/components/good/AppDefaultGood.vue'))
 
-const good = useChurchGoodStore()
-const goods = computed(() => good.Goods.Goods)
-const selectedGood = ref([] as Array<Good>)
+const _good = good.useGoodStore()
+const goods = computed(() => _good.goods())
+const selectedGood = ref([] as Array<good.Good>)
 
 const username = ref('')
 const displayGoods = computed(() => {
@@ -160,15 +159,15 @@ const displayGoods = computed(() => {
   return goods.value?.filter((el) => el.ID.toLowerCase().includes(name) || el.Unit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
 })
 
-const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
+const appGood = appgood.useAppGoodStore()
+const appGoods = computed(() => appGood.goods(AppID.value))
 
-const target = ref({} as AppGood)
+const target = ref({} as appgood.Good)
 const showing = ref(false)
 const updating = ref(false)
 
 const onMenuHide = () => {
-  target.value = {} as AppGood
+  target.value = {} as appgood.Good
   showing.value = false
 }
 
@@ -181,7 +180,7 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onRowClick = (row: AppGood) => {
+const onRowClick = (row: appgood.Good) => {
   target.value = { ...row }
   updating.value = true
   showing.value = true
@@ -192,7 +191,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const createAppGood = (done: () => void) => {
-  appGood.createAppGood({
+  appGood.createNAppGood({
     TargetAppID: AppID.value,
     ...target.value,
     GoodID: selectedGood.value[0].ID,
@@ -203,16 +202,16 @@ const createAppGood = (done: () => void) => {
         Title: 'MSG_AUTHORIZE_GOOD',
         Message: 'MSG_AUTHORIZE_GOOD_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_AUTHORIZE_GOOD',
         Message: 'MSG_AUTHORIZE_GOOD_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (g: AppGood, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -235,7 +234,6 @@ const updateTarget = computed(() => {
     CommissionPercent: target.value.CommissionPercent,
     TechnicalFeeRatio: target.value.TechnicalFeeRatio,
     ElectricityFeeRatio: target.value.ElectricityFeeRatio,
-    CommissionSettleType: target.value.CommissionSettleType,
     ProductPage: target.value?.ProductPage,
     EnableProductPage: target.value?.EnableProductPage,
     EnablePurchase: target.value?.EnablePurchase,
@@ -254,16 +252,16 @@ const updateAppGood = (done: () => void) => {
         Title: 'MSG_UPDATE_GOOD',
         Message: 'MSG_UPDATE_GOOD_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_GOOD',
         Message: 'MSG_UPDATE_GOOD_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (g: AppGood, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -295,79 +293,79 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: Good) => row.ID
+    field: (row: good.Good) => row.ID
   },
   {
     name: 'Title',
     label: t('MSG_GOOD_NAME'),
     sortable: true,
-    field: (row: Good) => row.Title
+    field: (row: good.Good) => row.Title
   },
   {
     name: 'GOODTYPE',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
-    field: (row: Good) => row.GoodType
+    field: (row: good.Good) => row.GoodType
   },
   {
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: Good) => row.Price
+    field: (row: good.Good) => row.Price
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: Good) => t(row.Unit)
+    field: (row: good.Good) => t(row.Unit)
   },
   {
     name: 'GOODTOTAL',
     label: t('MSG_GOOD_TOTAL'),
     sortable: true,
-    field: (row: Good) => row.Total
+    field: (row: good.Good) => row.Total
   },
   {
     name: 'GOODSOLD',
     label: t('MSG_GOOD_SOLD'),
     sortable: true,
-    field: (row: Good) => row.Sold
+    field: (row: good.Good) => row.Sold
   },
   {
     name: 'GOODLOCKED',
     label: t('MSG_GOOD_LOCKED'),
     sortable: true,
-    field: (row: Good) => row.Locked
+    field: (row: good.Good) => row.Locked
   },
   {
     name: 'GOODINSERVICE',
     label: t('MSG_GOOD_INSERVICE'),
     sortable: true,
-    field: (row: Good) => row.InService
+    field: (row: good.Good) => row.InService
   },
   {
     name: 'WaitStart',
     label: t('MSG_GOOD_WAITSTART'),
     sortable: true,
-    field: (row: Good) => row.WaitStart
+    field: (row: good.Good) => row.WaitStart
   },
   {
     name: 'COINNAME',
     label: t('MSG_COINNAME'),
     sortable: true,
-    field: (row: Good) => row.CoinName
+    field: (row: good.Good) => row.CoinName
   },
   {
     name: 'BENEFITTYPE',
     label: t('MSG_BENEFITTYPE'),
     sortable: true,
-    field: (row: Good) => row.BenefitType
+    field: (row: good.Good) => row.BenefitType
   },
   {
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
     sortable: true,
-    field: (row: Good) => formatTime(row.StartAt)
+    field: (row: good.Good) => utils.formatTime(row.StartAt)
   }
 ])
 
@@ -376,97 +374,91 @@ const appGoodsColumns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: AppGood) => row.ID
+    field: (row: appgood.Good) => row.ID
   },
   {
     name: 'GOODID',
     label: t('MSG_GOODID'),
     sortable: true,
-    field: (row: AppGood) => row.GoodID
+    field: (row: appgood.Good) => row.GoodID
   },
   {
     name: 'GOODNAME',
     label: t('MSG_GOODNAME'),
     sortable: true,
-    field: (row: AppGood) => row.GoodName
+    field: (row: appgood.Good) => row.GoodName
   },
   {
     name: 'GOODTYPE',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
-    field: (row: AppGood) => row.GoodType
+    field: (row: appgood.Good) => row.GoodType
   },
   {
     name: 'ONLINE',
     label: t('MSG_ONLINE'),
     sortable: true,
-    field: (row: AppGood) => row.Online
+    field: (row: appgood.Good) => row.Online
   },
   {
     name: 'VISIBLE',
     label: t('MSG_VISIBLE'),
     sortable: true,
-    field: (row: AppGood) => row.Visible
+    field: (row: appgood.Good) => row.Visible
   },
   {
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: AppGood) => row.Price
+    field: (row: appgood.Good) => row.Price
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: AppGood) => t(row.Unit)
+    field: (row: appgood.Good) => t(row.Unit)
   },
   {
     name: 'GOODTOTAL',
     label: t('MSG_GOOD_TOTAL'),
     sortable: true,
-    field: (row: AppGood) => row.Total
-  },
-  {
-    name: 'GOODSOLD',
-    label: t('MSG_GOOD_SOLD'),
-    sortable: true,
-    field: (row: AppGood) => row.Sold
+    field: (row: appgood.Good) => row.GoodTotal
   },
   {
     name: 'GOODLOCKED',
     label: t('MSG_GOOD_LOCKED'),
     sortable: true,
-    field: (row: AppGood) => row.Locked
+    field: (row: appgood.Good) => row.AppGoodLocked
   },
   {
     name: 'GOODINSERVICE',
     label: t('MSG_GOOD_INSERVICE'),
     sortable: true,
-    field: (row: AppGood) => row.InService
+    field: (row: appgood.Good) => row.AppGoodInService
   },
   {
     name: 'WaitStart',
     label: t('MSG_GOOD_WAITSTART'),
     sortable: true,
-    field: (row: AppGood) => row.WaitStart
+    field: (row: appgood.Good) => row.AppGoodWaitStart
   },
   {
     name: 'COINNAME',
     label: t('MSG_COINNAME'),
     sortable: true,
-    field: (row: AppGood) => row.CoinName
+    field: (row: appgood.Good) => row.CoinName
   },
   {
     name: 'BENEFITTYPE',
     label: t('MSG_BENEFITTYPE'),
     sortable: true,
-    field: (row: AppGood) => row.BenefitType
+    field: (row: appgood.Good) => row.BenefitType
   },
   {
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
     sortable: true,
-    field: (row: AppGood) => formatTime(row.StartAt)
+    field: (row: appgood.Good) => utils.formatTime(row.StartAt)
   }
 ])
 </script>

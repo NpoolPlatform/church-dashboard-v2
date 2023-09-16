@@ -1,42 +1,46 @@
-<!-- <template>
+<template>
   <div class='row announcement main'>
     <q-icon class='icon start' name='volume_up' />
-    {{ announcement }}
+    {{ _announcement }}
   </div>
 </template>
 
 <script setup lang='ts'>
-import { useMailboxStore, NotificationType } from 'npool-cli-v2'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { announcement, notify } from 'src/npoolstore'
+import { myAppID } from 'src/api/app'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const mailbox = useMailboxStore()
-const announcement = ref('')
+const mailbox = announcement.useAnnouncementStore()
+const _announcement = ref('')
+const announcements = computed(() => mailbox.announcements(myAppID))
 const index = ref(0)
 
 const ticker = ref(-1)
 
 onMounted(() => {
   ticker.value = window.setInterval(() => {
-    if (mailbox.Announcements.length === 0) {
+    if (!announcements.value.length) {
       return
     }
 
-    index.value = index.value % mailbox.Announcements.length
-    announcement.value = mailbox.Announcements[index.value].Title
+    index.value = index.value % announcements.value.length
+    _announcement.value = announcements.value[index.value].Title
     index.value += 1
   }, 3000)
 
   mailbox.getAnnouncements({
+    Offset: 0,
+    Limit: 100,
     Message: {
       Error: {
         Title: t('MSG_GET_ANNOUNCEMENTS'),
         Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
         Popup: true,
-        Type: NotificationType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -53,4 +57,4 @@ onUnmounted(() => {
 </script>
 
 <style lang='sass' scoped>
-</style> -->
+</style>

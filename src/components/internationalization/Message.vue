@@ -6,7 +6,7 @@
     :rows='displayAppMsgs'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Message)'
+    @row-click='(evt, row, index) => onRowClick(row as g11nbase.Message)'
     v-model:selected='selectedMessages'
     selection='single'
   >
@@ -131,23 +131,26 @@
 <script setup lang='ts'>
 
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { useChurchMessageStore, formatTime, NotifyType, Message, useLocaleStore, MessageReq } from 'npool-cli-v4'
 import { getAppMessages } from 'src/api/g11n'
 import { AppID } from 'src/api/app'
+import { message, utils, notify, _locale, g11nbase } from 'src/npoolstore'
 
 import saveAs from 'file-saver'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
-const message = useChurchMessageStore()
-const messages = computed(() => message.getMessagesByAppID(AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
+const _message = message.useMessageStore()
+const messages = computed(() => _message.messages(AppID.value, targetLangID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
 
 const messageID = ref('')
-const displayAppMsgs = computed(() => messages.value.filter((msg) => msg.MessageID?.toLowerCase().includes(messageID.value?.toLowerCase()) || msg.Message?.toLowerCase()?.includes(messageID.value?.toLowerCase())))
+const displayAppMsgs = computed(() => messages.value.filter((msg) => {
+  return msg.MessageID?.toLowerCase().includes(messageID.value?.toLowerCase()) ||
+        msg.Message?.toLowerCase()?.includes(messageID.value?.toLowerCase())
+}))
 
 const targetLangID = ref('')
-const target = ref({} as Message)
+const target = ref({} as g11nbase.Message)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -158,11 +161,11 @@ const onCreate = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as Message
+  target.value = {} as g11nbase.Message
   showing.value = false
 }
 
-const onRowClick = (row: Message) => {
+const onRowClick = (row: g11nbase.Message) => {
   target.value = { ...row }
   updating.value = true
   showing.value = true
@@ -172,9 +175,9 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const exportMessages = ref([] as Array<Message>)
+const exportMessages = ref([] as Array<g11nbase.Message>)
 const onExport = () => {
-  const resultMap = new Map<string, Array<Message>>()
+  const resultMap = new Map<string, Array<g11nbase.Message>>()
   messages.value.forEach((el) => {
     let data = resultMap.get(el.LangID)
     if (!data) {
@@ -187,7 +190,7 @@ const onExport = () => {
     if (values.length > 0) {
       console.log('_key: ', _key)
       const blob = new Blob([JSON.stringify(values)], { type: 'text/plain;charset=utf-8' })
-      const filename = 'messages-' + values[0].Lang + '-' + formatTime(new Date().getTime() / 1000) + '.json'
+      const filename = 'messages-' + values[0].Lang + '-' + utils.formatTime(new Date().getTime() / 1000) + '.json'
       saveAs(blob, filename)
     }
   })
@@ -198,7 +201,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const createAppMessage = (done: () => void) => {
-  message.createAppMessage({
+  _message.createAppMessage({
     TargetAppID: AppID.value,
     TargetLangID: targetLangID.value,
     ...target.value,
@@ -207,13 +210,13 @@ const createAppMessage = (done: () => void) => {
         Title: 'MSG_CREATE_MESSAGE',
         Message: 'MSG_CREATE_MESSAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_MESSAGE',
         Message: 'MSG_CREATE_MESSAGE_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -238,20 +241,20 @@ const updateTarget = computed(() => {
   }
 })
 const updateAppMessage = (done: () => void) => {
-  message.updateAppMessage({
+  _message.updateAppMessage({
     ...updateTarget.value,
     NotifyMessage: {
       Error: {
         Title: 'MSG_UPDATE_MESSAGE',
         Message: 'MSG_UPDATE_MESSAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_MESSAGE',
         Message: 'MSG_UPDATE_MESSAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -264,21 +267,21 @@ const updateAppMessage = (done: () => void) => {
 }
 
 const onDelete = () => {
-  message.deleteAppMessage({
+  _message.deleteAppMessage({
     ID: exportMessages?.value[0].ID,
     TargetAppID: AppID.value,
-    NotifyMessage: {
+    Message: {
       Error: {
         Title: 'MSG_DELETE_MESSAGE',
         Message: 'MSG_DELETE_MESSAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_DELETE_MESSAGE',
         Message: 'MSG_DELETE_MESSAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {
@@ -286,8 +289,8 @@ const onDelete = () => {
   })
 }
 
-const loadedMessages = ref([] as Array<Message>)
-const selectedMessages = ref([] as Array<Message>)
+const loadedMessages = ref([] as Array<g11nbase.Message>)
+const selectedMessages = ref([] as Array<g11nbase.Message>)
 const loadFileButton = ref<HTMLInputElement>()
 
 const uploadFile = (evt: Event) => {
@@ -296,7 +299,7 @@ const uploadFile = (evt: Event) => {
     const filename = target.files[0]
     const reader = new FileReader()
     reader.onload = () => {
-      loadedMessages.value = JSON.parse(reader.result as string) as Array<Message>
+      loadedMessages.value = JSON.parse(reader.result as string) as Array<g11nbase.Message>
     }
     reader.readAsText(filename)
   }
@@ -310,11 +313,11 @@ const importMessages = computed(() => {
       Message: el.Message,
       GetIndex: el.GetIndex,
       Disabled: el.Disabled
-    } as MessageReq
+    } as message.MessageReq
   })
 })
 
-const locale = useLocaleStore()
+const locale = _locale.useLocaleStore()
 const _langID = computed(() => locale?.AppLang?.LangID)
 const langID = ref(_langID.value)
 
@@ -329,7 +332,7 @@ const onBatchCancel = () => {
 }
 
 const onBatchSubmit = (done: () => void) => {
-  message.createAppMessages({
+  _message.createAppMessages({
     TargetAppID: AppID.value,
     TargetLangID: langID.value,
     Infos: importMessages.value,
@@ -338,13 +341,13 @@ const onBatchSubmit = (done: () => void) => {
         Title: 'MSG_CREATE_COUNTRIES',
         Message: 'MSG_CREATE_COUNTRIES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_BATCH_CREATE_COUNTRIES',
         Message: 'MSG_BATCH_CREATE_COUNTRIES_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {

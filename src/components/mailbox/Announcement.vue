@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime, NotifyType, useChurchAnnouncementStore, Announcement } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { computed, defineAsyncComponent, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { announcement, notify, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -24,8 +24,8 @@ const { t } = useI18n({ useScope: 'global' })
 const AnnouncementUser = defineAsyncComponent(() => import('src/components/mailbox/AnnouncementUser.vue'))
 const State = defineAsyncComponent(() => import('src/components/mailbox/State.vue'))
 
-const announcement = useChurchAnnouncementStore()
-const announcements = computed(() => announcement.announcements(AppID.value))
+const _announcement = announcement.useAnnouncementStore()
+const announcements = computed(() => _announcement.announcements(AppID.value))
 
 watch(AppID, () => {
   if (announcements.value?.length === 0) {
@@ -40,7 +40,7 @@ onMounted(() => {
 })
 
 const getAppAnnouncements = (offset: number, limit: number) => {
-  announcement.getAppAnnouncements({
+  _announcement.getNAppAnnouncements({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -49,10 +49,10 @@ const getAppAnnouncements = (offset: number, limit: number) => {
         Title: t('MSG_GET_ANNOUNCEMENTS'),
         Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<Announcement>) => {
+  }, (error: boolean, rows: Array<announcement.Announcement>) => {
     if (error || rows.length < limit) {
       return
     }
@@ -65,55 +65,55 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: Announcement) => row.ID
+    field: (row: announcement.Announcement) => row.ID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: Announcement) => row.AppID
+    field: (row: announcement.Announcement) => row.AppID
   },
   {
     name: 'LangID',
     label: t('MSG_LANG_ID'),
     sortable: true,
-    field: (row: Announcement) => row.LangID
+    field: (row: announcement.Announcement) => row.LangID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
     sortable: true,
-    field: (row: Announcement) => row.Title
+    field: (row: announcement.Announcement) => row.Title
   },
   {
     name: 'Type',
     label: t('MSG_TYPE'),
     sortable: true,
-    field: (row: Announcement) => row.AnnouncementType
+    field: (row: announcement.Announcement) => row.AnnouncementType
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
     sortable: true,
-    field: (row: Announcement) => row.Content
+    field: (row: announcement.Announcement) => row.Content
   },
   {
     name: 'Channel',
     label: t('MSG_CHANNEL'),
     sortable: true,
-    field: (row: Announcement) => row.Channel
+    field: (row: announcement.Announcement) => row.Channel
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: Announcement) => formatTime(row.CreatedAt)
+    field: (row: announcement.Announcement) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'END_AT',
     label: t('MSG_END_AT'),
     sortable: true,
-    field: (row: Announcement) => formatTime(row.EndAt)
+    field: (row: announcement.Announcement) => utils.formatTime(row.EndAt)
   }
 ])
 </script>

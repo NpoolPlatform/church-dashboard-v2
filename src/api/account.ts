@@ -1,5 +1,5 @@
 import { AppID } from './app'
-import { useraccount, notify, accountbase, goodbenefitaccount, platformaccount, paymentaccount } from 'src/npoolstore'
+import { useraccount, notify, goodbenefitaccount, platformaccount, paymentaccount, useraccountbase } from 'src/npoolstore'
 
 const account = useraccount.useUserAccountStore()
 
@@ -16,7 +16,7 @@ export const getNAppUserAccounts = (offset: number, limit: number) => {
         Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, accounts?: Array<accountbase.Account>) => {
+  }, (error: boolean, accounts?: Array<useraccountbase.Account>) => {
     if (error || !accounts?.length) {
       return
     }
@@ -30,7 +30,7 @@ export const getAppDepositAccounts = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, accounts?: Array<accountbase.Account>) => {
+  }, (error: boolean, accounts?: Array<useraccountbase.Account>) => {
     if (error || !accounts?.length) {
       return
     }

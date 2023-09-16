@@ -21,10 +21,10 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useChurchAppLangStore } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
+import { applang } from 'src/npoolstore'
 
 interface Props {
   language: string
@@ -37,8 +37,8 @@ const updating = toRef(props, 'updating')
 
 const lang = ref(language.value)
 
-const _lang = useChurchAppLangStore()
-const langs = computed(() => _lang.getAppLangsByAppID(AppID.value))
+const _lang = applang.useAppLangStore()
+const langs = computed(() => _lang.langs(AppID.value))
 const languages = computed(() => Array.from(langs.value).map((el) => {
   return {
     value: el.LangID,

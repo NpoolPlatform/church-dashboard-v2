@@ -48,10 +48,10 @@
 </template>
 
 <script setup lang='ts'>
-import { useLocalUserStore } from 'npool-cli-v4'
 import { MenuItem, useMenuStore } from 'src/localstore'
 import { defineProps, toRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { user } from 'src/npoolstore'
 
 interface Props {
   menu: MenuItem
@@ -72,8 +72,8 @@ const router = useRouter()
 const menus = useMenuStore()
 const active = computed(() => menus.ActiveMainBreadcrumb?.menuId === menu.value.menuId)
 
-const user = useLocalUserStore()
-const logined = computed(() => user.logined)
+const _user = user.useLocalUserStore()
+const logined = computed(() => _user.logined)
 
 const onItemClick = () => {
   menus.ActiveMainBreadcrumb = menu.value

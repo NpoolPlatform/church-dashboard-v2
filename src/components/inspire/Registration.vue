@@ -29,15 +29,16 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, Registration, useChurchRegistrationStore } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { registration, notify } from 'src/npoolstore'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const registration = useChurchRegistrationStore()
-const registrations = computed(() => registration.getRegistrationsByAppID(AppID.value))
+const _registration = registration.useRegistrationStore()
+const registrations = computed(() => _registration.registrations(AppID.value))
 
 const invitee = ref('')
 const inviter = ref('')
@@ -76,7 +77,7 @@ onMounted(() => {
 })
 
 const getAppRegistrations = (offset: number, limit: number) => {
-  registration.getAppRegistrations({
+  _registration.getAppRegistrations({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -84,10 +85,10 @@ const getAppRegistrations = (offset: number, limit: number) => {
       Error: {
         Title: t('MSG_GET_REGISTRATIONS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<Registration>) => {
+  }, (error: boolean, rows: Array<registration.Registration>) => {
     if (error) {
       return
     }

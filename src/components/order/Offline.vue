@@ -20,9 +20,9 @@
         <span>{{ $t('MSG_CREATE_OFFLINE_ORDER') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_TOTAL') }}: {{ selectedGood?.value?.Total }}</q-item-label>
-        <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedGood?.value?.Locked }}</q-item-label>
-        <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedGood?.value?.InService }}</q-item-label>
+        <q-item-label>{{ $t('MSG_TOTAL') }}: {{ selectedGood?.value?.GoodTotal }}</q-item-label>
+        <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedGood?.value?.AppGoodLocked }}</q-item-label>
+        <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedGood?.value?.AppGoodInService }}</q-item-label>
         <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
         <q-select
           :options='displayUsers'
@@ -46,12 +46,12 @@
 </template>
 
 <script setup lang='ts'>
-import { AppGood, NotifyType, useChurchAppGoodStore, useChurchOrderStore, useChurchUserStore, User, Order, OrderType, useChurchAppCoinStore } from 'npool-cli-v4'
 import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/api/app'
+import { appgood, notify, order, user, appcoin } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -59,12 +59,12 @@ const { t } = useI18n({ useScope: 'global' })
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const good = useChurchAppGoodStore()
-const appGoods = computed(() => good.getGoodsByAppID(AppID.value))
+const good = appgood.useAppGoodStore()
+const appGoods = computed(() => good.goods(AppID.value))
 
 interface MyGood {
   label: string
-  value: AppGood
+  value: appgood.Good
 }
 const goods = computed(() => Array.from(appGoods.value.filter((el) => el.Online)).map((el) => {
   return {
@@ -75,11 +75,11 @@ const goods = computed(() => Array.from(appGoods.value.filter((el) => el.Online)
 
 interface MyUser {
   label: string
-  value: User
+  value: user.User
 }
 
-const user = useChurchUserStore()
-const users = computed(() => Array.from(user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : []).map((el) => {
+const _user = user.useUserStore()
+const users = computed(() => Array.from(_user.appUsers(AppID.value)).map((el) => {
   return {
     label: el.EmailAddress?.length ? el.EmailAddress : el.PhoneNO,
     value: el
@@ -90,7 +90,8 @@ const displayUsers = ref(users.value)
 const filterUser = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
     displayUsers.value = users.value.filter((el) => {
-      return el.value.EmailAddress?.toLowerCase().includes(val.toLowerCase()) || el.value.PhoneNO?.toLowerCase().includes(val.toLowerCase())
+      return el.value.EmailAddress?.toLowerCase().includes(val.toLowerCase()) ||
+            el.value.PhoneNO?.toLowerCase().includes(val.toLowerCase())
     })
   })
 }
@@ -99,7 +100,7 @@ const selectedGood = ref(undefined as unknown as MyGood)
 const selectedUser = ref(undefined as unknown as MyUser)
 
 const units = ref(1)
-const maxUnits = computed(() => Number(selectedGood.value?.value?.Total) - (Number(selectedGood.value?.value?.Locked)) - (Number(selectedGood.value?.value?.InService)))
+const maxUnits = computed(() => Number(selectedGood.value?.value?.GoodSpotQuantity))
 
 const showing = ref(false)
 
@@ -117,8 +118,7 @@ const onMenuHide = () => {
   selectedUser.value = undefined as unknown as MyUser
 }
 
-const order = useChurchOrderStore()
-
+const _order = order.useOrderStore()
 const onSubmit = (done: () => void) => {
   if (units.value > maxUnits.value) {
     console.log('purchase units', units.value, 'max units', maxUnits.value)
@@ -136,22 +136,22 @@ const onSubmit = (done: () => void) => {
     return
   }
 
-  order.createAppUserOrder({
+  _order.createAppUserOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.ID,
     GoodID: selectedGood.value.value.GoodID,
     Units: `${units.value}`,
     PaymentCoinID: payCoinID.value,
-    OrderType: OrderType.Offline,
+    OrderType: order.OrderType.Offline,
     Message: {
       Error: {
         Title: t('MSG_CREATE_ORDER'),
         Message: t('MSG_CREATE_ORDER_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (o : Order, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -160,12 +160,14 @@ const onSubmit = (done: () => void) => {
   })
 }
 
-const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.getCoinsByAppID(AppID.value))
+const coin = appcoin.useAppCoinStore()
+const coins = computed(() => coin.coins(AppID.value))
 
 const payCoinID = computed(() => {
   const index = coins.value.findIndex((el) => {
-    return (el.ENV === selectedGood.value?.value.CoinEnv) && (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') || el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
+    return (el.ENV === selectedGood.value?.value.CoinEnv) &&
+          (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') ||
+          el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
   })
   if (index < 0) {
     return undefined as unknown as string
