@@ -94,7 +94,7 @@ const selectedUser = ref([] as Array<user.User>)
 
 const roleUserLoading = ref(false)
 const roleUsername = ref('')
-const roleUsers = computed(() => _role.roleUsers(AppID.value, selectedRole.value[0].ID))
+const roleUsers = computed(() => _role.roleUsers(AppID.value, selectedRole.value[0]?.ID))
 const displayRoleUsers = computed(() => roleUsers.value?.filter((el) => el.EmailAddress?.includes(roleUsername.value) || el.PhoneNO?.includes(roleUsername.value)))
 const selectedRoleUser = ref([] as Array<user.User>)
 
