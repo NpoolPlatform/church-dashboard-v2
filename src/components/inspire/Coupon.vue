@@ -167,7 +167,7 @@ const onSubmit = () => {
       Threshold: target.value.Threshold,
       Random: target.value.Random,
       CouponConstraint: target.value.CouponConstraint,
-      GoodID: target.value.GoodID,
+      AppGoodID: target.value.AppGoodID,
       NotifyMessage: {
         Error: {
           Title: 'MSG_UPDATE_COUPON',
@@ -200,7 +200,7 @@ const onSubmit = () => {
     Threshold: target.value.Threshold,
     Random: target.value.Random,
     CouponConstraint: target.value.CouponConstraint,
-    GoodID: target.value.GoodID,
+    AppGoodID: target.value.AppGoodID,
     NotifyMessage: {
       Error: {
         Title: 'MSG_CREATE_COUPON',
