@@ -49,12 +49,8 @@
 import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/api/app'
-import { appgood, notify, order, user, appcoin } from 'src/npoolstore'
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
+import { appgood, order, user, appcoin, sdk } from 'src/npoolstore'
 
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -118,45 +114,26 @@ const onMenuHide = () => {
   selectedUser.value = undefined as unknown as MyUser
 }
 
-const _order = order.useOrderStore()
-const onSubmit = (done: () => void) => {
+const onSubmit = () => {
   if (units.value > maxUnits.value) {
-    console.log('purchase units', units.value, 'max units', maxUnits.value)
-    done()
     return
   }
   if (!selectedGood.value) {
-    console.log('please select good')
-    done()
     return
   }
   if (!selectedUser.value) {
-    console.log('please select user')
-    done()
     return
   }
+  onMenuHide()
 
-  _order.createAppUserOrder({
+  sdk.createAppUserOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.ID,
-    GoodID: selectedGood.value.value.GoodID,
+    AppGoodID: selectedGood.value.value.GoodID,
     Units: `${units.value}`,
     PaymentCoinID: payCoinID.value,
     OrderType: order.OrderType.Offline,
-    Message: {
-      Error: {
-        Title: t('MSG_CREATE_ORDER'),
-        Message: t('MSG_CREATE_ORDER_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
+    InvestmentType: order.InvestmentType.FullPayment
   })
 }
 
