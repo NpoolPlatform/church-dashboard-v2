@@ -41,13 +41,13 @@ const displayCodes = computed(() => codes.value.filter((el) => {
 
 watch(AppID, () => {
   if (codes.value.length === 0) {
-    getAppInvitationCodes(0, 500)
+    getAppInvitationCodes(0, 100)
   }
 })
 
 onMounted(() => {
   if (codes.value?.length === 0) {
-    getAppInvitationCodes(0, 500)
+    getAppInvitationCodes(0, 100)
   }
 })
 

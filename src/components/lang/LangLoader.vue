@@ -15,10 +15,10 @@ const messages = computed(() => _message.messages(AppID.value, locale.langID()))
 const locale = _locale.useLocaleStore()
 
 onMounted(() => {
-  if (langs.value.length === 0) {
+  if (!langs.value.length) {
     getAppLangs(0, 100)
   }
-  if (messages.value.length === 0) {
+  if (!messages.value.length) {
     getMessages(0, 100)
   }
 })

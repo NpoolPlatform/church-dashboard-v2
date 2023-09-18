@@ -70,10 +70,11 @@ const feeds = computed(() => feed.feeds())
 
 const name = ref('')
 const displayFeeds = computed(() => {
-  return feeds.value.filter((el) => el.CoinName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
-    el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
-    el.CoinTypeID?.toLowerCase()?.includes(name.value?.toLowerCase())
-  )
+  return feeds.value.filter((el) => {
+    return el.CoinName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
+          el.CoinTypeID?.toLowerCase()?.includes(name.value?.toLowerCase())
+  })
 })
 
 const showing = ref(false)

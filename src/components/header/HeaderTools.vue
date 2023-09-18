@@ -77,7 +77,7 @@ onMounted(() => {
   if (!logined.value) {
     return
   }
-  if (applications.value.size === 0) {
+  if (!applications.value.size) {
     getApps(0, 500)
   }
 })

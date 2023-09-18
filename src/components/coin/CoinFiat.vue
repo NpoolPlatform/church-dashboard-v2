@@ -64,7 +64,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <CoinFiat />
 </template>
 
 <script setup lang='ts'>
@@ -94,13 +93,6 @@ const target = ref({} as coinfiat.CoinFiat)
 const onCreate = () => {
   showing.value = true
   updating.value = false
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const onRowClick = (row: coinfiat.CoinFiat) => {
-  target.value = { ...row }
-  showing.value = true
-  updating.value = true
 }
 
 const onCancel = () => {
@@ -177,7 +169,7 @@ const ids = computed(() => {
 
 onMounted(() => {
   if (!coins.value.length) {
-    getCoins(0, 500)
+    getCoins(0, 100)
   }
 })
 
@@ -187,6 +179,7 @@ watch(ids, () => {
     getCoinFiats(0, 100)
   }
 })
+
 const getCoinFiats = (offset: number, limit: number) => {
   _coinfiat.getCoinFiats({
     CoinTypeIDs: ids.value,
