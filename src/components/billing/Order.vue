@@ -6,8 +6,9 @@
     :rows='displayOrders'
     row-key='ID'
     :columns='columns'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[constant.DefaultPageSize]'
     @row-click='(evt, row, index) => onRowClick(row as order.Order)'
+    :loading='loading'
   >
     <template #top-right>
       <select class='order-type' name='order-type' v-model='selectedOrderType'>
@@ -85,7 +86,7 @@
         <!-- <q-item-label> <span class='cancel-order-tip' v-if='currentOrder.OrderType !== OrderType.Offline'>Only Paid offline orders can be Canceled!</span></q-item-label> -->
       </q-item>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_CANCEL_ORDER")' @click='cancelOrder' :disable='good.cancelable(AppID, currentOrder.GoodID)' />
+        <q-btn class='btn round alt' :label='$t("MSG_CANCEL_ORDER")' @click='cancelOrder' :disable='sdk.appGoodCancelable(currentOrder.GoodID)' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -93,27 +94,19 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppGoods } from 'src/api/good'
-import { getNAppOrders } from 'src/api/order'
-import { AppID } from 'src/api/app'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appgood, order, notify, utils, constant } from 'src/npoolstore'
+import { utils, constant, sdk, order } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
-
-const good = appgood.useAppGoodStore()
-const goods = computed(() => good.goods(AppID.value))
 
 const goodID = ref('')
 const start = ref('')
 const end = ref('')
 const selectedOrderType = ref('ALL')
 
-const _order = order.useOrderStore()
-const orders = computed(() => _order.orders(AppID.value))
-const displayOrders = computed(() => orders.value.filter((el) => {
+const displayOrders = computed(() => sdk.orders.value.filter((el) => {
   let display = el.GoodID.includes(goodID.value)
   if (start.value.length) {
     display = display && (el.CreatedAt >= new Date(start.value).getTime() / 1000)
@@ -173,40 +166,35 @@ const onCancel = () => {
 
 const cancelOrder = () => {
   orderInfoDialog.value = false
-  _order.updateAppUserOrder({
-    TargetAppID: AppID.value,
-    ID: currentOrder.value.ID,
-    TargetUserID: currentOrder.value.UserID,
-    PaymentID: currentOrder.value.PaymentID,
-    Canceled: true,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_ORDER',
-        Message: 'MSG_UPDATE_ORDER_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  sdk.updateAppUserOrder(currentOrder.value.ID, true)
 }
 
-watch(AppID, () => {
-  prepare()
+watch(sdk.AppID, () => {
+  onRequestOrders()
+  onRequestAppGoods()
 })
 
 onMounted(() => {
-  prepare()
+  onRequestOrders()
+  onRequestAppGoods()
 })
 
-const prepare = () => {
-  if (goods.value.length === 0) {
-    getAppGoods(0, 500)
+const loading = ref(false)
+const onRequestOrders = () => {
+  if (sdk.orders.value.length) {
+    return
   }
-  if (orders.value.length === 0) {
-    getNAppOrders(0, 500)
+  loading.value = true
+  sdk.getNAppOrders(0, 0, () => {
+    loading.value = false
+  })
+}
+
+const onRequestAppGoods = () => {
+  if (sdk.appGoods.value.length) {
+    return
   }
+  sdk.getNAppGoods(0, 0)
 }
 
 const columns = computed(() => [

@@ -19,6 +19,7 @@
 import { defineAsyncComponent, onMounted, watch, computed } from 'vue'
 import { notify, requesterror, user } from 'src/npoolstore'
 import { useRouter } from 'vue-router'
+// import 'src/api/localapp'
 
 const MainHeader = defineAsyncComponent(() => import('src/components/header/MainHeader.vue'))
 const Footer = defineAsyncComponent(() => import('src/components/footer/Footer.vue'))

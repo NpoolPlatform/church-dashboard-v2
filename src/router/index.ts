@@ -6,7 +6,7 @@ import {
   createWebHistory
 } from 'vue-router'
 import routes from './routes'
-import { utils } from 'src/npoolstore'
+import { loginInterceptor } from 'src/npoolstore/utils'
 
 /*
  * If not building with SSR mode, you can
@@ -36,7 +36,7 @@ export default route(function (/* { store, ssrContext } */) {
   })
 
   router.beforeEach((to, _, next) => {
-    utils.loginInterceptor('/signin', to, next)
+    loginInterceptor('/signin', to, next)
   })
 
   return router

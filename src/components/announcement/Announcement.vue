@@ -9,14 +9,14 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { announcement, notify } from 'src/npoolstore'
-import { myAppID } from 'src/api/app'
+import { MyAppID } from 'src/api/app'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const mailbox = announcement.useAnnouncementStore()
 const _announcement = ref('')
-const announcements = computed(() => mailbox.announcements(myAppID))
+const announcements = computed(() => mailbox.announcements(MyAppID.value))
 const index = ref(0)
 
 const ticker = ref(-1)

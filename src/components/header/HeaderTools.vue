@@ -31,7 +31,7 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
-import { AppID, myAppID } from 'src/api/app'
+import { AppID, MyAppID } from 'src/api/app'
 import { app, notif, user, localapp, notify } from 'src/npoolstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
@@ -58,7 +58,7 @@ const selectedApp = computed({
 })
 
 const mailbox = notif.useNotifStore()
-const bellIcon = computed(() => mailbox.notifs(myAppID, loginedUser.loginedUserID) ? bellMsg : bellNoMsg)
+const bellIcon = computed(() => mailbox.notifs(MyAppID.value, loginedUser.loginedUserID) ? bellMsg : bellNoMsg)
 
 const onAppSelected = (app: app.App) => {
   selectedApp.value = app
