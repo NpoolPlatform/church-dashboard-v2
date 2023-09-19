@@ -172,7 +172,8 @@ const targetUpdate = computed(() => {
     DeliveryAt: target.value.DeliveryAt,
     StartAt: target.value.StartAt,
     Total: target.value.Total,
-    TestOnly: target.value.TestOnly
+    TestOnly: target.value.TestOnly,
+    StartMode: target.value.StartMode
   }
 })
 
