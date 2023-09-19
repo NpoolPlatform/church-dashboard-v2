@@ -56,6 +56,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
+        <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' :min='0' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
         <q-input
           v-model='target.UserPurchaseLimit'
@@ -111,20 +112,16 @@
         />
       </q-card-section>
       <q-card-section>
-        <!-- <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' :disabled='!openSaleActivity' /></div> -->
-        <!-- <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' :disabled='!openSaleActivity' /></div> -->
-        <div> <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' /></div>
+        <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
+        <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
+        <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
-        <div><q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' /></div>
-        <div><q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
-        <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
-        <div>
-          <q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' />
-        </div>
-        <div>
-          <q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' />
-        </div>
+        <q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' />
+        <q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' />
+        <q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' />
+        <q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' />
+        <q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
