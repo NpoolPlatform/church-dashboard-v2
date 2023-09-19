@@ -175,6 +175,12 @@ pipeline {
           tag=`git describe --tags $revlist`
           git reset --hard
           git checkout $tag
+          major=`echo $tag | awk -F '.' '{ print $1 }'`
+          minor=`echo $tag | awk -F '.' '{ print $2 }'`
+          patch=`echo $tag | awk -F '.' '{ print $3 }'`
+          if [ $magor -le 0 and $minor -le 1 and $patch -le 228 ]; then
+            rm -rf src/npoolstore
+          fi
           set +e
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin command quasar
           rc=$?
