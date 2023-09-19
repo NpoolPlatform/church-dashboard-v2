@@ -191,7 +191,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const createAppGood = (done: () => void) => {
-  appGood.createNAppGood({
+  appGood.createAppGood({
     TargetAppID: AppID.value,
     ...target.value,
     GoodID: selectedGood.value[0].ID,
@@ -245,7 +245,7 @@ const updateTarget = computed(() => {
   }
 })
 const updateAppGood = (done: () => void) => {
-  appGood.updateAppGood({
+  appGood.updateNAppGood({
     ...updateTarget.value,
     Message: {
       Error: {
