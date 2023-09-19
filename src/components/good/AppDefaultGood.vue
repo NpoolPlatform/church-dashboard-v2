@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_APP_DEFAULT_GOODS")'
-    :rows='appDefaultGoods'
+    :rows='sdk.defaultGoods.value'
     row-key='ID'
     selection='single'
     :rows-per-page-options='[100]'
@@ -47,7 +47,7 @@
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/api/app'
-import { appdefaultgood, utils, notify } from 'src/npoolstore'
+import { appdefaultgood, utils, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -55,9 +55,6 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
-
-const appDefaultGood = appdefaultgood.useAppDefaultGoodStore()
-const appDefaultGoods = computed(() => appDefaultGood.defaults(AppID.value))
 
 const target = ref({} as appdefaultgood.Default)
 const showing = ref(false)
@@ -88,57 +85,15 @@ const onSubmit = (done: () => void) => {
 }
 
 const createAppDefaultGood = (done: () => void) => {
-  appDefaultGood.createNAppDefaultGood({
-    TargetAppID: AppID.value,
-    ...target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_APP_DEFAULT_GOOD',
-        Message: 'MSG_CREATE_APP_DEFAULT_GOOD_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_APP_DEFAULT_GOOD',
-        Message: 'MSG_CREATE_APP_DEFAULT_GOOD_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
+  done()
+  onMenuHide()
+  sdk.createNDefaultGood(target.value)
 }
 
 const updateAppDefaultGood = (done: () => void) => {
-  appDefaultGood.updateNAppDefaultGood({
-    ...target.value,
-    TargetAppID: target.value?.AppID,
-    Message: {
-      Error: {
-        Title: t('MSG_UPDATE_APP_DEFAULT_GOOD'),
-        Message: t('MSG_UPDATE_APP_DEFAULT_GOOD_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_UPDATE_APP_DEFAULT_GOOD'),
-        Message: t('MSG_UPDATE_APP_DEFAULT_GOOD_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
+  done()
+  onMenuHide()
+  sdk.updateNDefaultGood(target.value)
 }
 
 watch(AppID, () => {
@@ -150,29 +105,9 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (appDefaultGoods.value.length === 0) {
-    getAppDefaultGoods(0, 500)
+  if (!sdk.defaultGoods.value.length) {
+    sdk.getNDefaultGoods(0, 0)
   }
-}
-
-const getAppDefaultGoods = (offset: number, limit: number) => {
-  appDefaultGood.getNAppDefaultGoods({
-    TargetAppID: AppID.value,
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_APP_DEFAULT_GOODS_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, rows?: Array<appdefaultgood.Default>) => {
-    if (error || !rows?.length) {
-      return
-    }
-    getAppDefaultGoods(offset + limit, limit)
-  })
 }
 
 const appDefaultGoodsColumns = computed(() => [
