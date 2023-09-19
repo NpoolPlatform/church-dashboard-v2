@@ -48,26 +48,8 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
-        <!-- <q-input
-          v-model.number='target.Sold'
-          disable
-          :label='$t("MSG_GOOD_SOLD")'
-          type='number' :min='1'
-        />
-        <q-input
-          v-model.number='target.InService'
-          disable
-          :label='$t("MSG_GOOD_INSERVICE")'
-          type='number'
-          :min='0'
-        />
-        <q-input
-          v-model.number='target.Locked'
-          disable
-          :label='$t("MSG_GOOD_LOCKED")'
-          type='number'
-          :min='0'
-        /> -->
+        <q-input v-model.number='target.BenefitIntervalHours' :label='$t("MSG_BENEFIT_INTERVAL_HOURS")' type='number' :min='1' />
+        <q-input v-model='target.UnitLockDeposit' :label='$t("MSG_UNIT_LOCK_DEPOSIT")' />
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:id='target.CoinTypeID' />
@@ -78,6 +60,7 @@
       <q-card-section>
         <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
+        <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -116,7 +99,10 @@ const displayGoods = computed(() => {
   })
 })
 
-const target = ref({} as good.Good)
+const target = ref({
+  UnitLockDeposit: '0',
+  StartMode: goodbase.StartMode.GoodStartModeTBD
+} as good.Good)
 const showing = ref(false)
 const updating = ref(false)
 
