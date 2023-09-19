@@ -169,7 +169,7 @@ const columns = computed(() => [
     name: 'SHIPMENTAT',
     label: t('MSG_SHIPMENT_AT'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.ShipmentAt
+    field: (row: deviceinfo.DeviceInfo) => utils.formatTime(row.ShipmentAt)
   },
   {
     name: 'Type',
