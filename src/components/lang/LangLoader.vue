@@ -1,11 +1,8 @@
 <script setup lang='ts'>
-import { onMounted, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { onMounted, computed, watch } from 'vue'
 import { applang, message, _locale, notify, g11nbase } from 'src/npoolstore'
 import { AppID } from 'src/api/app'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
 const lang = applang.useAppLangStore()
 const langs = computed(() => lang.langs(AppID.value))
 
@@ -13,12 +10,16 @@ const _message = message.useMessageStore()
 const messages = computed(() => _message.messages(AppID.value, locale.langID()))
 
 const locale = _locale.useLocaleStore()
+const langID = computed(() => locale.AppLang?.LangID)
 
 onMounted(() => {
   if (!langs.value.length) {
     getAppLangs(0, 100)
   }
-  if (!messages.value.length) {
+})
+
+watch(langID, () => {
+  if (messages.value.length === 0) {
     getMessages(0, 100)
   }
 })
@@ -33,6 +34,9 @@ const getAppLangs = (offset: number, limit: number) => {
     if (error || rows.length === 0) {
       if (!error) {
         locale.setLangs(langs.value)
+        if (!messages.value.length) {
+          getMessages(0, 100)
+        }
       }
       return
     }
@@ -47,8 +51,8 @@ const getMessages = (offset: number, limit: number) => {
     Limit: limit,
     Message: {
       Error: {
-        Title: t('MSG_GET_LANG_MESSAGES'),
-        Message: t('MSG_GET_LANG_MESSAGES_FAIL'),
+        Title: 'MSG_GET_LANG_MESSAGES',
+        Message: 'MSG_GET_LANG_MESSAGES_FAIL',
         Popup: true,
         Type: notify.NotifyType.Error
       }
