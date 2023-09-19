@@ -32,7 +32,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
-        <q-input type='number' v-model='target.PowerComsuption' :label='$t("MSG_POWER_CONSUMPTION")' suffix='W' />
+        <q-input type='number' v-model='target.PowerConsumption' :label='$t("MSG_POWER_CONSUMPTION")' suffix='W' />
         <DatePicker v-model:date='target.ShipmentAt' :updating='updating' :label='$t("MSG_SHIPMENT_AT")' />
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
       </q-card-section>
@@ -160,10 +160,10 @@ const columns = computed(() => [
     field: (row: deviceinfo.DeviceInfo) => row.Manufacturer
   },
   {
-    name: 'POWERCOMSUPTION',
-    label: t('MSG_POWERCOMSUPTION'),
+    name: 'PowerConsumption',
+    label: t('MSG_PowerConsumption'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.PowerComsuption
+    field: (row: deviceinfo.DeviceInfo) => row.PowerConsumption
   },
   {
     name: 'SHIPMENTAT',
