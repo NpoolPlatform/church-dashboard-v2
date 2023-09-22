@@ -32,6 +32,7 @@
       <q-item class='row'>
         <q-item-label>{{ $t('MSG_KYC_REVIEW_STATE') }}: {{ target?.ReviewState }}</q-item-label>
       </q-item>
+      <div>{{ images }}</div>
       <q-item class='row'>
         <q-item-section>
           <q-img :ratio='1' :src='(images?.get(kyc.ImageType.FrontImg)?.Base64 as string)' />
@@ -98,11 +99,11 @@ const getAppKycReviews = (offset: number, limit: number) => {
 const prepare = () => {
   if (!review.reviews().length) {
     reviewLoading.value = true
-    getAppKycReviews(0, 500)
+    getAppKycReviews(0, 100)
   }
-  if (!_user.appUsers(AppID.value)) {
+  if (!_user.appUsers(AppID.value).length) {
     reviewLoading.value = true
-    getAppUsers(0, 500)
+    getAppUsers(0, 100)
   }
 }
 
@@ -150,7 +151,10 @@ const getAppUsers = (offset: number, limit: number) => {
 
 const onRowClick = (row: kycreview.KYCReview) => {
   target.value = { ...row }
-  targetUser.value = { ..._user.appUser(AppID.value, row.UserID) || {} as user.User }
+  if (!_user.appUser(AppID.value, row.UserID)) {
+    return
+  }
+  targetUser.value = { ..._user.appUser(AppID.value, row.UserID) as user.User }
   showing.value = true
   _kyc.getAppUserKYCImage({
     TargetAppID: AppID.value,
