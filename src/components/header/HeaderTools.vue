@@ -53,7 +53,7 @@ const applications = computed(() => application.Apps)
 const selectedApp = computed({
   get: () => application.app(AppID.value) as app.App,
   set: (val: app.App) => {
-    localApplication.MyAppID = val.ID
+    localApplication.CurrentAppID = val.ID
   }
 })
 
