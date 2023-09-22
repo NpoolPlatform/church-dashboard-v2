@@ -42,7 +42,7 @@ watch(trigger, () => {
     case requesterror.SwitchTarget.LOGIN:
       void router.push('/signin')
       errorswitcher.ErrorTrigger = undefined as unknown as requesterror.ErrorTarget
-      logined.User = undefined as unknown as user.User
+      logined.restUser()
   }
 })
 

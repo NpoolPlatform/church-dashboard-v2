@@ -53,7 +53,7 @@ onMounted(() => {
 })
 
 const getAppAnnouncementUsers = (offset: number, limit: number) => {
-  announcementUser.getNAppAnnouncementUsers({
+  announcementUser.getAppAnnouncementUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
