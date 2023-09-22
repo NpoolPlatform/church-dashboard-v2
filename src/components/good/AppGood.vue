@@ -56,7 +56,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
-        <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' :min='0' />
+        <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
         <q-input
           v-model='target.UserPurchaseLimit'
@@ -177,7 +177,6 @@ const createAppGood = (done: () => void) => {
     TargetAppID: AppID.value,
     ...target.value,
     GoodID: selectedGood.value[0].ID,
-    GoodName: selectedGood.value[0].Title,
     UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
     Message: {
       Error: {
