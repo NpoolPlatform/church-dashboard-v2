@@ -32,8 +32,7 @@
         <span>{{ $t('MSG_APP_DEFAULT_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector v-model:id='target.GoodID' />
-        <CoinPicker v-model:id='target.CoinTypeID' v-model:updating='updating' />
+        <AppGoodSelector v-model:id='target.AppGoodID' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -53,7 +52,6 @@ import { appdefaultgood, utils, sdk } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 
 const target = ref({} as appdefaultgood.Default)
