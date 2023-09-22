@@ -4,7 +4,7 @@
     flat
     :rows='displayHistories'
     row-key='ID'
-    :title='$t("MSG_COIN_CURRENCY_HISTORIES")'
+    :title='$t("MSG_COIN_FIAT_CURRENCY_HISTORIES")'
     :rows-per-page-options='[100]'
   >
     <template #top-right>
