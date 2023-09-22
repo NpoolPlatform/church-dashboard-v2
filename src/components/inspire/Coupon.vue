@@ -121,7 +121,7 @@ const target = ref({
 } as unknown as coupon.Coupon)
 
 const start = computed({
-  get: () => utils.formatTime(target.value.StartAt, true)?.replace(/\//g, '-'),
+  get: () => utils.formatTime(target.value.StartAt)?.replace(/\//g, '-'),
   set: (val) => {
     target.value.StartAt = new Date(val).getTime() / 1000
   }
