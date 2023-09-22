@@ -68,14 +68,6 @@
         <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
         <q-input
           class='commission-percent'
-          v-model.number='target.CommissionPercent'
-          :label='$t("MSG_COMMISSION_PERCENT")'
-          type='number'
-          :min='0'
-          suffix='%'
-        />
-        <q-input
-          class='commission-percent'
           v-model.number='target.TechnicalFeeRatio'
           :label='$t("MSG_TECHNICALFEE_RATIO")'
           type='number'
@@ -85,13 +77,6 @@
           class='commission-percent'
           v-model.number='target.ElectricityFeeRatio'
           :label='$t("MSG_ELECTRICITYFEE_RATIO")'
-          type='number'
-          :min='0'
-        />
-        <q-input
-          class='commission-percent'
-          v-model='target.DailyRewardAmount'
-          :label='$t("MSG_DAILY_REWARD_AMOUNT")'
           type='number'
           :min='0'
         />
