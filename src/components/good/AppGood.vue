@@ -93,7 +93,7 @@
           type='number'
           :min='0'
           suffix='h'
-          :disable='appGood.cancelable(AppID, target.ID)'
+          :disable='!appGood.cancelable(AppID, target.ID)'
         />
       </q-card-section>
       <q-card-section>
