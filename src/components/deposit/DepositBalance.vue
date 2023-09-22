@@ -238,9 +238,9 @@ const reset = () => {
   general.$reset()
   statement.$reset()
   account.$reset()
-  getAppGenerals(0, 500)
-  getAppDetails(0, 500)
-  getAppDepositAccounts(0, 500)
+  getAppGenerals(0, 100)
+  getAppDetails(0, 100)
+  getAppDepositAccounts(0, 100)
 }
 
 const onCancel = () => {
@@ -276,7 +276,7 @@ const displayGenerals = computed(() => general.ledgers(AppID.value).filter((el) 
 
 const accountUsername = ref('')
 const account = useraccount.useUserAccountStore()
-const accounts = computed(() => account.accounts(AppID.value, accountbase.AccountUsedFor.UserDeposit).filter((el) => {
+const accounts = computed(() => account.accounts(AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDeposit).filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
 
@@ -319,7 +319,7 @@ const generalsExport = () => {
         return
       }
       if (col === createdAtCol || col === paidAtCol) {
-        lineStr += utils.formatTime(Number(v), false)
+        lineStr += utils.formatTime(Number(v))
         return
       }
       lineStr += v
@@ -375,7 +375,7 @@ const detailsExport = () => {
         return
       }
       if (col === createdAtCol || col === paidAtCol) {
-        lineStr += utils.formatTime(Number(v), false)
+        lineStr += utils.formatTime(Number(v))
         return
       }
       if (col === ioExtra) {
@@ -405,7 +405,7 @@ const prepare = () => {
   if (!statement.statements(AppID.value).length) {
     getAppDetails(0, 100)
   }
-  if (!general.ledgers(AppID.value)) {
+  if (!general.ledgers(AppID.value).length) {
     getAppGenerals(0, 100)
   }
   if (!accounts.value.length) {
