@@ -79,7 +79,7 @@ const ids = computed(() => {
 watch(ids, () => {
   if (selectedFiats.value?.length > 0) {
     history.$reset()
-    getFiatCurrencyHistories(0, 100, 0, Math.ceil(Date.now() / 1000))
+    getFiatCurrencyHistories(0, 100, Math.ceil(Date.now() / 1000) - 3 * 24 * 60 * 60, Math.ceil(Date.now() / 1000))
   }
 })
 

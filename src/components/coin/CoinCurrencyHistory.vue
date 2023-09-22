@@ -43,7 +43,7 @@ const displayHistories = computed(() => {
 watch(ids, () => {
   if (ids.value?.length > 0) {
     history.$reset()
-    getCoinCurrencyHistories(0, 100, 0, Math.ceil(Date.now() / 1000))
+    getCoinCurrencyHistories(0, 100, Math.ceil(Date.now() / 1000) - 3 * 24 * 60 * 60, Math.ceil(Date.now() / 1000))
   }
 })
 
