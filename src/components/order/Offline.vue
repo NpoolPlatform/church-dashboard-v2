@@ -37,6 +37,16 @@
           :suffix='selectedGood?.value?.Unit'
         />
       </q-card-section>
+      <q-card-section>
+        <q-btn-toggle
+          v-model='orderType'
+          rounded
+          :options='[
+            {label: order.OrderType.Offline, value: order.OrderType.Offline},
+            {label: order.OrderType.Airdrop, value: order.OrderType.Airdrop}
+          ]'
+        />
+      </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
@@ -132,7 +142,7 @@ const onSubmit = () => {
     AppGoodID: selectedGood.value.value.GoodID,
     Units: `${units.value}`,
     PaymentCoinID: payCoinID.value,
-    OrderType: order.OrderType.Offline,
+    OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment
   })
 }
@@ -151,6 +161,7 @@ const payCoinID = computed(() => {
   }
   return coins.value[index].CoinTypeID
 })
+const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
 
 const prepare = () => {
   if (users.value.length === 0) {
