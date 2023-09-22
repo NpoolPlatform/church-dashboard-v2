@@ -41,7 +41,7 @@
         <q-input v-model='target.Circulation' :label='$t("MSG_COUPON_CIRCULATION")' suffix='$ | Pcs' />
         <q-input v-model='target.Threshold' :label='$t("MSG_COUPON_THRESHOLD")' suffix='$' />
         <q-toggle v-model='target.Random' :label='$t("MSG_COUPON_RANDOM")' />
-        <GoodSelector v-model:id='target.GoodID' />
+        <GoodSelector v-model:id='target.AppGoodID' />
       </q-card-section>
       <q-card-section v-if='target.CouponType === coupon.CouponType.SpecialOffer'>
         <q-item-label>{{ $t('MSG_SPECIAL_OFFSET_NOT_IMPLEMENTED') }}</q-item-label>
