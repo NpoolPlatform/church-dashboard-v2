@@ -32,7 +32,6 @@
       <q-item class='row'>
         <q-item-label>{{ $t('MSG_KYC_REVIEW_STATE') }}: {{ target?.ReviewState }}</q-item-label>
       </q-item>
-      <div>{{ images }}</div>
       <q-item class='row'>
         <q-item-section>
           <q-img :ratio='1' :src='(images?.get(kyc.ImageType.FrontImg)?.Base64 as string)' />
