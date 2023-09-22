@@ -134,17 +134,18 @@ const onSubmit = () => {
   if (!selectedUser.value) {
     return
   }
-  onMenuHide()
 
   sdk.createAppUserOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.ID,
-    AppGoodID: selectedGood.value.value.GoodID,
+    AppGoodID: selectedGood.value.value.ID,
     Units: `${units.value}`,
     PaymentCoinID: payCoinID.value,
     OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment
   })
+
+  onMenuHide()
 }
 
 const coin = appcoin.useAppCoinStore()
@@ -165,7 +166,7 @@ const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order
 
 const prepare = () => {
   if (users.value.length === 0) {
-    getAppUsers(0, 500)
+    getAppUsers(0, 100)
   }
 }
 
