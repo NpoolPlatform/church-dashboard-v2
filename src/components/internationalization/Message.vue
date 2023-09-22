@@ -141,7 +141,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
 const _message = message.useMessageStore()
-const messages = computed(() => _message.messages(AppID.value, targetLangID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
+const messages = computed(() => _message.messages(AppID.value, targetLangID.value.length ? targetLangID.value : undefined, undefined).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
 
 const messageID = ref('')
 const displayAppMsgs = computed(() => messages.value.filter((msg) => {
@@ -163,6 +163,7 @@ const onCreate = () => {
 const onMenuHide = () => {
   target.value = {} as g11nbase.Message
   showing.value = false
+  targetLangID.value = ''
 }
 
 const onRowClick = (row: g11nbase.Message) => {
