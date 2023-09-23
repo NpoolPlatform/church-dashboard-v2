@@ -23,7 +23,7 @@
         <q-item-label>{{ $t('MSG_TOTAL') }}: {{ selectedGood?.value?.GoodTotal }}</q-item-label>
         <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedGood?.value?.AppGoodLocked }}</q-item-label>
         <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedGood?.value?.AppGoodInService }}</q-item-label>
-        <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_GOOD")' />
+        <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_APP_GOOD")' />
         <q-select
           :options='displayUsers'
           use-input
@@ -74,7 +74,7 @@ interface MyGood {
 }
 const goods = computed(() => Array.from(appGoods.value.filter((el) => el.Online)).map((el) => {
   return {
-    label: `${el.GoodName} | ${el.GoodID}`,
+    label: `${el.GoodName} | ${el.ID}`,
     value: el
   } as MyGood
 }))
