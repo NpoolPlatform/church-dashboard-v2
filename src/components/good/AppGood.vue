@@ -173,6 +173,8 @@ const onSubmit = (done: () => void) => {
 }
 
 const createAppGood = (done: () => void) => {
+  target.value.TechnicalFeeRatio = target.value.TechnicalFeeRatio.toString()
+  target.value.ElectricityFeeRatio = target.value.ElectricityFeeRatio.toString()
   appGood.createAppGood({
     TargetAppID: AppID.value,
     ...target.value,

@@ -45,7 +45,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/api/app'
-import { announcementsendstate, announcementreadstate, notifchannel, notify, utils } from 'src/npoolstore'
+import { announcementsendstate, announcementreadstate, notify, utils, notifbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -72,8 +72,8 @@ const displayReadStates = computed(() => readStates.value.filter((el) => {
 
 watch(AppID, () => {
   if (sendStates.value?.length === 0) {
-    getAppSendStates(0, 100, notifchannel.NotifChannel.ChannelSMS)
-    getAppSendStates(0, 100, notifchannel.NotifChannel.ChannelEmail)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelSMS)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelEmail)
   }
 
   if (readStates.value?.length === 0) {
@@ -83,8 +83,8 @@ watch(AppID, () => {
 
 onMounted(() => {
   if (sendStates.value?.length === 0) {
-    getAppSendStates(0, 100, notifchannel.NotifChannel.ChannelSMS)
-    getAppSendStates(0, 100, notifchannel.NotifChannel.ChannelEmail)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelSMS)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelEmail)
   }
 
   if (readStates.value?.length === 0) {
@@ -92,7 +92,7 @@ onMounted(() => {
   }
 })
 
-const getAppSendStates = (offset: number, limit: number, channel: notifchannel.NotifChannel) => {
+const getAppSendStates = (offset: number, limit: number, channel: notifbase.NotifChannel) => {
   send.getNAppSendStates({
     TargetAppID: AppID.value,
     Offset: offset,

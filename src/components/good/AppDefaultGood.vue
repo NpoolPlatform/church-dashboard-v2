@@ -84,14 +84,14 @@ const onSubmit = (done: () => void) => {
 
 const createAppDefaultGood = (done: () => void) => {
   done()
-  onMenuHide()
   sdk.createNDefaultGood(target.value)
+  onMenuHide()
 }
 
 const updateAppDefaultGood = (done: () => void) => {
   done()
-  onMenuHide()
   sdk.updateNDefaultGood(target.value)
+  onMenuHide()
 }
 
 watch(AppID, () => {

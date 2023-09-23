@@ -41,7 +41,7 @@
         <q-input v-model='target.Circulation' :label='$t("MSG_COUPON_CIRCULATION")' suffix='$ | Pcs' />
         <q-input v-model='target.Threshold' :label='$t("MSG_COUPON_THRESHOLD")' suffix='$' />
         <q-toggle v-model='target.Random' :label='$t("MSG_COUPON_RANDOM")' />
-        <GoodSelector v-model:id='target.AppGoodID' />
+        <AppGoodSelector v-model:id='target.AppGoodID' />
       </q-card-section>
       <q-card-section v-if='target.CouponType === coupon.CouponType.SpecialOffer'>
         <q-item-label>{{ $t('MSG_SPECIAL_OFFSET_NOT_IMPLEMENTED') }}</q-item-label>
@@ -61,7 +61,7 @@ import { useI18n } from 'vue-i18n'
 import { coupon, user, notify, utils } from 'src/npoolstore'
 import { useRoute } from 'vue-router'
 
-const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
+const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

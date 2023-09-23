@@ -59,7 +59,7 @@
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { kycreview, kyc, notify, _locale, reviewbase, user } from 'src/npoolstore'
+import { kycreview, kyc, notify, reviewbase, user } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -69,7 +69,6 @@ const disableUpdateBtn = computed(() => (review: kycreview.KYCReview) => {
 })
 const _kyc = kyc.useKYCStore()
 const review = kycreview.useKycReviewStore()
-const locale = _locale.useLocaleStore()
 
 const displayReviews = computed(() => review.reviews(AppID.value))
 const reviewLoading = ref(false)
@@ -213,7 +212,6 @@ const updateReview = (state: reviewbase.ReviewState) => {
   review.updateAppKycReview({
     TargetAppID: AppID.value,
     ReviewID: target.value?.ReviewID,
-    LangID: locale.AppLang?.LangID,
     State: state,
     Message: target.value.Message,
     NotifyMessage: {

@@ -24,7 +24,7 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from
 import { appgood } from 'src/npoolstore'
 
 interface Props {
-  id: string
+  id: string | undefined
 }
 
 const props = defineProps<Props>()
@@ -36,12 +36,12 @@ const appGoods = computed(() => appGood.goods(AppID.value))
 
 const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
-    value: el.GoodID,
-    label: `${el.GoodName} | ${el.GoodID}`
+    value: el.ID,
+    label: `${el.GoodName} | ${el.ID}`
   }
 }))
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:id', id: string | undefined): void}>()
 const onUpdate = () => {
   emit('update:id', target.value)
 }
