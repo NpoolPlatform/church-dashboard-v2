@@ -6,9 +6,9 @@
 </template>
 
 <script setup lang='ts'>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { announcement, notify } from 'src/npoolstore'
+import { announcement, notify, user } from 'src/npoolstore'
 import { MyAppID } from 'src/api/app'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -18,8 +18,28 @@ const mailbox = announcement.useAnnouncementStore()
 const _announcement = ref('')
 const announcements = computed(() => mailbox.announcements(MyAppID.value))
 const index = ref(0)
+const logined = user.useLocalUserStore()
 
 const ticker = ref(-1)
+
+watch(() => logined.logined, () => {
+  if (logined.logined) {
+    mailbox.getAnnouncements({
+      Offset: 0,
+      Limit: 100,
+      Message: {
+        Error: {
+          Title: t('MSG_GET_ANNOUNCEMENTS'),
+          Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
+          Popup: true,
+          Type: notify.NotifyType.Error
+        }
+      }
+    }, () => {
+      // TODO
+    })
+  }
+})
 
 onMounted(() => {
   ticker.value = window.setInterval(() => {
@@ -32,20 +52,22 @@ onMounted(() => {
     index.value += 1
   }, 3000)
 
-  mailbox.getAnnouncements({
-    Offset: 0,
-    Limit: 100,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_ANNOUNCEMENTS'),
-        Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
+  if (logined.logined) {
+    mailbox.getAnnouncements({
+      Offset: 0,
+      Limit: 100,
+      Message: {
+        Error: {
+          Title: t('MSG_GET_ANNOUNCEMENTS'),
+          Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
+          Popup: true,
+          Type: notify.NotifyType.Error
+        }
       }
-    }
-  }, () => {
-    // TODO
-  })
+    }, () => {
+      // TODO
+    })
+  }
 })
 
 onUnmounted(() => {
