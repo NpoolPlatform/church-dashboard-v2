@@ -24,8 +24,8 @@
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
-import { useChurchAppLangStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
+import { applang } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -44,8 +44,8 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const lang = useChurchAppLangStore()
-const _langs = computed(() => lang.getAppLangsByAppID(AppID.value))
+const lang = applang.useAppLangStore()
+const _langs = computed(() => lang.langs(AppID.value))
 const langs = computed(() => Array.from(_langs.value).map((el) => {
   return {
     value: el.LangID,

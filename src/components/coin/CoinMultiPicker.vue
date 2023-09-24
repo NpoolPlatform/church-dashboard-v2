@@ -20,9 +20,9 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useChurchCoinStore } from 'npool-cli-v4'
 import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { coin } from 'src/npoolstore'
 
 interface Props {
   ids: string[]
@@ -33,9 +33,9 @@ const props = defineProps<Props>()
 const ids = toRef(props, 'ids')
 const updating = toRef(props, 'updating')
 const target = ref(ids.value)
-const coin = useChurchCoinStore()
+const _coin = coin.useCoinStore()
 
-const coins = computed(() => Array.from(coin.Coins.Coins).map((el) => {
+const coins = computed(() => Array.from(_coin.coins()).map((el) => {
   return {
     value: el.ID,
     label: el.Name
@@ -48,8 +48,8 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (coin.Coins.Coins.length === 0) {
-    getCoins(0, 500)
+  if (!coins.value.length) {
+    getCoins(0, 100)
   }
 })
 </script>

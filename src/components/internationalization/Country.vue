@@ -6,7 +6,7 @@
     :rows='countries'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Country)'
+    @row-click='(evt, row, index) => onRowClick(row as country.Country)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -88,17 +88,17 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { NotifyType, formatTime, useChurchCountryStore, Country } from 'npool-cli-v4'
 import { getCountries } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import AppCountry from './AppCountry.vue'
+import { country, notify, utils } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const AppCountry = defineAsyncComponent(() => import('src/components/internationalization/AppCountry.vue'))
 
-const country = useChurchCountryStore()
-const countries = computed(() => country.Countries.Countries)
+const _country = country.useCountryStore()
+const countries = computed(() => _country.countries())
 
-const target = ref({} as Country)
+const target = ref({} as country.Country)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -108,11 +108,11 @@ const onCreate = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as Country
+  target.value = {} as country.Country
   showing.value = false
 }
 
-const onRowClick = (row: Country) => {
+const onRowClick = (row: country.Country) => {
   target.value = { ...row }
   updating.value = true
   showing.value = true
@@ -127,20 +127,20 @@ const onSubmit = (done: () => void) => {
 }
 
 const createCountry = (done: () => void) => {
-  country.createCountry({
+  _country.createCountry({
     ...target.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COUNTRY',
         Message: 'MSG_CREATE_COUNTRY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_COUNTRY',
         Message: 'MSG_CREATE_COUNTRY_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -162,20 +162,20 @@ const updateTarget = computed(() => {
   }
 })
 const updateCountry = (done: () => void) => {
-  country.updateCountry({
+  _country.updateCountry({
     ...updateTarget.value,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_COUNTRY',
         Message: 'MSG_UPDATE_COUNTRY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_COUNTRY',
         Message: 'MSG_UPDATE_COUNTRY_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -189,11 +189,11 @@ const updateCountry = (done: () => void) => {
 
 const onExport = () => {
   const blob = new Blob([JSON.stringify(countries.value)], { type: 'text/plain;charset=utf-8' })
-  const filename = 'countries-' + formatTime(new Date().getTime() / 1000) + '.json'
+  const filename = 'countries-' + utils.formatTime(new Date().getTime() / 1000) + '.json'
   saveAs(blob, filename)
 }
 
-const loadedCountries = ref([] as Array<Country>)
+const loadedCountries = ref([] as Array<country.Country>)
 const loadFileButton = ref<HTMLInputElement>()
 
 const uploadFile = (evt: Event) => {
@@ -203,7 +203,7 @@ const uploadFile = (evt: Event) => {
     const reader = new FileReader()
 
     reader.onload = () => {
-      loadedCountries.value = JSON.parse(reader.result as string) as Array<Country>
+      loadedCountries.value = JSON.parse(reader.result as string) as Array<country.Country>
     }
     reader.readAsText(filename)
   }
@@ -216,25 +216,25 @@ const importedCountries = computed(() => {
       Code: el.Code,
       Short: el.Short,
       Flag: el.Flag
-    } as Country
+    } as country.Country
   })
 })
 
 const onBatchCreate = () => {
-  country.createCountries({
+  _country.createCountries({
     Infos: importedCountries.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COUNTRIES',
         Message: 'MSG_CREATE_COUNTRIES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_BATCH_CREATE_COUNTRIES',
         Message: 'MSG_BATCH_CREATE_COUNTRIES_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {

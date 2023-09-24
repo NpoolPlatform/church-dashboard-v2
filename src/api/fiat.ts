@@ -1,9 +1,8 @@
-import { NotifyType } from 'npool-cli-v4'
-import { fiatcurrency } from 'src/npoolstore'
+import { fiat, notify } from 'src/npoolstore'
 
-const fiat = fiatcurrency.useFiatCurrencyStore()
+const _fiat = fiat.useFiatStore()
 export const getFiatCurrencyTypes = (offset: number, limit: number) => {
-  fiat.getFiatCurrencyTypes({
+  _fiat.getFiats({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -11,11 +10,11 @@ export const getFiatCurrencyTypes = (offset: number, limit: number) => {
         Title: 'MSG_GET_FIAT_CURRENCY_TYPES',
         Message: 'MSG_GET_FIAT_CURRENCY_TYPES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<fiatcurrency.FiatCurrencyType>) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: Array<fiat.Fiat>) => {
+    if (error || !rows?.length) {
       return
     }
     getFiatCurrencyTypes(offset + limit, limit)

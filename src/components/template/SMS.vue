@@ -3,11 +3,11 @@
     dense
     flat
     :title='$t("MSG_SMS_TEMPLATES")'
-    :rows='smss'
+    :rows='templates'
     row-key='ID'
     :loading='smsLoading'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as SMSTemplate)'
+    @row-click='(evt, row, index) => onRowClick(row as smsnotiftemplate.Template)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -34,7 +34,7 @@
         <LanguagePicker v-model:language='target.LangID' :updating='updating' />
       </q-card-section>
       <q-card-section>
-        <q-select :options='UsedFors' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_USED_FOR")' />
+        <q-select :options='basetypes.EventTypes' v-model='target.UsedFor' :disable='updating' :label='$t("MSG_USED_FOR")' />
         <q-input v-model='target.Subject' :label='$t("MSG_SUBJECT")' />
         <q-input v-model='target.Message' :label='$t("MSG_BODY")' type='textarea' />
       </q-card-section>
@@ -49,18 +49,18 @@
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { useChurchSMSTemplateStore, SMSTemplate, NotifyType, UsedFors } from 'npool-cli-v4'
+import { smsnotiftemplate, notify, basetypes } from 'src/npoolstore'
 
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const templates = useChurchSMSTemplateStore()
-const smss = computed(() => templates.SMSTemplates.SMSTemplates.get(AppID.value) ? templates.SMSTemplates.SMSTemplates.get(AppID.value) : [])
+const _sms = smsnotiftemplate.useSMSTemplateStore()
+const templates = computed(() => _sms.templates(AppID.value))
 const smsLoading = ref(false)
 
 const prepare = () => {
-  if (!templates.SMSTemplates.SMSTemplates.get(AppID.value)) {
-    getAppSMSTemplates(0, 500)
+  if (!templates.value.length) {
+    getAppSMSTemplates(0, 100)
   }
 }
 
@@ -75,13 +75,13 @@ onMounted(() => {
 const showing = ref(false)
 const updating = ref(false)
 
-const target = ref({} as unknown as SMSTemplate)
+const target = ref({} as unknown as smsnotiftemplate.Template)
 
 const onMenuHide = () => {
-  target.value = {} as unknown as SMSTemplate
+  target.value = {} as unknown as smsnotiftemplate.Template
 }
 
-const onRowClick = (template: SMSTemplate) => {
+const onRowClick = (template: smsnotiftemplate.Template) => {
   target.value = { ...template }
   showing.value = true
   updating.value = true
@@ -102,7 +102,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const getAppSMSTemplates = (offset: number, limit: number) => {
-  templates.getAppSMSTemplates({
+  _sms.getAppSMSTemplates({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -111,11 +111,11 @@ const getAppSMSTemplates = (offset: number, limit: number) => {
         Title: 'MSG_GET_EMAIL_TEMPLATES',
         Message: 'MSG_GET_EMAIL_TEMPLATES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (smsTemplates: Array<SMSTemplate>, error: boolean) => {
-    if (error || smsTemplates.length < limit) {
+  }, (error: boolean, rows?: Array<smsnotiftemplate.Template>) => {
+    if (error || !rows?.length) {
       smsLoading.value = false
       return
     }
@@ -124,7 +124,7 @@ const getAppSMSTemplates = (offset: number, limit: number) => {
 }
 
 const createAppSMSTemplate = (done: () => void) => {
-  templates.createAppSMSTemplate({
+  _sms.createAppSMSTemplate({
     TargetAppID: AppID.value,
     TargetLangID: target.value.LangID,
     ...target.value,
@@ -133,10 +133,10 @@ const createAppSMSTemplate = (done: () => void) => {
         Title: 'MSG_CREATE_SMS_TEMPLATE',
         Message: 'MSG_CREATE_SMS_TEMPLATE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (template: SMSTemplate, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (!error) {
       onCancel()
@@ -145,7 +145,7 @@ const createAppSMSTemplate = (done: () => void) => {
 }
 
 const updateAppSMSTemplate = (done: () => void) => {
-  templates.updateAppSMSTemplate({
+  _sms.updateAppSMSTemplate({
     TargetAppID: AppID.value,
     TargetLangID: target.value.LangID,
     ...target.value,
@@ -154,10 +154,10 @@ const updateAppSMSTemplate = (done: () => void) => {
         Title: 'MSG_UPDATE_SMS_TEMPLATE',
         Message: 'MSG_UPDATE_SMS_TEMPLATE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (template: SMSTemplate, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (!error) {
       onCancel()

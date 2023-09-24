@@ -140,26 +140,11 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import {
-  Detail,
-  formatTime,
-  General,
-  NotifyType,
-  useChurchUserAccountStore,
-  useChurchAppStore,
-  useChurchDepositStore,
-  useChurchDetailStore,
-  useChurchGeneralStore,
-  useChurchUserStore,
-  User,
-  useChurchAppCoinStore,
-  Account
-} from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import saveAs from 'file-saver'
 import { getAppDepositAccounts } from 'src/api/account'
-import { CreateAppUserDepositRequest } from 'npool-cli-v4/dist/store/church/ledger/ledger/types'
+import { ledgerstatement, utils, ledger, notify, appcoin, useraccount, useraccountbase, user, app, accountbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -171,58 +156,58 @@ const columns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: User) => row.AppID
+    field: (row: user.User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: User) => row.ID
+    field: (row: user.User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: User) => row.EmailAddress
+    field: (row: user.User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: User) => row.PhoneNO
+    field: (row: user.User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
     sortable: true,
-    field: (row: User) => row.Roles.join(',')
+    field: (row: user.User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: User) => formatTime(row.CreatedAt)
+    field: (row: user.User) => utils.formatTime(row.CreatedAt)
   }
 ])
 
-const coin = useChurchAppCoinStore()
-const selectedCoin = computed(() => coin.getCoinByID(AppID.value, target.value?.CoinTypeID))
+const coin = appcoin.useAppCoinStore()
+const selectedCoin = computed(() => coin.coin(AppID.value, target.value.CoinTypeID))
 
 const target = ref({
   TargetAppID: AppID.value
-} as CreateAppUserDepositRequest)
+} as ledgerstatement.CreateAppUserDepositRequest)
 
 watch(AppID, () => {
   target.value.TargetAppID = AppID.value
 })
 
-const deposit = useChurchDepositStore()
+const statement = ledgerstatement.useStatementStore()
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
 const onSubmit = () => {
   submitting.value = true
-  deposit.createAppUserDeposit({
+  statement.createAppUserDeposit({
     ...target.value,
     TargetUserID: selectedUser.value[0].ID,
     Message: {
@@ -230,16 +215,16 @@ const onSubmit = () => {
         Title: 'MSG_DEPOSIT_BALANCE',
         Message: 'MSG_DEPOSIT_BALANCE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_DEPOSIT_BALANCE',
         Message: 'MSG_DEPOSIT_BALANCE_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (resp: Detail, error: boolean) => {
+  }, (error: boolean) => {
     submitting.value = false
     if (error) {
       return
@@ -251,11 +236,11 @@ const onSubmit = () => {
 
 const reset = () => {
   general.$reset()
-  detail.$reset()
+  statement.$reset()
   account.$reset()
-  getAppGenerals(0, 500)
-  getAppDetails(0, 500)
-  getAppDepositAccounts(0, 500)
+  getAppGenerals(0, 100)
+  getAppDetails(0, 100)
+  getAppDepositAccounts(0, 100)
 }
 
 const onCancel = () => {
@@ -270,33 +255,32 @@ const onMenuHide = () => {
   amount.value = undefined
 }
 
-const user = useChurchUserStore()
-const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
+const _user = user.useUserStore()
+const appUsers = computed(() => _user.appUsers(AppID.value))
 const username = ref('')
 const displayUsers = computed(() => appUsers.value.filter((user) => user.EmailAddress?.includes(username.value) || user.PhoneNO?.includes(username.value)))
-const selectedUser = ref([] as Array<User>)
+const selectedUser = ref([] as Array<user.User>)
 
 const userLoading = ref(false)
 
 const detailUsername = ref('')
-const detail = useChurchDetailStore()
-const displayDetails = computed(() => !detail.Details.Details.get(AppID.value) ? [] : detail.Details.Details.get(AppID.value)?.filter((el) => {
+const displayDetails = computed(() => statement.statements(AppID.value).filter((el) => {
   return el.EmailAddress?.includes(detailUsername.value) || el.PhoneNO?.includes(detailUsername.value)
 }))
 
 const generalUsername = ref('')
-const general = useChurchGeneralStore()
-const displayGenerals = computed(() => !general.Generals.Generals.get(AppID.value) ? [] : general.Generals.Generals.get(AppID.value)?.filter((el) => {
+const general = ledger.useLedgerStore()
+const displayGenerals = computed(() => general.ledgers(AppID.value).filter((el) => {
   return el.EmailAddress?.includes(generalUsername.value) || el.PhoneNO?.includes(generalUsername.value)
 }))
 
 const accountUsername = ref('')
-const account = useChurchUserAccountStore()
-const accounts = computed(() => account.getDepositAccountsByAppID(AppID.value).filter((el) => {
+const account = useraccount.useUserAccountStore()
+const accounts = computed(() => account.accounts(AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDeposit).filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
 
-const application = useChurchAppStore()
+const application = app.useApplicationStore()
 const generalsExport = () => {
   if (!displayGenerals.value || displayGenerals.value.length === 0) {
     return
@@ -335,7 +319,7 @@ const generalsExport = () => {
         return
       }
       if (col === createdAtCol || col === paidAtCol) {
-        lineStr += formatTime(Number(v), false)
+        lineStr += utils.formatTime(Number(v))
         return
       }
       lineStr += v
@@ -344,8 +328,8 @@ const generalsExport = () => {
   })
 
   const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
-  const filename = application.Apps.Apps.find((el) => el.ID === AppID.value)?.Name as string + '-Generals-' +
-                   formatTime(new Date().getTime() / 1000) +
+  const filename = application.app(AppID.value)?.Name as string + '-Generals-' +
+                   utils.formatTime(new Date().getTime() / 1000) +
                    '.csv'
   saveAs(blob, filename)
 }
@@ -391,7 +375,7 @@ const detailsExport = () => {
         return
       }
       if (col === createdAtCol || col === paidAtCol) {
-        lineStr += formatTime(Number(v), false)
+        lineStr += utils.formatTime(Number(v))
         return
       }
       if (col === ioExtra) {
@@ -406,7 +390,7 @@ const detailsExport = () => {
 
   const blob = new Blob([orderStr], { type: 'text/plain;charset=utf-8' })
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  const filename = application.Apps.Apps.find((el) => el.ID === AppID.value)?.Name as string + '-Details-' + (new Date().getTime() / 1000) + '.csv'
+  const filename = application.app(AppID.value)?.Name as string + '-Details-' + (new Date().getTime() / 1000) + '.csv'
   saveAs(blob, filename)
 }
 
@@ -415,16 +399,16 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!user.Users.get(AppID.value)) {
-    getAppUsers(0, 500)
+  if (!appUsers.value.length) {
+    getAppUsers(0, 100)
   }
-  if (!detail.Details.Details.get(AppID.value)) {
-    getAppDetails(0, 500)
+  if (!statement.statements(AppID.value).length) {
+    getAppDetails(0, 100)
   }
-  if (!general.Generals.Generals.get(AppID.value)) {
-    getAppGenerals(0, 500)
+  if (!general.ledgers(AppID.value).length) {
+    getAppGenerals(0, 100)
   }
-  if (accounts.value.length === 0) {
+  if (!accounts.value.length) {
     getAppDepositAccounts(0, 100)
   }
 }
@@ -434,7 +418,7 @@ watch(AppID, () => {
 })
 
 const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
+  _user.getAppUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -443,11 +427,11 @@ const getAppUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_USERS',
         Message: 'MSG_GET_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<User>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<user.User>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppUsers(offset + limit, limit)
@@ -455,13 +439,13 @@ const getAppUsers = (offset: number, limit: number) => {
 }
 
 const getAppGenerals = (offset: number, limit: number) => {
-  general.getAppGenerals({
+  general.getAppLedgers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (generals: Array<General>, error: boolean) => {
-    if (error || generals.length < limit) {
+  }, (error: boolean, rows?: Array<ledger.Ledger>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppGenerals(offset + limit, limit)
@@ -469,15 +453,15 @@ const getAppGenerals = (offset: number, limit: number) => {
 }
 
 const getAppDetails = (offset: number, limit: number) => {
-  detail.getAppDetails({
+  statement.getAppStatements({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
       Error: {}
     }
-  }, (details: Array<Detail>, error: boolean) => {
-    if (error || details.length < limit) {
+  }, (error: boolean, rows?: Array<ledgerstatement.Statement>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppDetails(offset + limit, limit)
@@ -489,73 +473,73 @@ const generalColumns = computed(() => [
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
     sortable: true,
-    field: (row: General) => row.CoinTypeID
+    field: (row: ledger.Ledger) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: General) => row.CoinName
+    field: (row: ledger.Ledger) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
     sortable: true,
-    field: (row: General) => row.CoinUnit
+    field: (row: ledger.Ledger) => row.CoinUnit
   },
   {
     name: 'Incoming',
     label: t('MSG_INCOMING'),
     sortable: true,
-    field: (row: General) => row.Incoming
+    field: (row: ledger.Ledger) => row.Incoming
   },
   {
     name: 'Outcoming',
     label: t('MSG_OUT_COMING'),
     sortable: true,
-    field: (row: General) => row.Outcoming
+    field: (row: ledger.Ledger) => row.Outcoming
   },
   {
     name: 'Spendable',
     label: t('MSG_SPENDABLE'),
     sortable: true,
-    field: (row: General) => row.Spendable
+    field: (row: ledger.Ledger) => row.Spendable
   },
   {
     name: 'Locked',
     label: t('MSG_LOCKED'),
     sortable: true,
-    field: (row: General) => row.Locked
+    field: (row: ledger.Ledger) => row.Locked
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: General) => row.UserID
+    field: (row: ledger.Ledger) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: General) => row.EmailAddress
+    field: (row: ledger.Ledger) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: General) => row.PhoneNO
+    field: (row: ledger.Ledger) => row.PhoneNO
   },
   {
     name: 'CoinDisabled',
     label: t('MSG_COIN_DISABLE'),
     sortable: true,
-    field: (row: General) => row.CoinDisabled
+    field: (row: ledger.Ledger) => row.CoinDisabled
   },
   {
     name: 'CoinDisplay',
     label: t('MSG_COIN_DISPLAY'),
     sortable: true,
-    field: (row: General) => row.CoinDisplay
+    field: (row: ledger.Ledger) => row.CoinDisplay
   }
 ])
 
@@ -564,62 +548,62 @@ const detailColumns = computed(() => [
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
     sortable: true,
-    field: (row: Detail) => row.CoinTypeID
+    field: (row: ledgerstatement.Statement) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: Detail) => row.CoinName
+    field: (row: ledgerstatement.Statement) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
     sortable: true,
-    field: (row: Detail) => row.CoinUnit
+    field: (row: ledgerstatement.Statement) => row.CoinUnit
   },
   {
     name: 'IOType',
     label: t('MSG_IO_TYPE'),
     sortable: true,
-    field: (row: Detail) => row.IOType
+    field: (row: ledgerstatement.Statement) => row.IOType
   },
   {
     name: 'IOSubType',
     label: t('MSG_IO_SUB_TYPE'),
     sortable: true,
-    field: (row: Detail) => row.IOSubType
+    field: (row: ledgerstatement.Statement) => row.IOSubType
   },
   {
     name: 'Amount',
     label: t('MSG_AMOUNT'),
     sortable: true,
-    field: (row: Detail) => row.Amount
+    field: (row: ledgerstatement.Statement) => row.Amount
   },
   {
     name: 'IOExtra',
     align: 'left',
     label: t('MSG_IO_EXTRA'),
     sortable: true,
-    field: (row: Detail) => row.IOExtra
+    field: (row: ledgerstatement.Statement) => row.IOExtra
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: Detail) => row.UserID
+    field: (row: ledgerstatement.Statement) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: Detail) => row.EmailAddress
+    field: (row: ledgerstatement.Statement) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: Detail) => row.PhoneNO
+    field: (row: ledgerstatement.Statement) => row.PhoneNO
   }
 ])
 
@@ -628,61 +612,61 @@ const accountColumns = computed(() => [
     name: 'AccountID',
     label: t('MSG_ACCOUNT_ID'),
     sortable: true,
-    field: (row: Account) => row.AccountID
+    field: (row: useraccountbase.Account) => row.AccountID
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
     sortable: true,
-    field: (row: Account) => row.Address
+    field: (row: useraccountbase.Account) => row.Address
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: Account) => row.CoinName
+    field: (row: useraccountbase.Account) => row.CoinName
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
     sortable: true,
-    field: (row: Account) => row.CoinUnit
+    field: (row: useraccountbase.Account) => row.CoinUnit
   },
   {
     name: 'Active',
     label: t('MSG_ACTIVE'),
     sortable: true,
-    field: (row: Account) => row.Active
+    field: (row: useraccountbase.Account) => row.Active
   },
   {
     name: 'Blocked',
     label: t('MSG_BLOCKED'),
     sortable: true,
-    field: (row: Account) => row.Blocked
+    field: (row: useraccountbase.Account) => row.Blocked
   },
   {
     name: 'UsedFor',
     label: t('MSG_USED_FOR'),
     sortable: true,
-    field: (row: Account) => row.UsedFor
+    field: (row: useraccountbase.Account) => row.UsedFor
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: Account) => row.UserID
+    field: (row: useraccountbase.Account) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: Detail) => row.EmailAddress
+    field: (row: useraccountbase.Account) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: Account) => row.PhoneNO
+    field: (row: useraccountbase.Account) => row.PhoneNO
   }
 ])
 </script>

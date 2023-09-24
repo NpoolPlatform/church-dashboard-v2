@@ -1,9 +1,9 @@
-import { NotifyType, useChurchLedgerWithdrawStore, Withdraw } from 'npool-cli-v4'
 import { AppID } from './app'
+import { ledgerwithdraw, notify } from 'src/npoolstore'
 
-const withdraw = useChurchLedgerWithdrawStore()
+const withdraw = ledgerwithdraw.useWithdrawStore()
 export const getAppWithdraws = (offset: number, limit: number) => {
-  withdraw.getAppWithdraws({
+  withdraw.getNAppWithdraws({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -12,11 +12,11 @@ export const getAppWithdraws = (offset: number, limit: number) => {
         Title: 'MSG_GET_APP_WITHDRAWS',
         Message: 'MSG_GET_APP_WITHDRAWS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (withdraws: Array<Withdraw>, error: boolean) => {
-    if (error || withdraws.length < limit) {
+  }, (error: boolean, withdraws?: Array<ledgerwithdraw.Withdraw>) => {
+    if (error || !withdraws?.length) {
       return
     }
     getAppWithdraws(offset + limit, limit)

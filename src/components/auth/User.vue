@@ -51,7 +51,7 @@
     selection='single'
     v-model:selected='selectedApi'
     :columns='apiColumns'
-    @row-click='(evt, row, index) => onRowClick(row as API)'
+    @row-click='(evt, row, index) => onRowClick(row as npoolapi.API)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -96,11 +96,9 @@
 </template>
 
 <script setup lang='ts'>
-import { ExpandAPI, Auth } from 'npool-cli-v2'
-import { formatTime, NotifyType, useChurchAuthingStore, User, useChurchUserStore } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
 import { AppID } from 'src/api/app'
-import { npoolapi } from 'src/npoolstore'
+import { npoolapi, user, authing, notify, utils } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -109,30 +107,27 @@ const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const user = useChurchUserStore()
-const users = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
+const _user = user.useUserStore()
+const users = computed(() => _user.appUsers(AppID.value))
 const username = ref('')
 const displayUsers = computed(() => users.value.filter((el) => el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)))
-const selectedUser = ref([] as Array<User>)
+const selectedUser = ref([] as Array<user.User>)
 const userLoading = ref(false)
 
 const api = npoolapi.useNpoolAPIStore()
 const apis = computed(() => api.APIs)
-const selectedApi = ref([] as Array<ExpandAPI>)
+const selectedApi = ref([] as Array<npoolapi.API>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
-const auths = computed(() => {
-  return auth.Auths.get(AppID.value) ? auth.Auths.get(AppID.value)?.filter((al) => {
-    return al.UserID === selectedUser.value[0]?.ID
-  }) : []
-})
+const auth = authing.useAuthingStore()
+const auths = computed(() => auth.auths(AppID.value, selectedUser.value[0]?.ID))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
-const selectedAuth = ref([] as Array<Auth>)
+const selectedAuth = ref([] as Array<authing.Auth>)
 
 const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
+  _user.getAppUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -141,18 +136,18 @@ const getAppUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_USERS',
         Message: 'MSG_GET_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<User>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<user.User>) => {
+    if (error || !rows?.length) {
       userLoading.value = false
       return
     }
     getAppUsers(offset + limit, limit)
   })
 }
-const auth = useChurchAuthingStore()
+
 const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
     Offset: offset,
@@ -163,11 +158,11 @@ const getAppAuths = (offset: number, limit: number) => {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<Auth>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<authing.Auth>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppAuths(offset + limit, limit)
@@ -175,9 +170,9 @@ const getAppAuths = (offset: number, limit: number) => {
 }
 
 const prepare = () => {
-  if (!user.Users.get(AppID.value)) {
+  if (!users.value.length) {
     userLoading.value = true
-    getAppUsers(0, 500)
+    getAppUsers(0, 100)
   }
 
   if (!auth.Auths.get(AppID.value)) {
@@ -191,7 +186,7 @@ watch(AppID, () => {
 
 onMounted(() => {
   if (apis.value.length === 0) {
-    getAPIs(0, 500)
+    getAPIs(0, 100)
   }
 
   prepare()
@@ -225,13 +220,13 @@ const onSubmit = () => {
         Title: 'MSG_UPDATE_API',
         Message: 'MSG_UPDATE_API_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_API',
         Message: 'MSG_UPDATE_API_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -242,7 +237,7 @@ const onSubmit = () => {
   })
 }
 
-const onCreateAuthClick = (row: ExpandAPI) => {
+const onCreateAuthClick = (row: npoolapi.API) => {
   auth.createAppAuth({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value[0]?.ID,
@@ -253,13 +248,13 @@ const onCreateAuthClick = (row: ExpandAPI) => {
         Title: 'MSG_CREATE_USER_AUTH',
         Message: 'MSG_CREATE_USER_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_USER_AUTH',
         Message: 'MSG_CREATE_USER_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {
@@ -270,19 +265,19 @@ const onCreateAuthClick = (row: ExpandAPI) => {
 const onDeleteAuthClick = () => {
   auth.deleteAppAuth({
     TargetAppID: AppID.value,
-    ID: selectedAuth.value[0].ID as string,
+    ID: selectedAuth.value[0].ID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_APP_USER_AUTH',
         Message: 'MSG_DELETE_APP_USER_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_DELETE_APP_USER_AUTH',
         Message: 'MSG_DELETE_APP_USER_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {
@@ -294,37 +289,37 @@ const columns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: User) => row.AppID
+    field: (row: user.User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: User) => row.ID
+    field: (row: user.User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: User) => row.EmailAddress
+    field: (row: user.User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: User) => row.PhoneNO
+    field: (row: user.User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
     sortable: true,
-    field: (row: User) => row.Roles.join(',')
+    field: (row: user.User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: User) => formatTime(row.CreatedAt)
+    field: (row: user.User) => utils.formatTime(row.CreatedAt)
   }
 ])
 
@@ -375,13 +370,13 @@ const apiColumns = computed(() => [
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     sortable: true,
-    field: (row: npoolapi.API) => formatTime(row.CreatedAt)
+    field: (row: npoolapi.API) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     sortable: true,
-    field: (row: npoolapi.API) => formatTime(row.UpdatedAt)
+    field: (row: npoolapi.API) => utils.formatTime(row.UpdatedAt)
   },
   {
     name: 'MethodName',

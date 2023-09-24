@@ -69,23 +69,20 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { formatTime } from 'npool-cli-v2'
-import { NotifyType, useChurchAuthingStore, Auth, App } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
-import { app } from 'src/npoolstore'
+import { app, authing, notify, utils } from 'src/npoolstore'
 import { computed, onMounted, ref, watch } from 'vue'
 
 const application = app.useApplicationStore()
 
-const auths = computed(() => auth.Auths.get(AppID.value))
+const auth = authing.useAuthingStore()
+const auths = computed(() => auth.auths(AppID.value))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 
-const loadedAuths = ref([] as Array<Auth>)
+const loadedAuths = ref([] as Array<authing.Auth>)
 const loadedPath = ref('')
 const displayLoadedAuths = computed(() => loadedAuths.value?.filter((auth) => auth.Resource.includes(loadedPath.value)))
-
-const auth = useChurchAuthingStore()
 
 const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
@@ -97,18 +94,18 @@ const getAppAuths = (offset: number, limit: number) => {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<Auth>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<authing.Auth>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppAuths(offset + limit, limit)
   })
 }
 const prepare = () => {
-  if (!auth.Auths.get(AppID.value)) {
+  if (!auths.value.length) {
     getAppAuths(0, 100)
   }
 }
@@ -122,19 +119,19 @@ onMounted(() => {
 })
 
 interface SavedAuths {
-  Application: App
-  Auths: Array<Auth>
+  Application: app.App
+  Auths: Array<authing.Auth>
 }
 
 const onExportClick = () => {
-  const myApp = application.getApp(AppID.value)
+  const myApp = application.app(AppID.value)
   const blob = new Blob([JSON.stringify({
     Application: myApp,
     Auths: auths.value
   })], { type: 'text/plain;charset=utf-8' })
   const filename = (myApp?.Name as string) + '-' +
                    (myApp?.ID as string) + '-auths-' +
-                   formatTime(new Date().getTime() / 1000) +
+                   utils.formatTime(new Date().getTime() / 1000) +
                    '.json'
   saveAs(blob, filename)
 }
@@ -172,13 +169,13 @@ const onSubmitClick = () => {
             Title: 'MSG_CREATE_APP_USER_AUTH',
             Message: 'MSG_CREATE_APP_USER_AUTH_FAIL',
             Popup: true,
-            Type: NotifyType.Error
+            Type: notify.NotifyType.Error
           },
           Info: {
             Title: 'MSG_CREATE_APP_USER_AUTH',
             Message: 'MSG_CREATE_APP_USER_AUTH_FAIL',
             Popup: true,
-            Type: NotifyType.Success
+            Type: notify.NotifyType.Success
           }
         }
       }, () => {
@@ -198,13 +195,13 @@ const onSubmitClick = () => {
             Title: 'MSG_CREATE_APP_ROLE_AUTH',
             Message: 'MSG_CREATE_APP_ROLE_AUTH_FAIL',
             Popup: true,
-            Type: NotifyType.Error
+            Type: notify.NotifyType.Error
           },
           Info: {
             Title: 'MSG_CREATE_APP_ROLE_AUTH',
             Message: 'MSG_CREATE_APP_ROLE_AUTH_FAIL',
             Popup: true,
-            Type: NotifyType.Success
+            Type: notify.NotifyType.Success
           }
         }
       }, () => {
@@ -223,13 +220,13 @@ const onSubmitClick = () => {
           Title: 'MSG_CREATE_APP_AUTH',
           Message: 'MSG_CREATE_APP_AUTH_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         },
         Info: {
           Title: 'MSG_CREATE_APP_AUTH',
           Message: 'MSG_CREATE_APP_AUTH_FAIL',
           Popup: true,
-          Type: NotifyType.Success
+          Type: notify.NotifyType.Success
         }
       }
     }, () => {

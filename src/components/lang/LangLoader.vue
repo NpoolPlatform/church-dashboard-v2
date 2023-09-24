@@ -1,24 +1,26 @@
 <script setup lang='ts'>
-import { onMounted, computed } from 'vue'
-import { AppLang, Message, NotifyType, useAdminAppLangStore, useAdminMessageStore, useLocaleStore } from 'npool-cli-v4'
-import { useI18n } from 'vue-i18n'
+import { onMounted, computed, watch } from 'vue'
+import { applang, message, _locale, notify, g11nbase } from 'src/npoolstore'
+import { AppID } from 'src/api/app'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
-const lang = useAdminAppLangStore()
-const langs = computed(() => lang.AppLangs.AppLangs)
+const lang = applang.useAppLangStore()
+const langs = computed(() => lang.langs(AppID.value))
 
-const message = useAdminMessageStore()
-const messages = computed(() => message.Messages.Messages)
+const _message = message.useMessageStore()
+const messages = computed(() => _message.messages(AppID.value, locale.langID()))
 
-const locale = useLocaleStore()
+const locale = _locale.useLocaleStore()
+const langID = computed(() => locale.AppLang?.LangID)
 
 onMounted(() => {
-  if (langs.value.length === 0) {
+  if (!langs.value.length) {
     getAppLangs(0, 100)
   }
+})
+
+watch(langID, () => {
   if (messages.value.length === 0) {
-    getMessages(0, 500)
+    getMessages(0, 100)
   }
 })
 
@@ -28,10 +30,13 @@ const getAppLangs = (offset: number, limit: number) => {
     Limit: limit,
     Message: {
     }
-  }, (error: boolean, rows: Array<AppLang>) => {
+  }, (error: boolean, rows: Array<g11nbase.AppLang>) => {
     if (error || rows.length === 0) {
       if (!error) {
         locale.setLangs(langs.value)
+        if (!messages.value.length) {
+          getMessages(0, 100)
+        }
       }
       return
     }
@@ -40,20 +45,20 @@ const getAppLangs = (offset: number, limit: number) => {
 }
 
 const getMessages = (offset: number, limit: number) => {
-  message.getMessages({
+  _message.getMessages({
     Disabled: false,
     Offset: offset,
     Limit: limit,
-    NotifyMessage: {
+    Message: {
       Error: {
-        Title: t('MSG_GET_LANG_MESSAGES'),
-        Message: t('MSG_GET_LANG_MESSAGES_FAIL'),
+        Title: 'MSG_GET_LANG_MESSAGES',
+        Message: 'MSG_GET_LANG_MESSAGES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<Message>) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: Array<g11nbase.Message>) => {
+    if (error || !rows?.length) {
       return
     }
     getMessages(offset + limit, limit)

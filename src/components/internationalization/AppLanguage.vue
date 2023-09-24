@@ -55,19 +55,19 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchAppLangStore, AppLang } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { applang, notify, g11nbase } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const LanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/LanguagePicker.vue'))
 
-const lang = useChurchAppLangStore()
-const langs = computed(() => lang.getAppLangsByAppID(AppID.value))
+const lang = applang.useAppLangStore()
+const langs = computed(() => lang.langs(AppID.value))
 
-const selectedAppLangs = ref([] as Array<AppLang>)
-const target = ref({} as AppLang)
+const selectedAppLangs = ref([] as Array<g11nbase.AppLang>)
+const target = ref({} as g11nbase.AppLang)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -75,12 +75,12 @@ const updating = ref(false)
 const onCreate = () => {
   showing.value = true
   updating.value = false
-  target.value = { Main: false } as AppLang
+  target.value = { Main: false } as g11nbase.AppLang
 }
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as AppLang
+  target.value = {} as g11nbase.AppLang
 }
 
 const onCancel = () => {
@@ -97,13 +97,13 @@ const onAuthorize = (done: () => void) => {
         Title: 'MSG_CREATE_APP_LANGUAGE',
         Message: 'MSG_CREATE_APP_LANGUAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_APP_LANGUAGE',
         Message: 'MSG_CREATE_APP_LANGUAGE_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -124,13 +124,13 @@ const onDelete = () => {
         Title: 'MSG_DELETE_APP_LANGUAGE',
         Message: 'MSG_DELETE_APP_LANGUAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_DELETE_APP_LANGUAGE',
         Message: 'MSG_DELETE_APP_LANGUAGE_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {

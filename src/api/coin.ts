@@ -1,9 +1,9 @@
-import { AppCoin, Coin, CoinDescription, NotifyType, useChurchAppCoinDescriptionStore, useChurchAppCoinStore, useChurchCoinStore } from 'npool-cli-v4'
 import { AppID } from './app'
+import { coin, notify, appcoindescription, appcoin } from 'src/npoolstore'
 
-const coin = useChurchCoinStore()
+const _coin = coin.useCoinStore()
 export const getCoins = (offset : number, limit: number) => {
-  coin.getCoins({
+  _coin.getCoins({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -11,18 +11,18 @@ export const getCoins = (offset : number, limit: number) => {
         Title: 'MSG_GET_COINS',
         Message: 'MSG_GET_COINS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, coins: Array<Coin>) => {
-    if (error || coins.length < limit) {
+  }, (error: boolean, coins?: Array<coin.Coin>) => {
+    if (error || !coins?.length) {
       return
     }
     getCoins(offset + limit, limit)
   })
 }
 
-const description = useChurchAppCoinDescriptionStore()
+const description = appcoindescription.useCoinDescriptionStore()
 export const getAppCoinDescriptions = (offset : number, limit: number) => {
   description.getAppCoinDescriptions({
     TargetAppID: AppID.value,
@@ -33,20 +33,20 @@ export const getAppCoinDescriptions = (offset : number, limit: number) => {
         Title: 'MSG_GET_COIN_DESCRIPTIONS',
         Message: 'MSG_GET_COIN_DESCRIPTIONS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, descriptions: Array<CoinDescription>) => {
-    if (error || descriptions.length < limit) {
+  }, (error: boolean, descriptions?: Array<appcoindescription.CoinDescription>) => {
+    if (error || !descriptions?.length) {
       return
     }
     getAppCoinDescriptions(offset + limit, limit)
   })
 }
 
-const appCoin = useChurchAppCoinStore()
+const appCoin = appcoin.useAppCoinStore()
 export const getAppCoins = (offset : number, limit: number) => {
-  appCoin.getAppCoins({
+  appCoin.getNAppCoins({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -55,11 +55,11 @@ export const getAppCoins = (offset : number, limit: number) => {
         Title: 'MSG_GET_COINS',
         Message: 'MSG_GET_COINS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, coins: Array<AppCoin>) => {
-    if (error || coins.length < limit) {
+  }, (error: boolean, coins?: Array<appcoin.AppCoin>) => {
+    if (error || !coins?.length) {
       return
     }
     getAppCoins(offset + limit, limit)

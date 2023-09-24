@@ -34,21 +34,21 @@
       </q-item>
       <q-item class='row'>
         <q-item-section>
-          <q-img :ratio='1' :src='(images?.get(ImageType.FrontImg)?.Base64 as string)' />
+          <q-img :ratio='1' :src='(images?.get(kyc.ImageType.FrontImg)?.Base64 as string)' />
         </q-item-section>
-        <q-item-section v-if='target?.DocumentType === DocumentType.IDCard'>
-          <q-img :ratio='1' :src='(images?.get(ImageType.BackImg)?.Base64 as string)' />
+        <q-item-section v-if='target?.DocumentType === kyc.DocumentType.IDCard'>
+          <q-img :ratio='1' :src='(images?.get(kyc.ImageType.BackImg)?.Base64 as string)' />
         </q-item-section>
         <q-item-section>
-          <q-img :ratio='1' :src='(images?.get(ImageType.SelfieImg)?.Base64 as string)' />
+          <q-img :ratio='1' :src='(images?.get(kyc.ImageType.SelfieImg)?.Base64 as string)' />
         </q-item-section>
       </q-item>
       <q-card-section>
         <q-input v-model='target.Message' :label='$t("MSG_COMMENT")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_APPROVE")' @click='updateReview(KYCReviewState.Approved)' :disable='disableUpdateBtn(target)' />
-        <q-btn class='btn round alt' :label='$t("MSG_REJECT")' @click='updateReview(KYCReviewState.Rejected)' :disable='disableUpdateBtn(target)' />
+        <q-btn class='btn round alt' :label='$t("MSG_APPROVE")' @click='updateReview(reviewbase.ReviewState.Approved)' :disable='disableUpdateBtn(target)' />
+        <q-btn class='btn round alt' :label='$t("MSG_REJECT")' @click='updateReview(reviewbase.ReviewState.Rejected)' :disable='disableUpdateBtn(target)' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -56,23 +56,25 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, KYCReview, KYCReviewState, ImageType, DocumentType, useChurchKycStore, User, useChurchUserStore, useLocaleStore } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { kycreview, kyc, notify, reviewbase, user } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const disableUpdateBtn = computed(() => (review: KYCReview) => review.ReviewState === KYCReviewState.Approved || review.ReviewState === KYCReviewState.Rejected)
-const kyc = useChurchKycStore()
-const locale = useLocaleStore()
+const disableUpdateBtn = computed(() => (review: kycreview.KYCReview) => {
+  return review.ReviewState === reviewbase.ReviewState.Approved || review.ReviewState === reviewbase.ReviewState.Rejected
+})
+const _kyc = kyc.useKYCStore()
+const review = kycreview.useKycReviewStore()
 
-const displayReviews = computed(() => !kyc.KycReviews.KycReviews.get(AppID.value) ? [] as Array<KYCReview> : kyc.KycReviews.KycReviews.get(AppID.value))
+const displayReviews = computed(() => review.reviews(AppID.value))
 const reviewLoading = ref(false)
 
 const getAppKycReviews = (offset: number, limit: number) => {
-  kyc.getAppKycReviews({
+  review.getAppKycReviews({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -81,11 +83,11 @@ const getAppKycReviews = (offset: number, limit: number) => {
         Title: t('MSG_GET_KYC_REVIEWS'),
         Message: t('MSG_GET_KYC_REVIEWS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (reviews: Array<KYCReview>, error: boolean) => {
-    if (error || reviews.length < limit) {
+  }, (error: boolean, reviews?: Array<kycreview.KYCReview>) => {
+    if (error || !reviews?.length) {
       reviewLoading.value = false
       return
     }
@@ -93,13 +95,13 @@ const getAppKycReviews = (offset: number, limit: number) => {
   })
 }
 const prepare = () => {
-  if (!kyc.KycReviews.KycReviews.get(AppID.value)) {
+  if (!review.reviews().length) {
     reviewLoading.value = true
-    getAppKycReviews(0, 500)
+    getAppKycReviews(0, 100)
   }
-  if (!user.Users.get(AppID.value)) {
+  if (!_user.appUsers(AppID.value).length) {
     reviewLoading.value = true
-    getAppUsers(0, 500)
+    getAppUsers(0, 100)
   }
 }
 
@@ -107,28 +109,24 @@ watch(AppID, () => {
   prepare()
 })
 
-const user = useChurchUserStore()
+const _user = user.useUserStore()
 onMounted(() => {
   prepare()
 })
 
 const showing = ref(false)
-const target = ref({} as KYCReview)
-const targetUser = ref({} as User)
-const images = computed(() => kyc.Images.get(target.value.KycID))
+const target = ref({} as kycreview.KYCReview)
+const targetUser = ref({} as user.User)
+const images = computed(() => _kyc.images(AppID.value, target.value.UserID))
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as unknown as KYCReview
-  targetUser.value = {} as unknown as User
+  target.value = {} as unknown as kycreview.KYCReview
+  targetUser.value = {} as unknown as user.User
 }
 
-const getTargetUser = (userID: string) => {
-  const u = user.Users.get(AppID.value)?.find((ul) => ul.ID === userID)
-  return !u ? {} as User : u
-}
 const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
+  _user.getAppUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -137,11 +135,11 @@ const getAppUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_USERS',
         Message: 'MSG_GET_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<User>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<user.User>) => {
+    if (error || !rows?.length) {
       reviewLoading.value = false
       return
     }
@@ -149,50 +147,53 @@ const getAppUsers = (offset: number, limit: number) => {
   })
 }
 
-const onRowClick = (row: KYCReview) => {
+const onRowClick = (row: kycreview.KYCReview) => {
   target.value = { ...row }
-  targetUser.value = { ...getTargetUser(row.UserID) }
+  if (!_user.appUser(AppID.value, row.UserID)) {
+    return
+  }
+  targetUser.value = { ..._user.appUser(AppID.value, row.UserID) as user.User }
   showing.value = true
-  kyc.getAppUserKYCImage({
+  _kyc.getAppUserKYCImage({
     TargetAppID: AppID.value,
     TargetUserID: row.UserID,
-    ImageType: ImageType.FrontImg,
+    ImageType: kyc.ImageType.FrontImg,
     Message: {
       Error: {
         Title: t('MSG_GET_KYC_IMAGES'),
         Message: t('MSG_GET_KYC_IMAGES_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, target.value.KycID, () => {
-    kyc.getAppUserKYCImage({
+    _kyc.getAppUserKYCImage({
       TargetAppID: AppID.value,
       TargetUserID: row.UserID,
-      ImageType: ImageType.SelfieImg,
+      ImageType: kyc.ImageType.SelfieImg,
       Message: {
         Error: {
           Title: t('MSG_GET_KYC_IMAGES'),
           Message: t('MSG_GET_KYC_IMAGES_FAIL'),
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         }
       }
     }, target.value.KycID, () => {
-      if (target?.value?.DocumentType === DocumentType.Passport) {
+      if (target?.value?.DocumentType === kyc.DocumentType.Passport) {
         showing.value = true
         return
       }
-      kyc.getAppUserKYCImage({
+      _kyc.getAppUserKYCImage({
         TargetAppID: AppID.value,
         TargetUserID: row.UserID,
-        ImageType: ImageType.BackImg,
+        ImageType: kyc.ImageType.BackImg,
         Message: {
           Error: {
             Title: t('MSG_GET_KYC_IMAGES'),
             Message: t('MSG_GET_KYC_IMAGES_FAIL'),
             Popup: true,
-            Type: NotifyType.Error
+            Type: notify.NotifyType.Error
           }
         }
       }, target.value.KycID, () => {
@@ -202,16 +203,15 @@ const onRowClick = (row: KYCReview) => {
   })
 }
 
-const updateReview = (state: KYCReviewState) => {
-  if (state === KYCReviewState.Rejected && target.value.Message.length === 0) {
+const updateReview = (state: reviewbase.ReviewState) => {
+  if (state === reviewbase.ReviewState.Rejected && target.value.Message.length === 0) {
     console.log('message is required')
     return
   }
 
-  kyc.updateAppKycReview({
+  review.updateAppKycReview({
     TargetAppID: AppID.value,
     ReviewID: target.value?.ReviewID,
-    LangID: locale.AppLang?.LangID,
     State: state,
     Message: target.value.Message,
     NotifyMessage: {
@@ -219,10 +219,10 @@ const updateReview = (state: KYCReviewState) => {
         Title: t('MSG_UPDATE_KYC_REVIEW'),
         Message: t('MSG_UPDATE_KYC_REVIEW_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (r:KYCReview, error: boolean) => {
+  }, (error: boolean) => {
     if (error) {
       return
     }

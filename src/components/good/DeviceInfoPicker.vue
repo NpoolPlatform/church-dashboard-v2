@@ -19,10 +19,10 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-
-import { DeviceInfo, NotifyType, useChurchDeviceInfoStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { deviceinfo, notify } from 'src/npoolstore'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 interface Props {
@@ -34,9 +34,9 @@ const props = defineProps<Props>()
 const device = toRef(props, 'device')
 const updating = toRef(props, 'updating')
 const target = ref(device.value)
-const deviceInfo = useChurchDeviceInfoStore()
+const deviceInfo = deviceinfo.useDeviceInfoStore()
 
-const devices = computed(() => Array.from(deviceInfo.DeviceInfos.DeviceInfos).map((el) => {
+const devices = computed(() => Array.from(deviceInfo.deviceInfos()).map((el) => {
   return {
     value: el.ID,
     label: el.Type
@@ -49,7 +49,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (deviceInfo.DeviceInfos.DeviceInfos.length === 0) {
+  if (!deviceInfo.deviceInfos().length) {
     getDeviceInfos(0, 500)
   }
 })
@@ -63,11 +63,11 @@ const getDeviceInfos = (offset: number, limit: number) => {
         Title: t('MSG_GET_DEVICES'),
         Message: t('MSG_GET_DEVICES_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (devices: Array<DeviceInfo>, error: boolean) => {
-    if (error || devices.length < limit) {
+  }, (error: boolean, devices?: Array<deviceinfo.DeviceInfo>) => {
+    if (error || !devices?.length) {
       return
     }
     getDeviceInfos(offset + limit, limit)

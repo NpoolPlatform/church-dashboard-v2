@@ -8,7 +8,7 @@
     :title='$t("MSG_FIATS")'
     :rows-per-page-options='[100]'
     :columns='columns'
-    @row-click='(evt, row, index) => onRowClick(row as Fiat)'
+    @row-click='(evt, row, index) => onRowClick(row as fiat.Fiat)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -49,9 +49,9 @@
 </template>
 
 <script setup lang='ts'>
-import { useFiatStore, NotifyType, formatTime, Fiat } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { fiat, notify, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -59,24 +59,27 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const FiatFeed = defineAsyncComponent(() => import('src/components/coin/FiatFeed.vue'))
 
-const fiat = useFiatStore()
-const fiats = computed(() => fiat.fiats())
+const _fiat = fiat.useFiatStore()
+const fiats = computed(() => _fiat.fiats())
 
 const name = ref('')
 const displayFiats = computed(() => {
-  return fiats.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return fiats.value.filter((el) => {
+    return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+  })
 })
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as Fiat)
+const target = ref({} as fiat.Fiat)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: Fiat) => {
+const onRowClick = (row: fiat.Fiat) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -88,7 +91,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as Fiat
+  target.value = {} as fiat.Fiat
 }
 
 const onSubmit = (done: () => void) => {
@@ -96,14 +99,14 @@ const onSubmit = (done: () => void) => {
 }
 
 const createFiat = (done: () => void) => {
-  fiat.createFiat({
+  _fiat.createFiat({
     ...target.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_FIAT',
         Message: 'MSG_CREATE_FIAT_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -116,14 +119,14 @@ const createFiat = (done: () => void) => {
 }
 
 const updateFiat = (done: () => void) => {
-  fiat.updateFiat({
+  _fiat.updateFiat({
     ...target.value,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_FIAT',
         Message: 'MSG_UPDATE_FIAT_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -136,18 +139,18 @@ const updateFiat = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (fiat.Fiats.Fiats.length === 0) {
+  if (!fiats.value.length) {
     getFiats(0, 100)
   }
 })
 
 const getFiats = (offset: number, limit: number) => {
-  fiat.getFiats({
+  _fiat.getFiats({
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Fiat[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: fiat.Fiat[]) => {
+    if (error || !rows?.length) {
       return
     }
     getFiats(offset + limit, limit)
@@ -159,37 +162,37 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: Fiat) => row.ID
+    field: (row: fiat.Fiat) => row.ID
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
     sortable: true,
-    field: (row: Fiat) => row.Name
+    field: (row: fiat.Fiat) => row.Name
   },
   {
     name: 'Unit',
     label: t('MSG_UNIT'),
     sortable: true,
-    field: (row: Fiat) => row.Unit
+    field: (row: fiat.Fiat) => row.Unit
   },
   {
     name: 'Logo',
     label: t('MSG_LOGO'),
     sortable: true,
-    field: (row: Fiat) => row.Logo
+    field: (row: fiat.Fiat) => row.Logo
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     sortable: true,
-    field: (row: Fiat) => formatTime(row.CreatedAt)
+    field: (row: fiat.Fiat) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     sortable: true,
-    field: (row: Fiat) => formatTime(row.UpdatedAt)
+    field: (row: fiat.Fiat) => utils.formatTime(row.UpdatedAt)
   }
 ])
 </script>

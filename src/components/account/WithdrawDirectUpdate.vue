@@ -40,15 +40,15 @@
 </template>
 
 <script setup lang='ts'>
-import { Account, NotifyType, useChurchUserAccountStore } from 'npool-cli-v4'
 import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits } from 'vue'
+import { useraccount, useraccountbase, notify } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 interface Props {
   visible: boolean
   update: boolean
-  account: Account
+  account: useraccountbase.Account
 }
 
 const props = defineProps<Props>()
@@ -76,7 +76,7 @@ const onSubmit = (done: () => void) => {
   updateUserAccount(done)
 }
 
-const userAccount = useChurchUserAccountStore()
+const _useraccount = useraccount.useUserAccountStore()
 
 const updateTarget = computed(() => {
   return {
@@ -89,21 +89,21 @@ const updateTarget = computed(() => {
 })
 // Withdraw & DirectBenefit
 const updateUserAccount = (done: () => void) => {
-  userAccount.UpdateAppUserAccount({
+  _useraccount.updateAppUserAccount({
     ...updateTarget.value,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (account: Account, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return

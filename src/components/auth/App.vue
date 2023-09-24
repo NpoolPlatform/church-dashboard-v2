@@ -40,7 +40,7 @@
     v-model:selected='selectedApi'
     :columns='columns'
     selection='single'
-    @row-click='(evt, row, index) => onRowClick(row as API)'
+    @row-click='(evt, row, index) => onRowClick(row as npoolapi.API)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -86,26 +86,24 @@
 </template>
 
 <script setup lang='ts'>
-import { ExpandAPI } from 'npool-cli-v2'
-import { useChurchAuthingStore, NotifyType, Auth, formatTime } from 'npool-cli-v4'
 import { getAPIs } from 'src/api/apis'
 import { AppID } from 'src/api/app'
-import { npoolapi } from 'src/npoolstore'
+import { npoolapi, authing, notify, utils } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const api = npoolapi.useNpoolAPIStore()
 const apis = computed(() => api.APIs)
-const selectedApi = ref([] as Array<ExpandAPI>)
+const selectedApi = ref([] as Array<npoolapi.API>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
-const auth = useChurchAuthingStore()
-const auths = computed(() => auth.Auths.get(AppID.value) ? auth.Auths.get(AppID.value) : [])
+const auth = authing.useAuthingStore()
+const auths = computed(() => auth.auths(AppID.value))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
-const selectedAuth = ref([] as Array<Auth>)
+const selectedAuth = ref([] as Array<authing.Auth>)
 
 const getAppAuths = (offset: number, limit: number) => {
   auth.getAppAuths({
@@ -117,11 +115,11 @@ const getAppAuths = (offset: number, limit: number) => {
         Title: 'MSG_GET_APP_AUTHS',
         Message: 'MSG_GET_APP_AUTHS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<Auth>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, rows?: Array<authing.Auth>) => {
+    if (error || !rows?.length) {
       return
     }
     getAppAuths(offset + limit, limit)
@@ -173,13 +171,13 @@ const onSubmit = (done: () => void) => {
         Title: 'MSG_UPDATE_API',
         Message: 'MSG_UPDATE_API_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_API',
         Message: 'MSG_UPDATE_API_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -191,7 +189,7 @@ const onSubmit = (done: () => void) => {
   })
 }
 
-const onCreateAuthClick = (row: ExpandAPI) => {
+const onCreateAuthClick = (row: npoolapi.API) => {
   auth.createAppAuth({
     TargetAppID: AppID.value,
     Resource: row.Path,
@@ -201,13 +199,13 @@ const onCreateAuthClick = (row: ExpandAPI) => {
         Title: 'MSG_CREATE_APP_AUTH',
         Message: 'MSG_CREATE_APP_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_APP_AUTH',
         Message: 'MSG_CREATE_APP_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {
@@ -228,13 +226,13 @@ const onDeleteAuthClick = () => {
         Title: 'MSG_DELETE_APP_AUTH',
         Message: 'MSG_DELETE_APP_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_DELETE_APP_AUTH',
         Message: 'MSG_DELETE_APP_AUTH_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, () => {
@@ -288,13 +286,13 @@ const columns = computed(() => [
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     sortable: true,
-    field: (row: npoolapi.API) => formatTime(row.CreatedAt)
+    field: (row: npoolapi.API) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     sortable: true,
-    field: (row: npoolapi.API) => formatTime(row.UpdatedAt)
+    field: (row: npoolapi.API) => utils.formatTime(row.UpdatedAt)
   },
   {
     name: 'MethodName',

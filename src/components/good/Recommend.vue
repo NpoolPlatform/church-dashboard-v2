@@ -11,7 +11,7 @@
     v-model:selected='selectedGood'
   />
 
-  <q-table
+  <!-- q-table
     dense
     flat
     :title='$t("MSG_APP_GOOD_RECOMMENDS")'
@@ -56,45 +56,37 @@
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
-  </q-dialog>
+  </q-dialog -->
 </template>
 
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
-import { useChurchAppGoodStore, AppGood, Recommend, NotifyType, useLocalUserStore, useChurchRecommendStore, formatTime } from 'npool-cli-v4'
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { computed, /* defineAsyncComponent, */ onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getAppGoods, getAppRecommends } from 'src/api/good'
+import { getAppGoods } from 'src/api/good'
+import { appgood, utils } from 'src/npoolstore'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+// const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
-const selectedGood = ref([] as Array<AppGood>)
+const appGood = appgood.useAppGoodStore()
+const appGoods = computed(() => appGood.goods(AppID.value))
+const selectedGood = ref([] as Array<appgood.Good>)
 
-const recommend = useChurchRecommendStore()
-const recommends = computed(() => recommend.getRecommendsByAppID(AppID.value))
-
-const logined = useLocalUserStore()
-const target = ref({
-  RecommenderID: logined.User?.ID
-} as Recommend)
-
+/*
 const showing = ref(false)
 const updating = ref(false)
 
 const onCreate = () => {
   updating.value = false
   showing.value = true
-  target.value.GoodID = selectedGood.value[0]?.GoodID
 }
 
-const onRowClick = (row: Recommend) => {
+const onRowClick = () => {
   updating.value = true
   showing.value = true
-  target.value = { ...row }
 }
 
 const onCancel = () => {
@@ -102,71 +94,13 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {
-    RecommenderID: logined.User?.ID
-  } as Recommend
   showing.value = false
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppRecommend(done) : createAppRecommend(done)
+const onSubmit = () => {
+  // TODO
 }
-
-const createAppRecommend = (done: () => void) => {
-  recommend.createAppRecommend({
-    TargetAppID: AppID.value,
-    ...target.value,
-    NotifyMessage: {
-      Error: {
-        Title: t('MSG_CREATE_RECOMMEND'),
-        Message: t('MSG_CREATE_RECOMMEND_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_CREATE_RECOMMEND'),
-        Message: t('MSG_CREATE_RECOMMEND_SUCCESS'),
-        Popup: true,
-        Type: NotifyType.Success
-      }
-    }
-  }, (g: Recommend, error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
-}
-
-const updateAppRecommend = (done: () => void) => {
-  recommend.updateAppRecommend({
-    TargetAppID: AppID.value,
-    ID: target.value.ID,
-    Message: target.value.Message,
-    RecommendIndex: target.value.RecommendIndex,
-    NotifyMessage: {
-      Error: {
-        Title: t('MSG_UPDATE_RECOMMEND'),
-        Message: t('MSG_UPDATE_RECOMMEND_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_UPDATE_RECOMMEND'),
-        Message: t('MSG_UPDATE_RECOMMEND_SUCCESS'),
-        Popup: true,
-        Type: NotifyType.Success
-      }
-    }
-  }, (g: Recommend, error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
-}
+*/
 
 watch(AppID, () => {
   prepare()
@@ -177,9 +111,6 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (recommends.value.length === 0) {
-    getAppRecommends(0, 500)
-  }
   if (appGoods.value.length === 0) {
     getAppGoods(0, 500)
   }
@@ -190,91 +121,85 @@ const appGoodsColumns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: AppGood) => row.ID
+    field: (row: appgood.Good) => row.ID
   },
   {
     name: 'GOODID',
     label: t('MSG_GOODID'),
     sortable: true,
-    field: (row: AppGood) => row.GoodID
+    field: (row: appgood.Good) => row.GoodID
   },
   {
     name: 'GOODNAME',
     label: t('MSG_GOODNAME'),
     sortable: true,
-    field: (row: AppGood) => row.GoodName
+    field: (row: appgood.Good) => row.GoodName
   },
   {
     name: 'GOODTYPE',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
-    field: (row: AppGood) => row.GoodType
+    field: (row: appgood.Good) => row.GoodType
   },
   {
     name: 'ONLINE',
     label: t('MSG_ONLINE'),
     sortable: true,
-    field: (row: AppGood) => row.Online
+    field: (row: appgood.Good) => row.Online
   },
   {
     name: 'VISIBLE',
     label: t('MSG_VISIBLE'),
     sortable: true,
-    field: (row: AppGood) => row.Visible
+    field: (row: appgood.Good) => row.Visible
   },
   {
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: AppGood) => row.Price
+    field: (row: appgood.Good) => row.Price
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: AppGood) => row.Unit
+    field: (row: appgood.Good) => row.Unit
   },
   {
     name: 'GOODTOTAL',
     label: t('MSG_GOOD_TOTAL'),
     sortable: true,
-    field: (row: AppGood) => row.Total
-  },
-  {
-    name: 'GOODSOLD',
-    label: t('MSG_GOOD_SOLD'),
-    sortable: true,
-    field: (row: AppGood) => row.Sold
+    field: (row: appgood.Good) => row.GoodTotal
   },
   {
     name: 'GOODLOCKED',
     label: t('MSG_GOOD_LOCKED'),
     sortable: true,
-    field: (row: AppGood) => row.Locked
+    field: (row: appgood.Good) => row.AppGoodLocked
   },
   {
     name: 'GOODINSERVICE',
     label: t('MSG_GOOD_INSERVICE'),
     sortable: true,
-    field: (row: AppGood) => row.InService
+    field: (row: appgood.Good) => row.AppGoodInService
   },
   {
     name: 'COINNAME',
     label: t('MSG_COINNAME'),
     sortable: true,
-    field: (row: AppGood) => row.CoinName
+    field: (row: appgood.Good) => row.CoinName
   },
   {
     name: 'BENEFITTYPE',
     label: t('MSG_BENEFITTYPE'),
     sortable: true,
-    field: (row: AppGood) => row.BenefitType
+    field: (row: appgood.Good) => row.BenefitType
   },
   {
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
     sortable: true,
-    field: (row: AppGood) => formatTime(row.StartAt)
+    field: (row: appgood.Good) => utils.formatTime(row.StartAt)
   }
 ])
 </script>

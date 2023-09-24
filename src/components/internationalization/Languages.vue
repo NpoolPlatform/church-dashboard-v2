@@ -6,7 +6,7 @@
     :rows='langs'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Lang)'
+    @row-click='(evt, row, index) => onRowClick(row as language.Lang)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -54,17 +54,17 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchLangStore, Lang } from 'npool-cli-v4'
 import { getLangs } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { language, notify } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguage = defineAsyncComponent(() => import('src/components/internationalization/AppLanguage.vue'))
 
-const lang = useChurchLangStore()
-const langs = computed(() => lang.Langs.Langs)
+const lang = language.useLangStore()
+const langs = computed(() => lang.langs())
 
-const target = ref({} as Lang)
+const target = ref({} as language.Lang)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -74,11 +74,11 @@ const onCreate = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as Lang
+  target.value = {} as language.Lang
   showing.value = false
 }
 
-const onRowClick = (row: Lang) => {
+const onRowClick = (row: language.Lang) => {
   target.value = { ...row }
   updating.value = true
   showing.value = true
@@ -100,13 +100,13 @@ const createLang = (done: () => void) => {
         Title: 'MSG_CREATE_LANGUAGE',
         Message: 'MSG_CREATE_LANGUAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_LANGUAGE',
         Message: 'MSG_CREATE_LANGUAGE_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -136,13 +136,13 @@ const updateLang = (done: () => void) => {
         Title: 'MSG_UPDATE_LANGUAGE',
         Message: 'MSG_UPDATE_LANGUAGE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_LANGUAGE',
         Message: 'MSG_UPDATE_LANGUAGE_SUCCESS',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {

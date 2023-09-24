@@ -6,7 +6,7 @@
     :rows='displayGbAccounts'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as GoodBenefitAccount)'
+    @row-click='(evt, row, index) => onRowClick(row as goodbenefitaccount.Account)'
   >
     <template #top>
       <div class='row justify-end table-right'>
@@ -72,23 +72,23 @@
 </template>
 
 <script setup lang='ts'>
-import { GoodBenefitAccount, NotifyType, useChurchGoodBenefitAccountStore } from 'npool-cli-v4'
 import { getGoodBenefitAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { goodbenefitaccount, notify } from 'src/npoolstore'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const gb = useChurchGoodBenefitAccountStore()
-const gbAccounts = computed(() => gb.GoodBenefitAccounts.GoodBenefitAccounts)
+const goodbenefit = goodbenefitaccount.useGoodBenefitAccountStore()
+const accounts = computed(() => goodbenefit.accounts())
 
 const backup = ref(null)
 const blocked = ref(null)
 const active = ref(null)
 const locked = ref(null)
 
-const displayGbAccounts = computed(() => gbAccounts.value.filter((el) => {
+const displayGbAccounts = computed(() => accounts.value.filter((el) => {
   let flag = true
   if (backup.value !== null) {
     flag = flag && el.Backup === backup.value
@@ -106,11 +106,11 @@ const displayGbAccounts = computed(() => gbAccounts.value.filter((el) => {
 }))
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as GoodBenefitAccount)
+const target = ref({} as goodbenefitaccount.Account)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as GoodBenefitAccount
+  target.value = {} as goodbenefitaccount.Account
 }
 
 const onCreate = () => {
@@ -122,7 +122,7 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onRowClick = (row: GoodBenefitAccount) => {
+const onRowClick = (row: goodbenefitaccount.Account) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -133,22 +133,22 @@ const onSubmit = (done: () => void) => {
 }
 
 const createGoodBenefitAccount = (done: () => void) => {
-  gb.createGoodBenefitAccount({
+  goodbenefit.createGoodBenefitAccount({
     ...target.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_GOOD_BENEFIT',
         Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_GOOD_BENEFIT',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (account: GoodBenefitAccount, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -168,22 +168,22 @@ const updateTarget = computed(() => {
 })
 
 const updateGoodBenefitAccount = (done: () => void) => {
-  gb.updateGoodBenefitAccount({
+  goodbenefit.updateGoodBenefitAccount({
     ...updateTarget.value,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_GOOD_BENEFIT',
         Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_GOOD_BENEFIT',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (account: GoodBenefitAccount, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -193,8 +193,8 @@ const updateGoodBenefitAccount = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (gbAccounts.value.length === 0) {
-    getGoodBenefitAccounts(0, 500)
+  if (!accounts.value.length) {
+    getGoodBenefitAccounts(0, 100)
   }
 })
 </script>

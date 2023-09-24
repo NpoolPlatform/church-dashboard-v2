@@ -63,10 +63,9 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { AppID } from 'src/api/app'
-import { appoauththirdparty, oauththirdparty } from 'src/npoolstore'
+import { appoauththirdparty, oauththirdparty, notify } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -106,13 +105,13 @@ const onDelete = () => {
           Title: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY',
           Message: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         },
         Info: {
           Title: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY',
           Message: 'MSG_DELETE_APP_OAUTH_THIRD_PARTY_FAIL',
           Popup: true,
-          Type: NotifyType.Success
+          Type: notify.NotifyType.Success
         }
       }
     }, () => {
@@ -154,13 +153,13 @@ const createCoin = (done: () => void) => {
         Title: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY',
         Message: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY',
         Message: 'MSG_CREATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -181,13 +180,13 @@ const updateCoin = (done: () => void) => {
         Title: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY',
         Message: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY',
         Message: 'MSG_UPDATE_APP_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -209,7 +208,7 @@ watch(AppID, () => {
         Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
         Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -227,7 +226,7 @@ onMounted(() => {
         Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
         Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -241,7 +240,7 @@ onMounted(() => {
         Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
         Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {

@@ -70,11 +70,11 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchAppCoinStore, NotifyType, AppCoin } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
 import { getAppCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { appcoin, notify } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -82,17 +82,20 @@ const { t } = useI18n({ useScope: 'global' })
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const coin = useChurchAppCoinStore()
-const coins = computed(() => coin.getCoinsByAppID(AppID.value))
+const coin = appcoin.useAppCoinStore()
+const coins = computed(() => coin.coins(AppID.value))
 
 const name = ref('')
 const displayCoins = computed(() => {
-  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.CoinTypeID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return coins.value.filter((el) => {
+    return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+      el.CoinTypeID?.toLowerCase()?.includes(name.value?.toLowerCase())
+  })
 })
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as AppCoin)
+const target = ref({} as appcoin.AppCoin)
 
 const onCreate = () => {
   showing.value = true
@@ -111,7 +114,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as AppCoin
+  target.value = {} as appcoin.AppCoin
 }
 
 const onSubmit = (done: () => void) => {
@@ -150,7 +153,7 @@ const createAppCoin = (done: () => void) => {
         Title: 'MSG_CREATE_APP_COIN',
         Message: 'MSG_CREATE_APP_COIN_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
 
@@ -163,7 +166,7 @@ const createAppCoin = (done: () => void) => {
   })
 }
 
-const selectedCoin = ref([] as Array<AppCoin>)
+const selectedCoin = ref([] as Array<appcoin.AppCoin>)
 const onDelete = () => {
   selectedCoin.value.forEach((el) => {
     coin.deleteAppCoin({
@@ -174,7 +177,7 @@ const onDelete = () => {
           Title: 'MSG_DELETE_APP_COIN',
           Message: 'MSG_DELETE_COIN_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         }
       }
     }, () => {
@@ -194,13 +197,13 @@ watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
 
 watch(AppID, () => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 500)
+    getAppCoins(0, 100)
   }
 })
 
 onMounted(() => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 500)
+    getAppCoins(0, 100)
   }
 })
 
@@ -209,115 +212,115 @@ const coinColumns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: AppCoin) => row.ID
+    field: (row: appcoin.AppCoin) => row.ID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: AppCoin) => row.AppID
+    field: (row: appcoin.AppCoin) => row.AppID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
     sortable: true,
-    field: (row: AppCoin) => row.CoinTypeID
+    field: (row: appcoin.AppCoin) => row.CoinTypeID
   },
   {
     name: 'Name',
     label: t('MSG_APP_COIN_NAME'),
     sortable: true,
-    field: (row: AppCoin) => row.Name
+    field: (row: appcoin.AppCoin) => row.Name
   },
   {
     name: 'DisplayNames',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: AppCoin) => row.DisplayNames.join(',')
+    field: (row: appcoin.AppCoin) => row.DisplayNames.join(',')
   },
   {
     name: 'Logo',
     label: t('MSG_LOGO'),
     sortable: true,
-    field: (row: AppCoin) => row.Logo
+    field: (row: appcoin.AppCoin) => row.Logo
   },
   {
     name: 'Unit',
     label: t('MSG_UNIT'),
     sortable: true,
-    field: (row: AppCoin) => row.Unit
+    field: (row: appcoin.AppCoin) => row.Unit
   },
   {
     name: 'Presale',
     label: t('MSG_PRESALE'),
     sortable: true,
-    field: (row: AppCoin) => row.Presale
+    field: (row: appcoin.AppCoin) => row.Presale
   },
   {
     name: 'ReservedAmount',
     label: t('MSG_RESERVED_AMOUNT'),
     sortable: true,
-    field: (row: AppCoin) => row.ReservedAmount
+    field: (row: appcoin.AppCoin) => row.ReservedAmount
   },
   {
     name: 'ForPay',
     label: t('MSG_FOR_PAY'),
     sortable: true,
-    field: (row: AppCoin) => row.ForPay
+    field: (row: appcoin.AppCoin) => row.ForPay
   },
   {
     name: 'ProductPage',
     label: t('MSG_PRODUCT_PAGE'),
     sortable: true,
-    field: (row: AppCoin) => row.ProductPage
+    field: (row: appcoin.AppCoin) => row.ProductPage
   },
   {
     name: 'ENV',
     label: t('MSG_ENV'),
     sortable: true,
-    field: (row: AppCoin) => row.ENV
+    field: (row: appcoin.AppCoin) => row.ENV
   },
   {
     name: 'MarketValue',
     label: t('MSG_MARKET_VALUE'),
     sortable: true,
-    field: (row: AppCoin) => row.MarketValue
+    field: (row: appcoin.AppCoin) => row.MarketValue
   },
   {
     name: 'SettleValue',
     label: t('MSG_SETTLE_VALUE'),
     sortable: true,
-    field: (row: AppCoin) => row.SettleValue
+    field: (row: appcoin.AppCoin) => row.SettleValue
   },
   {
     name: 'SettlePercent',
     label: t('MSG_SETTLE_PERCENT'),
     sortable: true,
-    field: (row: AppCoin) => row.SettlePercent
+    field: (row: appcoin.AppCoin) => row.SettlePercent
   },
   {
     name: 'SettleTips',
     label: t('MSG_SETTLE_TIPS'),
     sortable: true,
-    field: (row: AppCoin) => row.SettleTips.join(',')
+    field: (row: appcoin.AppCoin) => row.SettleTips.join(',')
   },
   {
     name: 'DailyRewardAmount',
     label: t('MSG_DAILY_REWARD_AMOUNT'),
     sortable: true,
-    field: (row: AppCoin) => row.DailyRewardAmount
+    field: (row: appcoin.AppCoin) => row.DailyRewardAmount
   },
   {
     name: 'Display',
     label: t('MSG_DISPLAY'),
     sortable: true,
-    field: (row: AppCoin) => row.Display
+    field: (row: appcoin.AppCoin) => row.Display
   },
   {
     name: 'DisplayIndex',
     label: t('MSG_DISPLAY_INDEX'),
     sortable: true,
-    field: (row: AppCoin) => row.DisplayIndex
+    field: (row: appcoin.AppCoin) => row.DisplayIndex
   }
 ])
 </script>

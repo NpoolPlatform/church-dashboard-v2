@@ -42,50 +42,58 @@
 </template>
 
 <script setup lang='ts'>
-import { formatTime, NotifyType, useChurchSendStateStore, SendState, NotifChannel, useChurchReadStateStore, ReadState } from 'npool-cli-v4'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/api/app'
+import { announcementsendstate, announcementreadstate, notify, utils, notifbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const send = useChurchSendStateStore()
-const sendStates = computed(() => send.getStatesByAppID(AppID.value))
+const send = announcementsendstate.useSendStateStore()
+const sendStates = computed(() => send.states(AppID.value))
 
 const username = ref('')
-const displayStates = computed(() => send.getStatesByID(AppID.value, username.value?.toLocaleLowerCase()))
+const displayStates = computed(() => sendStates.value.filter((el) => {
+  return el.AnnouncementID?.toLowerCase().includes(username.value?.toLocaleLowerCase()) ||
+        el.EmailAddress?.toLowerCase().includes(username.value?.toLocaleLowerCase()) ||
+        el.PhoneNO?.toLowerCase().includes(username.value?.toLocaleLowerCase())
+}))
 
-const read = useChurchReadStateStore()
-const readStates = computed(() => read.getStatesByAppID(AppID.value))
+const read = announcementreadstate.useReadStateStore()
+const readStates = computed(() => read.states(AppID.value))
 
 const username1 = ref('')
-const displayReadStates = computed(() => read.getStatesByID(AppID.value, username1.value?.toLocaleLowerCase()))
+const displayReadStates = computed(() => readStates.value.filter((el) => {
+  return el.AnnouncementID?.toLowerCase().includes(username1.value?.toLocaleLowerCase()) ||
+        el.EmailAddress?.toLowerCase().includes(username1.value?.toLocaleLowerCase()) ||
+        el.PhoneNO?.toLowerCase().includes(username1.value?.toLocaleLowerCase())
+}))
 
 watch(AppID, () => {
   if (sendStates.value?.length === 0) {
-    getAppSendStates(0, 500, NotifChannel.ChannelSMS)
-    getAppSendStates(0, 500, NotifChannel.ChannelEmail)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelSMS)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelEmail)
   }
 
   if (readStates.value?.length === 0) {
-    getAppReadStates(0, 500)
+    getAppReadStates(0, 100)
   }
 })
 
 onMounted(() => {
   if (sendStates.value?.length === 0) {
-    getAppSendStates(0, 500, NotifChannel.ChannelSMS)
-    getAppSendStates(0, 500, NotifChannel.ChannelEmail)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelSMS)
+    getAppSendStates(0, 100, notifbase.NotifChannel.ChannelEmail)
   }
 
   if (readStates.value?.length === 0) {
-    getAppReadStates(0, 500)
+    getAppReadStates(0, 100)
   }
 })
 
-const getAppSendStates = (offset: number, limit: number, channel: NotifChannel) => {
-  send.getAppSendStates({
+const getAppSendStates = (offset: number, limit: number, channel: notifbase.NotifChannel) => {
+  send.getNAppSendStates({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -95,10 +103,10 @@ const getAppSendStates = (offset: number, limit: number, channel: NotifChannel) 
         Title: t('MSG_GET_ANNOUNCEMENTS'),
         Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<SendState>) => {
+  }, (error: boolean, rows: Array<announcementsendstate.SendState>) => {
     if (error || rows.length < limit) {
       return
     }
@@ -107,7 +115,7 @@ const getAppSendStates = (offset: number, limit: number, channel: NotifChannel) 
 }
 
 const getAppReadStates = (offset: number, limit: number) => {
-  read.getAppReadStates({
+  read.getNAppReadStates({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -116,10 +124,10 @@ const getAppReadStates = (offset: number, limit: number) => {
         Title: t('MSG_GET_ANNOUNCEMENTS'),
         Message: t('MSG_GET_ANNOUNCEMENTS_FAIL'),
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<ReadState>) => {
+  }, (error: boolean, rows: Array<announcementreadstate.ReadState>) => {
     if (error || rows.length < limit) {
       return
     }
@@ -132,55 +140,55 @@ const columns = computed(() => [
     name: 'AnnouncementID',
     label: t('MSG_ANNOUNCEMENT_ID'),
     sortable: true,
-    field: (row: SendState) => row.AnnouncementID
+    field: (row: announcementsendstate.SendState) => row.AnnouncementID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: SendState) => row.AppID
+    field: (row: announcementsendstate.SendState) => row.AppID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
     sortable: true,
-    field: (row: SendState) => row.Title
+    field: (row: announcementsendstate.SendState) => row.Title
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
     sortable: true,
-    field: (row: SendState) => row.Content
+    field: (row: announcementsendstate.SendState) => row.Content
   },
   {
     name: 'Channel',
     label: t('MSG_CHANNEL'),
     sortable: true,
-    field: (row: SendState) => row.Channel
+    field: (row: announcementsendstate.SendState) => row.Channel
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: SendState) => row.UserID
+    field: (row: announcementsendstate.SendState) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: SendState) => row.EmailAddress
+    field: (row: announcementsendstate.SendState) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: SendState) => row.PhoneNO
+    field: (row: announcementsendstate.SendState) => row.PhoneNO
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: SendState) => formatTime(row.CreatedAt)
+    field: (row: announcementsendstate.SendState) => utils.formatTime(row.CreatedAt)
   }
 ])
 
@@ -189,49 +197,49 @@ const readStatesColumns = computed(() => [
     name: 'AnnouncementID',
     label: t('MSG_ANNOUNCEMENT_ID'),
     sortable: true,
-    field: (row: ReadState) => row.AnnouncementID
+    field: (row: announcementreadstate.ReadState) => row.AnnouncementID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: ReadState) => row.AppID
+    field: (row: announcementreadstate.ReadState) => row.AppID
   },
   {
     name: 'Title',
     label: t('MSG_TITLE'),
     sortable: true,
-    field: (row: ReadState) => row.Title
+    field: (row: announcementreadstate.ReadState) => row.Title
   },
   {
     name: 'Content',
     label: t('MSG_CONTENT'),
     sortable: true,
-    field: (row: ReadState) => row.Content
+    field: (row: announcementreadstate.ReadState) => row.Content
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: ReadState) => row.UserID
+    field: (row: announcementreadstate.ReadState) => row.UserID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: ReadState) => row.EmailAddress
+    field: (row: announcementreadstate.ReadState) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: ReadState) => row.PhoneNO
+    field: (row: announcementreadstate.ReadState) => row.PhoneNO
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: ReadState) => formatTime(row.CreatedAt)
+    field: (row: announcementreadstate.ReadState) => utils.formatTime(row.CreatedAt)
   }
 ])
 </script>

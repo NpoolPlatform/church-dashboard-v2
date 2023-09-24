@@ -22,8 +22,8 @@
 </template>
 <script setup lang='ts'>
 import { getLangs } from 'src/api/g11n'
-import { useChurchLangStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { language } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -42,8 +42,8 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const lang = useChurchLangStore()
-const langs = computed(() => Array.from(lang.Langs.Langs).map((el) => {
+const lang = language.useLangStore()
+const langs = computed(() => Array.from(lang.langs()).map((el) => {
   return {
     value: el.ID,
     label: `${el.Lang} | ${el.Short}`
@@ -65,7 +65,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (lang.Langs.Langs.length === 0) {
+  if (!langs.value.length) {
     getLangs(0, 100)
   }
 })

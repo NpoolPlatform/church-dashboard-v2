@@ -22,8 +22,8 @@
 </template>
 <script setup lang='ts'>
 import { getCountries } from 'src/api/g11n'
-import { useChurchCountryStore } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { country } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -42,8 +42,8 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const country = useChurchCountryStore()
-const countries = computed(() => Array.from(country.Countries.Countries).map((el) => {
+const _country = country.useCountryStore()
+const countries = computed(() => Array.from(_country.countries()).map((el) => {
   return {
     value: el.ID,
     label: `${el.Country} | ${el.Short}`
@@ -65,7 +65,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (country.Countries.Countries.length === 0) {
+  if (!countries.value.length) {
     getCountries(0, 100)
   }
 })

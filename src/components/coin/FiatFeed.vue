@@ -7,7 +7,7 @@
     :title='$t("MSG_FIAT_FEEDS")'
     :rows-per-page-options='[100]'
     :columns='columns'
-    @row-click='(evt, row, index) => onRowClick(row as FiatFeed)'
+    @row-click='(evt, row, index) => onRowClick(row as fiatcurrencyfeed.FiatFeed)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -37,7 +37,7 @@
       <q-card-section>
         <FiatPicker v-model:id='target.FiatID' :updating='updating' :label='"MSG_FIAT_ID"' />
         <q-input v-model='target.FeedFiatName' :label='$t("MSG_FEED_FIAT_NAME")' />
-        <q-select :options='Object.values(CurrencyFeedType)' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
+        <q-select :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
@@ -53,9 +53,9 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, formatTime, FiatFeed, useFiatFeedStore, CurrencyFeedType } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { fiatcurrencyfeed, notify, utils, chainbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -63,7 +63,7 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const FiatPicker = defineAsyncComponent(() => import('src/components/coin/FiatPicker.vue'))
 
-const feed = useFiatFeedStore()
+const feed = fiatcurrencyfeed.useFiatFeedStore()
 const feeds = computed(() => feed.feeds())
 
 const name = ref('')
@@ -76,14 +76,14 @@ const displayFeeds = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as FiatFeed)
+const target = ref({} as fiatcurrencyfeed.FiatFeed)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: FiatFeed) => {
+const onRowClick = (row: fiatcurrencyfeed.FiatFeed) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -95,7 +95,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as FiatFeed
+  target.value = {} as fiatcurrencyfeed.FiatFeed
 }
 
 const onSubmit = (done: () => void) => {
@@ -110,7 +110,7 @@ const createFeed = (done: () => void) => {
         Title: 'MSG_CREATE_FIAT_FEED',
         Message: 'MSG_CREATE_FIAT_FEED_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -132,7 +132,7 @@ const updateFeed = (done: () => void) => {
         Title: 'MSG_UPDATE_FIAT_FEED',
         Message: 'MSG_UPDATE_FIAT_FEED_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -145,7 +145,7 @@ const updateFeed = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (feed.Feeds.Feeds.length === 0) {
+  if (!feeds.value.length) {
     getFeeds(0, 100)
   }
 })
@@ -155,7 +155,7 @@ const getFeeds = (offset: number, limit: number) => {
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: FiatFeed[]) => {
+  }, (error: boolean, rows: fiatcurrencyfeed.FiatFeed[]) => {
     if (error || rows.length === 0) {
       return
     }
@@ -168,55 +168,55 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: FiatFeed) => row.ID
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.ID
   },
   {
     name: 'FiatID',
     label: t('MSG_FIAT_ID'),
     sortable: true,
-    field: (row: FiatFeed) => row.FiatID
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.FiatID
   },
   {
     name: 'FiatName',
     label: t('MSG_FIAT_NAME'),
     sortable: true,
-    field: (row: FiatFeed) => row.FiatName
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.FiatName
   },
   {
     name: 'FiatUnit',
     label: t('MSG_FIAT_UNIT'),
     sortable: true,
-    field: (row: FiatFeed) => row.FiatUnit
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.FiatUnit
   },
   {
     name: 'FeedType',
     label: t('MSG_FEED_TYPE'),
     sortable: true,
-    field: (row: FiatFeed) => row.FeedType
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.FeedType
   },
   {
     name: 'FeedFiatName',
     label: t('MSG_FEED_FIAT_NAME'),
     sortable: true,
-    field: (row: FiatFeed) => row.FeedFiatName
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.FeedFiatName
   },
   {
     name: 'Disabled',
     label: t('MSG_DISABLED'),
     sortable: true,
-    field: (row: FiatFeed) => row.Disabled
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.Disabled
   },
   {
     name: 'CreatedAt',
     label: 'MSG_CREATED_AT',
     sortable: true,
-    field: (row: FiatFeed) => formatTime(row.CreatedAt)
+    field: (row: fiatcurrencyfeed.FiatFeed) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: 'MSG_UPDATED_AT',
     sortable: true,
-    field: (row: FiatFeed) => formatTime(row.UpdatedAt)
+    field: (row: fiatcurrencyfeed.FiatFeed) => utils.formatTime(row.UpdatedAt)
   }
 ])
 </script>

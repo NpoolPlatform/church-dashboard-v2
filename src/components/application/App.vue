@@ -73,7 +73,7 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const _app = app.useApplicationStore()
-const apps = computed(() => _app.Apps)
+const apps = computed(() => _app.apps())
 const appLoading = ref(false)
 
 const logined = user.useLocalUserStore()
@@ -116,7 +116,7 @@ const createApp = (done: () => void) => {
         Type: notify.NotifyType.Error
       }
     }
-  }, (app: app.App, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -156,11 +156,11 @@ const updateApp = (done: () => void) => {
       }
     }
   } as app.UpdateAppRequest
-  const origin = _app.getApp(target.value.ID)
+  const origin = _app.app(target.value.ID)
   if (origin?.Name !== target.value.Name) { // don't send app name if not change
     request.Name = target.value.Name
   }
-  _app.updateApp(request, (app: app.App, error: boolean) => {
+  _app.updateApp(request, (error: boolean) => {
     done()
     if (error) {
       return
