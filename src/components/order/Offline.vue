@@ -140,7 +140,6 @@ const onSubmit = () => {
     TargetUserID: selectedUser.value.value.ID,
     AppGoodID: selectedGood.value.value.ID,
     Units: `${units.value}`,
-    PaymentCoinID: payCoinID.value,
     OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment
   })
@@ -151,17 +150,6 @@ const onSubmit = () => {
 const coin = appcoin.useAppCoinStore()
 const coins = computed(() => coin.coins(AppID.value))
 
-const payCoinID = computed(() => {
-  const index = coins.value.findIndex((el) => {
-    return (el.ENV === selectedGood.value?.value.CoinEnv) &&
-          (el.Name?.toLowerCase().replace(/ /, '').includes('usdttrc20') ||
-          el.Name?.toLowerCase().replace(/ /, '').includes('tethertrc20'))
-  })
-  if (index < 0) {
-    return undefined as unknown as string
-  }
-  return coins.value[index].CoinTypeID
-})
 const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
 
 const prepare = () => {
