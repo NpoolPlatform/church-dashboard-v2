@@ -35,6 +35,9 @@
         <q-input v-model='target.City' :label='$t("MSG_CITY")' />
         <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
       </q-card-section>
+      <q-card-section>
+        <BrandPicker :id='target.BrandID' />
+      </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
@@ -52,6 +55,7 @@ import { vendorlocation, notify } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const BrandPicker = defineAsyncComponent(() => import('src/components/supply/BrandPicker.vue'))
 
 const vendor = vendorlocation.useVendorLocationStore()
 const locations = computed(() => vendor.vendorLocations())
