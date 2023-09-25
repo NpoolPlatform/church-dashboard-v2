@@ -36,6 +36,19 @@
         <DatePicker v-model:date='target.ShipmentAt' :updating='updating' :label='$t("MSG_SHIPMENT_AT")' />
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
       </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_POSTERS'
+          filled
+          v-model='target.Posters'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />

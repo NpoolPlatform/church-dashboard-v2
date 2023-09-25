@@ -29,7 +29,7 @@ const onChange = () => {
 
 onMounted(() => {
   if (date.value) {
-    target.value = utils.formatTime(date.value, true)?.replace(/\//g, '-')
+    target.value = utils.formatTime(date.value, 'YYYY-MM-DD')?.replace(/\//g, '-')
   }
 })
 </script>
