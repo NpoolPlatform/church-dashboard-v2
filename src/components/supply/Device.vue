@@ -28,7 +28,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_DEVICE') }}</span>
+        <span>{{ $t('MSG_DEVICE') }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
