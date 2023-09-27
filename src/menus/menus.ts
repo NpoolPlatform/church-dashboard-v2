@@ -383,6 +383,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'TopMost',
+      caption: 'TopMost',
+      icon: 'perm_identity',
+      target: '/app/good/topmosts',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
