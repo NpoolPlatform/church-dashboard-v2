@@ -70,8 +70,9 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmost, sdk, utils } from 'src/npoolstore'
+import { AppID } from 'src/api/app'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
@@ -105,19 +106,25 @@ const onCancel = () => {
 
 const onSubmit = (done: () => void) => {
   if (updating.value) {
-    sdk.updateTopMost(target.value, (error: boolean) => {
+    sdk.updateNTopMost(target.value, (error: boolean) => {
       done()
       if (error) return
       onMenuHide()
     })
   } else {
-    sdk.createTopMost(target.value, (error: boolean) => {
+    sdk.createNTopMost(target.value, (error: boolean) => {
       done()
       if (error) return
       onMenuHide()
     })
   }
 }
+
+watch(AppID, () => {
+  if (!topMosts.value?.length) {
+    sdk.getNTopMosts(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!topMosts.value?.length) {

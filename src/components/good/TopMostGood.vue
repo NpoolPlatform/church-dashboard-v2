@@ -59,8 +59,9 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmostgood, sdk, utils } from 'src/npoolstore'
+import { AppID } from 'src/api/app'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
@@ -94,7 +95,7 @@ const onCancel = () => {
 
 const onSubmit = (done: () => void) => {
   if (updating.value) {
-    sdk.updateTopMostGood(target.value, (error: boolean) => {
+    sdk.updateNTopMostGood(target.value, (error: boolean) => {
       done()
       if (error) {
         return
@@ -102,7 +103,7 @@ const onSubmit = (done: () => void) => {
       onMenuHide()
     })
   } else {
-    sdk.createTopMostGood(target.value, (error: boolean) => {
+    sdk.createNTopMostGood(target.value, (error: boolean) => {
       done()
       if (error) {
         return
@@ -111,6 +112,12 @@ const onSubmit = (done: () => void) => {
     })
   }
 }
+
+watch(AppID, () => {
+  if (!topMostGoods.value?.length) {
+    sdk.getNTopMostGoods(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!topMostGoods.value?.length) {
