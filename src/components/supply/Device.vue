@@ -191,6 +191,12 @@ const columns = computed(() => [
     field: (row: deviceinfo.DeviceInfo) => row.Type
   },
   {
+    name: 'Posters',
+    label: t('MSG_POSTERS'),
+    sortable: true,
+    field: (row: deviceinfo.DeviceInfo) => row.Posters?.join(',')
+  },
+  {
     name: 'CREATED_AT',
     label: t('MSG_CREATED_AT'),
     sortable: true,
