@@ -173,8 +173,8 @@ const onSubmit = (done: () => void) => {
 }
 
 const createAppGood = (done: () => void) => {
-  target.value.TechnicalFeeRatio = target.value.TechnicalFeeRatio.toString()
-  target.value.ElectricityFeeRatio = target.value.ElectricityFeeRatio.toString()
+  target.value.TechnicalFeeRatio = target.value?.TechnicalFeeRatio?.toString()
+  target.value.ElectricityFeeRatio = target.value?.ElectricityFeeRatio?.toString()
   appGood.createAppGood({
     TargetAppID: AppID.value,
     ...target.value,
@@ -214,8 +214,8 @@ const updateTarget = computed(() => {
     DisplayIndex: target.value.DisplayIndex,
     PurchaseLimit: target.value.PurchaseLimit,
     UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
-    TechnicalFeeRatio: target.value.TechnicalFeeRatio.toString(),
-    ElectricityFeeRatio: target.value.ElectricityFeeRatio.toString(),
+    TechnicalFeeRatio: target.value.TechnicalFeeRatio?.toString(),
+    ElectricityFeeRatio: target.value.ElectricityFeeRatio?.toString(),
     ProductPage: target.value?.ProductPage,
     EnableProductPage: target.value?.EnableProductPage,
     EnablePurchase: target.value?.EnablePurchase,
