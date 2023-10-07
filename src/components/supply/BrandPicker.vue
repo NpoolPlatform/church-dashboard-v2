@@ -5,7 +5,7 @@
     :options='displayBrands'
     options-selected-class='text-deep-orange'
     emit-value
-    label='MSG_APP_COINS'
+    label='MSG_BRAND'
     map-options
     @update:model-value='onUpdate'
     use-input
