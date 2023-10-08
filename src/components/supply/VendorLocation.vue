@@ -36,7 +36,7 @@
         <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
       </q-card-section>
       <q-card-section>
-        <BrandPicker :id='target.BrandID' />
+        <BrandPicker v-model:id='target.BrandID' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -87,6 +87,7 @@ const onCancel = () => {
 
 const onSubmit = (done: () => void) => {
   showing.value = false
+  console.log('target: ', target.value)
   updating.value ? updateVendorLocation(done) : createVendorLocation(done)
 }
 
