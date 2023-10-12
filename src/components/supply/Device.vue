@@ -28,13 +28,26 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_DEVICE') }}</span>
+        <span>{{ $t('MSG_DEVICE') }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
         <q-input type='number' v-model='target.PowerConsumption' :label='$t("MSG_POWER_CONSUMPTION")' suffix='W' />
         <DatePicker v-model:date='target.ShipmentAt' :updating='updating' :label='$t("MSG_SHIPMENT_AT")' />
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_POSTERS'
+          filled
+          v-model='target.Posters'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -176,6 +189,12 @@ const columns = computed(() => [
     label: t('MSG_TYPE'),
     sortable: true,
     field: (row: deviceinfo.DeviceInfo) => row.Type
+  },
+  {
+    name: 'Posters',
+    label: t('MSG_POSTERS'),
+    sortable: true,
+    field: (row: deviceinfo.DeviceInfo) => row.Posters?.join(',')
   },
   {
     name: 'CREATED_AT',

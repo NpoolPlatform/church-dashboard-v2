@@ -397,6 +397,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'supply/vendorbrands',
+        component: () => import('pages/supply/Brand.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'supply/vendorlocations',
         component: () => import('pages/supply/VendorLocation.vue'),
         meta: {

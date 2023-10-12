@@ -53,14 +53,39 @@
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:id='target.CoinTypeID' />
-        <!-- <CoinMultiPicker v-model:coins='target.SupportCoinTypeIDs' /> -->
+        <CoinMultiPicker v-model:ids='target.SupportCoinTypeIDs' />
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_LABELS'
+          filled
+          v-model='target.Labels'
+          multiple
+          :options='goodbase.GoodLabels'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_POSTERS'
+          filled
+          v-model='target.Posters'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
       </q-card-section>
       <q-card-section>
         <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
         <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
+      </q-card-section>
+      <q-card-section>
+        <div><q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TESTONLY")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -79,7 +104,7 @@ import { good, notify, utils, goodbase } from 'src/npoolstore'
 const DeviceInfoPicker = defineAsyncComponent(() => import('src/components/good/DeviceInfoPicker.vue'))
 const VendorLocationPicker = defineAsyncComponent(() => import('src/components/good/VendorLocationPicker.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
-// const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
+const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
 
@@ -113,6 +138,10 @@ const onCreate = () => {
 
 const onRowClick = (row: good.Good) => {
   target.value = { ...row }
+  target.value.SupportCoinTypeIDs = []
+  target.value?.SupportCoins?.forEach((el) => {
+    target.value.SupportCoinTypeIDs.push(el.CoinTypeID)
+  })
   updating.value = true
   showing.value = true
 }
@@ -170,10 +199,17 @@ const targetUpdate = computed(() => {
     Unit: target.value.Unit,
     UnitAmount: target.value.UnitAmount,
     DeliveryAt: target.value.DeliveryAt,
+    BenefitIntervalHours: target.value.BenefitIntervalHours,
     StartAt: target.value.StartAt,
     Total: target.value.Total,
     TestOnly: target.value.TestOnly,
-    StartMode: target.value.StartMode
+    UnitLockDeposit: target.value?.UnitLockDeposit,
+    Posters: target.value?.Posters,
+    Labels: target.value?.Labels,
+    StartMode: target.value.StartMode,
+    BenefitType: target.value.BenefitType,
+    GoodType: target.value.GoodType,
+    SupportCoinTypeIDs: target.value?.SupportCoinTypeIDs
   }
 })
 
