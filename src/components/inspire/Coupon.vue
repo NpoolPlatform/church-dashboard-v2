@@ -75,14 +75,14 @@ import { AppID } from 'src/npoolstore/sdk'
 const { t } = useI18n({ useScope: 'global' })
 
 const _coupon = coupon.useCouponStore()
-const coupons = computed(() => _coupon.coupons().sort((a, b) => a.CouponType > b.CouponType ? -1 : 1))
+const coupons = computed(() => _coupon.coupons().sort((a, b) => a.CreatedAt > b.CreatedAt ? -1 : 1))
 
 const target = ref({} as coupon.Coupon)
 const showing = ref(false)
 const updating = ref(false)
 
 const onCreate = () => {
-  target.value = {} as coupon.Coupon
+  target.value = { CouponScope: coupon.CouponScope.Whitelist } as coupon.Coupon
   showing.value = true
   updating.value = false
 }
