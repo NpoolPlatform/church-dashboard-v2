@@ -65,6 +65,7 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { couponscope, coupon, sdk, utils } from 'src/npoolstore'
 import { AppID } from 'src/npoolstore/sdk'
 import { useI18n } from 'vue-i18n'
+import { CouponScope } from 'src/npoolstore/inspire/coupon'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -99,6 +100,7 @@ const _coupon = coupon.useCouponStore()
 const _scope = computed(() => _coupon.coupon(undefined, target.value?.CouponID)?.CouponScope)
 
 const onSubmit = (done: () => void) => {
+  target.value.CouponScope = _scope.value as CouponScope
   sdk.createScope(target.value, (error: boolean) => {
     done()
     if (error) {
