@@ -14,7 +14,8 @@
 </template>
 <script setup lang='ts'>
 import { coupon, sdk } from 'src/npoolstore'
-import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { AppID } from 'src/npoolstore/sdk'
+import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 
 interface Props {
     id: string
@@ -48,6 +49,12 @@ const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
   emit('update:id', target.value)
 }
+
+watch(AppID, () => {
+  if (coupons.value.length === 0) {
+    sdk.getAppCoupons(0, 0)
+  }
+})
 
 onMounted(() => {
   if (coupons.value.length === 0) {
