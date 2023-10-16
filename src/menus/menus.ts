@@ -599,7 +599,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '活动',
       caption: '管理APP活动',
@@ -608,7 +608,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */{
       menuId: uid(),
       label: '券',
       caption: '管理代金券',
