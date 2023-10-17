@@ -229,6 +229,8 @@
         />
       </q-card-section>
       <q-card-section>
+        <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
+        <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
