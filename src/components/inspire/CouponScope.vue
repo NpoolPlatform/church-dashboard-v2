@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_COUPON_SCOPE")'
-    :rows='scopes'
+    :rows='displayScopes'
     row-key='ID'
     :rows-per-page-options='[100]'
     selection='single'
@@ -76,7 +76,8 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 
 const scope = couponscope.useScopeStore()
 const username = ref('')
-const scopes = computed(() => scope.scopes(undefined).filter((el) => {
+const scopes = computed(() => scope.scopes(undefined))
+const displayScopes = computed(() => scope.scopes(undefined).filter((el) => {
   return el.AppGoodID?.includes(username.value) ||
            el.CouponID?.includes(username.value)
 }))
@@ -119,7 +120,7 @@ const onDelete = () => {
 
 watch(AppID, () => {
   if (!scopes.value?.length) {
-    sdk.getAppCoupons(0, 0)
+    sdk.getNAppScopes(0, 0)
   }
 })
 
