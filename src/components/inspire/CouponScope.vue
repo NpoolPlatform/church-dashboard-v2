@@ -150,7 +150,7 @@ const columns = computed(() => [
   },
   {
     name: 'GoodName',
-    label: t('MSG_MESSAGE'),
+    label: t('MSG_GOOD_NAME'),
     sortable: true,
     field: (row: couponscope.Scope) => row.GoodName
   },
