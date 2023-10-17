@@ -81,6 +81,26 @@
       </q-card-section>
       <q-card-section>
         <q-select
+          :options='appgood.CancelModes'
+          v-model='target.CancelMode'
+          :label='$t("MSG_CANCEL_MODE")'
+        />
+        <q-input
+          v-model.number='target.CancellableBeforeStart'
+          :label='$t("MSG_CANCELLABLE_BEFORE_START")'
+          type='number'
+          :min='0'
+          suffix='h'
+          :disable='!appGood.cancelable(AppID, target.ID)'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
+        <q-input v-model='target.GoodBanner' :label='$t("MSG_GOOD_BANNER")' />
+        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
           label='MSG_DISPLAY_NAMES'
           filled
           v-model='target.DisplayNames'
