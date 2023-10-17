@@ -63,7 +63,7 @@ watch(target, () => {
 
 onMounted(() => {
   if (date.value) {
-    target.value = utils.formatTime(date.value + 60 * new Date().getTimezoneOffset(), false)?.replace(/\//g, '-')
+    target.value = utils.formatTime(date.value + 60 * new Date().getTimezoneOffset())?.replace(/\//g, '-')
   }
 })
 </script>
