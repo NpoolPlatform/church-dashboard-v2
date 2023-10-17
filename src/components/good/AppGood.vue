@@ -55,8 +55,8 @@
         <span>{{ $t('MSG_CREATE_APP_GOOD') }} : {{ updating? target.GoodName : selectedGood[0]?.Title }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
         <q-input
           v-model='target.UserPurchaseLimit'
@@ -78,6 +78,26 @@
           type='number'
           :min='0'
         />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          :options='appgood.CancelModes'
+          v-model='target.CancelMode'
+          :label='$t("MSG_CANCEL_MODE")'
+        />
+        <q-input
+          v-model.number='target.CancellableBeforeStart'
+          :label='$t("MSG_CANCELLABLE_BEFORE_START")'
+          type='number'
+          :min='0'
+          suffix='h'
+          :disable='!appGood.cancelable(AppID, target.ID)'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
+        <q-input v-model='target.GoodBanner' :label='$t("MSG_GOOD_BANNER")' />
+        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
       </q-card-section>
       <q-card-section>
         <q-select
@@ -129,26 +149,6 @@
           hide-dropdown-icon
           input-debounce='0'
           new-value-mode='add'
-        />
-      </q-card-section>
-      <q-card-section>
-        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
-        <q-input v-model='target.GoodBanner' :label='$t("MSG_GOOD_BANNER")' />
-        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
-      </q-card-section>
-      <q-card-section>
-        <q-select
-          :options='appgood.CancelModes'
-          v-model='target.CancelMode'
-          :label='$t("MSG_CANCEL_MODE")'
-        />
-        <q-input
-          v-model.number='target.CancellableBeforeStart'
-          :label='$t("MSG_CANCELLABLE_BEFORE_START")'
-          type='number'
-          :min='0'
-          suffix='h'
-          :disable='!appGood.cancelable(AppID, target.ID)'
         />
       </q-card-section>
       <q-card-section>
