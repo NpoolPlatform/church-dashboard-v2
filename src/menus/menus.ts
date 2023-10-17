@@ -383,6 +383,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'TopMost',
+      caption: 'TopMost',
+      icon: 'perm_identity',
+      target: '/app/good/topmosts',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
@@ -408,6 +417,15 @@ const MainDrawerMenus = [
         caption: '管理托管场地',
         icon: 'perm_identity',
         target: '/supply/vendorlocations',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '品牌',
+        caption: '管理品牌',
+        icon: 'perm_identity',
+        target: '/supply/vendorbrands',
         level: 1,
         sectionBegin: false,
         children: []

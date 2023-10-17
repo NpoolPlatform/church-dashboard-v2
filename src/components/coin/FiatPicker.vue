@@ -21,8 +21,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useFiatStore, Fiat } from 'npool-cli-v4'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { fiat } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -42,8 +42,8 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const fiat = useFiatStore()
-const fiats = computed(() => Array.from(fiat.Fiats.Fiats).map((el) => {
+const _fiat = fiat.useFiatStore()
+const fiats = computed(() => Array.from(_fiat.fiats()).map((el) => {
   return {
     value: el.ID,
     label: `${el.Name} | ${el.ID}`
@@ -65,18 +65,18 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (fiat.Fiats.Fiats.length === 0) {
-    getFiats(0, 500)
+  if (!fiats.value.length) {
+    getFiats(0, 100)
   }
 })
 
 const getFiats = (offset: number, limit: number) => {
-  fiat.getFiats({
+  _fiat.getFiats({
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: Fiat[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: fiat.Fiat[]) => {
+    if (error || !rows?.length) {
       return
     }
     getFiats(offset + limit, limit)

@@ -44,21 +44,21 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useChurchUserStore, User, formatTime, encryptPassword } from 'npool-cli-v4'
 import { AppID } from 'src/api/app'
+import { notify, user, utils } from 'src/npoolstore'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const user = useChurchUserStore()
-const appUsers = computed(() => user.Users.get(AppID.value) ? user.Users.get(AppID.value) as Array<User> : [])
+const _user = user.useUserStore()
+const appUsers = computed(() => _user.appUsers(undefined))
 const userLoading = ref(false)
 const password = ref('')
 
 const getAppUsers = (offset: number, limit: number) => {
-  user.getAppUsers({
+  _user.getAppUsers({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -67,11 +67,11 @@ const getAppUsers = (offset: number, limit: number) => {
         Title: 'MSG_GET_USERS',
         Message: 'MSG_GET_USERS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (resp: Array<User>, error: boolean) => {
-    if (error || resp.length < limit) {
+  }, (error: boolean, users?: Array<user.User>) => {
+    if (error || !users?.length) {
       userLoading.value = false
       return
     }
@@ -98,37 +98,37 @@ const columns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: User) => row.AppID
+    field: (row: user.User) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: User) => row.ID
+    field: (row: user.User) => row.ID
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: User) => row.EmailAddress
+    field: (row: user.User) => row.EmailAddress
   },
   {
     name: 'PhoneNO',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: User) => row.PhoneNO
+    field: (row: user.User) => row.PhoneNO
   },
   {
     name: 'Roles',
     label: t('MSG_ROLES'),
     sortable: true,
-    field: (row: User) => row.Roles.join(',')
+    field: (row: user.User) => row.Roles.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: User) => formatTime(row.CreatedAt)
+    field: (row: user.User) => utils.formatTime(row.CreatedAt)
   }
 ])
 
@@ -139,13 +139,13 @@ const onCreate = () => {
 
 const target = ref({
   TargetAppID: AppID
-} as unknown as User)
+} as unknown as user.User)
 
 const onMenuHide = () => {
   showing.value = false
   target.value = {
     TargetAppID: AppID
-  } as unknown as User
+  } as unknown as user.User
 }
 
 const onCancel = () => {
@@ -155,17 +155,17 @@ const onCancel = () => {
 const onSubmit = () => {
   showing.value = false
 
-  user.createAppUser({
+  _user.createAppUser({
     TargetAppID: AppID.value,
     EmailAddress: target.value.EmailAddress,
     PhoneNO: target.value.PhoneNO,
-    PasswordHash: encryptPassword(password.value),
+    PasswordHash: utils.encryptPassword(password.value),
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP_USER',
         Message: 'MSG_CREATE_APP_USER',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {

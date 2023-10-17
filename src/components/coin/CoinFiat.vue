@@ -64,40 +64,35 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <CoinFiat />
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, useCoinFiatStore, CoinFiat, useChurchCoinStore, Coin } from 'npool-cli-v4'
 import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
+import { coinfiat, notify, coin } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const FiatPicker = defineAsyncComponent(() => import('src/components/coin/FiatPicker.vue'))
 
-const coinFiat = useCoinFiatStore()
-const coinFiats = computed(() => coinFiat.CoinFiats.CoinFiats)
+const _coinfiat = coinfiat.useCoinFiatStore()
+const coinFiats = computed(() => _coinfiat.coinfiats())
 
 const name1 = ref('')
 const displayCoinFiats = computed(() => {
-  return coinFiats.value.filter((el) => el.CoinName?.toLowerCase()?.includes?.(name1.value?.toLowerCase()) || el.FiatName?.toLowerCase()?.includes(name1.value?.toLowerCase()))
+  return coinFiats.value.filter((el) => {
+    return el.CoinName?.toLowerCase()?.includes?.(name1.value?.toLowerCase()) ||
+          el.FiatName?.toLowerCase()?.includes(name1.value?.toLowerCase())
+  })
 })
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as CoinFiat)
+const target = ref({} as coinfiat.CoinFiat)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const onRowClick = (row: CoinFiat) => {
-  target.value = { ...row }
-  showing.value = true
-  updating.value = true
 }
 
 const onCancel = () => {
@@ -106,7 +101,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as CoinFiat
+  target.value = {} as coinfiat.CoinFiat
 }
 
 const onSubmit = (done: () => void) => {
@@ -114,14 +109,14 @@ const onSubmit = (done: () => void) => {
 }
 
 const createCoinFiat = (done: () => void) => {
-  coinFiat.createCoinFiat({
+  _coinfiat.createCoinFiat({
     ...target.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN_CoinFiat',
         Message: 'MSG_CREATE_COIN_CoinFiat_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -134,14 +129,14 @@ const createCoinFiat = (done: () => void) => {
 }
 
 const deleteCoinFiat = (done: () => void) => {
-  coinFiat.deleteCoinFiat({
-    ID: `${target.value?.ID}`,
+  _coinfiat.deleteCoinFiat({
+    ID: target.value?.ID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_COIN_FIAT',
         Message: 'MSG_DELETE_COIN_FIAT_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (error: boolean) => {
@@ -153,15 +148,18 @@ const deleteCoinFiat = (done: () => void) => {
   })
 }
 
-const coin = useChurchCoinStore()
-const coins = computed(() => coin.Coins.Coins)
+const _coin = coin.useCoinStore()
+const coins = computed(() => _coin.coins())
 
 const name = ref('')
 const displayCoins = computed(() => {
-  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return coins.value.filter((el) => {
+    return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+  })
 })
 
-const selectedCoins = ref([] as Array<Coin>)
+const selectedCoins = ref([] as Array<coin.Coin>)
 
 const ids = computed(() => {
   const _ids = [] as Array<string>
@@ -170,25 +168,26 @@ const ids = computed(() => {
 })
 
 onMounted(() => {
-  if (coin.Coins.Coins.length === 0) {
-    getCoins(0, 500)
+  if (!coins.value.length) {
+    getCoins(0, 100)
   }
 })
 
 watch(ids, () => {
   if (selectedCoins.value?.length > 0) {
-    coinFiat.$reset()
+    _coinfiat.$reset()
     getCoinFiats(0, 100)
   }
 })
+
 const getCoinFiats = (offset: number, limit: number) => {
-  coinFiat.getCoinFiats({
+  _coinfiat.getCoinFiats({
     CoinTypeIDs: ids.value,
     Offset: offset,
     Limit: limit,
     Message: {}
-  }, (error: boolean, rows: CoinFiat[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: coinfiat.CoinFiat[]) => {
+    if (error || !rows?.length) {
       return
     }
     getCoinFiats(offset + limit, limit)

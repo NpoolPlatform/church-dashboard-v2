@@ -1,11 +1,10 @@
 <template>
   <q-select
-    :disable='!updating ? false : true'
     v-model='target'
-    :options='displayCountries'
+    :options='displayTopMosts'
     options-selected-class='text-deep-orange'
     emit-value
-    :label='myLabel'
+    :label='label'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -21,39 +20,31 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getCountries } from 'src/api/g11n'
+import { sdk } from 'src/npoolstore'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { country } from 'src/npoolstore'
 
-interface Props {
-  id: string
-  updating?: boolean
-  label?: string,
-}
+  interface Props {
+    id: string
+    label?: string
+  }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
-const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
-
-const myLabel = computed(() => {
-  return !label.value ? 'MSG_COUNTRIES' : label.value
-})
-
 const target = ref(id.value)
 
-const _country = country.useCountryStore()
-const countries = computed(() => Array.from(_country.countries()).map((el) => {
+const _topMosts = computed(() => sdk.topMosts.value)
+const topMosts = computed(() => Array.from(_topMosts.value, (el) => {
   return {
     value: el.ID,
-    label: `${el.Country} | ${el.Short}`
+    label: `${el.Title} | ${el.ID}`
   }
 }))
-const displayCountries = ref(countries.value)
+const displayTopMosts = ref(topMosts.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayCountries.value = countries.value.filter((el) => {
+    displayTopMosts.value = topMosts.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
@@ -65,8 +56,8 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (!countries.value.length) {
-    getCountries(0, 100)
+  if (!topMosts.value?.length) {
+    sdk.getTopMosts(0, 0)
   }
 })
 </script>

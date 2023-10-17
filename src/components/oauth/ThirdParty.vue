@@ -34,7 +34,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-select :options='SignMethodTypes' v-model='target.ClientName' :label='$t("MSG_CLIENT_NAME")' />
+        <q-select :options='appuserbase.SignMethodTypes' v-model='target.ClientName' :label='$t("MSG_CLIENT_NAME")' />
         <q-input v-model='target.ClientLogoURL' :label='$t("MSG_CLIENT_LOGO_URL")' />
         <q-input v-model='target.ClientOAuthURL' :label='$t("MSG_CLIENT_OAUTH_URL")' />
         <q-input v-model='target.ResponseType' :label='$t("MSG_RESPONSE_TYPE")' />
@@ -50,9 +50,8 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, SignMethodTypes } from 'npool-cli-v4'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { oauththirdparty } from 'src/npoolstore'
+import { oauththirdparty, notify, appuserbase } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -103,13 +102,13 @@ const createCoin = (done: () => void) => {
         Title: 'MSG_CREATE_OAUTH_THIRD_PARTY',
         Message: 'MSG_CREATE_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_OAUTH_THIRD_PARTY',
         Message: 'MSG_CREATE_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -129,13 +128,13 @@ const updateCoin = (done: () => void) => {
         Title: 'MSG_UPDATE_OAUTH_THIRD_PARTY',
         Message: 'MSG_UPDATE_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_OAUTH_THIRD_PARTY',
         Message: 'MSG_UPDATE_OAUTH_THIRD_PARTY_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -157,7 +156,7 @@ onMounted(() => {
           Title: 'MSG_GET_OAUTH_THIRD_PARTIES',
           Message: 'MSG_GET_OAUTH_THIRD_PARTIES_FAIL',
           Popup: true,
-          Type: NotifyType.Error
+          Type: notify.NotifyType.Error
         }
       }
     }, () => {

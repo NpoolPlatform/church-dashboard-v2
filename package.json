@@ -27,11 +27,11 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "@types/file-saver": "^2.0.5",
+    "@types/uuid": "^9.0.4",
     "axios": "^0.26.1",
     "core-js": "^3.6.5",
     "file-saver": "^2.0.5",
-    "npool-cli-v2": "^0.2.299",
-    "npool-cli-v4": "^0.3.855",
+    "js-sha256": "^0.9.0",
     "pinia": "^2.0.13",
     "quasar": "^2.0.0",
     "vue": "^3.0.0",

@@ -6,7 +6,7 @@
     row-key='ID'
     :title='$t("MSG_COINS")'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Coin)'
+    @row-click='(evt, row, index) => onRowClick(row as coin.Coin)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -73,9 +73,9 @@
 </template>
 
 <script setup lang='ts'>
-import { useChurchCoinStore, Coin, NotifyType } from 'npool-cli-v4'
 import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { coin, notify } from 'src/npoolstore'
 
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
@@ -91,24 +91,27 @@ const CoinEnvironments = [
   CoinEnvironment.Test
 ]
 
-const coin = useChurchCoinStore()
-const coins = computed(() => coin.Coins.Coins)
+const _coin = coin.useCoinStore()
+const coins = computed(() => _coin.coins())
 
 const name = ref('')
 const displayCoins = computed(() => {
-  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return coins.value.filter((el) => {
+    return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
+          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+  })
 })
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as Coin)
+const target = ref({} as coin.Coin)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: Coin) => {
+const onRowClick = (row: coin.Coin) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -120,7 +123,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as Coin
+  target.value = {} as coin.Coin
 }
 
 const onSubmit = (done: () => void) => {
@@ -153,20 +156,20 @@ const updateTarget = computed(() => {
 })
 
 const createCoin = (done: () => void) => {
-  coin.createCoin({
+  _coin.createCoin({
     ...target.value,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
         Message: 'MSG_CREATE_COIN_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_CREATE_COIN',
         Message: 'MSG_CREATE_COIN_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -179,20 +182,20 @@ const createCoin = (done: () => void) => {
 }
 
 const updateCoin = (done: () => void) => {
-  coin.updateCoin({
+  _coin.updateCoin({
     ...updateTarget.value,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_COIN',
         Message: 'MSG_UPDATE_COIN_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_COIN',
         Message: 'MSG_UPDATE_COIN_FAIL',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
   }, (error: boolean) => {
@@ -205,8 +208,8 @@ const updateCoin = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (coin.Coins.Coins.length === 0) {
-    getCoins(0, 500)
+  if (!coins.value.length) {
+    getCoins(0, 100)
   }
 })
 </script>

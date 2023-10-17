@@ -35,34 +35,24 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import {
-  encryptPassword,
-  GoogleTokenType,
-  NotificationType,
-  useCodeRepoStore
-} from 'npool-cli-v2'
 import { useRouter } from 'vue-router'
 import { useReCaptcha } from 'vue-recaptcha-v3'
-import {
-  AccountType,
-  useFrontendUserStore,
-  NotifyType
-} from 'npool-cli-v4'
+import { user, coderepo, utils, appuserbase, notify, constant } from 'src/npoolstore'
 
 const account = ref('')
 const password = ref('')
 
-const user = useFrontendUserStore()
-const coderepo = useCodeRepoStore()
+const _user = user.useUserStore()
+const _coderepo = coderepo.useCodeRepoStore()
 const recaptcha = useReCaptcha()
 
 const router = useRouter()
 
 const signin = (token: string) => {
-  user.login({
+  _user.login({
     Account: account.value,
-    PasswordHash: encryptPassword(password.value),
-    AccountType: AccountType.Email,
+    PasswordHash: utils.encryptPassword(password.value),
+    AccountType: appuserbase.SignMethodType.Email,
     ManMachineSpec: token,
     EnvironmentSpec: 'NOT USED',
     Message: {
@@ -70,7 +60,7 @@ const signin = (token: string) => {
         Title: 'MSG_SINGIN',
         Message: 'MSG_SIGNIN_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, () => {
@@ -79,15 +69,15 @@ const signin = (token: string) => {
 }
 
 const getRecaptcha = () => {
-  coderepo.getGoogleToken({
+  _coderepo.getGoogleToken({
     Recaptcha: recaptcha,
-    Req: GoogleTokenType.Login,
+    Req: constant.GoogleTokenType.Login,
     Message: {
       Error: {
         Title: 'MSG_GET_GOOGLE_TOKEN',
         Message: 'MSG_GET_GOOGLE_TOKEN_FAIL',
         Popup: true,
-        Type: NotificationType.Error
+        Type: notify.NotifyType.Error
       }
     }
   }, (token: string) => {

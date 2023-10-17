@@ -3,11 +3,11 @@
     dense
     flat
     :title='$t("MSG_DIRECT_BENEFIT_ADDRESS")'
-    :rows='displayDirectBenefitAccounts'
+    :rows='displayAccounts'
     row-key='ID'
     :columns='directBenefitColumns'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Account)'
+    @row-click='(evt, row, index) => onRowClick(row as useraccountbase.Account)'
   >
     <template #top>
       <div class='row justify-end table-right'>
@@ -28,46 +28,41 @@
 </template>
 
 <script setup lang='ts'>
-import {
-  Account,
-  useChurchUserAccountStore
-} from 'npool-cli-v4'
 import { getNAppUserAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/api/app'
+import { accountbase, useraccount, useraccountbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 
-const account = useChurchUserAccountStore()
-const directBenefitAccounts = computed(() => account.directBenefitAddress(AppID.value))
+const useracc = useraccount.useUserAccountStore()
+const accounts = computed(() => useracc.accounts(AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDirectBenefit))
 
 const blocked = ref(null)
 const active = ref(null)
 const username = ref('')
 
-const displayDirectBenefitAccounts = computed(() => {
-  return directBenefitAccounts.value.filter((el) => {
-    let flag = el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
-                                              el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
-    if (blocked.value !== null) {
-      flag = flag && el.Blocked === blocked.value
-    }
-    if (active.value !== null) {
-      flag = flag && el.Active === active.value
-    }
-    return flag
-  })
-})
+const displayAccounts = computed(() => accounts.value.filter((el) => {
+  let flag = el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
+                                            el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
+  if (blocked.value !== null) {
+    flag = flag && el.Blocked === blocked.value
+  }
+  if (active.value !== null) {
+    flag = flag && el.Active === active.value
+  }
+  return flag
+}))
 
 const updating = ref(true)
 const showing = ref(false)
-const target = ref({} as Account)
+const target = ref({} as useraccountbase.Account)
 
-const onRowClick = (row: Account) => {
+const onRowClick = (row: useraccountbase.Account) => {
   updating.value = true
   showing.value = true
   target.value = { ...row }
@@ -82,8 +77,8 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!account.UserAccounts.UserAccounts.get(AppID.value)) {
-    getNAppUserAccounts(0, 500)
+  if (!accounts.value.length) {
+    getNAppUserAccounts(0, 100)
   }
 }
 
@@ -92,85 +87,85 @@ const directBenefitColumns = computed(() => [
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
-    field: (row: Account) => row.ID
+    field: (row: useraccountbase.Account) => row.ID
   },
   {
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: Account) => row.AppID
+    field: (row: useraccountbase.Account) => row.AppID
   },
   {
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: Account) => row.UserID
+    field: (row: useraccountbase.Account) => row.UserID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_DESCRIPTION'),
     sortable: true,
-    field: (row: Account) => row.CoinTypeID
+    field: (row: useraccountbase.Account) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: Account) => row.CoinName
+    field: (row: useraccountbase.Account) => row.CoinName
   },
   {
     name: 'AccountID',
     label: t('MSG_ACCOUNT_ID'),
     sortable: true,
-    field: (row: Account) => row.AccountID
+    field: (row: useraccountbase.Account) => row.AccountID
   },
   {
     name: 'Address',
     label: t('MSG_ADDRESS'),
     sortable: true,
-    field: (row: Account) => row.Address
+    field: (row: useraccountbase.Account) => row.Address
   },
   {
     name: 'UsedFor',
     label: t('MSG_USED_FOR'),
     sortable: true,
-    field: (row: Account) => row.UsedFor
+    field: (row: useraccountbase.Account) => row.UsedFor
   },
   {
     name: 'Labels',
     label: t('MSG_LABELS'),
     sortable: true,
-    field: (row: Account) => row.Labels?.join(',')
+    field: (row: useraccountbase.Account) => row.Labels?.join(',')
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: Account) => row.CreatedAt
+    field: (row: useraccountbase.Account) => row.CreatedAt
   },
   {
     name: 'EmailAddress',
     label: t('MSG_EMAIL_ADDRESS'),
     sortable: true,
-    field: (row: Account) => row.EmailAddress
+    field: (row: useraccountbase.Account) => row.EmailAddress
   },
   {
     name: 'PhoneNo',
     label: t('MSG_PHONE_NO'),
     sortable: true,
-    field: (row: Account) => row.PhoneNO
+    field: (row: useraccountbase.Account) => row.PhoneNO
   },
   {
     name: 'Active',
     label: t('MSG_ACTIVE'),
     sortable: true,
-    field: (row: Account) => row.Active
+    field: (row: useraccountbase.Account) => row.Active
   },
   {
     name: 'BLOCKED',
     label: t('MSG_BLOCKED'),
     sortable: true,
-    field: (row: Account) => row.Blocked
+    field: (row: useraccountbase.Account) => row.Blocked
   }
 ])
 </script>

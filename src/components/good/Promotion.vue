@@ -10,7 +10,7 @@
     selection='single'
     v-model:selected='selectedGood'
   />
-  <q-table
+  <!-- q-table
     dense
     flat
     :title='$t("MSG_APP_GOOD_PROMOTIONS")'
@@ -32,8 +32,8 @@
         />
       </div>
     </template>
-  </q-table>
-  <q-dialog
+  </q-table -->
+  <!-- q-dialog
     v-model='showing'
     @hide='onMenuHide'
     position='right'
@@ -56,42 +56,38 @@
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
-  </q-dialog>
+  </q-dialog -->
 </template>
 
 <script setup lang='ts'>
-import { useChurchAppGoodStore, AppGood, useChurchPromotionStore, Promotion, NotifyType, formatTime } from 'npool-cli-v4'
-import { getAppGoods, getAppPromotions } from 'src/api/good'
+import { getAppGoods } from 'src/api/good'
 import { AppID } from 'src/api/app'
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { computed, /* defineAsyncComponent, */ onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { appgood, utils } from 'src/npoolstore'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+// const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
+// const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const appGood = useChurchAppGoodStore()
-const appGoods = computed(() => appGood.getGoodsByAppID(AppID.value))
-const selectedGood = ref([] as Array<AppGood>)
+const appGood = appgood.useAppGoodStore()
+const appGoods = computed(() => appGood.goods(AppID.value))
+const selectedGood = ref([] as Array<appgood.Good>)
 
-const promotion = useChurchPromotionStore()
-const promotions = computed(() => promotion.getPromotionsByAppID(AppID.value))
+// const showing = ref(false)
+// const updating = ref(false)
 
-const target = ref({} as Promotion)
-const showing = ref(false)
-const updating = ref(false)
-
+/*
 const onCreate = () => {
   updating.value = false
   showing.value = true
-  target.value.GoodID = selectedGood.value[0]?.GoodID
 }
 
-const onRowClick = (row: Promotion) => {
+const onRowClick = () => {
   updating.value = true
   showing.value = true
-  target.value = { ...row }
 }
 
 const onCancel = () => {
@@ -100,66 +96,12 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as Promotion
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppPromotion(done) : createAppPromotion(done)
+const onSubmit = () => {
+  // TODO
 }
-
-const createAppPromotion = (done: () => void) => {
-  promotion.createAppPromotion({
-    TargetAppID: AppID.value,
-    ...target.value,
-    NotifyMessage: {
-      Error: {
-        Title: t('MSG_CREATE_PROMOTION'),
-        Message: t('MSG_CREATE_PROMOTION_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_CREATE_PROMOTION'),
-        Message: t('MSG_CREATE_PROMOTION_SUCCESS'),
-        Popup: true,
-        Type: NotifyType.Success
-      }
-    }
-  }, (g: Promotion, error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
-}
-
-const updateAppPromotion = (done: () => void) => {
-  promotion.updateAppPromotion({
-    TargetAppID: AppID.value,
-    ...target.value,
-    NotifyMessage: {
-      Error: {
-        Title: t('MSG_UPDATE_PROMOTION'),
-        Message: t('MSG_UPDATE_PROMOTION_FAIL'),
-        Popup: true,
-        Type: NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_UPDATE_PROMOTION'),
-        Message: t('MSG_UPDATE_PROMOTION_SUCCESS'),
-        Popup: true,
-        Type: NotifyType.Success
-      }
-    }
-  }, (g: Promotion, error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onMenuHide()
-  })
-}
+*/
 
 watch(AppID, () => {
   prepare()
@@ -170,9 +112,6 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (promotions.value.length === 0) {
-    getAppPromotions(0, 500)
-  }
   if (appGoods.value.length === 0) {
     getAppGoods(0, 500)
   }
@@ -183,130 +122,86 @@ const appGoodsColumns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: AppGood) => row.ID
+    field: (row: appgood.Good) => row.ID
   },
   {
     name: 'GOODID',
     label: t('MSG_GOODID'),
     sortable: true,
-    field: (row: AppGood) => row.GoodID
+    field: (row: appgood.Good) => row.GoodID
   },
   {
     name: 'GOODNAME',
     label: t('MSG_GOODNAME'),
     sortable: true,
-    field: (row: AppGood) => row.GoodName
+    field: (row: appgood.Good) => row.GoodName
   },
   {
     name: 'GOODTYPE',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
-    field: (row: AppGood) => row.GoodType
+    field: (row: appgood.Good) => row.GoodType
   },
   {
     name: 'ONLINE',
     label: t('MSG_ONLINE'),
     sortable: true,
-    field: (row: AppGood) => row.Online
+    field: (row: appgood.Good) => row.Online
   },
   {
     name: 'VISIBLE',
     label: t('MSG_VISIBLE'),
     sortable: true,
-    field: (row: AppGood) => row.Visible
+    field: (row: appgood.Good) => row.Visible
   },
   {
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: AppGood) => row.Price
+    field: (row: appgood.Good) => row.Price
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: AppGood) => row.Unit
+    field: (row: appgood.Good) => row.Unit
   },
   {
     name: 'GOODTOTAL',
     label: t('MSG_GOOD_TOTAL'),
     sortable: true,
-    field: (row: AppGood) => row.Total
-  },
-  {
-    name: 'GOODSOLD',
-    label: t('MSG_GOOD_SOLD'),
-    sortable: true,
-    field: (row: AppGood) => row.Sold
+    field: (row: appgood.Good) => row.GoodTotal
   },
   {
     name: 'GOODLOCKED',
     label: t('MSG_GOOD_LOCKED'),
     sortable: true,
-    field: (row: AppGood) => row.Locked
+    field: (row: appgood.Good) => row.AppGoodLocked
   },
   {
     name: 'GOODINSERVICE',
     label: t('MSG_GOOD_INSERVICE'),
     sortable: true,
-    field: (row: AppGood) => row.InService
+    field: (row: appgood.Good) => row.AppGoodInService
   },
   {
     name: 'COINNAME',
     label: t('MSG_COINNAME'),
     sortable: true,
-    field: (row: AppGood) => row.CoinName
+    field: (row: appgood.Good) => row.CoinName
   },
   {
     name: 'BENEFITTYPE',
     label: t('MSG_BENEFITTYPE'),
     sortable: true,
-    field: (row: AppGood) => row.BenefitType
+    field: (row: appgood.Good) => row.BenefitType
   },
   {
     name: 'STARTAT',
     label: t('MSG_STARTAT'),
     sortable: true,
-    field: (row: AppGood) => formatTime(row.StartAt)
+    field: (row: appgood.Good) => utils.formatTime(row.StartAt)
   }
 ])
 
-const columns = computed(() => [
-  {
-    name: 'ID',
-    label: t('MSG_ID'),
-    sortable: true,
-    field: (row: Promotion) => row.ID
-  },
-  {
-    name: 'GOODID',
-    label: t('MSG_GOOD_ID'),
-    sortable: true,
-    field: (row: Promotion) => row.GoodID
-  },
-  {
-    name: 'GOODNAME',
-    label: t('MSG_GOOD_NAME'),
-    sortable: true,
-    field: (row: Promotion) => row.GoodName
-  },
-  {
-    name: 'PRICE',
-    label: t('MSG_GOOD_RPICE'),
-    sortable: true,
-    field: (row: Promotion) => row.Price
-  },
-  {
-    name: 'START_AT',
-    label: t('MSG_START_AT'),
-    sortable: true,
-    field: (row: Promotion) => formatTime(row.StartAt)
-  },
-  {
-    name: 'END_AT',
-    label: t('MSG_END_AT'),
-    sortable: true,
-    field: (row: Promotion) => formatTime(row.EndAt)
-  }
-])
 </script>

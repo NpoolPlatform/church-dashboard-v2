@@ -4,7 +4,7 @@
     flat
     :rows='displayHistories'
     row-key='ID'
-    :title='$t("MSG_COIN_CURRENCY_HISTORIES")'
+    :title='$t("MSG_COIN_FIAT_CURRENCY_HISTORIES")'
     :rows-per-page-options='[100]'
   >
     <template #top-right>
@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang='ts'>
-import { useCoinFiatCurrencyHistoryStore, CoinFiatCurrency } from 'npool-cli-v4'
 import { computed, defineProps, ref, watch, toRef } from 'vue'
+import { coinfiatcurrencyhistory } from 'src/npoolstore'
 
 interface Props {
   ids: string[]
@@ -32,31 +32,31 @@ interface Props {
 const props = defineProps<Props>()
 const ids = toRef(props, 'ids')
 
-const cfch = useCoinFiatCurrencyHistoryStore()
-const cfchs = computed(() => cfch.Histories.Histories)
+const history = coinfiatcurrencyhistory.useCoinFiatCurrencyHistoryStore()
+const histories = computed(() => history.histories())
 
 const name = ref('')
 const displayHistories = computed(() => {
-  return cfchs.value.filter((el) => el.CoinName.toLowerCase()?.includes?.(name.value?.toLowerCase()))
+  return histories.value.filter((el) => el.CoinName.toLowerCase()?.includes?.(name.value?.toLowerCase()))
 })
 
 watch(ids, () => {
   if (ids.value?.length > 0) {
-    cfch.$reset()
-    getCoinFiatCurrencyHistories(0, 100, 0, Math.ceil(Date.now() / 1000))
+    history.$reset()
+    getCoinFiatCurrencyHistories(0, 100, Math.ceil(Date.now() / 1000) - 3 * 24 * 60 * 60, Math.ceil(Date.now() / 1000))
   }
 })
 
 const getCoinFiatCurrencyHistories = (offset: number, limit: number, startAt: number, endAt: number) => {
-  cfch.getCoinFiatCurrencyHistories({
+  history.getCoinFiatCurrencyHistories({
     CoinTypeIDs: ids.value,
     Offset: offset,
     Limit: limit,
     StartAt: startAt,
     EndAt: endAt,
     Message: {}
-  }, (error: boolean, rows: CoinFiatCurrency[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: coinfiatcurrencyhistory.CoinFiatCurrency[]) => {
+    if (error || !rows?.length) {
       return
     }
     getCoinFiatCurrencyHistories(offset + limit, limit, startAt, endAt)

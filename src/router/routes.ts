@@ -1,9 +1,9 @@
 import { RouteRecordRaw } from 'vue-router'
-import { RouteMetaImpl } from 'npool-cli-v2/utils'
+import { utils } from 'src/npoolstore'
 
 declare module 'vue-router' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface RouteMeta extends RouteMetaImpl {
+  interface RouteMeta extends utils.RouteMetaImpl {
   }
 }
 
@@ -147,6 +147,18 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'app/good/recommends',
         component: () => import('pages/good/Recommend.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/topmosts',
+        component: () => import('pages/good/TopMost.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -397,6 +409,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'supply/vendorbrands',
+        component: () => import('pages/supply/Brand.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'supply/vendorlocations',
         component: () => import('pages/supply/VendorLocation.vue'),
         meta: {
@@ -409,44 +433,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'fee/feetypes',
-        component: () => import('pages/fee/FeeType.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'fee/fees',
-        component: () => import('pages/fee/Fee.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'app/good/goods',
         component: () => import('pages/good/Good.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'stock',
-        component: () => import('pages/good/Stock.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -495,18 +483,6 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'announcement/channel',
         component: () => import('pages/mailbox/Channel.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'mail',
-        component: () => import('pages/mailbox/Mail.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -615,18 +591,6 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'account/gasfeeder',
         component: () => import('pages/account/GasFeeder.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
-        path: 'inspire/activity',
-        component: () => import('pages/inspire/Activity.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

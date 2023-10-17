@@ -6,7 +6,7 @@
     :rows='displayAccounts'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as PaymentAccount)'
+    @row-click='(evt, row, index) => onRowClick(row as paymentaccount.Account)'
   >
     <template #top>
       <div class='row justify-end table-right'>
@@ -62,22 +62,22 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, PaymentAccount, useChurchPaymentAccountStore } from 'npool-cli-v4'
 import { getPaymentAccounts } from 'src/api/account'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { paymentaccount, notify } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const payment = useChurchPaymentAccountStore()
-const paymentAccounts = computed(() => payment.PaymentAccounts.PaymentAccounts)
+const payment = paymentaccount.usePaymentAccountStore()
+const accounts = computed(() => payment.accounts())
 
 const address = ref('')
 const blocked = ref(null)
 const active = ref(null)
 const locked = ref(null)
 
-const displayAccounts = computed(() => paymentAccounts.value.filter((el) => {
+const displayAccounts = computed(() => accounts.value.filter((el) => {
   let flag = el.Address?.toLowerCase().includes(address.value?.toLowerCase())
   if (blocked.value !== null) {
     flag = flag && el.Blocked === blocked.value
@@ -93,14 +93,14 @@ const displayAccounts = computed(() => paymentAccounts.value.filter((el) => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as PaymentAccount)
+const target = ref({} as paymentaccount.Account)
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as PaymentAccount
+  target.value = {} as paymentaccount.Account
 }
 
-const onRowClick = (row: PaymentAccount) => {
+const onRowClick = (row: paymentaccount.Account) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -126,15 +126,15 @@ const onSubmit = (done: () => void) => {
       Error: {
         Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       },
       Info: {
         Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
         Popup: true,
-        Type: NotifyType.Success
+        Type: notify.NotifyType.Success
       }
     }
-  }, (account: PaymentAccount, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (error) {
       return
@@ -144,7 +144,7 @@ const onSubmit = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (paymentAccounts.value.length === 0) {
+  if (!accounts.value.length) {
     getPaymentAccounts(0, 500)
   }
 })

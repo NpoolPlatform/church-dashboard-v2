@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_EMAIL_TEMPLATES")'
-    :rows='emails'
+    :rows='_templates'
     row-key='ID'
     :loading='emailLoading'
     :rows-per-page-options='[100]'
@@ -35,7 +35,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='myTarget.DefaultToUsername' :label='$t("MSG_DEFAULT_TO_USERNAME")' />
-        <q-select :options='UsedFors' :disable='updating' v-model='myTarget.UsedFor' :label='$t("MSG_USED_FOR")' />
+        <q-select :options='basetypes.EventTypes' :disable='updating' v-model='myTarget.UsedFor' :label='$t("MSG_USED_FOR")' />
         <q-input v-model='myTarget.Sender' :label='$t("MSG_SENDER")' />
         <q-input v-model='myTarget.ReplyTos' :label='$t("MSG_REPLY_TOS_COMMA")' />
         <q-input v-model='myTarget.CCTos' :label='$t("MSG_CC_TOS_COMMA")' />
@@ -54,7 +54,7 @@
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { useChurchEmailTemplateStore, EmailTemplate, UsedFors, NotifyType, UsedFor, validateEmailAddress } from 'npool-cli-v4'
+import { emailnotiftemplate, notify, basetypes, utils } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
@@ -63,7 +63,7 @@ interface MyEmailTemplate {
   ID: string
   LangID: string
   DefaultToUsername: string
-  UsedFor: UsedFor
+  UsedFor: basetypes.EventType
   Sender: string
   ReplyTos: string
   CCTos: string
@@ -71,11 +71,9 @@ interface MyEmailTemplate {
   Body: string
 }
 
-const templates = useChurchEmailTemplateStore()
-const appEmails = computed(() => {
-  return templates.EmailTemplates.EmailTemplates.get(AppID.value) ? templates.EmailTemplates.EmailTemplates.get(AppID.value) as Array<EmailTemplate> : []
-})
-const emails = computed(() => Array.from(appEmails.value).map((el) => {
+const _email = emailnotiftemplate.useEmailTemplateStore()
+const templates = computed(() => _email.templates(AppID.value))
+const _templates = computed(() => Array.from(templates.value).map((el) => {
   return {
     ID: el.ID,
     LangID: el.LangID,
@@ -91,8 +89,8 @@ const emails = computed(() => Array.from(appEmails.value).map((el) => {
 const emailLoading = ref(false)
 
 const prepare = () => {
-  if (!templates.EmailTemplates.EmailTemplates.get(AppID.value)) {
-    getAppEmailTemplates(0, 500)
+  if (!templates.value.length) {
+    getAppEmailTemplates(0, 100)
   }
 }
 
@@ -119,7 +117,7 @@ const target = computed(() => {
     CCTos: myTarget.value?.CCTos?.length === 0 ? [] : myTarget.value?.CCTos?.split(','),
     Subject: myTarget.value.Subject,
     Body: myTarget.value.Body
-  } as EmailTemplate
+  } as emailnotiftemplate.Template
 })
 
 const onMenuHide = () => {
@@ -147,7 +145,7 @@ const onCancel = () => {
 }
 
 const getAppEmailTemplates = (offset: number, limit: number) => {
-  templates.getAppEmailTemplates({
+  _email.getAppEmailTemplates({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -156,11 +154,11 @@ const getAppEmailTemplates = (offset: number, limit: number) => {
         Title: 'MSG_GET_EMAIL_TEMPLATES',
         Message: 'MSG_GET_EMAIL_TEMPLATES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (emailTemplates: Array<EmailTemplate>, error: boolean) => {
-    if (error || emailTemplates.length < limit) {
+  }, (error: boolean, rows?: Array<emailnotiftemplate.Template>) => {
+    if (error || !rows?.length) {
       emailLoading.value = false
       return
     }
@@ -168,35 +166,33 @@ const getAppEmailTemplates = (offset: number, limit: number) => {
   })
 }
 
+const validateTarget = () => {
+  let valid = true
+  target.value?.ReplyTos?.forEach((el) => {
+    const emails = el.match(/[\d\w]+\b@[a-zA-ZA-z0-9]+\.[a-z]+/g)
+    emails?.forEach((al) => {
+      if (!utils.validateEmailAddress(al)) {
+        valid = false
+      }
+    })
+  })
+  target.value?.CCTos?.forEach((el) => {
+    const emails = el.match(/[\d\w]+\b@[a-zA-ZA-z0-9]+\.[a-z]+/g)
+    emails?.forEach((al) => {
+      if (!utils.validateEmailAddress(al)) {
+        valid = false
+      }
+    })
+  })
+  return valid
+}
+
 const createAppEmailTemplate = (done: () => void) => {
-  let flag = false
-  if (myTarget.value?.ReplyTos?.length > 0) {
-    myTarget.value?.ReplyTos?.split(',')?.forEach((el) => {
-      const emails = el.match(/[\d\w]+\b@[a-zA-ZA-z0-9]+\.[a-z]+/g)
-      emails?.forEach((al) => {
-        if (!validateEmailAddress(al)) {
-          console.log('invalid email address', al)
-          flag = true
-        }
-      })
-    })
-  }
-  if (myTarget.value?.CCTos?.length > 0) {
-    myTarget.value?.CCTos?.split(',')?.forEach((el) => {
-      const emails = el.match(/[\d\w]+\b@[a-zA-ZA-z0-9]+\.[a-z]+/g)
-      emails?.forEach((al) => {
-        if (!validateEmailAddress(al)) {
-          console.log('invalid email address', al)
-          flag = true
-        }
-      })
-    })
-  }
-  if (flag) {
+  if (!validateTarget()) {
     done()
     return
   }
-  templates.createAppEmailTemplate({
+  _email.createAppEmailTemplate({
     TargetAppID: AppID.value,
     TargetLangID: myTarget.value.LangID,
     ...target.value,
@@ -205,10 +201,10 @@ const createAppEmailTemplate = (done: () => void) => {
         Title: 'MSG_CREATE_EMAIL_TEMPLATE',
         Message: 'MSG_CREATE_EMAIL_TEMPLATE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (template: EmailTemplate, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (!error) {
       onCancel()
@@ -216,34 +212,11 @@ const createAppEmailTemplate = (done: () => void) => {
   })
 }
 const updateAppEmailTemplate = (done: () => void) => {
-  let flag = false
-  if (myTarget.value?.ReplyTos?.length > 0) {
-    myTarget.value?.ReplyTos?.split(',')?.forEach((el) => {
-      const emails = el.match(/[\d\w]+\b@[a-zA-ZA-z0-9]+\.[a-z]+/g)
-      emails?.forEach((al) => {
-        if (!validateEmailAddress(al)) {
-          console.log('invalid email address', al)
-          flag = true
-        }
-      })
-    })
-  }
-  if (myTarget.value?.CCTos?.length > 0) {
-    myTarget.value?.CCTos?.split(',')?.forEach((el) => {
-      const emails = el.match(/[\d\w]+\b@[a-zA-ZA-z0-9]+\.[a-z]+/g)
-      emails?.forEach((al) => {
-        if (!validateEmailAddress(al)) {
-          console.log('invalid email address', al)
-          flag = true
-        }
-      })
-    })
-  }
-  if (flag) {
+  if (!validateTarget()) {
     done()
     return
   }
-  templates.updateAppEmailTemplate({
+  _email.updateAppEmailTemplate({
     TargetAppID: AppID.value,
     TargetLangID: myTarget.value.LangID,
     ...target.value,
@@ -252,10 +225,10 @@ const updateAppEmailTemplate = (done: () => void) => {
         Title: 'MSG_UPDATE_EMAIL_TEMPLATE',
         Message: 'MSG_UPDATE_EMAIL_TEMPLATE_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (template: EmailTemplate, error: boolean) => {
+  }, (error: boolean) => {
     done()
     if (!error) {
       onCancel()

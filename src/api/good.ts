@@ -1,10 +1,9 @@
-import { AppGood, DeviceInfo, Good, NotifyType, Promotion, Recommend, useChurchAppGoodStore, useChurchDeviceInfoStore, useChurchGoodStore, useChurchPromotionStore, useChurchRecommendStore } from 'npool-cli-v4'
 import { AppID } from './app'
+import { appgood, good, notify, deviceinfo } from 'src/npoolstore'
 
-const good = useChurchGoodStore()
-
+const _good = good.useGoodStore()
 export const getGoods = (offset: number, limit: number) => {
-  good.getGoods({
+  _good.getGoods({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -12,20 +11,20 @@ export const getGoods = (offset: number, limit: number) => {
         Title: 'MSG_GET_GOODS',
         Message: 'MSG_GET_GOODS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (goods: Array<Good>, error: boolean) => {
-    if (error || goods.length < limit) {
+  }, (error: boolean, goods?: Array<good.Good>) => {
+    if (error || !goods?.length) {
       return
     }
     getGoods(offset + limit, limit)
   })
 }
 
-const appGood = useChurchAppGoodStore()
+const appGood = appgood.useAppGoodStore()
 export const getAppGoods = (offset: number, limit: number) => {
-  appGood.getAppGoods({
+  appGood.getNAppGoods({
     Offset: offset,
     Limit: limit,
     TargetAppID: AppID.value,
@@ -34,62 +33,18 @@ export const getAppGoods = (offset: number, limit: number) => {
         Title: 'MSG_GET_APP_GOODS',
         Message: 'MSG_GET_APP_GOODS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (goods: Array<AppGood>, error: boolean) => {
-    if (error || goods.length < limit) {
+  }, (error: boolean, goods?: Array<appgood.Good>) => {
+    if (error || !goods?.length) {
       return
     }
     getAppGoods(offset + limit, limit)
   })
 }
 
-const promotion = useChurchPromotionStore()
-export const getAppPromotions = (offset: number, limit: number) => {
-  promotion.getAppPromotions({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: AppID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOOD_PROMOTIONS',
-        Message: 'MSG_GET_GOOD_PROMOTIONS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Promotion>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppPromotions(offset + limit, limit)
-  })
-}
-
-const recommend = useChurchRecommendStore()
-export const getAppRecommends = (offset: number, limit: number) => {
-  recommend.getAppRecommends({
-    Offset: offset,
-    Limit: limit,
-    TargetAppID: AppID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_GOOD_RECOMMENDS',
-        Message: 'MSG_GET_GOOD_RECOMMENDS_FAIL',
-        Popup: true,
-        Type: NotifyType.Error
-      }
-    }
-  }, (goods: Array<Recommend>, error: boolean) => {
-    if (error || goods.length < limit) {
-      return
-    }
-    getAppRecommends(offset + limit, limit)
-  })
-}
-
-const device = useChurchDeviceInfoStore()
+const device = deviceinfo.useDeviceInfoStore()
 export const getDeviceInfos = (offset: number, limit: number) => {
   device.getDeviceInfos({
     Offset: offset,
@@ -99,11 +54,11 @@ export const getDeviceInfos = (offset: number, limit: number) => {
         Title: 'MSG_GET_DEVICES',
         Message: 'MSG_GET_DEVICES_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (devices: Array<DeviceInfo>, error: boolean) => {
-    if (error || devices.length < limit) {
+  }, (error: boolean, devices?: Array<deviceinfo.DeviceInfo>) => {
+    if (error || !devices?.length) {
       return
     }
     getDeviceInfos(offset + limit, limit)

@@ -6,7 +6,7 @@
     :title='$t("MSG_GAS_FEEDER")'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as PlatformAccount)'
+    @row-click='(evt, row, index) => onRowClick(row as platformaccount.Account)'
   >
     <template #top>
       <div class='row justify-end table-right'>
@@ -27,22 +27,22 @@
 </template>
 
 <script setup lang='ts'>
-import { AccountUsedFor, PlatformAccount, useChurchPlatformAccountStore } from 'npool-cli-v4'
 import { getPlatformAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { platformaccount, accountbase } from 'src/npoolstore'
 
 const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const platform = useChurchPlatformAccountStore()
-const gasProvider = computed(() => platform.getAccountsByKey(AccountUsedFor.GasProvider))
+const platform = platformaccount.usePlatformAccountStore()
+const accounts = computed(() => platform.accounts(accountbase.AccountUsedFor.GasProvider))
 
 const backup = ref(null)
 const blocked = ref(null)
 const active = ref(null)
 const locked = ref(null)
 
-const displayGasProvider = computed(() => gasProvider.value.filter((el) => {
+const displayGasProvider = computed(() => accounts.value.filter((el) => {
   let flag = true
   if (backup.value !== null) {
     flag = flag && el.Backup === backup.value
@@ -61,23 +61,23 @@ const displayGasProvider = computed(() => gasProvider.value.filter((el) => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as PlatformAccount)
+const target = ref({} as platformaccount.Account)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
-  target.value = { UsedFor: AccountUsedFor.GasProvider } as PlatformAccount
+  target.value = { UsedFor: accountbase.AccountUsedFor.GasProvider } as platformaccount.Account
 }
 
-const onRowClick = (row: PlatformAccount) => {
+const onRowClick = (row: platformaccount.Account) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
 }
 
 onMounted(() => {
-  if (platform.PlatformAccounts.PlatformAccounts.length === 0) {
-    getPlatformAccounts(0, 500)
+  if (!accounts.value.length) {
+    getPlatformAccounts(0, 100)
   }
 })
 

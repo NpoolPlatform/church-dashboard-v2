@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang='ts'>
-import { NotifyType, Tx, useChurchTxStore } from 'npool-cli-v4'
 import { computed, onMounted, ref } from 'vue'
+import { tx, notify } from 'src/npoolstore'
 
-const tx = useChurchTxStore()
-const transactions = computed(() => tx.Txs.Txs)
+const _tx = tx.useTxStore()
+const transactions = computed(() => _tx.txs())
 
 const loading = ref(false)
 
@@ -26,7 +26,7 @@ onMounted(() => {
 })
 
 const getTxs = (offset: number, limit: number) => {
-  tx.getTxs({
+  _tx.getTxs({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -34,10 +34,10 @@ const getTxs = (offset: number, limit: number) => {
         Title: 'MSG_GET_COINS',
         Message: 'MSG_GET_COINS_FAIL',
         Popup: true,
-        Type: NotifyType.Error
+        Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, rows: Array<Tx>) => {
+  }, (error: boolean, rows: Array<tx.Tx>) => {
     if (error || rows?.length === 0) {
       loading.value = false
       return

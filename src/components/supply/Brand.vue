@@ -2,11 +2,11 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_VENDOR_LOCATIONS")'
-    :rows='locations'
+    :title='$t("MSG_BRAND")'
+    :rows='brands'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as vendorlocation.VendorLocation)'
+    @row-click='(evt, row, index) => onRowClick(row as vendorbrand.VendorBrand)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -27,16 +27,11 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_VENDOR_LOCATION') }}</span>
+        <span>{{ $t('MSG_CREATE_VENDOR_BRAND') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Country' :label='$t("MSG_COUNTRY")' />
-        <q-input v-model='target.Province' :label='$t("MSG_PROVINCE")' />
-        <q-input v-model='target.City' :label='$t("MSG_CITY")' />
-        <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
-      </q-card-section>
-      <q-card-section>
-        <BrandPicker v-model:id='target.BrandID' />
+        <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
+        <q-input v-model='target.Logo' :label='$t("MSG_LOGO")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -49,18 +44,17 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { vendorlocation, notify } from 'src/npoolstore'
+import { vendorbrand, notify } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-const BrandPicker = defineAsyncComponent(() => import('src/components/supply/BrandPicker.vue'))
 
-const vendor = vendorlocation.useVendorLocationStore()
-const locations = computed(() => vendor.vendorLocations())
+const vendor = vendorbrand.useVendorBrandStore()
+const brands = computed(() => vendor.vendorBrands())
 
-const target = ref({} as vendorlocation.VendorLocation)
+const target = ref({} as vendorbrand.VendorBrand)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -70,14 +64,14 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (row: vendorlocation.VendorLocation) => {
+const onRowClick = (row: vendorbrand.VendorBrand) => {
   updating.value = true
   showing.value = true
   target.value = { ...row }
 }
 
 const onMenuHide = () => {
-  target.value = {} as vendorlocation.VendorLocation
+  target.value = {} as vendorbrand.VendorBrand
   showing.value = false
 }
 
@@ -87,23 +81,22 @@ const onCancel = () => {
 
 const onSubmit = (done: () => void) => {
   showing.value = false
-  console.log('target: ', target.value)
-  updating.value ? updateVendorLocation(done) : createVendorLocation(done)
+  updating.value ? updateVendorBrand(done) : createVendorBrand(done)
 }
 
-const createVendorLocation = (done: () => void) => {
-  vendor.createVendorLocation({
+const createVendorBrand = (done: () => void) => {
+  vendor.createVendorBrand({
     ...target.value,
     Message: {
       Error: {
-        Title: t('MSG_CREATE_VENDOR_LOCATION'),
-        Message: t('MSG_CREATE_VENDOR_LOCATION_FAIL'),
+        Title: t('MSG_CREATE_VENDOR_BRAND'),
+        Message: t('MSG_CREATE_VENDOR_BRAND_FAIL'),
         Popup: true,
         Type: notify.NotifyType.Error
       },
       Info: {
-        Title: t('MSG_CREATE_VENDOR_LOCATION'),
-        Message: t('MSG_CREATE_VENDOR_LOCATION_SUCCESS'),
+        Title: t('MSG_CREATE_VENDOR_BRAND'),
+        Message: t('MSG_CREATE_VENDOR_BRAND_SUCCESS'),
         Popup: true,
         Type: notify.NotifyType.Success
       }
@@ -117,19 +110,19 @@ const createVendorLocation = (done: () => void) => {
   })
 }
 
-const updateVendorLocation = (done: () => void) => {
-  vendor.updateVendorLocation({
+const updateVendorBrand = (done: () => void) => {
+  vendor.updateVendorBrand({
     ...target.value,
     Message: {
       Error: {
-        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
-        Message: t('MSG_UPDATE_VENDOR_LOCATION_FAIL'),
+        Title: t('MSG_UPDATE_VENDOR_BRAND'),
+        Message: t('MSG_UPDATE_VENDOR_BRAND_FAIL'),
         Popup: true,
         Type: notify.NotifyType.Error
       },
       Info: {
-        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
-        Message: t('MSG_UPDATE_VENDOR_LOCATION_SUCCESS'),
+        Title: t('MSG_UPDATE_VENDOR_BRAND'),
+        Message: t('MSG_UPDATE_VENDOR_BRAND_SUCCESS'),
         Popup: true,
         Type: notify.NotifyType.Success
       }
@@ -144,28 +137,28 @@ const updateVendorLocation = (done: () => void) => {
 }
 
 onMounted(() => {
-  if (!locations.value.length) {
-    getVendorLocations(0, 100)
+  if (!brands.value.length) {
+    getVendorBrands(0, 100)
   }
 })
 
-const getVendorLocations = (offset: number, limit: number) => {
-  vendor.getVendorLocations({
+const getVendorBrands = (offset: number, limit: number) => {
+  vendor.getVendorBrands({
     Offset: offset,
     Limit: limit,
     Message: {
       Error: {
-        Title: t('MSG_GET_VENDOR_LOCATIONS'),
-        Message: t('MSG_GET_VENDOR_LOCATIONS_FAIL'),
+        Title: t('MSG_GET_BRAND'),
+        Message: t('MSG_GET_BRAND_FAIL'),
         Popup: true,
         Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, vendorLocations?: Array<vendorlocation.VendorLocation>) => {
-    if (error || !vendorLocations?.length) {
+  }, (error: boolean, vendorbrands?: Array<vendorbrand.VendorBrand>) => {
+    if (error || !vendorbrands?.length) {
       return
     }
-    getVendorLocations(offset + limit, limit)
+    getVendorBrands(offset + limit, limit)
   })
 }
 </script>

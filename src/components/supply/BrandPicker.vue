@@ -2,10 +2,10 @@
   <q-select
     :disable='!updating ? false : true'
     v-model='target'
-    :options='displayCountries'
+    :options='displayBrands'
     options-selected-class='text-deep-orange'
     emit-value
-    :label='myLabel'
+    label='MSG_BRAND'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -21,39 +21,31 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getCountries } from 'src/api/g11n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { country } from 'src/npoolstore'
+import { vendorbrand, notify } from 'src/npoolstore'
 
-interface Props {
-  id: string
-  updating?: boolean
-  label?: string,
-}
+  interface Props {
+    id: string
+    updating?: boolean
+  }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
-const label = toRef(props, 'label')
-
-const myLabel = computed(() => {
-  return !label.value ? 'MSG_COUNTRIES' : label.value
-})
-
 const target = ref(id.value)
 
-const _country = country.useCountryStore()
-const countries = computed(() => Array.from(_country.countries()).map((el) => {
+const vendor = vendorbrand.useVendorBrandStore()
+const brands = computed(() => Array.from(vendor.vendorBrands()).map((el) => {
   return {
     value: el.ID,
-    label: `${el.Country} | ${el.Short}`
+    label: `${el.Name} | ${el.ID}`
   }
 }))
-const displayCountries = ref(countries.value)
+const displayBrands = ref(brands.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayCountries.value = countries.value.filter((el) => {
+    displayBrands.value = brands.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
@@ -65,8 +57,28 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (!countries.value.length) {
-    getCountries(0, 100)
+  if (!brands.value.length) {
+    getVendorBrands(0, 100)
   }
 })
+
+const getVendorBrands = (offset: number, limit: number) => {
+  vendor.getVendorBrands({
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {
+        Title: 'MSG_GET_BRAND',
+        Message: 'MSG_GET_BRAND_FAIL',
+        Popup: true,
+        Type: notify.NotifyType.Error
+      }
+    }
+  }, (error: boolean, vendorbrands?: Array<vendorbrand.VendorBrand>) => {
+    if (error || !vendorbrands?.length) {
+      return
+    }
+    getVendorBrands(offset + limit, limit)
+  })
+}
 </script>

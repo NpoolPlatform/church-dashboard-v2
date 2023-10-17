@@ -22,8 +22,9 @@
 </template>
 
 <script setup lang='ts'>
-import { CoinCurrency, useCoinCurrencyHistoryStore } from 'npool-cli-v4'
 import { computed, ref, defineProps, toRef, watch } from 'vue'
+import { coincurrencyhistory, coincurrencybase } from 'src/npoolstore'
+
 interface Props {
   ids: string[]
 }
@@ -31,31 +32,31 @@ interface Props {
 const props = defineProps<Props>()
 const ids = toRef(props, 'ids')
 
-const cch = useCoinCurrencyHistoryStore()
-const cchs = computed(() => cch.Histories.Histories)
+const history = coincurrencyhistory.useCoinCurrencyHistoryStore()
+const histories = computed(() => history.histories())
 
 const name = ref('')
 const displayHistories = computed(() => {
-  return cchs.value.filter((el) => el.CoinName.toLowerCase()?.includes?.(name.value?.toLowerCase()))
+  return histories.value.filter((el) => el.CoinName.toLowerCase()?.includes?.(name.value?.toLowerCase()))
 })
 
 watch(ids, () => {
   if (ids.value?.length > 0) {
-    cch.$reset()
-    getCoinCurrencyHistories(0, 100, 0, Math.ceil(Date.now() / 1000))
+    history.$reset()
+    getCoinCurrencyHistories(0, 100, Math.ceil(Date.now() / 1000) - 3 * 24 * 60 * 60, Math.ceil(Date.now() / 1000))
   }
 })
 
 const getCoinCurrencyHistories = (offset: number, limit: number, startAt: number, endAt: number) => {
-  cch.getCurrencyHistories({
+  history.getCurrencyHistories({
     CoinTypeIDs: ids.value,
     Offset: offset,
     Limit: limit,
     StartAt: startAt,
     EndAt: endAt,
     Message: {}
-  }, (error: boolean, rows: CoinCurrency[]) => {
-    if (error || rows.length === 0) {
+  }, (error: boolean, rows?: coincurrencybase.CoinCurrency[]) => {
+    if (error || !rows?.length) {
       return
     }
     getCoinCurrencyHistories(offset + limit, limit, startAt, endAt)
