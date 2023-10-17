@@ -89,6 +89,7 @@ pipeline {
                 patch=$(( $patch + 1 ))
                 git reset --hard
                 git checkout $tag
+                git submodule update --init --recursive
                 ;;
             esac
             tag=$major.$minor.$patch
@@ -175,10 +176,11 @@ pipeline {
           tag=`git describe --tags $revlist`
           git reset --hard
           git checkout $tag
+          git submodule update --init --recursive
           major=`echo $tag | awk -F '.' '{ print $1 }'`
           minor=`echo $tag | awk -F '.' '{ print $2 }'`
           patch=`echo $tag | awk -F '.' '{ print $3 }'`
-          if [ $magor -le 0 and $minor -le 1 and $patch -le 228 ]; then
+          if [ $major -le 0 and $minor -le 1 and $patch -le 228 ]; then
             rm -rf src/npoolstore
           fi
           set +e
@@ -331,6 +333,7 @@ pipeline {
 
           git reset --hard
           git checkout $tag
+          git submodule update --init --recursive
           sed -i "s/church-dashboard-v2:latest/church-dashboard-v2:$tag/g" k8s/01-church-dashboard-v2.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml
           sed -i "s/development/$TARGET_ENV/g" k8s/02-traefik-ingress.yaml
@@ -357,6 +360,7 @@ pipeline {
 
           git reset --hard
           git checkout $tag
+          git submodule update --init --recursive
           sed -i "s/church-dashboard-v2:latest/church-dashboard-v2:$tag/g" k8s/01-church-dashboard-v2.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-church-dashboard-v2.yaml
           sed -i "s/development/$TARGET_ENV/g" k8s/02-traefik-ingress.yaml
