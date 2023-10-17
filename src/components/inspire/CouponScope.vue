@@ -125,7 +125,7 @@ watch(AppID, () => {
 
 onMounted(() => {
   if (!scopes.value?.length) {
-    sdk.getAppScopes(0, 0)
+    sdk.getNAppScopes(0, 0)
   }
 })
 
