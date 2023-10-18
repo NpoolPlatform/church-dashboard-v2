@@ -146,9 +146,13 @@
           new-value-mode='add'
         />
       </q-card-section>
-      <q-card-section v-if='!updating'>
-        <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' /></div>
-        <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' /></div>
+      <q-card-section>
+        <div v-if='!updating'>
+          <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
+        </div>
+        <div v-if='!updating'>
+          <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
+        </div>
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
