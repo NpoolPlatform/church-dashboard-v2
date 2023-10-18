@@ -218,6 +218,7 @@ const onCancel = () => {
 
 const onRowClick = (row: appgood.Good) => {
   target.value = { ...row }
+  target.value.Posters = target.value?.AppGoodPosters
   updating.value = true
   showing.value = true
 }
