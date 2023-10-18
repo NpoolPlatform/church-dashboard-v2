@@ -55,17 +55,10 @@
         <span>{{ $t('MSG_CREATE_APP_GOOD') }} : {{ updating? target.GoodName : selectedGood[0]?.Title }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
+        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
-        <q-input
-          v-model='target.UserPurchaseLimit'
-          :label='$t("MSG_USER_PURCHASE_LIMIT")'
-          type='number'
-          :min='0'
-        />
-        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
-        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
+        <q-input v-model='target.UserPurchaseLimit' :label='$t("MSG_USER_PURCHASE_LIMIT")' type='number' :min='0' />
         <q-input
           class='commission-percent'
           v-model.number='target.TechnicalFeeRatio'
@@ -97,16 +90,77 @@
         />
       </q-card-section>
       <q-card-section>
-        <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
-        <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
+        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
+        <q-input v-model='target.GoodBanner' :label='$t("MSG_GOOD_BANNER")' />
+        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_DISPLAY_NAMES'
+          filled
+          v-model='target.DisplayNames'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_DESCRIPTIONS'
+          filled
+          v-model='target.Descriptions'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_DISPLAY_COLORS'
+          filled
+          v-model='target.DisplayColors'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_POSTERS'
+          filled
+          v-model='target.Posters'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <div v-if='!updating'>
+          <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
+        </div>
+        <div v-if='!updating'>
+          <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
+        </div>
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
-        <q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' />
-        <q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' />
-        <q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' />
-        <q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' />
-        <q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' />
+        <div><q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' /></div>
+        <div><q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
+        <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
+        <div><q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' /></div>
+        <div><q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -164,6 +218,7 @@ const onCancel = () => {
 
 const onRowClick = (row: appgood.Good) => {
   target.value = { ...row }
+  target.value.Posters = target.value?.AppGoodPosters
   updating.value = true
   showing.value = true
 }
@@ -217,6 +272,11 @@ const updateTarget = computed(() => {
     TechnicalFeeRatio: target.value.TechnicalFeeRatio?.toString(),
     ElectricityFeeRatio: target.value.ElectricityFeeRatio?.toString(),
     ProductPage: target.value?.ProductPage,
+    Descriptions: target.value?.Descriptions,
+    DisplayNames: target.value?.DisplayNames,
+    DisplayColors: target.value?.DisplayColors,
+    Posters: target.value?.Posters,
+    GoodBanner: target.value?.GoodBanner?.length === 0 ? undefined as unknown as string : target.value?.GoodBanner,
     EnableProductPage: target.value?.EnableProductPage,
     EnablePurchase: target.value?.EnablePurchase,
     EnableSetCommission: target.value?.EnableSetCommission,
@@ -224,6 +284,8 @@ const updateTarget = computed(() => {
     CancellableBeforeStart: target.value?.CancellableBeforeStart,
     DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
     ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
+    // SaleStartAt: target.value.SaleStartAt,
+    // SaleEndAt: target.value.SaleEndAt
   }
 })
 const updateAppGood = (done: () => void) => {
