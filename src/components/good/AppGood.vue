@@ -152,11 +152,11 @@
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
-        <q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' />
-        <q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' />
-        <q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' />
-        <q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' />
-        <q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' />
+        <div><q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' /></div>
+        <div><q-toggle dense v-model='target.EnablePurchase' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
+        <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
+        <div><q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' /></div>
+        <div><q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
