@@ -146,7 +146,9 @@
           new-value-mode='add'
         />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
+        <div> <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' /></div>
+        <div> <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' /></div>
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
@@ -277,6 +279,8 @@ const updateTarget = computed(() => {
     CancellableBeforeStart: target.value?.CancellableBeforeStart,
     DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
     ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
+    // SaleStartAt: target.value.SaleStartAt,
+    // SaleEndAt: target.value.SaleEndAt
   }
 })
 const updateAppGood = (done: () => void) => {
