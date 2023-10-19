@@ -19,7 +19,7 @@ export const getAPIs = (offset: number, limit: number) => {
 export const updateAPI = (row: npoolapi.API, done: (error: boolean) => void) => {
   api.updateAPI({
     ID: row.ID,
-    Depracated: row.Depracated,
+    Deprecated: row.Deprecated,
     Message: {
     }
   }, (error: boolean) => {
