@@ -1,4 +1,5 @@
 <template>
+  <Chain />
   <q-table
     dense
     flat
@@ -77,6 +78,7 @@ import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { coin, notify } from 'src/npoolstore'
 
+const Chain = defineAsyncComponent(() => import('src/components/coin/Chain.vue'))
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
