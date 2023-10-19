@@ -72,7 +72,7 @@ const name = ref('')
 const displayFeeds = computed(() => {
   return feeds.value.filter((el) => {
     return el.CoinName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
-          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
+          el.EntID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
           el.CoinTypeID?.toLowerCase()?.includes(name.value?.toLowerCase())
   })
 })
@@ -172,6 +172,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: coincurrencyfeed.CoinFeed) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: coincurrencyfeed.CoinFeed) => row.EntID
   },
   {
     name: 'CoinTypeID',

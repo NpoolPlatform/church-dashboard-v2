@@ -98,7 +98,7 @@ const name = ref('')
 const displayCoins = computed(() => {
   return coins.value.filter((el) => {
     return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
-          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+          el.EntID?.toLowerCase()?.includes(name.value?.toLowerCase())
   })
 })
 
@@ -158,6 +158,8 @@ const updateTarget = computed(() => {
 const createCoin = (done: () => void) => {
   _coin.createCoin({
     ...target.value,
+    ChainNickName: '', // TODO
+    ChainUnitExp: '', // TODO
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
