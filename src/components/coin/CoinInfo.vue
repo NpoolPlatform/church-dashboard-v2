@@ -64,6 +64,15 @@
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
         <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' />
         <q-select :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENV")' />
+        <ChainPicker v-model:id='target.ChainID' />
+        <q-input v-model='target.ChainNickname' :label='$t("MSG_CHAIN_NICK_NAME")' />
+        <q-input v-model='target.ChainNativeCoinName' :label='$t("MSG_CHAIN_NATIVE_COIN_NAME")' />
+        <q-input v-model='target.ChainType' :label='$t("MSG_CHAIN_TYPE")' />
+        <q-input v-model='target.ChainNativeUnit' :label='$t("MSG_CHAIN_NATIVE_UNIT")' />
+        <q-input v-model='target.ChainUnitExp' :label='$t("MSG_CHAIN_UNIT_EXP")' />
+      </q-card-section>
+      <q-card-section>
+        <q-select dense :options='basetypes.GasTypes' v-model='target.GasType' :label='$t("MSG_GAS_TYPE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -75,12 +84,13 @@
 
 <script setup lang='ts'>
 import { getCoins } from 'src/api/coin'
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { coin, notify } from 'src/npoolstore'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
+import { coin, notify, basetypes, chain } from 'src/npoolstore'
 
 const Chain = defineAsyncComponent(() => import('src/components/coin/Chain.vue'))
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const ChainPicker = defineAsyncComponent(() => import('src/components/coin/ChainPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 enum CoinEnvironment {
@@ -107,6 +117,15 @@ const displayCoins = computed(() => {
 const showing = ref(false)
 const updating = ref(false)
 const target = ref({} as coin.Coin)
+
+const _chain = chain.useChainStore()
+const targetChain = computed(() => _chain.getChainByChainID(target.value?.ChainID))
+watch(() => target.value.ChainID, () => {
+  target.value.ChainType = targetChain.value?.ChainType as string
+  target.value.ChainNativeUnit = targetChain.value?.NativeUnit as string
+  target.value.ChainAtomicUnit = targetChain.value?.AtomicUnit as string
+  target.value.ChainUnitExp = targetChain.value?.UnitDecExp as number
+})
 
 const onCreate = () => {
   showing.value = true
@@ -160,8 +179,8 @@ const updateTarget = computed(() => {
 const createCoin = (done: () => void) => {
   _coin.createCoin({
     ...target.value,
-    ChainNickName: '', // TODO
-    ChainUnitExp: '', // TODO
+    ChainUnitExp: target.value?.ChainUnitExp,
+    ChainNickName: target.value?.ChainNickname,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',

@@ -2,10 +2,10 @@
   <q-select
     :disable='!updating ? false : true'
     v-model='target'
-    :options='displayCoins'
+    :options='displayChains'
     options-selected-class='text-deep-orange'
     emit-value
-    :label='myLabel'
+    label='MSG_CHAINS'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -21,41 +21,32 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { coin } from 'src/npoolstore'
+import { chain, sdk } from 'src/npoolstore'
 
 interface Props {
   id: string
   updating?: boolean
-  label?: string,
-  getData?: boolean
 }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
-const label = toRef(props, 'label')
-const getData = toRef(props, 'getData')
-
-const myLabel = computed(() => {
-  return !label.value ? 'MSG_COINS' : label.value
-})
-
 const target = ref(id.value)
 
-const _coin = coin.useCoinStore()
-const coins = computed(() => Array.from(_coin.coins()).map((el) => {
+const _chain = chain.useChainStore()
+const chains = computed(() => Array.from(_chain.chains()).map((el) => {
   return {
-    value: el.EntID,
-    label: `${el.Name} | ${el.EntID} | ${el.ID}`
+    value: el.ChainID,
+    label: `${el.ChainName} | ${el.ChainID} | ${el.EntID}`
   }
 }))
-const displayCoins = ref(coins.value)
+
+const displayChains = ref(chains.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayCoins.value = coins.value.filter((el) => {
+    displayChains.value = chains.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
@@ -67,8 +58,9 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (!coins.value.length && (getData.value === undefined || getData.value === false)) {
-    getCoins(0, 100)
+  if (!chains.value?.length) {
+    sdk.getChains(0, 0)
   }
 })
+
 </script>
