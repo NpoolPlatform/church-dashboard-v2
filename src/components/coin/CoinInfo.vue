@@ -124,7 +124,8 @@ watch(() => target.value.ChainID, () => {
   target.value.ChainType = targetChain.value?.ChainType as string
   target.value.ChainNativeUnit = targetChain.value?.NativeUnit as string
   target.value.ChainAtomicUnit = targetChain.value?.AtomicUnit as string
-  target.value.ChainUnitExp = targetChain.value?.UnitDecExp as number
+  target.value.ChainUnitExp = targetChain.value?.UnitExp as number
+  target.value.GasType = targetChain.value?.GasType as basetypes.GasType
 })
 
 const onCreate = () => {

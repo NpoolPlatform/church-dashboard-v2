@@ -38,7 +38,7 @@ const _chain = chain.useChainStore()
 const chains = computed(() => Array.from(_chain.chains()).map((el) => {
   return {
     value: el.ChainID,
-    label: `${el.ChainName} | ${el.ChainID} | ${el.EntID}`
+    label: `${el.ChainType} | ${el.ChainID} | ${el.EntID}`
   }
 }))
 

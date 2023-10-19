@@ -45,8 +45,8 @@ const target = ref(id.value)
 const _fiat = fiat.useFiatStore()
 const fiats = computed(() => Array.from(_fiat.fiats()).map((el) => {
   return {
-    value: el.ID,
-    label: `${el.Name} | ${el.ID}`
+    value: el.EntID,
+    label: `${el.Name} | ${el.EntID} | ${el.ID}`
   }
 }))
 const displayFiats = ref(fiats.value)
