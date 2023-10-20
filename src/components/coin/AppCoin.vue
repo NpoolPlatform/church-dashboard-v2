@@ -102,12 +102,6 @@ const onCreate = () => {
   updating.value = false
 }
 
-// const onRowClick = (row: AppCoin) => {
-//   target.value = { ...row }
-//   showing.value = true
-//   updating.value = true
-// }
-
 const onCancel = () => {
   onMenuHide()
 }
@@ -120,24 +114,6 @@ const onMenuHide = () => {
 const onSubmit = (done: () => void) => {
   updating.value ? updateAppCoin(done) : createAppCoin(done)
 }
-
-// const updateTarget = computed(() => {
-//   return {
-//     ID: target.value?.ID,
-//     AppID: target.value?.AppID,
-//     CoinTypeID: target.value?.CoinTypeID,
-//     Name: target.value?.Name,
-//     Logo: target.value?.Logo,
-//     ForPay: target.value?.ForPay,
-//     WithdrawAutoReviewAmount: target.value?.WithdrawAutoReviewAmount,
-//     MarketValue: target.value?.MarketValue,
-//     SettlePercent: target.value?.SettlePercent === 0 ? undefined as unknown as number : target.value?.SettlePercent,
-//     ProductPage: target.value?.ProductPage?.length > 0 ? target.value?.ProductPage : undefined as unknown as string,
-//     DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
-//     Disabled: target?.value?.Disabled,
-//     Display: target?.value?.Display
-//   }
-// })
 
 const updateAppCoin = (done: () => void) => {
   // TODO
@@ -213,6 +189,12 @@ const coinColumns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: appcoin.AppCoin) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: appcoin.AppCoin) => row.EntID
   },
   {
     name: 'AppID',

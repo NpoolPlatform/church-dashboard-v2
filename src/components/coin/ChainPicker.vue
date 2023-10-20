@@ -2,10 +2,10 @@
   <q-select
     :disable='!updating ? false : true'
     v-model='target'
-    :options='displayFiats'
+    :options='displayChains'
     options-selected-class='text-deep-orange'
     emit-value
-    :label='myLabel'
+    label='MSG_CHAINS'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -22,38 +22,31 @@
 </template>
 <script setup lang='ts'>
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { fiat } from 'src/npoolstore'
+import { chain, sdk } from 'src/npoolstore'
 
 interface Props {
   id: string
   updating?: boolean
-  label?: string,
-  getData?: boolean
 }
 
 const props = defineProps<Props>()
 const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
-const label = toRef(props, 'label')
-
-const myLabel = computed(() => {
-  return !label.value ? 'MSG_FiatS' : label.value
-})
-
 const target = ref(id.value)
 
-const _fiat = fiat.useFiatStore()
-const fiats = computed(() => Array.from(_fiat.fiats()).map((el) => {
+const _chain = chain.useChainStore()
+const chains = computed(() => Array.from(_chain.chains()).map((el) => {
   return {
-    value: el.EntID,
-    label: `${el.Name} | ${el.EntID} | ${el.ID}`
+    value: el.ChainID,
+    label: `${el.ChainType} | ${el.ChainID} | ${el.EntID}`
   }
 }))
-const displayFiats = ref(fiats.value)
+
+const displayChains = ref(chains.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayFiats.value = fiats.value.filter((el) => {
+    displayChains.value = chains.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
@@ -65,22 +58,9 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (!fiats.value.length) {
-    getFiats(0, 100)
+  if (!chains.value?.length) {
+    sdk.getChains(0, 0)
   }
 })
-
-const getFiats = (offset: number, limit: number) => {
-  _fiat.getFiats({
-    Offset: offset,
-    Limit: limit,
-    Message: {}
-  }, (error: boolean, rows?: fiat.Fiat[]) => {
-    if (error || !rows?.length) {
-      return
-    }
-    getFiats(offset + limit, limit)
-  })
-}
 
 </script>

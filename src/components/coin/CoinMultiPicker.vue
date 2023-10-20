@@ -37,8 +37,8 @@ const _coin = coin.useCoinStore()
 
 const coins = computed(() => Array.from(_coin.coins()).map((el) => {
   return {
-    value: el.ID,
-    label: `${el.Name} | ${el.ID} `
+    value: el.EntID,
+    label: `${el.Name} | ${el.EntID} | ${el.ID} `
   }
 }))
 

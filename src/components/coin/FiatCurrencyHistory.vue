@@ -58,7 +58,7 @@ const fiats = computed(() => _fiat.fiats())
 const name = ref('')
 const displayFiats = computed(() => fiats.value.filter((el) => {
   return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
-        el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+        el.EntID?.toLowerCase()?.includes(name.value?.toLowerCase())
 }))
 
 const selectedFiats = ref([] as Array<fiat.Fiat>)
@@ -72,7 +72,7 @@ const displayHistories = computed(() => {
 
 const ids = computed(() => {
   const _ids = [] as Array<string>
-  selectedFiats.value?.forEach((el) => _ids.push(el.ID))
+  selectedFiats.value?.forEach((el) => _ids.push(el.EntID))
   return _ids
 })
 
@@ -124,6 +124,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: fiat.Fiat) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: fiat.Fiat) => row.EntID
   },
   {
     name: 'Name',

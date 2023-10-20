@@ -66,7 +66,7 @@ const name = ref('')
 const displayFiats = computed(() => {
   return fiats.value.filter((el) => {
     return el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
-          el.ID?.toLowerCase()?.includes(name.value?.toLowerCase())
+          el.EntID?.toLowerCase()?.includes(name.value?.toLowerCase())
   })
 })
 
@@ -163,6 +163,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: fiat.Fiat) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: fiat.Fiat) => row.EntID
   },
   {
     name: 'Name',

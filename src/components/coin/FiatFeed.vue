@@ -69,7 +69,7 @@ const feeds = computed(() => feed.feeds())
 const name = ref('')
 const displayFeeds = computed(() => {
   return feeds.value.filter((el) => el.FiatName?.toLowerCase()?.includes?.(name.value?.toLowerCase()) ||
-    el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
+    el.EntID?.toLowerCase()?.includes(name.value?.toLowerCase()) ||
     el.FiatName?.toLowerCase()?.includes?.(name.value?.toLowerCase())
   )
 })
@@ -169,6 +169,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: fiatcurrencyfeed.FiatFeed) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: fiatcurrencyfeed.FiatFeed) => row.EntID
   },
   {
     name: 'FiatID',

@@ -39,14 +39,14 @@ const coins = computed(() => _coin.coins())
 
 const name = ref('')
 const displayCoins = computed(() => {
-  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.ID?.toLowerCase()?.includes(name.value?.toLowerCase()))
+  return coins.value.filter((el) => el.Name?.toLowerCase()?.includes?.(name.value?.toLowerCase()) || el.EntID?.toLowerCase()?.includes(name.value?.toLowerCase()))
 })
 
 const selectedCoins = ref([] as Array<coin.Coin>)
 
 const ids = computed(() => {
   const _ids = [] as Array<string>
-  selectedCoins.value?.forEach((el) => _ids.push(el.ID))
+  selectedCoins.value?.forEach((el) => _ids.push(el.EntID))
   return _ids
 })
 

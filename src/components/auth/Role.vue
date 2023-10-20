@@ -79,7 +79,7 @@
     <q-card class='popup-menu'>
       <q-card-section>
         <div>
-          <q-toggle dense v-model='target.Depracated' :label='$t("MSG_DEPRECATED")' />
+          <q-toggle dense v-model='target.Deprecated' :label='$t("MSG_DEPRECATED")' />
         </div>
       </q-card-section>
       <q-item class='row'>
@@ -253,7 +253,7 @@ const onCancel = () => {
 const onSubmit = () => {
   api.updateAPI({
     ID: target.value.ID,
-    Depracated: target.value.Depracated,
+    Deprecated: target.value.Deprecated,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_API',
@@ -409,10 +409,10 @@ const apiColumns = computed(() => [
     field: (row: npoolapi.API) => row.Exported
   },
   {
-    name: 'Depracated',
-    label: 'MSG_DEPRACATED',
+    name: 'Deprecated',
+    label: 'MSG_DEPRECATED',
     sortable: true,
-    field: (row: npoolapi.API) => row.Depracated
+    field: (row: npoolapi.API) => row.Deprecated
   },
   {
     name: 'CreatedAt',
