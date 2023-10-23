@@ -51,15 +51,6 @@
         <q-input type='number' v-model='target.PaymentAccountCollectAmount' :label='$t("MSG_PAYMENT_ACCOUNT_COLLECT_AMOUNT")' />
         <q-input type='number' v-model='target.LeastTransferAmount' :label='$t("MSG_LEAST_TRANSFER_AMOUNT")' />
       </q-card-section>
-      <q-card-section v-if='updating'>
-        <div><q-toggle dense v-model='target.NeedMemo' :label='$t("MSG_MEMO")' /></div>
-        <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
-        <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_FOR_PAY")' /></div>
-        <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_PRESALE")' /></div>
-        <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLED")' /></div>
-        <div><q-toggle dense v-model='target.StableUSD' :label='$t("MSG_STABLEUSD")' /></div>
-        <div><q-toggle dense v-model='target.CheckNewAddressBalance' :label='$t("MSG_CHECK_NEW_ADDRESS_BALANCE")' /></div>
-      </q-card-section>
       <q-card-section v-if='!updating'>
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
         <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' />
@@ -71,8 +62,17 @@
         <q-input v-model='target.ChainNativeUnit' :label='$t("MSG_CHAIN_NATIVE_UNIT")' />
         <q-input v-model='target.ChainUnitExp' :label='$t("MSG_CHAIN_UNIT_EXP")' />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
         <q-select dense :options='basetypes.GasTypes' v-model='target.GasType' :label='$t("MSG_GAS_TYPE")' />
+      </q-card-section>
+      <q-card-section v-if='updating'>
+        <div><q-toggle dense v-model='target.NeedMemo' :label='$t("MSG_MEMO")' /></div>
+        <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
+        <div><q-toggle dense v-model='target.ForPay' :label='$t("MSG_FOR_PAY")' /></div>
+        <div><q-toggle dense v-model='target.Presale' :label='$t("MSG_PRESALE")' /></div>
+        <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLED")' /></div>
+        <div><q-toggle dense v-model='target.StableUSD' :label='$t("MSG_STABLEUSD")' /></div>
+        <div><q-toggle dense v-model='target.CheckNewAddressBalance' :label='$t("MSG_CHECK_NEW_ADDRESS_BALANCE")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
