@@ -51,6 +51,20 @@
         <q-input type='number' v-model='target.PaymentAccountCollectAmount' :label='$t("MSG_PAYMENT_ACCOUNT_COLLECT_AMOUNT")' />
         <q-input type='number' v-model='target.LeastTransferAmount' :label='$t("MSG_LEAST_TRANSFER_AMOUNT")' />
       </q-card-section>
+      <q-card-section v-if='!updating'>
+        <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
+        <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' />
+        <q-select :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENV")' />
+        <ChainPicker v-model:id='target.ChainID' />
+        <q-input v-model='target.ChainNickname' :label='$t("MSG_CHAIN_NICK_NAME")' />
+        <q-input v-model='target.ChainType' :label='$t("MSG_CHAIN_TYPE")' />
+        <q-input v-model='target.ChainNativeUnit' :label='$t("MSG_CHAIN_NATIVE_UNIT")' />
+        <q-input v-model='target.ChainUnitExp' :label='$t("MSG_CHAIN_UNIT_EXP")' />
+        <CoinPickerByName v-model:name='target.ChainNativeCoinName' label='MSG_CHAIN_NATIVE_COIN_NAME' />
+      </q-card-section>
+      <q-card-section v-if='!updating'>
+        <q-select dense :options='basetypes.GasTypes' v-model='target.GasType' :label='$t("MSG_GAS_TYPE")' />
+      </q-card-section>
       <q-card-section v-if='updating'>
         <div><q-toggle dense v-model='target.NeedMemo' :label='$t("MSG_MEMO")' /></div>
         <div><q-toggle dense v-model='target.WithdrawFeeByStableUSD' :label='$t("MSG_WITHDRAW_FEE_BY_STABLE_USD")' /></div>
@@ -59,20 +73,6 @@
         <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLED")' /></div>
         <div><q-toggle dense v-model='target.StableUSD' :label='$t("MSG_STABLEUSD")' /></div>
         <div><q-toggle dense v-model='target.CheckNewAddressBalance' :label='$t("MSG_CHECK_NEW_ADDRESS_BALANCE")' /></div>
-      </q-card-section>
-      <q-card-section v-if='!updating'>
-        <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
-        <q-input v-model='target.Unit' :label='$t("MSG_COIN_UNIT")' />
-        <q-select :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENV")' />
-        <ChainPicker v-model:id='target.ChainID' />
-        <q-input v-model='target.ChainNickname' :label='$t("MSG_CHAIN_NICK_NAME")' />
-        <q-input v-model='target.ChainNativeCoinName' :label='$t("MSG_CHAIN_NATIVE_COIN_NAME")' />
-        <q-input v-model='target.ChainType' :label='$t("MSG_CHAIN_TYPE")' />
-        <q-input v-model='target.ChainNativeUnit' :label='$t("MSG_CHAIN_NATIVE_UNIT")' />
-        <q-input v-model='target.ChainUnitExp' :label='$t("MSG_CHAIN_UNIT_EXP")' />
-      </q-card-section>
-      <q-card-section>
-        <q-select dense :options='basetypes.GasTypes' v-model='target.GasType' :label='$t("MSG_GAS_TYPE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -89,7 +89,7 @@ import { coin, notify, basetypes, chain } from 'src/npoolstore'
 
 const Chain = defineAsyncComponent(() => import('src/components/coin/Chain.vue'))
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
-const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const CoinPickerByName = defineAsyncComponent(() => import('src/components/coin/CoinPickerByName.vue'))
 const ChainPicker = defineAsyncComponent(() => import('src/components/coin/ChainPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -120,12 +120,14 @@ const target = ref({} as coin.Coin)
 
 const _chain = chain.useChainStore()
 const targetChain = computed(() => _chain.getChainByChainID(target.value?.ChainID))
+
 watch(() => target.value.ChainID, () => {
   target.value.ChainType = targetChain.value?.ChainType as string
   target.value.ChainNativeUnit = targetChain.value?.NativeUnit as string
   target.value.ChainAtomicUnit = targetChain.value?.AtomicUnit as string
   target.value.ChainUnitExp = targetChain.value?.UnitExp as number
   target.value.GasType = targetChain.value?.GasType as basetypes.GasType
+  target.value.ChainNickname = targetChain.value?.Nickname as string
 })
 
 const onCreate = () => {
@@ -181,7 +183,6 @@ const createCoin = (done: () => void) => {
   _coin.createCoin({
     ...target.value,
     ChainUnitExp: target.value?.ChainUnitExp,
-    ChainNickName: target.value?.ChainNickname,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
