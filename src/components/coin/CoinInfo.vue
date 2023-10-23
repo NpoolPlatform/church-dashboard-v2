@@ -57,10 +57,10 @@
         <q-select :options='CoinEnvironments' v-model='target.ENV' :label='$t("MSG_COIN_ENV")' />
         <ChainPicker v-model:id='target.ChainID' />
         <q-input v-model='target.ChainNickname' :label='$t("MSG_CHAIN_NICK_NAME")' />
-        <q-input v-model='target.ChainNativeCoinName' :label='$t("MSG_CHAIN_NATIVE_COIN_NAME")' />
         <q-input v-model='target.ChainType' :label='$t("MSG_CHAIN_TYPE")' />
         <q-input v-model='target.ChainNativeUnit' :label='$t("MSG_CHAIN_NATIVE_UNIT")' />
         <q-input v-model='target.ChainUnitExp' :label='$t("MSG_CHAIN_UNIT_EXP")' />
+        <CoinPickerByName v-model:name='target.ChainNativeCoinName' label='MSG_CHAIN_NATIVE_COIN_NAME' />
       </q-card-section>
       <q-card-section v-if='!updating'>
         <q-select dense :options='basetypes.GasTypes' v-model='target.GasType' :label='$t("MSG_GAS_TYPE")' />
@@ -89,7 +89,7 @@ import { coin, notify, basetypes, chain } from 'src/npoolstore'
 
 const Chain = defineAsyncComponent(() => import('src/components/coin/Chain.vue'))
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
-const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const CoinPickerByName = defineAsyncComponent(() => import('src/components/coin/CoinPickerByName.vue'))
 const ChainPicker = defineAsyncComponent(() => import('src/components/coin/ChainPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -120,6 +120,7 @@ const target = ref({} as coin.Coin)
 
 const _chain = chain.useChainStore()
 const targetChain = computed(() => _chain.getChainByChainID(target.value?.ChainID))
+
 watch(() => target.value.ChainID, () => {
   target.value.ChainType = targetChain.value?.ChainType as string
   target.value.ChainNativeUnit = targetChain.value?.NativeUnit as string
@@ -182,7 +183,6 @@ const createCoin = (done: () => void) => {
   _coin.createCoin({
     ...target.value,
     ChainUnitExp: target.value?.ChainUnitExp,
-    ChainNickName: target.value?.ChainNickname,
     Message: {
       Error: {
         Title: 'MSG_CREATE_COIN',
