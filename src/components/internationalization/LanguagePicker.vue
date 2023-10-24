@@ -45,7 +45,7 @@ const target = ref(id.value)
 const lang = language.useLangStore()
 const langs = computed(() => Array.from(lang.langs()).map((el) => {
   return {
-    value: el.ID,
+    value: el.EntID,
     label: `${el.Lang} | ${el.Short}`
   }
 }))
