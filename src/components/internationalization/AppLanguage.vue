@@ -62,7 +62,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const LanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/LanguagePicker.vue'))
 
 const lang = applang.useAppLangStore()
-const langs = computed(() => lang.langs(AppID.value))
+const langs = computed(() => lang.langs())
 
 const selectedAppLangs = ref([] as Array<g11nbase.AppLang>)
 const target = ref({} as g11nbase.AppLang)
