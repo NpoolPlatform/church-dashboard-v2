@@ -176,7 +176,6 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const exportMessages = ref([] as Array<g11nbase.Message>)
 const onExport = () => {
   const resultMap = new Map<string, Array<g11nbase.Message>>()
   messages.value.forEach((el) => {
@@ -269,7 +268,7 @@ const updateAppMessage = (done: () => void) => {
 
 const onDelete = () => {
   _message.deleteAppMessage({
-    ID: exportMessages?.value[0].ID,
+    ID: selectedMessages?.value[0].ID,
     TargetAppID: AppID.value,
     Message: {
       Error: {
@@ -307,7 +306,7 @@ const uploadFile = (evt: Event) => {
 }
 
 const importMessages = computed(() => {
-  return Array.from(selectedMessages.value).map((el) => {
+  return Array.from(loadedMessages.value).map((el) => {
     return {
       AppID: AppID.value,
       MessageID: el.MessageID,

@@ -36,13 +36,11 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_APP_LANGUAGE') }}</span>
+        {{ $t('MSG_CREATE_APP_LANGUAGE') }}
       </q-card-section>
-      <q-card-selection>
-        <div>
-          <LanguagePicker v-model:id='target.LangID' />
-        </div>
-      </q-card-selection>
+      <q-card-section>
+        <LanguagePicker v-model:id='target.LangID' />
+      </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.Main' :label='$t("MSG_MAIN_LANGUAGE")' /></div>
       </q-card-section>

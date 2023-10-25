@@ -46,7 +46,7 @@ const _country = country.useCountryStore()
 const countries = computed(() => Array.from(_country.countries()).map((el) => {
   return {
     value: el.EntID,
-    label: `${el.Country} | ${el.Short}`
+    label: `${el.Country} | ${el.Short} | ${el.EntID}`
   }
 }))
 const displayCountries = ref(countries.value)
