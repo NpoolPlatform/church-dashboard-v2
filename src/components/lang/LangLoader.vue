@@ -41,9 +41,6 @@ const setLang = () => {
 
 watch(targetLangID, () => {
   setLang()
-  if (!lang.langs(undefined).length) {
-    getAppLangs(0, 100)
-  }
 })
 
 onMounted(() => {
@@ -67,6 +64,9 @@ const getAppLangs = (offset: number, limit: number) => {
   }, (error: boolean, rows: Array<g11nbase.AppLang>) => {
     if (error || rows.length < limit) {
       setLang()
+      if (!error) {
+        getMessages(0, 100)
+      }
       return
     }
     getAppLangs(offset + limit, limit)
