@@ -53,7 +53,7 @@
         <span>{{ updating ? $t('MSG_UPDATE_MESSAGE') : $t('MSG_CREATE_MESSAGE') }}</span>
       </q-card-section>
       <q-card-section v-if='!updating'>
-        <AppLanguagePicker v-model:id='targetLangID' label='MSG_SELECT_LANGUAGE' />
+        <AppLanguagePicker v-model:id='target.LangID' label='MSG_SELECT_LANGUAGE' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <span> {{ target?.Lang }}</span>
@@ -129,19 +129,22 @@
 </template>
 
 <script setup lang='ts'>
-
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { getAppMessages } from 'src/api/g11n'
 import { AppID } from 'src/api/app'
 import { message, utils, notify, _locale, g11nbase } from 'src/npoolstore'
-
 import saveAs from 'file-saver'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
+const locale = _locale.useLocaleStore()
+const _langID = computed(() => locale?.AppLang?.LangID)
+
 const _message = message.useMessageStore()
-const messages = computed(() => _message.messages(undefined, undefined, undefined).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN')))
+const messages = computed(() => {
+  return _message.messages(AppID.value, _langID.value ? _langID.value : undefined, undefined)?.filter((el) => el.AppID === AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN'))
+})
 
 const messageID = ref('')
 const displayAppMsgs = computed(() => messages.value.filter((msg) => {
@@ -149,7 +152,6 @@ const displayAppMsgs = computed(() => messages.value.filter((msg) => {
         msg.Message?.toLowerCase()?.includes(messageID.value?.toLowerCase())
 }))
 
-const targetLangID = ref('')
 const target = ref({} as g11nbase.Message)
 const showing = ref(false)
 const updating = ref(false)
@@ -163,7 +165,6 @@ const onCreate = () => {
 const onMenuHide = () => {
   target.value = {} as g11nbase.Message
   showing.value = false
-  targetLangID.value = ''
 }
 
 const onRowClick = (row: g11nbase.Message) => {
@@ -203,7 +204,7 @@ const onSubmit = (done: () => void) => {
 const createAppMessage = (done: () => void) => {
   _message.createAppMessage({
     TargetAppID: AppID.value,
-    TargetLangID: targetLangID.value,
+    TargetLangID: target.value?.LangID,
     ...target.value,
     NotifyMessage: {
       Error: {
@@ -317,8 +318,6 @@ const importMessages = computed(() => {
   })
 })
 
-const locale = _locale.useLocaleStore()
-const _langID = computed(() => locale?.AppLang?.LangID)
 const langID = ref(_langID.value)
 
 const batchCreating = ref(false)
@@ -360,7 +359,7 @@ const onBatchSubmit = (done: () => void) => {
 }
 
 const prepare = () => {
-  if (messages.value?.length === 0) {
+  if (!messages.value?.length) {
     getAppMessages(0, 500)
   }
 }
