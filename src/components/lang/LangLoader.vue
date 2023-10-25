@@ -65,7 +65,9 @@ const getAppLangs = (offset: number, limit: number) => {
     if (error || rows.length < limit) {
       setLang()
       if (!error) {
-        getMessages(0, 100)
+        if (messages.value.length === 0) {
+          getMessages(0, 100)
+        }
       }
       return
     }
