@@ -212,11 +212,11 @@ const coinColumns = computed(() => [
     name: 'Name',
     label: t('MSG_APP_COIN_NAME'),
     sortable: true,
-    field: (row: appcoin.AppCoin) => row.Name
+    field: (row: appcoin.AppCoin) => row.CoinName
   },
   {
     name: 'DisplayNames',
-    label: t('MSG_COIN_NAME'),
+    label: t('MSG_DISPLAY_NAME'),
     sortable: true,
     field: (row: appcoin.AppCoin) => row.DisplayNames.join(',')
   },
