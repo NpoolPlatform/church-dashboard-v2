@@ -45,8 +45,8 @@ const target = ref(id.value)
 const _country = country.useCountryStore()
 const countries = computed(() => Array.from(_country.countries()).map((el) => {
   return {
-    value: el.ID,
-    label: `${el.Country} | ${el.Short}`
+    value: el.EntID,
+    label: `${el.Country} | ${el.Short} | ${el.EntID}`
   }
 }))
 const displayCountries = ref(countries.value)

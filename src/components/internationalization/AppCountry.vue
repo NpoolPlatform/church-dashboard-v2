@@ -39,7 +39,7 @@
         <span>{{ $t('MSG_AUTHORIZE_COUNTRY') }}</span>
       </q-card-section>
       <q-card-section>
-        <CountryPicker v-model:id='countryID' />
+        <CountryPicker v-model:id='target.CountryID' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
@@ -63,11 +63,12 @@ const countries = computed(() => country.countries(AppID.value))
 
 const selectedCountries = ref([] as Array<appcountry.Country>)
 
-const countryID = ref('')
+const target = ref({} as appcountry.Country)
 const showing = ref(false)
 
 const onCreate = () => {
   showing.value = true
+  target.value = {} as appcountry.Country
 }
 
 const onMenuHide = () => {
@@ -81,7 +82,7 @@ const onCancel = () => {
 const onAuthorize = (done: () => void) => {
   country.createAppCountry({
     TargetAppID: AppID.value,
-    CountryID: countryID.value,
+    CountryID: target.value?.CountryID,
     Message: {
       Error: {
         Title: 'MSG_AUTHORIZE_COUNTRY',
