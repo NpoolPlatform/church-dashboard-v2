@@ -74,7 +74,7 @@ interface MyEmailTemplate {
 
 const _email = emailnotiftemplate.useEmailTemplateStore()
 const templates = computed(() => _email.templates(AppID.value))
-const _templates = computed(() => Array.from(templates.value)?.sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')).map((el) => {
+const _templates = computed(() => Array.from(templates.value).map((el) => {
   return {
     ID: el.ID,
     LangID: el.LangID,

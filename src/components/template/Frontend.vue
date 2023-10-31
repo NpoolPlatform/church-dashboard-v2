@@ -59,7 +59,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 
 const _frontend = frontendnotiftemplate.useFrontendTemplateStore()
-const templates = computed(() => _frontend.templates(AppID.value)?.sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
+const templates = computed(() => _frontend.templates(AppID.value))
 
 const showing = ref(false)
 const updating = ref(false)

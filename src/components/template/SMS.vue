@@ -60,7 +60,7 @@ const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/La
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const _sms = smsnotiftemplate.useSMSTemplateStore()
-const templates = computed(() => _sms.templates(AppID.value)?.sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
+const templates = computed(() => _sms.templates(AppID.value))
 const smsLoading = ref(false)
 
 const prepare = () => {
