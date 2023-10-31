@@ -59,7 +59,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const LanguagePicker = defineAsyncComponent(() => import('src/components/lang/LanguagePicker.vue'))
 
 const _frontend = frontendnotiftemplate.useFrontendTemplateStore()
-const templates = computed(() => _frontend.templates(AppID.value))
+const templates = computed(() => _frontend.templates(AppID.value)?.sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
 
 const showing = ref(false)
 const updating = ref(false)
@@ -182,6 +182,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: frontendnotiftemplate.Template) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: frontendnotiftemplate.Template) => row.EntID
   },
   {
     name: 'AppID',

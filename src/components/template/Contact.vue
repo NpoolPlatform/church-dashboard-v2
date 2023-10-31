@@ -53,7 +53,7 @@ import { contact, basetypes, appuserbase, notify } from 'src/npoolstore'
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const _contact = contact.useContactStore()
-const contacts = computed(() => _contact.contacts(AppID.value))
+const contacts = computed(() => _contact.contacts(AppID.value)?.sort((a, b) => a.UsedFor.localeCompare(b.UsedFor, 'zh-CN')))
 const contactsLoading = ref(false)
 
 const prepare = () => {
