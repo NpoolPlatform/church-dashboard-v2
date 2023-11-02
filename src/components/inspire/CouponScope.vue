@@ -48,7 +48,7 @@
         <span>{{ $t('MSG_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector v-model:id='target.AppGoodID' :label='"MSG_APP_GOOD"' />
+        <GoodSelector v-model:id='target.GoodID' :label='"MSG_GOOD"' />
         <CouponSelector v-model:id='target.CouponID' />
         <q-select :options='coupon.CouponScopes' v-model='_scope' disable :label='$t("MSG_COUPON_SCOPE")' />
       </q-card-section>
@@ -61,9 +61,8 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { couponscope, coupon, sdk, utils } from 'src/npoolstore'
-import { AppID } from 'src/npoolstore/sdk'
 import { useI18n } from 'vue-i18n'
 import { CouponScope } from 'src/npoolstore/inspire/coupon'
 
@@ -71,14 +70,14 @@ import { CouponScope } from 'src/npoolstore/inspire/coupon'
 const { t } = useI18n({ useScope: 'global' })
 
 const CouponSelector = defineAsyncComponent(() => import('src/components/inspire/CouponSelector.vue'))
-const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const scope = couponscope.useScopeStore()
 const username = ref('')
 const scopes = computed(() => scope.scopes(undefined))
 const displayScopes = computed(() => scope.scopes(undefined).filter((el) => {
-  return el.AppGoodID?.includes(username.value) ||
+  return el.GoodID?.includes(username.value) ||
            el.CouponID?.includes(username.value)
 }))
 
@@ -118,15 +117,9 @@ const onDelete = () => {
   })
 }
 
-watch(AppID, () => {
-  if (!scopes.value?.length) {
-    sdk.getNAppScopes(0, 0)
-  }
-})
-
 onMounted(() => {
   if (!scopes.value?.length) {
-    sdk.getNAppScopes(0, 0)
+    sdk.getScopes(0, 0)
   }
 })
 
@@ -138,22 +131,16 @@ const columns = computed(() => [
     field: (row: couponscope.Scope) => row.ID
   },
   {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
     sortable: true,
-    field: (row: couponscope.Scope) => row.AppID
+    field: (row: couponscope.Scope) => row.GoodID
   },
   {
-    name: 'AppGoodID',
-    label: t('MSG_APP_GOOD_ID'),
+    name: 'GoodTitle',
+    label: t('MSG_GOOD_TITLE'),
     sortable: true,
-    field: (row: couponscope.Scope) => row.AppGoodID
-  },
-  {
-    name: 'GoodName',
-    label: t('MSG_GOOD_NAME'),
-    sortable: true,
-    field: (row: couponscope.Scope) => row.GoodName
+    field: (row: couponscope.Scope) => row.GoodTitle
   },
   {
     name: 'Type',
@@ -184,6 +171,18 @@ const columns = computed(() => [
     label: t('MSG_SCOPE'),
     sortable: true,
     field: (row: couponscope.Scope) => row.CouponScope
+  },
+  {
+    name: 'CouponDenomination',
+    label: t('MSG_COUPON_DENOMINATION'),
+    sortable: true,
+    field: (row: couponscope.Scope) => row.CouponDenomination
+  },
+  {
+    name: 'CouponCirculation',
+    label: t('MSG_COUPON_CIRCULATION'),
+    sortable: true,
+    field: (row: couponscope.Scope) => row.CouponCirculation
   },
   {
     name: 'CreatedAt',
