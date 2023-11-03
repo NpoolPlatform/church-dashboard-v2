@@ -31,7 +31,7 @@ const myCoupons = computed(() => _coupon.coupons().filter((el) => el.CouponType 
 const coupons = computed(() => myCoupons.value.map((el) => {
   return {
     value: el.ID,
-    label: `${el.ID} | ${el.Name} | ${el.CouponType} | ${el.Denomination}`
+    label: `${el.ID} | ${el.Name} | ${el.CouponType} | ${el.Denomination} | ${el.CouponScope}`
   }
 }))
 const displayCoupons = ref(coupons.value)

@@ -50,7 +50,14 @@
       <q-card-section>
         <GoodSelector v-model:id='target.GoodID' :label='"MSG_GOOD"' />
         <CouponSelector v-model:id='target.CouponID' />
-        <q-select :options='coupon.CouponScopes' v-model='_scope' disable :label='$t("MSG_COUPON_SCOPE")' />
+        <q-select
+          :options='[
+            coupon.CouponScope.Whitelist,
+            coupon.CouponScope.Blacklist
+          ]'
+          v-model='target.CouponScope'
+          :label='$t("MSG_COUPON_SCOPE")'
+        />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -61,10 +68,9 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { couponscope, coupon, sdk, utils } from 'src/npoolstore'
 import { useI18n } from 'vue-i18n'
-import { CouponScope } from 'src/npoolstore/inspire/coupon'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -75,8 +81,8 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 
 const scope = couponscope.useScopeStore()
 const username = ref('')
-const scopes = computed(() => scope.scopes(undefined))
-const displayScopes = computed(() => scope.scopes(undefined).filter((el) => {
+const scopes = computed(() => scope.scopes())
+const displayScopes = computed(() => scope.scopes().filter((el) => {
   return el.GoodID?.includes(username.value) ||
            el.CouponID?.includes(username.value)
 }))
@@ -97,10 +103,12 @@ const onCancel = () => {
 }
 
 const _coupon = coupon.useCouponStore()
-const _scope = computed(() => _coupon.coupon(undefined, target.value?.CouponID)?.CouponScope)
+
+watch(() => target.value?.CouponID, () => {
+  target.value.CouponScope = _coupon.coupon(undefined, target.value?.CouponID)?.CouponScope as coupon.CouponScope
+})
 
 const onSubmit = (done: () => void) => {
-  target.value.CouponScope = _scope.value as CouponScope
   sdk.createScope(target.value, (error: boolean) => {
     done()
     if (error) {
