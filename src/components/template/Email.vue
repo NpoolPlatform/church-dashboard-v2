@@ -81,6 +81,7 @@ const templates = computed(() => _email.templates(AppID.value))
 const _templates = computed(() => Array.from(templates.value).map((el) => {
   return {
     ID: el.ID,
+    EntID: el.EntID,
     LangID: el.LangID,
     DefaultToUsername: el.DefaultToUsername,
     UsedFor: el.UsedFor,
