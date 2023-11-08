@@ -184,6 +184,12 @@ const columns = computed(() => [
     field: (row: frontendnotiftemplate.Template) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: frontendnotiftemplate.Template) => row.EntID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
