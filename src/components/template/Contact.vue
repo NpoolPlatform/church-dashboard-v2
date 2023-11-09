@@ -7,6 +7,7 @@
     row-key='ID'
     :loading='contactsLoading'
     :rows-per-page-options='[100]'
+    :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as contact.Contact)'
   >
     <template #top-right>
@@ -48,8 +49,11 @@
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { contact, basetypes, appuserbase, notify } from 'src/npoolstore'
+import { contact, basetypes, appuserbase, notify, utils } from 'src/npoolstore'
+import { useI18n } from 'vue-i18n'
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const _contact = contact.useContactStore()
@@ -160,4 +164,61 @@ const createAppContact = (done: () => void) => {
     }
   })
 }
+
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: contact.Contact) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: contact.Contact) => row.EntID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    sortable: true,
+    field: (row: contact.Contact) => row.AppID
+  },
+  {
+    name: 'Account',
+    label: t('MSG_ACCOUNT'),
+    sortable: true,
+    field: (row: contact.Contact) => row.Account
+  },
+  {
+    name: 'AccountType',
+    label: t('MSG_ACCOUNT_TYPE'),
+    sortable: true,
+    field: (row: contact.Contact) => row.AccountType
+  },
+  {
+    name: 'Sender',
+    label: t('MSG_SENDER'),
+    sortable: true,
+    field: (row: contact.Contact) => row.Sender
+  },
+  {
+    name: 'UsedFor',
+    label: t('MSG_USED_FOR'),
+    sortable: true,
+    field: (row: contact.Contact) => row.UsedFor
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATED_AT'),
+    sortable: true,
+    field: (row: contact.Contact) => utils.formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: t('MSG_UPDATED_AT'),
+    sortable: true,
+    field: (row: contact.Contact) => utils.formatTime(row.UpdatedAt)
+  }
+])
 </script>
