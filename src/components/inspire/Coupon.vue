@@ -5,8 +5,8 @@
     :title='$t("MSG_COUPONS")'
     :rows='coupons'
     row-key='ID'
-    :loading='loading'
     :rows-per-page-options='[100]'
+    :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as coupon.Coupon)'
   >
     <template #top-right>
@@ -28,200 +28,194 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_COUPON') }}</span>
+        <span>{{ $t('MSG_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' disable />
-        <q-select :options='coupon.CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_COUPONCONSTRAINT")' />
-        <q-input v-model='target.Name' :label='$t("MSG_COUPON_NAME")' />
-        <q-input v-model='target.Message' :label='$t("MSG_COUPON_DESCRIPTION")' />
-        <q-input type='date' v-model='start' :label='$t("MSG_START")' />
-        <q-input type='number' v-model='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' :suffix='$t("MSG_DAYS")' />
-        <q-input v-model='target.Denomination' :label='$t("MSG_COUPON_DENOMINATION")' suffix='%' />
-        <q-input v-model='target.Circulation' :label='$t("MSG_COUPON_CIRCULATION")' suffix='$ | Pcs' />
-        <q-input v-model='target.Threshold' :label='$t("MSG_COUPON_THRESHOLD")' suffix='$' />
-        <q-toggle v-model='target.Random' :label='$t("MSG_COUPON_RANDOM")' />
-        <AppGoodSelector v-model:id='target.AppGoodID' />
+        <!-- <AppGoodSelector v-model:id='target.AppGoodID' :label='$t("MSG_GOOD")' /> -->
+        <!-- <AppUserSelector v-model:id='target.UserID' /> -->
+        <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
+        <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
+        <q-select :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
+        <q-select :options='coupon.CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_CONSTRAINT")' />
+        <q-input v-model='target.Denomination' :label='$t("MSG_DENOMINATION")' />
+        <q-input v-model='target.Circulation' :label='$t("MSG_CIRCULATION")' />
+        <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' />
+        <q-input v-model='target.Threshold' :label='$t("MSG_THRESHOLD")' />
+        <q-select :options='coupon.CouponScopes' v-model='target.CouponScope' :label='$t("MSG_COUPON_SCOPE")' />
+      </q-card-section>
+      <q-card-section>
+        <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
+      </q-card-section>
+      <q-card-section>
+        <div><q-toggle dense v-model='target.Random' :label='$t("MSG_RANDOM")' /></div>
       </q-card-section>
       <q-card-section v-if='target.CouponType === coupon.CouponType.SpecialOffer'>
         <q-item-label>{{ $t('MSG_SPECIAL_OFFSET_NOT_IMPLEMENTED') }}</q-item-label>
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round alt' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
+  <CouponScope />
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
-import { AppID } from 'src/api/app'
-import { useI18n } from 'vue-i18n'
-import { coupon, user, notify, utils } from 'src/npoolstore'
-import { useRoute } from 'vue-router'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { coupon, sdk, utils } from 'src/npoolstore'
+const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
+const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const CouponScope = defineAsyncComponent(() => import('src/components/inspire/CouponScope.vue'))
 
-const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+import { useI18n } from 'vue-i18n'
+import { AppID } from 'src/npoolstore/sdk'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-interface Query {
-  couponType: coupon.CouponType
+const _coupon = coupon.useCouponStore()
+const coupons = computed(() => _coupon.coupons().sort((a, b) => a.CreatedAt > b.CreatedAt ? -1 : 1))
+
+const target = ref({} as coupon.Coupon)
+const showing = ref(false)
+const updating = ref(false)
+
+const onCreate = () => {
+  target.value = { CouponScope: coupon.CouponScope.Whitelist } as coupon.Coupon
+  showing.value = true
+  updating.value = false
+}
+const onRowClick = (row: coupon.Coupon) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+}
+const onMenuHide = () => {
+  showing.value = false
+  target.value = {} as coupon.Coupon
+}
+const onCancel = () => {
+  onMenuHide()
 }
 
-const route = useRoute()
-const query = computed(() => route.query as unknown as Query)
-const couponType = computed(() => query.value.couponType)
-
-const _coupon = coupon.useCouponStore()
-const coupons = computed(() => _coupon.coupons(AppID.value, couponType.value))
-const loading = ref(true)
-
-const logined = user.useLocalUserStore()
-
-const prepare = () => {
-  if (coupons.value.length > 0) {
-    loading.value = true
+const onSubmit = (done: () => void) => {
+  if (updating.value) {
+    sdk.updateCoupon(target.value, (error: boolean) => {
+      done()
+      if (error) {
+        return
+      }
+      onMenuHide()
+    })
     return
   }
-  loading.value = true
-  _coupon.getAppCoupons({
-    TargetAppID: AppID.value,
-    CouponType: couponType.value,
-    Offset: 0,
-    Limit: 100,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_COUPONS'),
-        Message: t('MSG_GET_COUPONS_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
+  sdk.createCoupon(target.value, (error: boolean) => {
+    done()
+    if (error) {
+      return
     }
-  }, () => {
-    loading.value = false
+    onMenuHide()
   })
 }
 
 watch(AppID, () => {
-  prepare()
+  if (!coupons.value?.length) {
+    sdk.getAppCoupons(0, 0)
+  }
 })
 
 onMounted(() => {
-  prepare()
-})
-
-const showing = ref(false)
-const updating = ref(false)
-const target = ref({
-  IssuedBy: logined.User?.ID,
-  CouponType: couponType.value,
-  Random: false
-} as unknown as coupon.Coupon)
-
-const start = computed({
-  get: () => utils.formatTime(target.value.StartAt)?.replace(/\//g, '-'),
-  set: (val) => {
-    target.value.StartAt = new Date(val).getTime() / 1000
+  if (!coupons.value?.length) {
+    sdk.getAppCoupons(0, 0)
   }
 })
-watch(couponType, () => {
-  target.value.CouponType = couponType.value
-  prepare()
-})
 
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (coupon: coupon.Coupon) => {
-  showing.value = true
-  updating.value = true
-  target.value = coupon
-}
-
-const onMenuHide = () => {
-  showing.value = false
-  target.value = {
-    IssuedBy: logined.User?.ID,
-    CouponType: couponType.value,
-    Random: false
-  } as unknown as coupon.Coupon
-}
-
-const onSubmit = () => {
-  showing.value = false
-
-  if (updating.value) {
-    _coupon.updateCoupon({
-      ID: target.value.ID,
-      TargetAppID: AppID.value,
-      Denomination: target.value.Denomination,
-      Circulation: target.value.Circulation,
-      StartAt: target.value.StartAt,
-      DurationDays: target.value.DurationDays,
-      Message: target.value.Message,
-      Name: target.value.Name,
-      Threshold: target.value.Threshold,
-      Random: target.value.Random,
-      CouponConstraint: target.value.CouponConstraint,
-      AppGoodID: target.value.AppGoodID,
-      NotifyMessage: {
-        Error: {
-          Title: 'MSG_UPDATE_COUPON',
-          Message: 'MSG_UPDATE_COUPON_FAIL',
-          Popup: true,
-          Type: notify.NotifyType.Error
-        },
-        Info: {
-          Title: 'MSG_UPDATE_COUPON',
-          Message: 'MSG_UPDATE_COUPON_SUCCESS',
-          Popup: true,
-          Type: notify.NotifyType.Success
-        }
-      }
-    }, () => {
-      // TODO
-    })
-    return
+const columns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.ID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.AppID
+  },
+  {
+    name: 'Name',
+    label: t('MSG_NAME'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.Name
+  },
+  {
+    name: 'Message',
+    label: t('MSG_MESSAGE'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.Message
+  },
+  {
+    name: 'Type',
+    label: t('MSG_TYPE'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.CouponType
+  },
+  {
+    name: 'Scope',
+    label: t('MSG_COUPON_SCOPE'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.CouponScope
+  },
+  {
+    name: 'Denomination',
+    label: t('MSG_DENOMINATION'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.Denomination
+  },
+  {
+    name: 'Circulation',
+    label: t('MSG_CIRCULATION'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.Circulation
+  },
+  {
+    name: 'Allocated',
+    label: t('MSG_ALLOCATED'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.Allocated
+  },
+  {
+    name: 'DurationDays',
+    label: t('MSG_DURATION_DAYS'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.DurationDays
+  },
+  {
+    name: 'CouponConstraint',
+    label: t('MSG_CONSTRAINT'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.CouponConstraint
+  },
+  {
+    name: 'Random',
+    label: t('MSG_RANDOM'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.Random
+  },
+  {
+    name: 'StartAt',
+    label: t('MSG_START_AT'),
+    sortable: true,
+    field: (row: coupon.Coupon) => utils.formatTime(row.StartAt)
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATED_AT'),
+    sortable: true,
+    field: (row: coupon.Coupon) => utils.formatTime(row.CreatedAt)
   }
-
-  _coupon.createCoupon({
-    TargetAppID: AppID.value,
-    CouponType: couponType.value,
-    Denomination: target.value.Denomination,
-    Circulation: target.value.Circulation,
-    StartAt: target.value.StartAt,
-    DurationDays: target.value.DurationDays,
-    Message: target.value.Message,
-    Name: target.value.Name,
-    Threshold: target.value.Threshold,
-    Random: target.value.Random,
-    CouponConstraint: target.value.CouponConstraint,
-    AppGoodID: target.value.AppGoodID,
-    NotifyMessage: {
-      Error: {
-        Title: 'MSG_CREATE_COUPON',
-        Message: 'MSG_CREATE_COUPON_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_COUPON',
-        Message: 'MSG_CREATE_COUPON_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, () => {
-    // TODO
-  })
-}
-
-const onCancel = () => {
-  showing.value = false
-}
+])
 
 </script>

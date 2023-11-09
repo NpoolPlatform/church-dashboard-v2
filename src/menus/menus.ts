@@ -1,6 +1,5 @@
 import { uid } from 'quasar'
 import { MenuItem } from 'src/localstore'
-import { coupon } from 'src/npoolstore'
 
 const MainDrawerMenus = [
   {
@@ -600,7 +599,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '活动',
       caption: '管理APP活动',
@@ -609,17 +608,17 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */{
       menuId: uid(),
-      label: '定额券',
-      caption: '管理定额代金券',
+      label: '券',
+      caption: '管理代金券',
       icon: 'format_list_numbered',
       target: '/inspire/coupon',
-      query: { couponType: coupon.CouponType.FixAmount },
+      // query: { couponType: coupon.CouponType.FixAmount },
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, /* {
       menuId: uid(),
       label: '折扣券',
       caption: '管理折扣代金券',
@@ -639,7 +638,7 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, {
+    } as MenuItem, */ {
       menuId: uid(),
       label: '邀请关系',
       caption: '查看用户邀请关系',
