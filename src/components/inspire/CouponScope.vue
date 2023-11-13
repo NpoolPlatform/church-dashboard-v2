@@ -105,7 +105,7 @@ const onCancel = () => {
 const _coupon = coupon.useCouponStore()
 
 watch(() => target.value?.CouponID, () => {
-  target.value.CouponScope = _coupon.coupon(undefined, target.value?.CouponID)?.CouponScope as coupon.CouponScope
+  target.value.CouponScope = _coupon.getCouponByEntID(undefined, target.value?.CouponID)?.CouponScope as coupon.CouponScope
 })
 
 const onSubmit = (done: () => void) => {
@@ -137,6 +137,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: couponscope.Scope) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: couponscope.Scope) => row.EntID
   },
   {
     name: 'GoodID',
