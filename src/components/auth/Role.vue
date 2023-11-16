@@ -134,7 +134,7 @@ const api = npoolapi.useNpoolAPIStore()
 const apis = computed(() => api.APIs)
 const selectedApi = ref([] as Array<npoolapi.API>)
 const apiPath = ref('')
-const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
+const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value) || api.PathPrefix.includes(apiPath.value)))
 
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => {
