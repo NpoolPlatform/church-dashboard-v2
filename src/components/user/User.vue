@@ -95,16 +95,22 @@ onMounted(() => {
 })
 const columns = computed(() => [
   {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: user.User) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: user.User) => row.EntID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
     field: (row: user.User) => row.AppID
-  },
-  {
-    name: 'UserID',
-    label: t('MSG_USER_ID'),
-    sortable: true,
-    field: (row: user.User) => row.ID
   },
   {
     name: 'EmailAddress',

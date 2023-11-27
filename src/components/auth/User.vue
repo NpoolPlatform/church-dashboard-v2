@@ -121,7 +121,7 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = authing.useAuthingStore()
-const auths = computed(() => auth.auths(AppID.value, selectedUser.value[0]?.ID))
+const auths = computed(() => auth.auths(AppID.value, selectedUser.value[0]?.EntID))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
 const selectedAuth = ref([] as Array<authing.Auth>)
@@ -240,7 +240,7 @@ const onSubmit = () => {
 const onCreateAuthClick = (row: npoolapi.API) => {
   auth.createAppAuth({
     TargetAppID: AppID.value,
-    TargetUserID: selectedUser.value[0]?.ID,
+    TargetUserID: selectedUser.value[0]?.EntID,
     Resource: row.Path,
     Method: row.Method,
     Message: {
@@ -266,6 +266,7 @@ const onDeleteAuthClick = () => {
   auth.deleteAppAuth({
     TargetAppID: AppID.value,
     ID: selectedAuth.value[0].ID,
+    EntID: selectedAuth.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_APP_USER_AUTH',

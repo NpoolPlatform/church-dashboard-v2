@@ -209,7 +209,7 @@ const onSubmit = () => {
   submitting.value = true
   statement.createAppUserDeposit({
     ...target.value,
-    TargetUserID: selectedUser.value[0].ID,
+    TargetUserID: selectedUser.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_DEPOSIT_BALANCE',

@@ -62,7 +62,7 @@ const clientName = ref('')
 const displayThirdParties = computed(() => {
   return thirdParties.value.filter((el) => {
     return el.ClientName?.toLowerCase()?.includes?.(clientName.value?.toLowerCase()) ||
-           el.ID?.toLowerCase()?.includes(clientName.value?.toLowerCase())
+           el.EntID?.toLowerCase()?.includes(clientName.value?.toLowerCase())
   })
 })
 

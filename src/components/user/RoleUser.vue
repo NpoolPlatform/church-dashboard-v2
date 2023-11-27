@@ -94,7 +94,7 @@ const selectedUser = ref([] as Array<user.User>)
 
 const roleUserLoading = ref(false)
 const roleUsername = ref('')
-const roleUsers = computed(() => _role.roleUsers(AppID.value, selectedRole.value[0]?.ID))
+const roleUsers = computed(() => _role.roleUsers(AppID.value, selectedRole.value[0]?.EntID))
 const displayRoleUsers = computed(() => roleUsers.value?.filter((el) => el.EmailAddress?.includes(roleUsername.value) || el.PhoneNO?.includes(roleUsername.value)))
 const selectedRoleUser = ref([] as Array<user.User>)
 
@@ -164,7 +164,7 @@ const getAppRoleUsers = (offset: number, limit: number) => {
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
-    RoleID: selectedRole.value[0]?.ID,
+    RoleID: selectedRole.value[0]?.EntID,
     Message: {
       Error: {
         Title: 'MSG_GET_ROLE_USERS',
@@ -197,8 +197,8 @@ const onAddRoleUser = () => {
   }
   _role.createAppRoleUser({
     TargetAppID: AppID.value,
-    TargetUserID: selectedUser.value[0].ID,
-    RoleID: selectedRole.value[0].ID,
+    TargetUserID: selectedUser.value[0].EntID,
+    RoleID: selectedRole.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_ADD_ROLE_USER',
