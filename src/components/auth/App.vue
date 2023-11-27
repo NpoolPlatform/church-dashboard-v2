@@ -221,6 +221,7 @@ const onDeleteAuthClick = () => {
   auth.deleteAppAuth({
     TargetAppID: AppID.value,
     ID: selectedAuth.value[0].ID,
+    EntID: selectedAuth.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_APP_AUTH',
@@ -245,6 +246,12 @@ const columns = computed(() => [
     label: 'MSG_ID',
     sortable: true,
     field: (row: npoolapi.API) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: 'MSG_ENT_ID',
+    sortable: true,
+    field: (row: npoolapi.API) => row.EntID
   },
   {
     name: 'Method',

@@ -130,7 +130,7 @@ const onExportClick = () => {
     Auths: auths.value
   })], { type: 'text/plain;charset=utf-8' })
   const filename = (myApp?.Name as string) + '-' +
-                   (myApp?.ID as string) + '-auths-' +
+                   (myApp?.EntID as string) + '-auths-' +
                    utils.formatTime(new Date().getTime() / 1000) +
                    '.json'
   saveAs(blob, filename)
@@ -149,7 +149,7 @@ const onFileLoaded = (evt: Event) => {
     const reader = new FileReader()
     reader.onload = () => {
       const loaded = JSON.parse(reader.result as string) as SavedAuths
-      application.AppID = loaded.Application.ID
+      // application.AppID = loaded.Application.ID
       loadedAuths.value = loaded.Auths
     }
     reader.readAsText(filename)

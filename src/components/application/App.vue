@@ -32,6 +32,7 @@
         <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
       </q-card-section>
       <q-card-section>
+        <q-input v-model='target.EntID' :label='$t("MSG_ENT_ID")' />
         <q-input v-model='target.Name' :label='$t("MSG_APPLICATION_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
@@ -107,7 +108,7 @@ const onSubmit = (done: () => void) => {
 const createApp = (done: () => void) => {
   _app.createApp({
     ...target.value,
-    CreatedBy: logined.User?.ID,
+    CreatedBy: logined.User?.EntID,
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP',
@@ -156,7 +157,7 @@ const updateApp = (done: () => void) => {
       }
     }
   } as app.UpdateAppRequest
-  const origin = _app.app(target.value.ID)
+  const origin = _app.app(target.value.EntID)
   if (origin?.Name !== target.value.Name) { // don't send app name if not change
     request.Name = target.value.Name
   }
@@ -171,10 +172,16 @@ const updateApp = (done: () => void) => {
 
 const columns = computed(() => [
   {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
+    name: 'ID',
+    label: t('MSG_ID'),
     sortable: true,
     field: (row: app.App) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: app.App) => row.EntID
   },
   {
     name: 'Name',
