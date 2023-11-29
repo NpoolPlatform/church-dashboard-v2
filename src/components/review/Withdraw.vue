@@ -123,7 +123,7 @@ const updateAppWithdrawReview = (done: () => void) => {
     AppID: undefined as unknown as string,
     ReviewID: target.value.ReviewID,
     LangID: locale.AppLang?.LangID,
-    UserID: logined.User?.ID,
+    UserID: logined.User?.EntID,
     Message: target.value.Message,
     State: target.value.State,
     NotifyMessage: {

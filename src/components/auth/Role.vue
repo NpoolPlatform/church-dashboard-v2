@@ -335,6 +335,12 @@ const onDeleteAuthClick = () => {
 
 const columns = computed(() => [
   {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: user.User) => row.ID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,

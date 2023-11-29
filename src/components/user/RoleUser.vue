@@ -241,6 +241,12 @@ const onDeleteRoleUser = () => {
 }
 const columns = computed(() => [
   {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: user.User) => row.ID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
@@ -250,7 +256,7 @@ const columns = computed(() => [
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: user.User) => row.ID
+    field: (row: user.User) => row.EntID
   },
   {
     name: 'EmailAddress',
