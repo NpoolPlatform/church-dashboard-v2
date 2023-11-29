@@ -130,6 +130,7 @@ const commitButtonTargets = ref('')
 const updateApp = (done: () => void) => {
   const request = {
     ID: target.value.ID,
+    EntID: target.value.EntID,
     Logo: target.value.Logo,
     Description: target.value.Description,
     SignupMethods: target.value.SignupMethods,

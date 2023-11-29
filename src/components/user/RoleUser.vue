@@ -224,6 +224,7 @@ const onDeleteRoleUser = () => {
 
   const req = {
     ID: roleUsers.value?.[index].ID,
+    EntID: roleUsers.value?.[index].EntID,
     TargetAppID: AppID.value,
     TargetUserID: roleUsers.value?.[index].UserID,
     Message: {

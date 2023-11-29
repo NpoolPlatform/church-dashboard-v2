@@ -214,6 +214,7 @@ const onCancel = () => {
 const onSubmit = () => {
   api.updateAPI({
     ID: target.value.ID,
+    EntID: target.value.EntID,
     Deprecated: target.value.Deprecated,
     Message: {
       Error: {
