@@ -75,6 +75,12 @@ const columns = computed(() => [
     field: (row: notifchannel.TNotifChannel) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: notifchannel.TNotifChannel) => row.EntID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,

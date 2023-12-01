@@ -13,7 +13,7 @@
         <q-item
           dense
           v-for='_app in applications.values()'
-          :key='_app.ID'
+          :key='_app.EntID'
           clickable
           @click='onAppSelected(_app)'
         >
@@ -53,7 +53,7 @@ const applications = computed(() => application.Apps)
 const selectedApp = computed({
   get: () => application.app(AppID.value) as app.App,
   set: (val: app.App) => {
-    localApplication.CurrentAppID = val.ID
+    localApplication.CurrentAppID = val.EntID
   }
 })
 

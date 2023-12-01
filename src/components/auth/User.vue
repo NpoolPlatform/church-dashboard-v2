@@ -9,7 +9,19 @@
     v-model:selected='selectedUser'
     :loading='userLoading'
     :columns='columns'
-  />
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-table
     :title='$t("MSG_USER_RESOURCES")'
     dense
@@ -121,9 +133,15 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = authing.useAuthingStore()
-const auths = computed(() => auth.auths(AppID.value, selectedUser.value[0]?.ID))
+const auths = computed(() => auth.auths(AppID.value))
 const authPath = ref('')
-const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
+const displayAuths = computed(() => auths.value?.filter((auth) => {
+  let exist = auth.Resource?.includes(authPath.value) || auth.EmailAddress?.includes(authPath.value) || auth.PhoneNO?.includes(authPath.value)
+  if (selectedUser.value?.[0]?.EntID?.length > 0) {
+    exist = exist && auth.UserID?.includes(selectedUser.value?.[0]?.EntID)
+  }
+  return exist
+}))
 const selectedAuth = ref([] as Array<authing.Auth>)
 
 const getAppUsers = (offset: number, limit: number) => {
@@ -214,6 +232,7 @@ const onCancel = () => {
 const onSubmit = () => {
   api.updateAPI({
     ID: target.value.ID,
+    EntID: target.value.EntID,
     Deprecated: target.value.Deprecated,
     Message: {
       Error: {
@@ -240,7 +259,7 @@ const onSubmit = () => {
 const onCreateAuthClick = (row: npoolapi.API) => {
   auth.createAppAuth({
     TargetAppID: AppID.value,
-    TargetUserID: selectedUser.value[0]?.ID,
+    TargetUserID: selectedUser.value[0]?.EntID,
     Resource: row.Path,
     Method: row.Method,
     Message: {
@@ -266,6 +285,7 @@ const onDeleteAuthClick = () => {
   auth.deleteAppAuth({
     TargetAppID: AppID.value,
     ID: selectedAuth.value[0].ID,
+    EntID: selectedAuth.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_APP_USER_AUTH',
@@ -286,16 +306,22 @@ const onDeleteAuthClick = () => {
 }
 const columns = computed(() => [
   {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: user.User) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: user.User) => row.EntID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
     field: (row: user.User) => row.AppID
-  },
-  {
-    name: 'UserID',
-    label: t('MSG_USER_ID'),
-    sortable: true,
-    field: (row: user.User) => row.ID
   },
   {
     name: 'EmailAddress',

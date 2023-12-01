@@ -134,14 +134,14 @@ const api = npoolapi.useNpoolAPIStore()
 const apis = computed(() => api.APIs)
 const selectedApi = ref([] as Array<npoolapi.API>)
 const apiPath = ref('')
-const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
+const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value) || api.PathPrefix.includes(apiPath.value)))
 
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => {
   return auth.UserID === NIL_UUID &&
           auth.RoleID !== NIL_UUID &&
           auth.Resource.includes(authPath.value) &&
-          (selectedRole.value.length === 0 || auth.RoleID === selectedRole.value[0]?.ID)
+          (selectedRole.value.length === 0 || auth.RoleID === selectedRole.value[0]?.EntID)
 }))
 const selectedAuth = ref([] as Array<authing.Auth>)
 
@@ -253,6 +253,7 @@ const onCancel = () => {
 const onSubmit = () => {
   api.updateAPI({
     ID: target.value.ID,
+    EntID: target.value.EntID,
     Deprecated: target.value.Deprecated,
     Message: {
       Error: {
@@ -283,7 +284,7 @@ const onCreateAuthClick = (row: npoolapi.API) => {
 
   auth.createAppAuth({
     TargetAppID: AppID.value,
-    RoleID: selectedRole.value[0].ID,
+    RoleID: selectedRole.value[0].EntID,
     Resource: row.Path,
     Method: row.Method,
     Message: {
@@ -313,6 +314,7 @@ const onDeleteAuthClick = () => {
   auth.deleteAppAuth({
     TargetAppID: AppID.value,
     ID: selectedAuth.value[0].ID,
+    EntID: selectedAuth.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_DELETE_APP_AUTH',
@@ -334,6 +336,12 @@ const onDeleteAuthClick = () => {
 
 const columns = computed(() => [
   {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: user.User) => row.ID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
@@ -343,7 +351,7 @@ const columns = computed(() => [
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: user.User) => row.ID
+    field: (row: user.User) => row.EntID
   },
   {
     name: 'EmailAddress',

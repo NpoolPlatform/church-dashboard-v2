@@ -86,7 +86,7 @@ const displayThirdParties = computed(() => {
   }
   return appThirdParties.value.filter((el) => {
     return el.ClientName?.toLowerCase()?.includes?.(clientName.value?.toLowerCase()) ||
-           el.ID?.toLowerCase()?.includes(clientName.value?.toLowerCase())
+           el.EntID?.toLowerCase()?.includes(clientName.value?.toLowerCase())
   })
 })
 
@@ -99,6 +99,7 @@ const onDelete = () => {
   selectedThirdParty.value.forEach((el) => {
     appThirdParty.deleteAppOAuthThirdParty({
       ID: el.ID,
+      EntID: el.EntID,
       TargetAppID: el.AppID,
       Message: {
         Error: {

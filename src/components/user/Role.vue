@@ -95,7 +95,7 @@ const showing = ref(false)
 const updating = ref(false)
 const target = ref({
   AppID: AppID,
-  CreatedBy: logined.User?.ID
+  CreatedBy: logined.User?.EntID
 } as unknown as role.Role)
 
 const onCreate = () => {

@@ -162,7 +162,7 @@ const columns = computed(() => [
     name: 'UserID',
     label: t('MSG_USER_ID'),
     sortable: true,
-    field: (row: user.User) => row.ID
+    field: (row: user.User) => row.EntID
   },
   {
     name: 'EmailAddress',
@@ -209,7 +209,7 @@ const onSubmit = () => {
   submitting.value = true
   statement.createAppUserDeposit({
     ...target.value,
-    TargetUserID: selectedUser.value[0].ID,
+    TargetUserID: selectedUser.value[0].EntID,
     Message: {
       Error: {
         Title: 'MSG_DEPOSIT_BALANCE',
