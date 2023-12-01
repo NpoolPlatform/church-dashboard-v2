@@ -9,7 +9,19 @@
     v-model:selected='selectedUser'
     :loading='userLoading'
     :columns='columns'
-  />
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='username'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-table
     :title='$t("MSG_USER_RESOURCES")'
     dense
@@ -121,9 +133,14 @@ const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
 
 const auth = authing.useAuthingStore()
-const auths = computed(() => auth.auths(AppID.value, selectedUser.value[0]?.EntID))
+const auths = computed(() => auth.auths(AppID.value))
 const authPath = ref('')
-const displayAuths = computed(() => auths.value?.filter((auth) => auth.Resource.includes(authPath.value)))
+const displayAuths = computed(() => auths.value?.filter((auth) => {
+  if (!selectedUser.value?.[0]?.EntID) {
+    return true
+  }
+  return auth.UserID?.includes(selectedUser.value?.[0]?.EntID)
+}))
 const selectedAuth = ref([] as Array<authing.Auth>)
 
 const getAppUsers = (offset: number, limit: number) => {
@@ -288,12 +305,6 @@ const onDeleteAuthClick = () => {
 }
 const columns = computed(() => [
   {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
-    sortable: true,
-    field: (row: user.User) => row.AppID
-  },
-  {
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
@@ -304,6 +315,12 @@ const columns = computed(() => [
     label: t('MSG_ENT_ID'),
     sortable: true,
     field: (row: user.User) => row.EntID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    sortable: true,
+    field: (row: user.User) => row.AppID
   },
   {
     name: 'EmailAddress',
