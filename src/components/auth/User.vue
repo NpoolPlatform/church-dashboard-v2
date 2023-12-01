@@ -136,10 +136,11 @@ const auth = authing.useAuthingStore()
 const auths = computed(() => auth.auths(AppID.value))
 const authPath = ref('')
 const displayAuths = computed(() => auths.value?.filter((auth) => {
-  if (!selectedUser.value?.[0]?.EntID) {
-    return true
+  let exist = auth.Resource?.includes(authPath.value) || auth.EmailAddress?.includes(authPath.value) || auth.PhoneNO?.includes(authPath.value)
+  if (selectedUser.value?.[0]?.EntID?.length > 0) {
+    exist = exist && auth.UserID?.includes(selectedUser.value?.[0]?.EntID)
   }
-  return auth.UserID?.includes(selectedUser.value?.[0]?.EntID)
+  return exist
 }))
 const selectedAuth = ref([] as Array<authing.Auth>)
 
