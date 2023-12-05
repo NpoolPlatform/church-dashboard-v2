@@ -81,6 +81,7 @@ const _useraccount = useraccount.useUserAccountStore()
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
+    EntID: target.value.EntID,
     TargetAppID: target.value.AppID,
     TargetUserID: target.value.UserID,
     Active: target.value.Active,
