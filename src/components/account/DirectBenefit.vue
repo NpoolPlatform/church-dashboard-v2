@@ -84,14 +84,20 @@ const prepare = () => {
 
 const directBenefitColumns = computed(() => [
   {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
+    name: 'ID',
+    label: t('MSG_ID'),
     sortable: true,
     field: (row: useraccountbase.Account) => row.ID
   },
   {
-    name: 'ID',
-    label: t('MSG_ID'),
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: useraccountbase.Account) => row.EntID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
     sortable: true,
     field: (row: useraccountbase.Account) => row.AppID
   },

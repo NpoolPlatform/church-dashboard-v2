@@ -113,6 +113,7 @@ const onCancel = () => {
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
+    EntID: target.value.EntID,
     Active: target.value.Active,
     Blocked: target.value.Blocked,
     Locked: target.value.Locked

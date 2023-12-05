@@ -160,6 +160,7 @@ const createGoodBenefitAccount = (done: () => void) => {
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
+    EntID: target.value.EntID,
     Backup: target.value.Backup,
     Active: target.value.Active,
     Blocked: target.value.Blocked,

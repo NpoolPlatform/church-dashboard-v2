@@ -91,7 +91,13 @@ const withdrawColumns = computed(() => [
     field: (row: useraccountbase.Account) => row.ID
   },
   {
-    name: 'ID',
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: useraccountbase.Account) => row.EntID
+  },
+  {
+    name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
     field: (row: useraccountbase.Account) => row.AppID
