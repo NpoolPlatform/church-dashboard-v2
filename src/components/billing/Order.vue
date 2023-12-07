@@ -65,6 +65,7 @@
       </q-card-section>
       <q-card-section>
         <q-item-label>{{ $t('MSG_ORDER_ID') }}: {{ currentOrder?.ID }}</q-item-label>
+        <q-item-label>{{ $t('MSG_ORDER_ENT_ID') }}: {{ currentOrder?.EntID }}</q-item-label>
         <q-item-label>{{ $t('MSG_USER_ID') }}: {{ currentOrder?.UserID }}</q-item-label>
         <q-item-label>{{ $t('MSG_EMAIL_ADDRESS') }}: {{ currentOrder?.EmailAddress }}</q-item-label>
         <q-item-label>{{ $t('MSG_PHONE_NO') }}: {{ currentOrder?.PhoneNO }}</q-item-label>
@@ -203,6 +204,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: order.Order) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: order.Order) => row.EntID
   },
   {
     name: 'AppID',
