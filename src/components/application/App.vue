@@ -32,7 +32,8 @@
         <span>{{ $t('MSG_CREATE_APPLICATION') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.EntID' :label='$t("MSG_ENT_ID")' />
+        <q-input v-if='updating' disable v-model='target.EntID' :label='$t("MSG_ENT_ID")' />
+        <q-input v-if='updating' v-model='newEntID' :label='$t("MSG_NEW_ENT_ID")' />
         <q-input v-model='target.Name' :label='$t("MSG_APPLICATION_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
@@ -80,12 +81,14 @@ const appLoading = ref(false)
 const logined = user.useLocalUserStore()
 
 const target = ref({} as app.App)
+const newEntID = ref(undefined as unknown as string)
 const showing = ref(false)
 const updating = ref(false)
 
 const onRowClick = (row: app.App) => {
   target.value = { ...row }
   commitButtonTargets.value = row.CommitButtonTargets?.join(',')
+  newEntID.value = ''
   showing.value = true
   updating.value = true
 }
@@ -131,6 +134,7 @@ const updateApp = (done: () => void) => {
   const request = {
     ID: target.value.ID,
     EntID: target.value.EntID,
+    NewEntID: target.value?.EntID === newEntID.value ? undefined as unknown as string : newEntID.value,
     Logo: target.value.Logo,
     Description: target.value.Description,
     SignupMethods: target.value.SignupMethods,
