@@ -139,6 +139,12 @@ const columns = computed(() => [
     field: (row: coupon.Coupon) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.EntID
+  },
+  {
     name: 'AppID',
     label: t('MSG_APP_ID'),
     sortable: true,
