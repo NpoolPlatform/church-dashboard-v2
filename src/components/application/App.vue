@@ -88,7 +88,7 @@ const updating = ref(false)
 const onRowClick = (row: app.App) => {
   target.value = { ...row }
   commitButtonTargets.value = row.CommitButtonTargets?.join(',')
-  newEntID.value = ''
+  newEntID.value = target.value?.EntID
   showing.value = true
   updating.value = true
 }
