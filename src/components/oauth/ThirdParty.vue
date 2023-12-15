@@ -6,7 +6,7 @@
     row-key='ID'
     :title='$t("MSG_OAUTH_THIRD_PARTIES")'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as oauththirdparty.OAuthThirdParty)'
+    @row-click='(evt, row, index) => onRowClick(row as oauthbase.OAuthThirdParty)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -51,7 +51,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { oauththirdparty, notify, appuserbase } from 'src/npoolstore'
+import { oauththirdparty, notify, appuserbase, oauthbase } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -68,14 +68,14 @@ const displayThirdParties = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
-const target = ref({} as oauththirdparty.OAuthThirdParty)
+const target = ref({} as oauthbase.OAuthThirdParty)
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
 }
 
-const onRowClick = (row: oauththirdparty.OAuthThirdParty) => {
+const onRowClick = (row: oauthbase.OAuthThirdParty) => {
   target.value = { ...row }
   showing.value = true
   updating.value = true
@@ -87,14 +87,14 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as oauththirdparty.OAuthThirdParty
+  target.value = {} as oauthbase.OAuthThirdParty
 }
 
 const onSubmit = (done: () => void) => {
-  updating.value ? updateCoin(done) : createCoin(done)
+  updating.value ? updateOAuthThirdParty(done) : createOAuthThirdParty(done)
 }
 
-const createCoin = (done: () => void) => {
+const createOAuthThirdParty = (done: () => void) => {
   thirdParty.createOAuthThirdParty({
     ...target.value,
     Message: {
@@ -120,7 +120,7 @@ const createCoin = (done: () => void) => {
   })
 }
 
-const updateCoin = (done: () => void) => {
+const updateOAuthThirdParty = (done: () => void) => {
   thirdParty.updateOAuthThirdParty({
     ...target.value,
     Message: {
