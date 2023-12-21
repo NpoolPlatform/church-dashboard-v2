@@ -167,6 +167,12 @@ const columns = computed(() => [
     field: (row: deviceinfo.DeviceInfo) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: deviceinfo.DeviceInfo) => row.EntID
+  },
+  {
     name: 'MANUFACTURER',
     label: t('MSG_MANUFACTURER'),
     sortable: true,

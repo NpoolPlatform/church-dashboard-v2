@@ -138,7 +138,7 @@ const onSubmit = () => {
   sdk.createAppUserOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.EntID,
-    AppGoodID: selectedGood.value.value.ID,
+    AppGoodID: selectedGood.value.value.EntID,
     Units: `${units.value}`,
     OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment

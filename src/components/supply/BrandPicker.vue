@@ -37,8 +37,8 @@ const target = ref(id.value)
 const vendor = vendorbrand.useVendorBrandStore()
 const brands = computed(() => Array.from(vendor.vendorBrands()).map((el) => {
   return {
-    value: el.ID,
-    label: `${el.Name} | ${el.ID}`
+    value: el.EntID,
+    label: `${el.Name} | ${el.EntID}`
   }
 }))
 const displayBrands = ref(brands.value)
