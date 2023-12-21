@@ -133,6 +133,12 @@ const columns = computed(() => [
     field: (row: topmostgood.TopMostGood) => row.ID
   },
   {
+    name: 'EntID',
+    label: 'MSG_ENT_ID',
+    sortable: true,
+    field: (row: topmostgood.TopMostGood) => row.EntID
+  },
+  {
     name: 'AppID',
     label: 'MSG_APP_ID',
     sortable: true,

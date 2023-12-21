@@ -38,7 +38,7 @@ const deviceInfo = deviceinfo.useDeviceInfoStore()
 
 const devices = computed(() => Array.from(deviceInfo.deviceInfos()).map((el) => {
   return {
-    value: el.ID,
+    value: el.EntID,
     label: el.Type
   }
 }))

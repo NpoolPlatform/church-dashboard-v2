@@ -116,6 +116,12 @@ const appDefaultGoodsColumns = computed(() => [
     field: (row: appdefaultgood.Default) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: appdefaultgood.Default) => row.EntID
+  },
+  {
     name: 'GoodID',
     label: t('MSG_GOOD_ID'),
     sortable: true,

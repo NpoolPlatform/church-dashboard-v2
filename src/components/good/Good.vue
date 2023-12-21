@@ -118,7 +118,7 @@ const username = ref('')
 const displayGoods = computed(() => {
   const name = username.value?.toLowerCase()
   return goods.value?.filter((el) => {
-    return el.ID.toLowerCase().includes(name) ||
+    return el.EntID.toLowerCase().includes(name) ||
           el.Unit.toLowerCase().includes(name) ||
           el.Title.toLowerCase().includes(name)
   })
@@ -190,6 +190,7 @@ const createGood = (done: () => void) => {
 const targetUpdate = computed(() => {
   return {
     ID: target.value.ID,
+    EntID: target.value.EntID,
     DeviceInfoID: target.value.DeviceInfoID,
     DurationDays: target.value.DurationDays,
     CoinTypeID: target.value.CoinTypeID,
@@ -252,6 +253,12 @@ const columns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: good.Good) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: good.Good) => row.EntID
   },
   {
     name: 'Title',

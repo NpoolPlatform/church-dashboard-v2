@@ -36,8 +36,8 @@ const target = ref(id.value)
 const _topMosts = computed(() => sdk.topMosts.value)
 const topMosts = computed(() => Array.from(_topMosts.value, (el) => {
   return {
-    value: el.ID,
-    label: `${el.Title} | ${el.ID}`
+    value: el.EntID,
+    label: `${el.Title} | ${el.EntID}`
   }
 }))
 const displayTopMosts = ref(topMosts.value)

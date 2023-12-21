@@ -39,7 +39,7 @@ const vendor = vendorlocation.useVendorLocationStore()
 
 const locations = computed(() => Array.from(vendor.vendorLocations()).map((el) => {
   return {
-    value: el.ID,
+    value: el.EntID,
     label: el.Country + ' ' + el.Province + ' ' + el.City + ' ' + el.Address
   }
 }))

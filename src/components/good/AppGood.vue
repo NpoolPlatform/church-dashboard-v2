@@ -86,7 +86,7 @@
           type='number'
           :min='0'
           suffix='h'
-          :disable='!appGood.cancelable(AppID, target.ID)'
+          :disable='!appGood.cancelable(AppID, target.EntID)'
         />
       </q-card-section>
       <q-card-section>
@@ -192,7 +192,7 @@ const selectedGood = ref([] as Array<good.Good>)
 const username = ref('')
 const displayGoods = computed(() => {
   const name = username.value?.toLowerCase()
-  return goods.value?.filter((el) => el.ID.toLowerCase().includes(name) || el.Unit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
+  return goods.value?.filter((el) => el.EntID.toLowerCase().includes(name) || el.Unit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
 })
 
 const appGood = appgood.useAppGoodStore()
@@ -233,7 +233,7 @@ const createAppGood = (done: () => void) => {
   appGood.createAppGood({
     TargetAppID: AppID.value,
     ...target.value,
-    GoodID: selectedGood.value[0].ID,
+    GoodID: selectedGood.value[0].EntID,
     UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
     Message: {
       Error: {
@@ -261,6 +261,7 @@ const createAppGood = (done: () => void) => {
 const updateTarget = computed(() => {
   return {
     ID: target.value.ID,
+    EntID: target.value.EntID,
     TargetAppID: target?.value?.AppID,
     Online: target.value.Online,
     Visible: target.value.Visible,
