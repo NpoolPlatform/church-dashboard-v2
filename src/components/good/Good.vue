@@ -40,7 +40,7 @@
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.QuantityUnit' :label='$t("MSG_UNIT")' />
-        <q-input v-model.number='target.QuantityUnitAmount' :label='$t("MSG_UNIT_POWER")' type='number' :min='1' />
+        <q-input v-model='target.QuantityUnitAmount' :label='$t("MSG_UNIT_POWER")' />
         <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
         <q-input v-model='target.UnitPrice' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
@@ -128,7 +128,7 @@ const displayGoods = computed(() => {
 
 const target = ref({
   UnitLockDeposit: '0',
-  StartMode: goodbase.StartMode.GoodStartModeTBD
+  StartMode: goodbase.StartMode.GoodStartModeNextDay
 } as good.Good)
 const showing = ref(false)
 const updating = ref(false)
