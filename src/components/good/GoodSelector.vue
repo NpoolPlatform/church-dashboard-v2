@@ -36,7 +36,7 @@ const _good = good.useGoodStore()
 const goods = computed(() => Array.from(_good.goods(), (el) => {
   return {
     value: el.EntID,
-    label: `${el.EntID} | ${el.Title} | ${el.Unit} | ${el.Price}`
+    label: `${el.EntID} | ${el.Title} | ${el.QuantityUnit} | ${el.UnitPrice}`
   }
 }))
 const displayGoods = ref(goods.value)

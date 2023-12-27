@@ -39,10 +39,10 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
-        <q-input v-model='target.Unit' :label='$t("MSG_UNIT")' />
-        <q-input v-model.number='target.UnitAmount' :label='$t("MSG_UNIT_POWER")' type='number' :min='1' />
+        <q-input v-model='target.QuantityUnit' :label='$t("MSG_UNIT")' />
+        <q-input v-model.number='target.QuantityUnitAmount' :label='$t("MSG_UNIT_POWER")' type='number' :min='1' />
         <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
+        <q-input v-model='target.UnitPrice' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
         <DatePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
       </q-card-section>
@@ -53,7 +53,6 @@
       </q-card-section>
       <q-card-section>
         <CoinPicker v-model:id='target.CoinTypeID' />
-        <CoinMultiPicker v-model:ids='target.SupportCoinTypeIDs' />
         <DeviceInfoPicker v-model:device='target.DeviceInfoID' />
         <VendorLocationPicker v-model:location='target.VendorLocationID' />
       </q-card-section>
@@ -83,6 +82,10 @@
         <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
         <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
+        <q-select :options='goodbase.GoodUnitTypes' v-model='target.UnitType' :label='$t("MSG_GOOD_UNIT_TYPE")' />
+        <q-select :options='goodbase.GoodUnitCalculateTypes' v-model='target.QuantityCalculateType' :label='$t("MSG_QUANTITY_CALCULATE_TYPE")' />
+        <q-select :options='goodbase.GoodDurationTypes' v-model='target.DurationType' :label='$t("MSG_DURATION_TYPE")' />
+        <q-select :options='goodbase.GoodUnitCalculateTypes' v-model='target.DurationCalculateType' :label='$t("MSG_DURATION_CALCULATE_TYPE")' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TESTONLY")' /></div>
@@ -104,7 +107,6 @@ import { good, notify, utils, goodbase } from 'src/npoolstore'
 const DeviceInfoPicker = defineAsyncComponent(() => import('src/components/good/DeviceInfoPicker.vue'))
 const VendorLocationPicker = defineAsyncComponent(() => import('src/components/good/VendorLocationPicker.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
-const CoinMultiPicker = defineAsyncComponent(() => import('src/components/coin/CoinMultiPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
 
@@ -119,7 +121,7 @@ const displayGoods = computed(() => {
   const name = username.value?.toLowerCase()
   return goods.value?.filter((el) => {
     return el.EntID.toLowerCase().includes(name) ||
-          el.Unit.toLowerCase().includes(name) ||
+          el.QuantityUnit.toLowerCase().includes(name) ||
           el.Title.toLowerCase().includes(name)
   })
 })
@@ -138,10 +140,6 @@ const onCreate = () => {
 
 const onRowClick = (row: good.Good) => {
   target.value = { ...row }
-  target.value.SupportCoinTypeIDs = []
-  target.value?.SupportCoins?.forEach((el) => {
-    target.value.SupportCoinTypeIDs.push(el.CoinTypeID)
-  })
   updating.value = true
   showing.value = true
 }
@@ -195,10 +193,10 @@ const targetUpdate = computed(() => {
     DurationDays: target.value.DurationDays,
     CoinTypeID: target.value.CoinTypeID,
     VendorLocationID: target.value.VendorLocationID,
-    Price: target.value.Price,
+    UnitPrice: target.value.UnitPrice,
     Title: target.value.Title,
-    Unit: target.value.Unit,
-    UnitAmount: target.value.UnitAmount,
+    QuantityUnit: target.value.QuantityUnit,
+    QuantityUnitAmount: target.value.QuantityUnitAmount,
     DeliveryAt: target.value.DeliveryAt,
     BenefitIntervalHours: target.value.BenefitIntervalHours,
     StartAt: target.value.StartAt,
@@ -209,8 +207,7 @@ const targetUpdate = computed(() => {
     Labels: target.value?.Labels,
     StartMode: target.value.StartMode,
     BenefitType: target.value.BenefitType,
-    GoodType: target.value.GoodType,
-    SupportCoinTypeIDs: target.value?.SupportCoinTypeIDs
+    GoodType: target.value.GoodType
   }
 })
 
@@ -276,13 +273,19 @@ const columns = computed(() => [
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: good.Good) => row.Price
+    field: (row: good.Good) => row.UnitPrice
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: good.Good) => t(row.Unit)
+    field: (row: good.Good) => t(row.QuantityUnit)
+  },
+  {
+    name: 'GOODUNITAMOUNT',
+    label: t('MSG_GOOD_UNIT_AMOUNT'),
+    sortable: true,
+    field: (row: good.Good) => t(row.QuantityUnitAmount)
   },
   {
     name: 'GOODTOTAL',
@@ -331,6 +334,30 @@ const columns = computed(() => [
     label: t('MSG_CREATEDAT'),
     sortable: true,
     field: (row: good.Good) => utils.formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UNITTYPE',
+    label: t('MSG_UNIT_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.UnitType
+  },
+  {
+    name: 'QUANTITYCALCULATETYPE',
+    label: t('MSG_QUANTITY_CALCULATE_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.QuantityCalculateType
+  },
+  {
+    name: 'DURATIONTYPE',
+    label: t('MSG_DURATION_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.DurationType
+  },
+  {
+    name: 'DURATIONCALCULATETYPE',
+    label: t('MSG_DURATION_CALCULATE_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.DurationCalculateType
   }
 ])
 </script>
