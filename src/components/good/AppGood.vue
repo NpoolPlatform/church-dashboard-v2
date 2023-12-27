@@ -443,6 +443,12 @@ const columns = computed(() => [
     label: t('MSG_DURATION_CALCULATE_TYPE'),
     sortable: true,
     field: (row: good.Good) => row.DurationCalculateType
+  },
+  {
+    name: 'SETTLEMENTTYPE',
+    label: t('MSG_SETTLEMENT_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.SettlementType
   }
 ])
 
@@ -578,6 +584,12 @@ const appGoodsColumns = computed(() => [
     label: t('MSG_PACKAGE_WITH_REQUIREDS'),
     sortable: true,
     field: (row: appgood.Good) => row.PackageWithRequireds
+  },
+  {
+    name: 'SETTLEMENTTYPE',
+    label: t('MSG_SETTLEMENT_TYPE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.SettlementType
   }
 ])
 </script>

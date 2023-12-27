@@ -86,6 +86,7 @@
         <q-select :options='goodbase.GoodUnitCalculateTypes' v-model='target.QuantityCalculateType' :label='$t("MSG_QUANTITY_CALCULATE_TYPE")' />
         <q-select :options='goodbase.GoodDurationTypes' v-model='target.DurationType' :label='$t("MSG_DURATION_TYPE")' />
         <q-select :options='goodbase.GoodUnitCalculateTypes' v-model='target.DurationCalculateType' :label='$t("MSG_DURATION_CALCULATE_TYPE")' />
+        <q-select :options='goodbase.GoodSettlementTypes' v-model='target.SettlementType' :label='$t("MSG_SETTLEMENT_TYPE")' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TESTONLY")' /></div>
@@ -358,6 +359,12 @@ const columns = computed(() => [
     label: t('MSG_DURATION_CALCULATE_TYPE'),
     sortable: true,
     field: (row: good.Good) => row.DurationCalculateType
+  },
+  {
+    name: 'SETTLEMENTTYPE',
+    label: t('MSG_SETTLEMENT_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.SettlementType
   }
 ])
 </script>
