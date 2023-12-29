@@ -495,6 +495,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '券提现请求',
+        caption: '审核券提现请求',
+        icon: 'format_list_numbered',
+        target: '/review/couponwithdraw',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
