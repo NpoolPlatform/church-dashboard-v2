@@ -222,6 +222,12 @@ const columns = computed(() => [
     field: (row: coupon.Coupon) => utils.formatTime(row.StartAt)
   },
   {
+    name: 'EndAt',
+    label: t('MSG_END_AT'),
+    sortable: true,
+    field: (row: coupon.Coupon) => utils.formatTime(row.EndAt)
+  },
+  {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
