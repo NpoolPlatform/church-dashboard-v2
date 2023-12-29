@@ -34,7 +34,7 @@
         <q-input
           v-model='units' :label='$t("MSG_PURCHASE_UNITS")' type='number' min='0'
           :max='maxUnits'
-          :suffix='selectedGood?.value?.Unit'
+          :suffix='selectedGood?.value?.QuantityUnit'
         />
       </q-card-section>
       <q-card-section>

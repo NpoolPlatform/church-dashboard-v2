@@ -72,6 +72,7 @@
         <q-item-label>{{ $t('MSG_COINTYPE_ID') }}: {{ currentOrder?.CoinTypeID }}</q-item-label>
         <q-item-label>{{ $t('MSG_COINNAME') }}: {{ currentOrder?.CoinName }} {{ currentOrder?.Units }}</q-item-label>
         <q-item-label>{{ $t('MSG_UNTITS') }}: {{ currentOrder?.Units }}</q-item-label>
+        <q-item-label>{{ $t('MSG_DURATION') }}: {{ currentOrder?.Duration }}</q-item-label>
         <q-item-label>{{ $t('MSG_PAYMENT_AMOUNT') }}: {{ currentOrder?.PaymentAmount }}</q-item-label>
         <q-item-label>{{ $t('MSG_CREATED_AT') }}: {{ utils.formatTime(currentOrder?.CreatedAt) }}</q-item-label>
       </q-card-section>
@@ -97,7 +98,7 @@
 <script setup lang='ts'>
 import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { utils, constant, sdk, order } from 'src/npoolstore'
+import { utils, constant, sdk, order, appgood } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -106,6 +107,7 @@ const goodID = ref('')
 const start = ref('')
 const end = ref('')
 const selectedOrderType = ref('ALL')
+const good = appgood.useAppGoodStore()
 
 const displayOrders = computed(() => sdk.orders.value.filter((el) => {
   let display = el.GoodID.includes(goodID.value)
@@ -252,6 +254,12 @@ const columns = computed(() => [
     label: t('MSG_UNITS'),
     sortable: true,
     field: (row: order.Order) => row.Units
+  },
+  {
+    name: 'Duration',
+    label: t('MSG_DURATION'),
+    sortable: true,
+    field: (row: order.Order) => row.Duration.toString() + ' ' + good.durationUnit(undefined, row.AppGoodID)
   },
   {
     name: 'PaymentID',
