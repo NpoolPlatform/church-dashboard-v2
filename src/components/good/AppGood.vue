@@ -58,8 +58,11 @@
         <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
         <q-input v-model='target.PackagePrice' :label='$t("MSG_PACKAGE_PRICE")' type='number' :min='0' />
-        <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
-        <q-input v-model='target.UserPurchaseLimit' :label='$t("MSG_USER_PURCHASE_LIMIT")' type='number' :min='0' />
+        <q-input v-model='target.MinOrderAmount' :label='$t("MSG_MIN_ORDER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MaxOrderAmount' :label='$t("MSG_MAX_ORDER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MaxUserAmount' :label='$t("MSG_MAX_USER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MinOrderDuration' :label='$t("MSG_MIN_ORDER_DURATION")' type='number' :min='0' />
+        <q-input v-model='target.MaxOrderDuration' :label='$t("MSG_MAX_ORDER_DURATION")' type='number' :min='0' />
         <q-input
           class='commission-percent'
           v-model.number='target.TechnicalFeeRatio'
@@ -236,7 +239,9 @@ const createAppGood = (done: () => void) => {
     TargetAppID: AppID.value,
     ...target.value,
     GoodID: selectedGood.value[0].EntID,
-    UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
+    MinOrderAmount: `${target.value.MinOrderAmount}`,
+    MaxOrderAmount: `${target.value.MaxOrderAmount}`,
+    MaxUserAmount: `${target.value.MaxUserAmount}`,
     Message: {
       Error: {
         Title: 'MSG_AUTHORIZE_GOOD',
@@ -271,8 +276,11 @@ const updateTarget = computed(() => {
     UnitPrice: target.value.UnitPrice,
     PackagePrice: target.value.PackagePrice,
     DisplayIndex: target.value.DisplayIndex,
-    PurchaseLimit: target.value.PurchaseLimit,
-    UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
+    MinOrderAmount: `${target.value.MinOrderAmount}`,
+    MaxOrderAmount: `${target.value.MaxOrderAmount}`,
+    MaxUserAmount: `${target.value.MaxUserAmount}`,
+    MinOrderDuration: target.value.MinOrderDuration,
+    MaxOrderDuration: target.value.MaxOrderDuration,
     TechnicalFeeRatio: target.value.TechnicalFeeRatio?.toString(),
     ElectricityFeeRatio: target.value.ElectricityFeeRatio?.toString(),
     ProductPage: target.value?.ProductPage,

@@ -41,7 +41,6 @@
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.QuantityUnit' :label='$t("MSG_UNIT")' />
         <q-input v-model='target.QuantityUnitAmount' :label='$t("MSG_UNIT_POWER")' />
-        <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' type='number' />
         <q-input v-model='target.UnitPrice' :label='$t("MSG_PRICE")' type='number' :min='0' />
         <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
         <DatePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
@@ -191,7 +190,6 @@ const targetUpdate = computed(() => {
     ID: target.value.ID,
     EntID: target.value.EntID,
     DeviceInfoID: target.value.DeviceInfoID,
-    DurationDays: target.value.DurationDays,
     CoinTypeID: target.value.CoinTypeID,
     VendorLocationID: target.value.VendorLocationID,
     UnitPrice: target.value.UnitPrice,
