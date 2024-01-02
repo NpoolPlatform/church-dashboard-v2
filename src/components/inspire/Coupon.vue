@@ -42,7 +42,7 @@
         <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' />
         <q-input v-model='target.Threshold' :label='$t("MSG_THRESHOLD")' />
         <q-select :options='coupon.CouponScopes' v-model='target.CouponScope' :label='$t("MSG_COUPON_SCOPE")' />
-        <q-input v-model='target.CashableProbabilityPerMillion' :label='$t("MSG_WITHDRAW_PROBABILITY")' />
+        <q-input v-model='target.CashableProbability' :label='$t("MSG_WITHDRAW_PROBABILITY")' />
       </q-card-section>
       <q-card-section>
         <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
@@ -210,10 +210,10 @@ const columns = computed(() => [
     field: (row: coupon.Coupon) => row.Random
   },
   {
-    name: 'CashableProbabilityPerMillion',
+    name: 'CashableProbability',
     label: t('MSG_CASHABLE_PROBABILITY'),
     sortable: true,
-    field: (row: coupon.Coupon) => row.CashableProbabilityPerMillion
+    field: (row: coupon.Coupon) => row.CashableProbability
   },
   {
     name: 'StartAt',

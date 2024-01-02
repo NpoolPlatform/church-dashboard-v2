@@ -48,7 +48,7 @@
         <span>{{ $t('MSG_COUPON_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <CouponSelector v-model:id='target.CouponID' />
+        <AppSelector v-model:id='target.AppID' />
         <AppCoinPicker v-model:id='target.CoinTypeID' />
       </q-card-section>
       <q-item class='row'>
@@ -60,14 +60,13 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { couponcoin, sdk, utils } from 'src/npoolstore'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const CouponSelector = defineAsyncComponent(() => import('src/components/inspire/CouponSelector.vue'))
+const AppSelector = defineAsyncComponent(() => import('src/components/application/AppSelector.vue'))
 const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -76,7 +75,7 @@ const username = ref('')
 const couponcoins = computed(() => _couponcoin.couponcoins())
 const displayCouponCoins = computed(() => _couponcoin.couponcoins().filter((el) => {
   return el.CoinTypeID?.includes(username.value) ||
-             el.CouponID?.includes(username.value)
+             el.CoinName?.includes(username.value)
 }))
 
 const target = ref({} as couponcoin.CouponCoin)
@@ -117,12 +116,6 @@ onMounted(() => {
   }
 })
 
-watch(AppID, () => {
-  if (!couponcoins.value?.length) {
-    sdk.getCouponCoins(0, 0)
-  }
-})
-
 const columns = computed(() => [
   {
     name: 'ID',
@@ -135,6 +128,18 @@ const columns = computed(() => [
     label: t('MSG_ENT_ID'),
     sortable: true,
     field: (row: couponcoin.CouponCoin) => row.EntID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    sortable: true,
+    field: (row: couponcoin.CouponCoin) => row.AppID
+  },
+  {
+    name: 'AppName',
+    label: t('MSG_APP_NAME'),
+    sortable: true,
+    field: (row: couponcoin.CouponCoin) => row.AppName
   },
   {
     name: 'CoinTypeID',
@@ -153,24 +158,6 @@ const columns = computed(() => [
     label: t('MSG_COIN_ENV'),
     sortable: true,
     field: (row: couponcoin.CouponCoin) => row.CoinENV
-  },
-  {
-    name: 'CouponID',
-    label: t('MSG_COUPON_ID'),
-    sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.CouponID
-  },
-  {
-    name: 'CouponName',
-    label: t('MSG_COUPON_NAME'),
-    sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.CouponName
-  },
-  {
-    name: 'CouponDenomination',
-    label: t('MSG_COUPON_DENOMINATION'),
-    sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.CouponDenomination
   },
   {
     name: 'CreatedAt',
