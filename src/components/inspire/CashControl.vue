@@ -62,12 +62,13 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { cashcontrol, sdk, utils } from 'src/npoolstore'
 import { useI18n } from 'vue-i18n'
 import { ControlTypes } from 'src/npoolstore/inspire/coupon'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+import { AppID } from 'src/npoolstore/sdk'
 
 const CouponSelector = defineAsyncComponent(() => import('src/components/inspire/CouponSelector.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
@@ -111,6 +112,12 @@ const onDelete = () => {
     // TODO
   })
 }
+
+watch(AppID, () => {
+  if (!cashcontrols.value?.length) {
+    sdk.getCashControls(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!cashcontrols.value?.length) {
