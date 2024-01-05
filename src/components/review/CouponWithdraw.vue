@@ -233,12 +233,6 @@ const columns = computed(() => [
     field: (row: couponwithdrawreview.CouponWithdrawReview) => row.State
   },
   {
-    name: 'State',
-    label: t('MSG_STATE'),
-    sortable: true,
-    field: (row: couponwithdrawreview.CouponWithdrawReview) => row.State
-  },
-  {
     name: 'Trigger',
     label: t('MSG_TRIGGER'),
     sortable: true,
