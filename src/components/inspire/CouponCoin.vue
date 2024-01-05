@@ -48,7 +48,6 @@
         <span>{{ $t('MSG_COUPON_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppSelector v-model:id='target.AppID' />
         <AppCoinPicker v-model:id='target.CoinTypeID' />
       </q-card-section>
       <q-item class='row'>
@@ -60,13 +59,13 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { couponcoin, sdk, utils } from 'src/npoolstore'
 import { useI18n } from 'vue-i18n'
+import { AppID } from 'src/npoolstore/sdk'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const AppSelector = defineAsyncComponent(() => import('src/components/application/AppSelector.vue'))
 const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -94,6 +93,7 @@ const onCancel = () => {
 }
 
 const onSubmit = (done: () => void) => {
+  target.value.AppID = AppID.value
   sdk.createCouponCoin(target.value, (error: boolean) => {
     done()
     if (error) {
@@ -109,6 +109,12 @@ const onDelete = () => {
     // TODO
   })
 }
+
+watch(AppID, () => {
+  if (!couponcoins.value?.length) {
+    sdk.getCouponCoins(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!couponcoins.value?.length) {

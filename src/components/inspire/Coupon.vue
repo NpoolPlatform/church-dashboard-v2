@@ -42,7 +42,7 @@
         <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' />
         <q-input v-model='target.Threshold' :label='$t("MSG_THRESHOLD")' />
         <q-select :options='coupon.CouponScopes' v-model='target.CouponScope' :label='$t("MSG_COUPON_SCOPE")' />
-        <q-input v-model='target.CashableProbability' :label='$t("MSG_WITHDRAW_PROBABILITY")' />
+        <q-input v-model='target.CashableProbability' :label='$t("MSG_CASHABLE_PROBABILITY")' />
       </q-card-section>
       <q-card-section>
         <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
@@ -58,6 +58,7 @@
     </q-card>
   </q-dialog>
   <CouponScope />
+  <CouponCoin />
 </template>
 
 <script setup lang='ts'>
@@ -66,6 +67,7 @@ import { coupon, sdk, utils } from 'src/npoolstore'
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CouponScope = defineAsyncComponent(() => import('src/components/inspire/CouponScope.vue'))
+const CouponCoin = defineAsyncComponent(() => import('src/components/inspire/CouponCoin.vue'))
 
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/npoolstore/sdk'
