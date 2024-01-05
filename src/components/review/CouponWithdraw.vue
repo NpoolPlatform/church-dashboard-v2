@@ -197,10 +197,10 @@ const columns = computed(() => [
     field: (row: couponwithdrawreview.CouponWithdrawReview) => row.AllocatedID
   },
   {
-    name: 'CoinName',
+    name: 'CouponName',
     label: t('MSG_COUPON_NAME'),
     sortable: true,
-    field: (row: couponwithdrawreview.CouponWithdrawReview) => row.CoinName
+    field: (row: couponwithdrawreview.CouponWithdrawReview) => row.CouponName
   },
   {
     name: 'CoinName',
