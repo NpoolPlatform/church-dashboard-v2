@@ -35,7 +35,7 @@
         <!-- <AppUserSelector v-model:id='target.UserID' /> -->
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
-        <q-select :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
+        <q-select :disable='updating' :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
         <q-select :options='coupon.CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_CONSTRAINT")' />
         <q-input v-model='target.Denomination' :label='$t("MSG_DENOMINATION")' />
         <q-input v-model='target.Circulation' :label='$t("MSG_CIRCULATION")' />
