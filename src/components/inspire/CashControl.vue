@@ -149,7 +149,7 @@ const columns = computed(() => [
   },
   {
     name: 'ControlType',
-    label: t('MSG_COIN_TYPE_ID'),
+    label: t('MSG_CONTROL_TYPE'),
     sortable: true,
     field: (row: cashcontrol.CashControl) => row.ControlType
   },
