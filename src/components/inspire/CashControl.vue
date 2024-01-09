@@ -51,7 +51,10 @@
         <CouponSelector v-model:id='target.CouponID' />
       </q-card-section>
       <q-card-section>
-        <q-select :options='ControlTypes' v-model='target.ControlType' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
+        <q-select :options='ControlTypes' v-model='target.ControlType' :label='$t("MSG_ACCOUNT_USED_FOR")' />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model='target.Value' :label='$t("MSG_VALUE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -143,12 +146,6 @@ const columns = computed(() => [
     label: t('MSG_APP_ID'),
     sortable: true,
     field: (row: cashcontrol.CashControl) => row.AppID
-  },
-  {
-    name: 'AppName',
-    label: t('MSG_APP_NAME'),
-    sortable: true,
-    field: (row: cashcontrol.CashControl) => row.AppName
   },
   {
     name: 'ControlType',
