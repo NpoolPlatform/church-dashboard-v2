@@ -154,6 +154,12 @@ const columns = computed(() => [
     field: (row: cashcontrol.CashControl) => row.ControlType
   },
   {
+    name: 'Value',
+    label: t('MSG_VALUE'),
+    sortable: true,
+    field: (row: cashcontrol.CashControl) => row.Value
+  },
+  {
     name: 'CouponID',
     label: t('MSG_COUPON_ID'),
     sortable: true,
