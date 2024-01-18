@@ -9,6 +9,7 @@
     selection='single'
     :columns='columns'
     v-model:selected='selectedCashControls'
+    @row-click='(evt, row, index) => onRowClick(row as cashcontrol.CashControl)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -48,10 +49,10 @@
         <span>{{ $t('MSG_CASH_CONTROL') }}</span>
       </q-card-section>
       <q-card-section>
-        <CouponSelector v-model:id='target.CouponID' />
+        <CouponSelector v-if='!updating' v-model:id='target.CouponID' />
       </q-card-section>
       <q-card-section>
-        <q-select :options='ControlTypes' v-model='target.ControlType' :label='$t("MSG_ACCOUNT_USED_FOR")' />
+        <q-select :disable='updating' :options='ControlTypes' v-model='target.ControlType' :label='$t("MSG_ACCOUNT_USED_FOR")' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Value' :label='$t("MSG_VALUE")' />
@@ -86,6 +87,13 @@ const displayCashControls = computed(() => _cashcontrol.cashcontrols().filter((e
 
 const target = ref({} as cashcontrol.CashControl)
 const showing = ref(false)
+const updating = ref(false)
+
+const onRowClick = (row: cashcontrol.CashControl) => {
+  target.value = { ...row }
+  showing.value = true
+  updating.value = true
+}
 
 const onCreate = () => {
   target.value = {} as cashcontrol.CashControl
@@ -100,6 +108,16 @@ const onCancel = () => {
 }
 
 const onSubmit = (done: () => void) => {
+  if (updating.value) {
+    sdk.updateCashControl(target.value, (error:boolean) => {
+      done()
+      if (error) {
+        return
+      }
+      onMenuHide()
+    })
+    return
+  }
   sdk.createCashControl(target.value, (error: boolean) => {
     done()
     if (error) {
