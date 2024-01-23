@@ -351,6 +351,12 @@ const columns = computed(() => [
     field: (row: good.Good) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: good.Good) => row.EntID
+  },
+  {
     name: 'Title',
     label: t('MSG_GOOD_NAME'),
     sortable: true,
@@ -466,6 +472,12 @@ const appGoodsColumns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: appgood.Good) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: appgood.Good) => row.EntID
   },
   {
     name: 'GOODID',
