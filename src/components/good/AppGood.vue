@@ -56,9 +56,13 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' type='number' :min='0' />
-        <q-input v-model.number='target.PurchaseLimit' :label='$t("MSG_PURCHASE_LIMIT")' type='number' :min='0' />
-        <q-input v-model='target.UserPurchaseLimit' :label='$t("MSG_USER_PURCHASE_LIMIT")' type='number' :min='0' />
+        <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
+        <q-input v-model='target.PackagePrice' :label='$t("MSG_PACKAGE_PRICE")' type='number' :min='0' />
+        <q-input v-model='target.MinOrderAmount' :label='$t("MSG_MIN_ORDER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MaxOrderAmount' :label='$t("MSG_MAX_ORDER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MaxUserAmount' :label='$t("MSG_MAX_USER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MinOrderDuration' :label='$t("MSG_MIN_ORDER_DURATION")' type='number' :min='0' />
+        <q-input v-model='target.MaxOrderDuration' :label='$t("MSG_MAX_ORDER_DURATION")' type='number' :min='0' />
         <q-input
           class='commission-percent'
           v-model.number='target.TechnicalFeeRatio'
@@ -161,6 +165,7 @@
         <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
         <div><q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' /></div>
         <div><q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' /></div>
+        <div><q-toggle dense v-model='target.PackageWithRequireds' :label='$t("MSG_PACKAGE_WITH_REQUIREDS")' /></div>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -192,7 +197,7 @@ const selectedGood = ref([] as Array<good.Good>)
 const username = ref('')
 const displayGoods = computed(() => {
   const name = username.value?.toLowerCase()
-  return goods.value?.filter((el) => el.EntID.toLowerCase().includes(name) || el.Unit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
+  return goods.value?.filter((el) => el.EntID.toLowerCase().includes(name) || el.QuantityUnit.toLowerCase().includes(name) || el.Title.toLowerCase().includes(name))
 })
 
 const appGood = appgood.useAppGoodStore()
@@ -234,7 +239,9 @@ const createAppGood = (done: () => void) => {
     TargetAppID: AppID.value,
     ...target.value,
     GoodID: selectedGood.value[0].EntID,
-    UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
+    MinOrderAmount: `${target.value.MinOrderAmount}`,
+    MaxOrderAmount: `${target.value.MaxOrderAmount}`,
+    MaxUserAmount: `${target.value.MaxUserAmount}`,
     Message: {
       Error: {
         Title: 'MSG_AUTHORIZE_GOOD',
@@ -266,10 +273,14 @@ const updateTarget = computed(() => {
     Online: target.value.Online,
     Visible: target.value.Visible,
     GoodName: target.value.GoodName,
-    Price: target.value.Price,
+    UnitPrice: target.value.UnitPrice,
+    PackagePrice: target.value.PackagePrice,
     DisplayIndex: target.value.DisplayIndex,
-    PurchaseLimit: target.value.PurchaseLimit,
-    UserPurchaseLimit: `${target.value.UserPurchaseLimit}`,
+    MinOrderAmount: `${target.value.MinOrderAmount}`,
+    MaxOrderAmount: `${target.value.MaxOrderAmount}`,
+    MaxUserAmount: `${target.value.MaxUserAmount}`,
+    MinOrderDuration: target.value.MinOrderDuration,
+    MaxOrderDuration: target.value.MaxOrderDuration,
     TechnicalFeeRatio: target.value.TechnicalFeeRatio?.toString(),
     ElectricityFeeRatio: target.value.ElectricityFeeRatio?.toString(),
     ProductPage: target.value?.ProductPage,
@@ -283,7 +294,6 @@ const updateTarget = computed(() => {
     EnableSetCommission: target.value?.EnableSetCommission,
     CancelMode: target.value?.CancelMode,
     CancellableBeforeStart: target.value?.CancellableBeforeStart,
-    DailyRewardAmount: target.value?.DailyRewardAmount?.length > 0 ? target.value?.DailyRewardAmount : undefined as unknown as string,
     ServiceStartAt: target.value.ServiceStartAt === 0 ? undefined as unknown as number : target.value.ServiceStartAt
     // SaleStartAt: target.value.SaleStartAt,
     // SaleEndAt: target.value.SaleEndAt
@@ -341,6 +351,12 @@ const columns = computed(() => [
     field: (row: good.Good) => row.ID
   },
   {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: good.Good) => row.EntID
+  },
+  {
     name: 'Title',
     label: t('MSG_GOOD_NAME'),
     sortable: true,
@@ -354,15 +370,21 @@ const columns = computed(() => [
   },
   {
     name: 'GOODPRICE',
-    label: t('MSG_GOOD_PRICE'),
+    label: t('MSG_GOOD_UNIT_PRICE'),
     sortable: true,
-    field: (row: good.Good) => row.Price
+    field: (row: good.Good) => row.UnitPrice
   },
   {
-    name: 'GOODUNIT',
+    name: 'GOODQUANTITYUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: good.Good) => t(row.Unit)
+    field: (row: good.Good) => t(row.QuantityUnit)
+  },
+  {
+    name: 'GOODQUANTITYUNITAMOUNT',
+    label: t('MSG_GOOD_UNIT'),
+    sortable: true,
+    field: (row: good.Good) => t(row.QuantityUnitAmount)
   },
   {
     name: 'GOODTOTAL',
@@ -411,6 +433,36 @@ const columns = computed(() => [
     label: t('MSG_STARTAT'),
     sortable: true,
     field: (row: good.Good) => utils.formatTime(row.StartAt)
+  },
+  {
+    name: 'UNITTYPE',
+    label: t('MSG_UNIT_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.UnitType
+  },
+  {
+    name: 'QUANTITYCALCULATETYPE',
+    label: t('MSG_QUANTITY_CALCULATE_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.QuantityCalculateType
+  },
+  {
+    name: 'DURATIONTYPE',
+    label: t('MSG_DURATION_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.DurationType
+  },
+  {
+    name: 'DURATIONCALCULATETYPE',
+    label: t('MSG_DURATION_CALCULATE_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.DurationCalculateType
+  },
+  {
+    name: 'SETTLEMENTTYPE',
+    label: t('MSG_SETTLEMENT_TYPE'),
+    sortable: true,
+    field: (row: good.Good) => row.SettlementType
   }
 ])
 
@@ -420,6 +472,12 @@ const appGoodsColumns = computed(() => [
     label: t('MSG_ID'),
     sortable: true,
     field: (row: appgood.Good) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: appgood.Good) => row.EntID
   },
   {
     name: 'GOODID',
@@ -452,16 +510,28 @@ const appGoodsColumns = computed(() => [
     field: (row: appgood.Good) => row.Visible
   },
   {
-    name: 'GOODPRICE',
+    name: 'GOODUNITPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: appgood.Good) => row.Price
+    field: (row: appgood.Good) => row.UnitPrice
   },
   {
-    name: 'GOODUNIT',
+    name: 'GOODPACKAGEPRICE',
+    label: t('MSG_GOOD_PRICE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.PackagePrice
+  },
+  {
+    name: 'GOODQUANTITYUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: appgood.Good) => t(row.Unit)
+    field: (row: appgood.Good) => t(row.QuantityUnit)
+  },
+  {
+    name: 'GOODQUANTITYUNITAMOUNT',
+    label: t('MSG_GOOD_UNIT'),
+    sortable: true,
+    field: (row: appgood.Good) => t(row.QuantityUnitAmount)
   },
   {
     name: 'GOODTOTAL',
@@ -504,6 +574,42 @@ const appGoodsColumns = computed(() => [
     label: t('MSG_STARTAT'),
     sortable: true,
     field: (row: appgood.Good) => utils.formatTime(row.StartAt)
+  },
+  {
+    name: 'UNITTYPE',
+    label: t('MSG_UNIT_TYPE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.UnitType
+  },
+  {
+    name: 'QUANTITYCALCULATETYPE',
+    label: t('MSG_QUANTITY_CALCULATE_TYPE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.QuantityCalculateType
+  },
+  {
+    name: 'DURATIONTYPE',
+    label: t('MSG_DURATION_TYPE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.DurationCalculateType
+  },
+  {
+    name: 'DURATIONCALCULATETYPE',
+    label: t('MSG_DURATION_CALCULATE_TYPE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.DurationType
+  },
+  {
+    name: 'PACKAGEWITHREQUIREDS',
+    label: t('MSG_PACKAGE_WITH_REQUIREDS'),
+    sortable: true,
+    field: (row: appgood.Good) => row.PackageWithRequireds
+  },
+  {
+    name: 'SETTLEMENTTYPE',
+    label: t('MSG_SETTLEMENT_TYPE'),
+    sortable: true,
+    field: (row: appgood.Good) => row.SettlementType
   }
 ])
 </script>

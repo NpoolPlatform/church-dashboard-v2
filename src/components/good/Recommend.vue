@@ -157,13 +157,13 @@ const appGoodsColumns = computed(() => [
     name: 'GOODPRICE',
     label: t('MSG_GOOD_PRICE'),
     sortable: true,
-    field: (row: appgood.Good) => row.Price
+    field: (row: appgood.Good) => row.UnitPrice
   },
   {
     name: 'GOODUNIT',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
-    field: (row: appgood.Good) => row.Unit
+    field: (row: appgood.Good) => row.QuantityUnit
   },
   {
     name: 'GOODTOTAL',

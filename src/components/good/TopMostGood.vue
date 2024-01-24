@@ -35,7 +35,8 @@
         <TopMostSelector :label='$t("MSG_TOP_MOST")' v-model:id='target.TopMostID' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Price' :label='$t("MSG_PRICE")' />
+        <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' />
+        <q-input v-model='target.PackagePrice' :label='$t("MSG_PACKAGE_PRICE")' />
       </q-card-section>
       <q-card-section>
         <q-select
@@ -193,10 +194,16 @@ const columns = computed(() => [
     field: (row: topmostgood.TopMostGood) => row.TopMostType
   },
   {
-    name: 'Price',
-    label: 'MSG_PRICE',
+    name: 'UnitPrice',
+    label: 'MSG_UNIT_PRICE',
     sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.Price
+    field: (row: topmostgood.TopMostGood) => row.UnitPrice
+  },
+  {
+    name: 'PackagePrice',
+    label: 'MSG_PACKAGE_PRICE',
+    sortable: true,
+    field: (row: topmostgood.TopMostGood) => row.PackagePrice
   },
   {
     name: 'Posters',
