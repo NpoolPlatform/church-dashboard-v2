@@ -59,9 +59,7 @@ const review = withdrawreview.useWithdrawReviewStore()
 const locale = _locale.useLocaleStore()
 const logined = user.useLocalUserStore()
 
-const displayReviews = computed(() => {
-  return review.reviews(AppID.value)
-})
+const displayReviews = computed(() => review.reviews())
 
 const showing = ref(false)
 const target = ref({} as withdrawreview.WithdrawReview)

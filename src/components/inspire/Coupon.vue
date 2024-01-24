@@ -35,22 +35,21 @@
         <!-- <AppUserSelector v-model:id='target.UserID' /> -->
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
-        <q-select :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
+        <q-select :disable='updating' :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
         <q-select :options='coupon.CouponConstraints' v-model='target.CouponConstraint' :label='$t("MSG_COUPON_CONSTRAINT")' />
         <q-input v-model='target.Denomination' :label='$t("MSG_DENOMINATION")' />
         <q-input v-model='target.Circulation' :label='$t("MSG_CIRCULATION")' />
         <q-input v-model.number='target.DurationDays' :label='$t("MSG_DURATION_DAYS")' />
         <q-input v-model='target.Threshold' :label='$t("MSG_THRESHOLD")' />
         <q-select :options='coupon.CouponScopes' v-model='target.CouponScope' :label='$t("MSG_COUPON_SCOPE")' />
+        <q-input v-model='target.CashableProbability' :label='$t("MSG_CASHABLE_PROBABILITY")' />
       </q-card-section>
       <q-card-section>
         <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
+        <DateTimePicker v-model:date='target.EndAt' label='MSG_END_AT' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.Random' :label='$t("MSG_RANDOM")' /></div>
-      </q-card-section>
-      <q-card-section v-if='target.CouponType === coupon.CouponType.SpecialOffer'>
-        <q-item-label>{{ $t('MSG_SPECIAL_OFFSET_NOT_IMPLEMENTED') }}</q-item-label>
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -59,6 +58,8 @@
     </q-card>
   </q-dialog>
   <CouponScope />
+  <CouponCoin />
+  <CashControl />
 </template>
 
 <script setup lang='ts'>
@@ -67,6 +68,8 @@ import { coupon, sdk, utils } from 'src/npoolstore'
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CouponScope = defineAsyncComponent(() => import('src/components/inspire/CouponScope.vue'))
+const CouponCoin = defineAsyncComponent(() => import('src/components/inspire/CouponCoin.vue'))
+const CashControl = defineAsyncComponent(() => import('src/components/inspire/CashControl.vue'))
 
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/npoolstore/sdk'
@@ -211,10 +214,22 @@ const columns = computed(() => [
     field: (row: coupon.Coupon) => row.Random
   },
   {
+    name: 'CashableProbability',
+    label: t('MSG_CASHABLE_PROBABILITY'),
+    sortable: true,
+    field: (row: coupon.Coupon) => row.CashableProbability
+  },
+  {
     name: 'StartAt',
     label: t('MSG_START_AT'),
     sortable: true,
     field: (row: coupon.Coupon) => utils.formatTime(row.StartAt)
+  },
+  {
+    name: 'EndAt',
+    label: t('MSG_END_AT'),
+    sortable: true,
+    field: (row: coupon.Coupon) => utils.formatTime(row.EndAt)
   },
   {
     name: 'CreatedAt',

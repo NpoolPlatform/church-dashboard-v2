@@ -53,6 +53,9 @@
           <q-toggle dense v-model='target.InvitationCodeMust' :label='$t("MSG_INVITATION_CODE_MUST")' />
         </div>
         <div>
+          <q-toggle dense v-model='target.CouponWithdrawEnable' :label='$t("MSG_COUPON_WITHDRAW_ENABLE")' />
+        </div>
+        <div>
           <q-toggle dense v-model='target.Maintaining' :label='$t("MSG_MAINTAINING")' />
         </div>
       </q-card-section>
@@ -142,6 +145,7 @@ const updateApp = (done: () => void) => {
     RecaptchaMethod: target.value.RecaptchaMethod,
     KycEnable: target.value.KycEnable,
     Maintaining: target.value.Maintaining,
+    CouponWithdrawEnable: target.value.CouponWithdrawEnable,
     CommitButtonTargets: commitButtonTargets.value?.split(','),
     SigninVerifyEnable: target.value.SigninVerifyEnable,
     InvitationCodeMust: target.value.InvitationCodeMust,
@@ -223,6 +227,12 @@ const columns = computed(() => [
     label: t('MSG_SIGNIN_VERIFY_ENABLE'),
     sortable: true,
     field: (row: app.App) => row.SigninVerifyEnable
+  },
+  {
+    name: 'CouponWithdrawEnable',
+    label: t('MSG_COUPON_WITHDRAW_ENABLE'),
+    sortable: true,
+    field: (row: app.App) => row.CouponWithdrawEnable
   },
   {
     name: 'CreatedBy',
