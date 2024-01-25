@@ -41,6 +41,7 @@
         <q-input v-model='commitButtonTargets' :label='$t("MSG_COMMIT_BUTTON_TARGETS")' />
         <q-select :options='appuserbase.RecaptchaTypes' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
         <q-select :options='appuserbase.CreateInvitationCodeWhens' v-model='target.CreateInvitationCodeWhen' :label='$t("MSG_CREATE_INVITATION_CODE_WHEN")' />
+        <q-select :options='appuserbase.ResetUserMethods' v-model='target.ResetUserMethod' :label='$t("MSG_RESET_USER_METHOD")' />
       </q-card-section>
       <q-card-section>
         <div>
@@ -95,14 +96,18 @@ const onRowClick = (row: app.App) => {
   showing.value = true
   updating.value = true
 }
+
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value.ResetUserMethod = appuserbase.ResetUserMethod.Normal
 }
+
 const onMenuHide = () => {
   showing.value = false
   target.value = {} as app.App
 }
+
 const onCancel = () => {
   onMenuHide()
 }
@@ -151,6 +156,7 @@ const updateApp = (done: () => void) => {
     InvitationCodeMust: target.value.InvitationCodeMust,
     CreateInvitationCodeWhen: target.value?.CreateInvitationCodeWhen,
     MaxTypedCouponsPerOrder: target.value?.MaxTypedCouponsPerOrder,
+    ResetUserMethod: target.value?.ResetUserMethod,
     Message: {
       Error: {
         Title: 'MSG_UPDATE_APP',
@@ -233,6 +239,12 @@ const columns = computed(() => [
     label: t('MSG_COUPON_WITHDRAW_ENABLE'),
     sortable: true,
     field: (row: app.App) => row.CouponWithdrawEnable
+  },
+  {
+    name: 'ResetUserMethod',
+    label: t('MSG_RESET_USER_METHOD'),
+    sortable: true,
+    field: (row: app.App) => row.ResetUserMethod
   },
   {
     name: 'CreatedBy',
