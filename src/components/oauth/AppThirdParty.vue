@@ -75,7 +75,7 @@ const thirdParty = oauththirdparty.useOAuthThirdPartyStore()
 const thirdParties = computed(() => thirdParty.OAuthThirdParties.map((el) => {
   return {
     label: el.ClientName,
-    value: el.ID
+    value: el.EntID
   }
 }))
 
@@ -142,10 +142,10 @@ const onMenuHide = () => {
 }
 
 const onSubmit = (done: () => void) => {
-  updating.value ? updateCoin(done) : createCoin(done)
+  updating.value ? updateCoin(done) : createAppOAuthThirdParty(done)
 }
 
-const createCoin = (done: () => void) => {
+const createAppOAuthThirdParty = (done: () => void) => {
   appThirdParty.createAppOAuthThirdParty({
     TargetAppID: AppID.value,
     ...target.value,
