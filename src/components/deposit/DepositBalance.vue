@@ -109,6 +109,48 @@
       </div>
     </template>
   </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_SIMULATE_GENERALS")'
+    :rows='displaySimulateGenerals'
+    row-key='ID'
+    :rows-per-page-options='[100]'
+    :columns='simulateGeneralColumns'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='simulateGeneralUsername'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_SIMULATE_DETAILS")'
+    :rows='displaySimulateDetails'
+    row-key='ID'
+    :rows-per-page-options='[100]'
+    :columns='(simulateDetailColumns as any)'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='simulateDetailUsername'
+          :label='$t("MSG_USERNAME")'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -144,7 +186,7 @@ import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import saveAs from 'file-saver'
 import { getAppDepositAccounts } from 'src/api/account'
-import { ledgerstatement, utils, ledger, notify, appcoin, useraccount, useraccountbase, user, app, accountbase } from 'src/npoolstore'
+import { ledgerstatement, simulateledgerstatement, utils, ledger, simulateledger, notify, appcoin, useraccount, useraccountbase, user, app, accountbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -202,6 +244,7 @@ watch(AppID, () => {
 })
 
 const statement = ledgerstatement.useStatementStore()
+const simulatestatement = simulateledgerstatement.useStatementStore()
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
@@ -241,6 +284,8 @@ const reset = () => {
   getAppGenerals(0, 100)
   getAppDetails(0, 100)
   getAppDepositAccounts(0, 100)
+  getAppSimulateGenerals(0, 100)
+  getAppSimulateDetails(0, 100)
 }
 
 const onCancel = () => {
@@ -268,10 +313,21 @@ const displayDetails = computed(() => statement.statements(AppID.value).filter((
   return el.EmailAddress?.includes(detailUsername.value) || el.PhoneNO?.includes(detailUsername.value)
 }))
 
+const simulateDetailUsername = ref('')
+const displaySimulateDetails = computed(() => simulatestatement.statements(AppID.value).filter((el) => {
+  return el.EmailAddress?.includes(simulateDetailUsername.value) || el.PhoneNO?.includes(simulateDetailUsername.value)
+}))
+
 const generalUsername = ref('')
 const general = ledger.useLedgerStore()
 const displayGenerals = computed(() => general.ledgers(AppID.value).filter((el) => {
   return el.EmailAddress?.includes(generalUsername.value) || el.PhoneNO?.includes(generalUsername.value)
+}))
+
+const simulateGeneralUsername = ref('')
+const simulategeneral = simulateledger.useLedgerStore()
+const displaySimulateGenerals = computed(() => simulategeneral.ledgers(AppID.value).filter((el) => {
+  return el.EmailAddress?.includes(simulateGeneralUsername.value) || el.PhoneNO?.includes(simulateGeneralUsername.value)
 }))
 
 const accountUsername = ref('')
@@ -411,6 +467,14 @@ const prepare = () => {
   if (!accounts.value.length) {
     getAppDepositAccounts(0, 100)
   }
+  console.log('aaaaaaaaaaaaa')
+  if (!simulatestatement.statements(AppID.value).length) {
+    console.log('bbbbbbbbbbbbbbbbb')
+    getAppSimulateDetails(0, 100)
+  }
+  if (!simulategeneral.ledgers(AppID.value).length) {
+    getAppSimulateGenerals(0, 100)
+  }
 }
 
 watch(AppID, () => {
@@ -452,6 +516,20 @@ const getAppGenerals = (offset: number, limit: number) => {
   })
 }
 
+const getAppSimulateGenerals = (offset: number, limit: number) => {
+  simulategeneral.getAppLedgers({
+    TargetAppID: AppID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {}
+  }, (error: boolean, rows?: Array<simulateledger.Ledger>) => {
+    if (error || !rows?.length) {
+      return
+    }
+    getAppSimulateGenerals(offset + limit, limit)
+  })
+}
+
 const getAppDetails = (offset: number, limit: number) => {
   statement.getAppStatements({
     TargetAppID: AppID.value,
@@ -465,6 +543,22 @@ const getAppDetails = (offset: number, limit: number) => {
       return
     }
     getAppDetails(offset + limit, limit)
+  })
+}
+
+const getAppSimulateDetails = (offset: number, limit: number) => {
+  simulatestatement.getAppStatements({
+    TargetAppID: AppID.value,
+    Offset: offset,
+    Limit: limit,
+    Message: {
+      Error: {}
+    }
+  }, (error: boolean, rows?: Array<ledgerstatement.Statement>) => {
+    if (error || !rows?.length) {
+      return
+    }
+    getAppSimulateDetails(offset + limit, limit)
   })
 }
 
@@ -543,6 +637,70 @@ const generalColumns = computed(() => [
   }
 ])
 
+
+const simulateGeneralColumns = computed(() => [
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.CoinTypeID
+  },
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.CoinName
+  },
+  {
+    name: 'CoinUnit',
+    label: t('MSG_COIN_UNIT'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.CoinUnit
+  },
+  {
+    name: 'Incoming',
+    label: t('MSG_INCOMING'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.Incoming
+  },
+  {
+    name: 'Outcoming',
+    label: t('MSG_OUT_COMING'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.Outcoming
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.UserID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.PhoneNO
+  },
+  {
+    name: 'CoinDisabled',
+    label: t('MSG_COIN_DISABLE'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.CoinDisabled
+  },
+  {
+    name: 'CoinDisplay',
+    label: t('MSG_COIN_DISPLAY'),
+    sortable: true,
+    field: (row: simulateledger.Ledger) => row.CoinDisplay
+  }
+])
+
 const detailColumns = computed(() => [
   {
     name: 'CoinTypeID',
@@ -604,6 +762,76 @@ const detailColumns = computed(() => [
     label: t('MSG_PHONE_NO'),
     sortable: true,
     field: (row: ledgerstatement.Statement) => row.PhoneNO
+  }
+])
+
+const simulateDetailColumns = computed(() => [
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.CoinTypeID
+  },
+  {
+    name: 'CoinName',
+    label: t('MSG_COIN_NAME'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.CoinName
+  },
+  {
+    name: 'CoinUnit',
+    label: t('MSG_COIN_UNIT'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.CoinUnit
+  },
+  {
+    name: 'IOType',
+    label: t('MSG_IO_TYPE'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.IOType
+  },
+  {
+    name: 'IOSubType',
+    label: t('MSG_IO_SUB_TYPE'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.IOSubType
+  },
+  {
+    name: 'Amount',
+    label: t('MSG_AMOUNT'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.Amount
+  },
+  {
+    name: 'IOExtra',
+    align: 'left',
+    label: t('MSG_IO_EXTRA'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.IOExtra
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.UserID
+  },
+  {
+    name: 'EmailAddress',
+    label: t('MSG_EMAIL_ADDRESS'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.EmailAddress
+  },
+  {
+    name: 'PhoneNO',
+    label: t('MSG_PHONE_NO'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.PhoneNO
+  },
+  {
+    name: 'Cashable',
+    label: t('MSG_CASHABLE'),
+    sortable: true,
+    field: (row: simulateledgerstatement.Statement) => row.Cashable
   }
 ])
 

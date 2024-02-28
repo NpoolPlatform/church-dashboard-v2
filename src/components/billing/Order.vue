@@ -16,6 +16,7 @@
           {{ value }}
         </option>
       </select>
+      <q-toggle dense v-model='showSimulate' :label='$t("MSG_SHOW_SIMULATE")' size='xs' />
       <q-input
         dense
         class='small'
@@ -109,6 +110,8 @@ const end = ref('')
 const selectedOrderType = ref('ALL')
 const good = appgood.useAppGoodStore()
 
+const showSimulate = ref(false)
+
 const displayOrders = computed(() => sdk.orders.value.filter((el) => {
   let display = el.GoodID.includes(goodID.value)
   if (start.value.length) {
@@ -120,6 +123,7 @@ const displayOrders = computed(() => sdk.orders.value.filter((el) => {
   if (selectedOrderType.value !== 'ALL') {
     display = display && (el.OrderType === selectedOrderType.value)
   }
+  display = display && (el.Simulate === showSimulate.value)
   return display
 }))
 

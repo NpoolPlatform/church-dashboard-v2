@@ -174,6 +174,7 @@
     </q-card>
   </q-dialog>
   <AppDefaultGood />
+  <AppSimulateGood />
 </template>
 
 <script setup lang='ts'>
@@ -189,6 +190,7 @@ const { t } = useI18n({ useScope: 'global' })
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const AppDefaultGood = defineAsyncComponent(() => import('src/components/good/AppDefaultGood.vue'))
+const AppSimulateGood = defineAsyncComponent(() => import('src/components/good/AppSimulateGood.vue'))
 
 const _good = good.useGoodStore()
 const goods = computed(() => _good.goods())

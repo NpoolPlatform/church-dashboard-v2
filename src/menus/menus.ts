@@ -749,6 +749,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '模拟订单配置',
+        caption: '模拟订单配置',
+        icon: 'format_list_numbered',
+        target: '/order/simulateconfig',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
