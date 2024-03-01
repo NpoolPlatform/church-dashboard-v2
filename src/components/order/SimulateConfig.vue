@@ -7,6 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     :columns='columns'
+    selection='single'
+    v-model:selected='selectedSimulate'
     @row-click='(evt, row, index) => onRowClick(row as simulateconfig.SimulateConfig)'
   >
     <template #top-right>
@@ -17,6 +19,16 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+      </div>
+      <div class='row indent flat'>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedSimulate.length === 0'
         />
       </div>
     </template>
@@ -103,14 +115,14 @@ const onDelete = () => {
     EntID: selectedSimulate.value[0].EntID,
     Message: {
       Error: {
-        Title: 'MSG_DELETE_APP_SIMULATE_GOOD',
-        Message: 'MSG_DELETE_APP_SIMULATE_GOOD_FAIL',
+        Title: 'MSG_DELETE_APP_SIMULATE_CONFIG',
+        Message: 'MSG_DELETE_APP_SIMULATE_CONFIG_FAIL',
         Popup: true,
         Type: notify.NotifyType.Error
       },
       Info: {
-        Title: 'MSG_DELETE_APP_SIMULATE_GOOD',
-        Message: 'MSG_DELETE_APP_SIMULATE_GOOD_FAIL',
+        Title: 'MSG_DELETE_APP_SIMULATE_CONFIG',
+        Message: 'MSG_DELETE_APP_SIMULATE_CONFIG_FAIL',
         Popup: true,
         Type: notify.NotifyType.Success
       }

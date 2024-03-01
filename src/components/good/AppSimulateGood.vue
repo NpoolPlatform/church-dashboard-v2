@@ -5,9 +5,9 @@
     :title='$t("MSG_APP_SIMULATE_GOODS")'
     :rows='sdk.simulateGoods.value'
     row-key='ID'
-    selection='single'
     :rows-per-page-options='[100]'
     :columns='appSimulateGoodsColumns'
+    selection='single'
     v-model:selected='selectedSimulate'
     @row-click='(evt, row, index) => onRowClick(row as appsimulategood.Simulate)'
   >
