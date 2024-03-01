@@ -637,7 +637,6 @@ const generalColumns = computed(() => [
   }
 ])
 
-
 const simulateGeneralColumns = computed(() => [
   {
     name: 'CoinTypeID',
