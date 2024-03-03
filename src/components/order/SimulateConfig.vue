@@ -48,9 +48,6 @@
         <q-input v-model='target.CashableProfitProbability' :label='$t("MSG_CASHABLE_PROFIT_PROBABILITY")' />
       </q-card-section>
       <q-card-section>
-        <div><q-toggle dense v-model='target.EnabledCashableProfit' :label='$t("MSG_ENABLED_CASHABLE_PROFIT")' /></div>
-      </q-card-section>
-      <q-card-section>
         <div><q-toggle dense v-model='target.Enabled' :label='$t("MSG_ENABLED")' /></div>
       </q-card-section>
       <q-item class='row'>
@@ -188,12 +185,6 @@ const columns = computed(() => [
     label: t('MSG_SEND_COUPON_PROBABILITY'),
     sortable: true,
     field: (row: simulateconfig.SimulateConfig) => row.SendCouponProbability
-  },
-  {
-    name: 'EnabledCashableProfit',
-    label: t('MSG_ENABLED_CASHABLE_PROFIT'),
-    sortable: true,
-    field: (row: simulateconfig.SimulateConfig) => row.EnabledCashableProfit
   },
   {
     name: 'CashableProfitProbability',
