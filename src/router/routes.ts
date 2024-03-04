@@ -709,6 +709,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'order/simulateconfig',
+        component: () => import('src/pages/order/SimulateConfig.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'deposit/balance',
         component: () => import('src/pages/deposit/DepositBalance.vue'),
         meta: {
