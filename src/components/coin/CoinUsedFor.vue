@@ -48,7 +48,10 @@
         <span>{{ $t('MSG_COIN_USED_FOR') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppCoinPicker v-model:id='target.CoinTypeID' />
+        <CoinPicker v-model:id='target.CoinTypeID' />
+      </q-card-section>
+      <q-card-section>
+        <q-select :options='coinusedfor.CoinUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -66,7 +69,7 @@ import { AppID } from 'src/npoolstore/sdk'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const _coinusedfor = coinusedfor.useCoinUsedForStore()
