@@ -2,13 +2,13 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_COUPON_COIN")'
-    :rows='displayCouponCoins'
+    :title='$t("MSG_COIN_USED_FOR")'
+    :rows='displayCoinUsedFors'
     row-key='ID'
     :rows-per-page-options='[100]'
     selection='single'
     :columns='columns'
-    v-model:selected='selectedCouponCoins'
+    v-model:selected='selectedCoinUsedFors'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -25,7 +25,7 @@
         flat
         class='btn flat'
         :label='$t("MSG_DELETE")'
-        :disable='selectedCouponCoins?.length === 0'
+        :disable='selectedCoinUsedFors?.length === 0'
         @click='onDelete'
       />
       <q-btn
@@ -45,7 +45,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_COUPON_COIN') }}</span>
+        <span>{{ $t('MSG_COIN_USED_FOR') }}</span>
       </q-card-section>
       <q-card-section>
         <AppCoinPicker v-model:id='target.CoinTypeID' />
@@ -60,7 +60,7 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { couponcoin, sdk, utils } from 'src/npoolstore'
+import { coinusedfor, sdk, utils } from 'src/npoolstore'
 import { useI18n } from 'vue-i18n'
 import { AppID } from 'src/npoolstore/sdk'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -69,32 +69,31 @@ const { t } = useI18n({ useScope: 'global' })
 const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const _couponcoin = couponcoin.useCouponCoinStore()
+const _coinusedfor = coinusedfor.useCoinUsedForStore()
 const username = ref('')
-const couponcoins = computed(() => _couponcoin.couponcoins())
-const displayCouponCoins = computed(() => _couponcoin.couponcoins().filter((el) => {
+const coinusedfors = computed(() => _coinusedfor.coins())
+const displayCoinUsedFors = computed(() => _coinusedfor.coins().filter((el) => {
   return el.CoinTypeID?.includes(username.value) ||
              el.CoinName?.includes(username.value)
 }))
 
-const target = ref({} as couponcoin.CouponCoin)
+const target = ref({} as coinusedfor.CoinUsedFor)
 const showing = ref(false)
 
 const onCreate = () => {
-  target.value = {} as couponcoin.CouponCoin
+  target.value = {} as coinusedfor.CoinUsedFor
   showing.value = true
 }
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as couponcoin.CouponCoin
+  target.value = {} as coinusedfor.CoinUsedFor
 }
 const onCancel = () => {
   onMenuHide()
 }
 
 const onSubmit = (done: () => void) => {
-  target.value.AppID = AppID.value
-  sdk.createCouponCoin(target.value, (error: boolean) => {
+  sdk.createCoinUsedFor(target.value, (error: boolean) => {
     done()
     if (error) {
       return
@@ -103,22 +102,22 @@ const onSubmit = (done: () => void) => {
   })
 }
 
-const selectedCouponCoins = ref([] as Array<couponcoin.CouponCoin>)
+const selectedCoinUsedFors = ref([] as Array<coinusedfor.CoinUsedFor>)
 const onDelete = () => {
-  sdk.deleteCouponCoin(selectedCouponCoins.value?.[0], () => {
+  sdk.deleteCoinUsedFor(selectedCoinUsedFors.value?.[0], () => {
     // TODO
   })
 }
 
 watch(AppID, () => {
-  if (!couponcoins.value?.length) {
-    sdk.getCouponCoins(0, 0)
+  if (!coinusedfors.value?.length) {
+    sdk.getCoinUsedFors(0, 0)
   }
 })
 
 onMounted(() => {
-  if (!couponcoins.value?.length) {
-    sdk.getCouponCoins(0, 0)
+  if (!coinusedfors.value?.length) {
+    sdk.getCoinUsedFors(0, 0)
   }
 })
 
@@ -127,55 +126,49 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.ID
+    field: (row: coinusedfor.CoinUsedFor) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.EntID
+    field: (row: coinusedfor.CoinUsedFor) => row.EntID
   },
   {
-    name: 'AppID',
-    label: t('MSG_APP_ID'),
+    name: 'UsedFor',
+    label: t('MSG_USED_FOR'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.AppID
-  },
-  {
-    name: 'AppName',
-    label: t('MSG_APP_NAME'),
-    sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.AppName
+    field: (row: coinusedfor.CoinUsedFor) => row.UsedFor
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.CoinTypeID
+    field: (row: coinusedfor.CoinUsedFor) => row.CoinTypeID
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.CoinName
+    field: (row: coinusedfor.CoinUsedFor) => row.CoinName
   },
   {
     name: 'CoinENV',
     label: t('MSG_COIN_ENV'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => row.CoinENV
+    field: (row: coinusedfor.CoinUsedFor) => row.CoinENV
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => utils.formatTime(row.CreatedAt)
+    field: (row: coinusedfor.CoinUsedFor) => utils.formatTime(row.CreatedAt)
   },
   {
     name: 'UpdatedAt',
     label: t('MSG_UPDATED_AT'),
     sortable: true,
-    field: (row: couponcoin.CouponCoin) => utils.formatTime(row.UpdatedAt)
+    field: (row: coinusedfor.CoinUsedFor) => utils.formatTime(row.UpdatedAt)
   }
 ])
 

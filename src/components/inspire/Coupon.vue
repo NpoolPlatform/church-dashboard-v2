@@ -68,7 +68,6 @@ import { coupon, sdk, utils } from 'src/npoolstore'
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CouponScope = defineAsyncComponent(() => import('src/components/inspire/CouponScope.vue'))
-const CouponCoin = defineAsyncComponent(() => import('src/components/inspire/CouponCoin.vue'))
 const CashControl = defineAsyncComponent(() => import('src/components/inspire/CashControl.vue'))
 
 import { useI18n } from 'vue-i18n'
