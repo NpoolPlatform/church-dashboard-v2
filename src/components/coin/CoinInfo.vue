@@ -80,6 +80,7 @@
       </q-item>
     </q-card>
   </q-dialog>
+  <CoinUsedFor />
 </template>
 
 <script setup lang='ts'>
@@ -88,6 +89,7 @@ import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { coin, notify, basetypes, chain } from 'src/npoolstore'
 
 const Chain = defineAsyncComponent(() => import('src/components/coin/Chain.vue'))
+const CoinUsedFor = defineAsyncComponent(() => import('src/components/coin/CoinUsedFor.vue'))
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
 const CoinPickerByName = defineAsyncComponent(() => import('src/components/coin/CoinPickerByName.vue'))
 const ChainPicker = defineAsyncComponent(() => import('src/components/coin/ChainPicker.vue'))
