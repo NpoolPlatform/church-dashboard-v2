@@ -68,6 +68,7 @@
         <q-input v-model='target.ThresholdAmount' :label='$t("MSG_THRESHOLD")' suffix='$' />
         <q-input v-model='target.Invites' :label='$t("MSG_INVITES")' />
         <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
+        <q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLED")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -96,6 +97,7 @@
         <q-input v-model='target2.ThresholdAmount' :label='$t("MSG_THRESHOLD")' suffix='$' />
         <q-input v-model='target2.Invites' :label='$t("MSG_INVITES")' />
         <DateTimePicker v-model:date='target2.StartAt' label='MSG_START_AT' />
+        <q-toggle dense v-model='target2.Disabled' :label='$t("MSG_DISABLED")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit2' />
@@ -431,6 +433,12 @@ const columns = computed(() => [
     field: (row: appcommissionconfig.AppCommissionConfig) => row.EndAt === 0 ? row.EndAt : utils.formatTime(row.EndAt)
   },
   {
+    name: 'Disabled',
+    label: t('MSG_DISABLED'),
+    sortable: true,
+    field: (row: appcommissionconfig.AppCommissionConfig) => row.Disabled
+  },
+  {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
@@ -534,6 +542,12 @@ const columns2 = computed(() => [
     label: t('MSG_END_AT'),
     sortable: true,
     field: (row: appgoodcommissionconfig.AppGoodCommissionConfig) => row.EndAt === 0 ? row.EndAt : utils.formatTime(row.EndAt)
+  },
+  {
+    name: 'Disabled',
+    label: t('MSG_DISABLED'),
+    sortable: true,
+    field: (row: appgoodcommissionconfig.AppGoodCommissionConfig) => row.Disabled
   },
   {
     name: 'CreatedAt',
