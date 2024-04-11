@@ -39,6 +39,7 @@
         <q-select :options='inspireappconfig.SettleAmountTypes' v-model='target.SettleAmountType' :label='$t("MSG_COMMISSION_SETTLE_AMOUNT_TYPE")' />
         <q-select :options='inspireappconfig.SettleIntervals' v-model='target.SettleInterval' :label='$t("MSG_COMMISSION_SETTLE_INTERVAL")' />
         <q-select :options='inspireappconfig.CommissionTypes' v-model='target.CommissionType' :label='$t("MSG_COMMISSION_TYPE")' />
+        <q-input v-model='target.MaxLevelCount' :label='$t("MSG_MAX_LEVEL_COUNT")' />
       </q-card-section>
       <q-card-section v-if='!updating'>
         <q-toggle dense v-model='target.SettleBenefit' :label='$t("MSG_SETTLE_BENEFIT")' />
@@ -250,6 +251,12 @@ const columns = computed(() => [
     label: t('MSG_SETTLE_BENEFIT'),
     sortable: true,
     field: (row: inspireappconfig.AppConfig) => row.SettleBenefit
+  },
+  {
+    name: 'MaxLevelCount',
+    label: t('MSG_MAX_LEVEL_COUNT'),
+    sortable: true,
+    field: (row: inspireappconfig.AppConfig) => row.MaxLevelCount
   },
   {
     name: 'StartAt',

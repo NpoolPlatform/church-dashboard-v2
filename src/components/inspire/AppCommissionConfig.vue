@@ -65,6 +65,7 @@
         <q-input v-model='target.AmountOrPercent' :label='$t("MSG_AMOUNT_OR_PERCENT")' suffix='$ | %' />
       </q-card-section>
       <q-card-section>
+        <q-input v-model='target.Level' :label='$t("MSG_LEVEL")' />
         <q-input v-model='target.ThresholdAmount' :label='$t("MSG_THRESHOLD")' suffix='$' />
         <q-input v-model='target.Invites' :label='$t("MSG_INVITES")' />
         <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
@@ -94,6 +95,7 @@
         <q-input v-model='target2.AmountOrPercent' :label='$t("MSG_AMOUNT_OR_PERCENT")' suffix='$ | %' />
       </q-card-section>
       <q-card-section>
+        <q-input v-model='target2.Level' :label='$t("MSG_LEVEL")' />
         <q-input v-model='target2.ThresholdAmount' :label='$t("MSG_THRESHOLD")' suffix='$' />
         <q-input v-model='target2.Invites' :label='$t("MSG_INVITES")' />
         <DateTimePicker v-model:date='target2.StartAt' label='MSG_START_AT' />
@@ -403,6 +405,12 @@ const columns = computed(() => [
     field: (row: appcommissionconfig.AppCommissionConfig) => row.SettleType
   },
   {
+    name: 'Level',
+    label: t('MSG_LEVEL'),
+    sortable: true,
+    field: (row: appcommissionconfig.AppCommissionConfig) => row.Level
+  },
+  {
     name: 'AmountOrPercent',
     label: t('MSG_AMOUNT_OR_PERCENT'),
     sortable: true,
@@ -512,6 +520,12 @@ const columns2 = computed(() => [
     label: t('MSG_COIN_LOGO'),
     sortable: true,
     field: (row: appgoodcommissionconfig.AppGoodCommissionConfig) => row.CoinLogo
+  },
+  {
+    name: 'Level',
+    label: t('MSG_LEVEL'),
+    sortable: true,
+    field: (row: appgoodcommissionconfig.AppGoodCommissionConfig) => row.Level
   },
   {
     name: 'AmountOrPercent',

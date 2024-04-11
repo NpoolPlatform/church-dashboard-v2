@@ -60,14 +60,6 @@
           <q-toggle dense v-model='target.Maintaining' :label='$t("MSG_MAINTAINING")' />
         </div>
       </q-card-section>
-      <q-card-section v-if='!updating'>
-        <q-select :options='inspireappconfig.SettleModes' v-model='target.SettleMode' :label='$t("MSG_COMMISSION_SETTLE_MODE")' />
-        <q-select :options='inspireappconfig.SettleAmountTypes' v-model='target.SettleAmountType' :label='$t("MSG_COMMISSION_SETTLE_AMOUNT_TYPE")' />
-        <q-select :options='inspireappconfig.SettleIntervals' v-model='target.SettleInterval' :label='$t("MSG_COMMISSION_SETTLE_INTERVAL")' />
-        <q-select :options='inspireappconfig.CommissionTypes' v-model='target.CommissionType' :label='$t("MSG_COMMISSION_TYPE")' />
-        <q-toggle dense v-model='target.SettleBenefit' :label='$t("MSG_SETTLE_BENEFIT")' />
-        <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' />
-      </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_AUTHORIZE")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
@@ -79,13 +71,12 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { user, notify, app, appuserbase, inspireappconfig } from 'src/npoolstore'
+import { user, notify, app, appuserbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 
 const _app = app.useApplicationStore()
 const apps = computed(() => _app.apps())
