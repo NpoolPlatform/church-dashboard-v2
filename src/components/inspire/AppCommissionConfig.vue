@@ -121,7 +121,6 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import { appcommissionconfig, appgoodcommissionconfig, notify, utils } from 'src/npoolstore'
-import { ELOOP } from 'constants'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
