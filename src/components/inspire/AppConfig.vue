@@ -111,7 +111,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const updateAppConfig = (done: () => void) => {
-  _appconfig.updateNAppConfig({
+  _appconfig.adminUpdateAppConfig({
     TargetAppID: AppID.value,
     ...target.value,
     Message: {
@@ -138,7 +138,7 @@ const updateAppConfig = (done: () => void) => {
 }
 
 const createAppConfig = (done: () => void) => {
-  _appconfig.createNAppConfig({
+  _appconfig.adminCreateAppConfig({
     TargetAppID: AppID.value,
     ...target.value,
     Message: {
@@ -181,7 +181,7 @@ watch(AppID, () => {
 })
 
 const getAppCommissions = (offset: number, limit: number) => {
-  _appconfig.getNAppConfigs({
+  _appconfig.adminGetAppConfigs({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,

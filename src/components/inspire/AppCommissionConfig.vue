@@ -216,7 +216,7 @@ const onSubmit2 = (done: () => void) => {
 }
 
 const updateAppCommissionConfig = (done: () => void) => {
-  _commconfig.updateNAppCommissionConfig({
+  _commconfig.adminUpdateAppCommissionConfig({
     TargetAppID: AppID.value,
     ...target.value,
     Message: {
@@ -242,7 +242,7 @@ const updateAppCommissionConfig = (done: () => void) => {
   })
 }
 const createAppCommissionConfig = (done: () => void) => {
-  _commconfig.createNAppCommissionConfig({
+  _commconfig.adminCreateAppCommissionConfig({
     TargetAppID: AppID.value,
     ...target.value,
     Message: {
@@ -270,7 +270,7 @@ const createAppCommissionConfig = (done: () => void) => {
 }
 
 const updateAppGoodCommissionConfig = (done: () => void) => {
-  _commgoodconfig.updateNAppGoodCommissionConfig({
+  _commgoodconfig.adminUpdateAppGoodCommissionConfig({
     TargetAppID: AppID.value,
     ...target2.value,
     Message: {
@@ -296,7 +296,7 @@ const updateAppGoodCommissionConfig = (done: () => void) => {
   })
 }
 const createAppGoodCommissionConfig = (done: () => void) => {
-  _commgoodconfig.createNAppGoodCommissionConfig({
+  _commgoodconfig.adminCreateAppGoodCommissionConfig({
     TargetAppID: AppID.value,
     ...target2.value,
     Message: {
@@ -342,7 +342,7 @@ onMounted(() => {
 })
 
 const getAppCommissions = (offset: number, limit: number) => {
-  _commconfig.getNAppCommissionConfigs({
+  _commconfig.adminGetAppCommissionConfigs({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
@@ -365,7 +365,7 @@ const getAppCommissions = (offset: number, limit: number) => {
 }
 
 const getAppGoodCommissions = (offset: number, limit: number) => {
-  _commgoodconfig.getNAppGoodCommissionConfigs({
+  _commgoodconfig.adminGetAppGoodCommissionConfigs({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
