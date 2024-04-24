@@ -467,9 +467,7 @@ const prepare = () => {
   if (!accounts.value.length) {
     getAppDepositAccounts(0, 100)
   }
-  console.log('aaaaaaaaaaaaa')
   if (!simulatestatement.statements(AppID.value).length) {
-    console.log('bbbbbbbbbbbbbbbbb')
     getAppSimulateDetails(0, 100)
   }
   if (!simulategeneral.ledgers(AppID.value).length) {

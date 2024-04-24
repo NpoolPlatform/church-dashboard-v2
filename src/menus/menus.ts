@@ -656,6 +656,24 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '激励配置',
+      caption: '查看系统激励配置',
+      icon: 'format_list_numbered',
+      target: '/inspire/appconfig',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '系统佣金配置',
+      caption: '查看系统佣金配置',
+      icon: 'format_list_numbered',
+      target: '/inspire/commissionconfig',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
