@@ -798,7 +798,27 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
-  } as MenuItem
+  } as MenuItem, {
+    menuId: uid(),
+    label: '矿池',
+    caption: '授权矿池、管理矿池子账户等',
+    icon: 'pending',
+    target: '/miningpool',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '矿池信息',
+        caption: '展示矿池信息',
+        icon: 'perm_identity',
+        target: '/miningpool/pool',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  }as MenuItem
 ] as Array<MenuItem>
 
 export {
