@@ -816,6 +816,16 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
+        label: 'APP矿池管理',
+        caption: '授权矿池到APP',
+        icon: 'perm_identity',
+        target: '/miningpool/app/pool',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   }as MenuItem
