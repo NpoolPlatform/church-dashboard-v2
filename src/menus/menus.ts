@@ -819,6 +819,16 @@ const MainDrawerMenus = [
       } as MenuItem,
       {
         menuId: uid(),
+        label: '矿池币种信息',
+        caption: '展示币种信息',
+        icon: 'perm_identity',
+        target: '/miningpool/coin',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
         label: 'APP矿池管理',
         caption: '授权矿池到APP',
         icon: 'perm_identity',
