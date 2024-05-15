@@ -810,7 +810,7 @@ const MainDrawerMenus = [
       {
         menuId: uid(),
         label: '矿池信息',
-        caption: '展示矿池信息',
+        caption: '管理矿池信息',
         icon: 'perm_identity',
         target: '/miningpool/pool',
         level: 1,
@@ -820,9 +820,19 @@ const MainDrawerMenus = [
       {
         menuId: uid(),
         label: '矿池币种信息',
-        caption: '展示币种信息',
+        caption: '管理币种信息',
         icon: 'perm_identity',
         target: '/miningpool/coin',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      }as MenuItem,
+      {
+        menuId: uid(),
+        label: '矿池提币规则',
+        caption: '管理提币规则',
+        icon: 'perm_identity',
+        target: '/miningpool/fractionrule',
         level: 1,
         sectionBegin: false,
         children: []

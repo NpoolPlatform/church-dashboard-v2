@@ -781,6 +781,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'miningpool/fractionrule',
+        component: () => import('src/pages/miningpool/FractionRule.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'miningpool/app/pool',
         component: () => import('src/pages/miningpool/AppPool.vue'),
         meta: {

@@ -2,12 +2,12 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_MININGPOOLS")'
-    :rows='devices'
-    :columns='poolColums'
+    :title='$t("MSG_MININGPOOL_FRACTIONRULES")'
+    :rows='fractionrules'
+    :columns='columns'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as miningpoolpool.Pool)'
+    @row-click='(evt, row, index) => onRowClick(row as miningpoolfractionrule.FractionRule)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -28,14 +28,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_MININGPOOL') }}</span>
+        <span>{{ $t('MSG_MININGPOOL_FRACTIONRULE') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select v-if='!updating' :options='miningpoolbase.MiningpoolTypes' v-model='target.MiningpoolType' :label='$t("MSG_MININGPOOL_TYPE")' />
-        <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
-        <q-input v-model='target.Site' :label='$t("MSG_SITE")' />
-        <q-input v-model='target.Logo' :label='$t("MSG_LOGO")' />
-        <q-input v-model='target.Description' :label='$t("MSG_DESCRIPTION")' />
+        <CoinPicker v-if='!updating' v-model:id='target.PoolCoinTypeID' :label='$t("MSG_POOLCOINTYPEID")' />
+        <q-input type='number' v-model='target.WithdrawInterval' :label='$t("MSG_WITHDRAWINTERVAL")' />
+        <q-input v-model='target.MinAmount' :label='$t("MSG_MINAMOUNT")' />
+        <q-input v-model='target.WithdrawRate' :label='$t("MSG_WITHDRAWRATE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -48,17 +47,19 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { miningpoolpool, miningpoolbase, notify } from 'src/npoolstore'
+import { miningpoolfractionrule, notify } from 'src/npoolstore'
+
+const CoinPicker = defineAsyncComponent(() => import('src/components/miningpool/CoinPicker.vue'))
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const poolInfo = miningpoolpool.useMiningpoolPoolStore()
-const devices = computed(() => poolInfo.pools())
+const fractionruleInfo = miningpoolfractionrule.useMiningpoolFractionRuleStore()
+const fractionrules = computed(() => fractionruleInfo.fractionrules())
 
-const target = ref({} as miningpoolpool.Pool)
+const target = ref({} as miningpoolfractionrule.FractionRule)
 const showing = ref(false)
 const updating = ref(false)
 
@@ -67,7 +68,7 @@ const onCreate = () => {
   showing.value = true
 }
 
-const onRowClick = (row: miningpoolpool.Pool) => {
+const onRowClick = (row: miningpoolfractionrule.FractionRule) => {
   updating.value = true
   showing.value = true
   target.value = { ...row }
@@ -75,7 +76,7 @@ const onRowClick = (row: miningpoolpool.Pool) => {
 
 const onSubmit = (done: () => void) => {
   showing.value = false
-  updating.value ? updatePool(done) : createPool(done)
+  updating.value ? updateFractionRule(done) : createFractionRule(done)
 }
 
 const onCancel = () => {
@@ -83,12 +84,12 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as miningpoolpool.Pool
+  target.value = {} as miningpoolfractionrule.FractionRule
   showing.value = false
 }
 
-const updatePool = (done: () => void) => {
-  poolInfo.updatePool({
+const updateFractionRule = (done: () => void) => {
+  fractionruleInfo.updateFractionRule({
     ...target.value,
     Message: {
       Error: {
@@ -113,8 +114,8 @@ const updatePool = (done: () => void) => {
   })
 }
 
-const createPool = (done: () => void) => {
-  poolInfo.createPool({
+const createFractionRule = (done: () => void) => {
+  fractionruleInfo.createFractionRule({
     ...target.value,
     Message: {
       Error: {
@@ -139,8 +140,8 @@ const createPool = (done: () => void) => {
   })
 }
 
-const getPools = (offset: number, limit: number) => {
-  poolInfo.getPools({
+const getFractionRules = (offset: number, limit: number) => {
+  fractionruleInfo.getFractionRules({
     Offset: offset,
     Limit: limit,
     Message: {
@@ -151,62 +152,68 @@ const getPools = (offset: number, limit: number) => {
         Type: notify.NotifyType.Error
       }
     }
-  }, (error: boolean, pools?: Array<miningpoolpool.Pool>) => {
-    if (error || !pools?.length) {
+  }, (error: boolean, fractionrules?: Array<miningpoolfractionrule.FractionRule>) => {
+    if (error || !fractionrules?.length) {
       return
     }
-    getPools(offset + limit, limit)
+    getFractionRules(offset + limit, limit)
   })
 }
 
 onMounted(() => {
-  if (!devices.value.length) {
-    getPools(0, 100)
+  if (!fractionrules.value.length) {
+    getFractionRules(0, 100)
   }
 })
 
-const poolColums = computed(() => [
+const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: miningpoolpool.Pool) => row.ID
+    field: (row: miningpoolfractionrule.FractionRule) => row.ID
   },
   {
     name: 'ENTID',
-    label: t('MSG_ENT_ID'),
+    label: t('MSG_ENTID'),
     sortable: true,
-    field: (row: miningpoolpool.Pool) => row.EntID
+    field: (row: miningpoolfractionrule.FractionRule) => row.EntID
+  },
+  {
+    name: 'POOLCOINTYPEID',
+    label: t('MSG_POOLCOINTYPEID'),
+    sortable: true,
+    field: (row: miningpoolfractionrule.FractionRule) => row.PoolCoinTypeID
+  },
+  {
+    name: 'WITHDRAWINTERVAL',
+    label: t('MSG_WITHDRAWINTERVAL'),
+    sortable: true,
+    field: (row: miningpoolfractionrule.FractionRule) => row.WithdrawInterval
+  },
+  {
+    name: 'MINAMOUNT',
+    label: t('MSG_MINAMOUNT'),
+    sortable: true,
+    field: (row: miningpoolfractionrule.FractionRule) => row.MinAmount
+  },
+  {
+    name: 'WITHDRAWRATE',
+    label: t('MSG_WITHDRAWRATE'),
+    sortable: true,
+    field: (row: miningpoolfractionrule.FractionRule) => row.WithdrawRate
   },
   {
     name: 'MININGPOOLTYPE',
     label: t('MSG_MININGPOOLTYPE'),
     sortable: true,
-    field: (row: miningpoolpool.Pool) => row.MiningpoolType
+    field: (row: miningpoolfractionrule.FractionRule) => row.MiningpoolType
   },
   {
-    name: 'NAME',
-    label: t('MSG_NAME'),
+    name: 'COINTYPE',
+    label: t('MSG_COINTYPE'),
     sortable: true,
-    field: (row: miningpoolpool.Pool) => row.Name
-  },
-  {
-    name: 'SITE',
-    label: t('MSG_SITE'),
-    sortable: true,
-    field: (row: miningpoolpool.Pool) => row.Site
-  },
-  {
-    name: 'LOGO',
-    label: t('MSG_LOGO'),
-    sortable: true,
-    field: (row: miningpoolpool.Pool) => row.Logo
-  },
-  {
-    name: 'DESCRIPTION',
-    label: t('MSG_DESCRIPTION'),
-    sortable: true,
-    field: (row: miningpoolpool.Pool) => row.Description
+    field: (row: miningpoolfractionrule.FractionRule) => row.CoinType
   }
 ])
 </script>
