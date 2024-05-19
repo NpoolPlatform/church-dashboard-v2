@@ -839,6 +839,26 @@ const MainDrawerMenus = [
       } as MenuItem,
       {
         menuId: uid(),
+        label: '矿池RootUser管理',
+        caption: '管理RootUser',
+        icon: 'perm_identity',
+        target: '/miningpool/rootuser',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
+        label: '矿池GoodUser管理',
+        caption: '管理GoodUser',
+        icon: 'perm_identity',
+        target: '/miningpool/gooduser',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
         label: 'APP矿池管理',
         caption: '授权矿池到APP',
         icon: 'perm_identity',

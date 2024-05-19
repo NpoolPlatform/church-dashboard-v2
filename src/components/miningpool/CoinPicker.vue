@@ -38,8 +38,8 @@ const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
 const target = ref(id.value)
 
-const _coin = miningpoolcoin.useMiningpoolCoinStore()
-const coins = computed(() => Array.from(_coin.coins()).map((el) => {
+const coinInfo = miningpoolcoin.useMiningpoolCoinStore()
+const coins = computed(() => Array.from(coinInfo.coins()).map((el) => {
   return {
     value: el.EntID,
     label: `${el.CoinType} | ${el.MiningpoolType} | ${el.EntID}`
@@ -60,7 +60,6 @@ const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
   emit('update:id', target.value)
 }
-const coinInfo = miningpoolcoin.useMiningpoolCoinStore()
 
 const getCoins = (offset: number, limit: number) => {
   coinInfo.getCoins({
