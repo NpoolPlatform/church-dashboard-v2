@@ -7,6 +7,7 @@
     :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedAppPool'
+    :columns='appPoolColumns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -72,9 +73,7 @@
     position='right'
   >
     <q-card class='popup-menu'>
-      <pre>
-        {{ JSON.stringify(target) }}
-      </pre>
+      <pre>{{ JSON.stringify(target,null,'  ') }}</pre>
     </q-card>
   </q-dialog>
 </template>
@@ -204,6 +203,58 @@ const onDeleteAuthClick = () => {
     // TODO
   })
 }
+
+const appPoolColumns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.ID
+  },
+  {
+    name: 'ENTID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.EntID
+  },
+  {
+    name: 'APP_ID',
+    label: t('MSG_APP_ID'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.AppID
+  },
+  {
+    name: 'MININGPOOLTYPE',
+    label: t('MSG_MININGPOOLTYPE'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.MiningpoolType
+  },
+  {
+    name: 'NAME',
+    label: t('MSG_NAME'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.Name
+  },
+  {
+    name: 'SITE',
+    label: t('MSG_SITE'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.Site
+  },
+  {
+    name: 'LOGO',
+    label: t('MSG_LOGO'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.Logo
+  },
+  {
+    name: 'DESCRIPTION',
+    label: t('MSG_DESCRIPTION'),
+    sortable: true,
+    field: (row: miningpoolapppool.Pool) => row.Description
+  }
+])
+
 const columns = computed(() => [
   {
     name: 'ID',
