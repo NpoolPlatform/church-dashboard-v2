@@ -798,7 +798,77 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem
     ]
-  } as MenuItem
+  } as MenuItem, {
+    menuId: uid(),
+    label: '矿池',
+    caption: '授权矿池、管理矿池子账户等',
+    icon: 'pending',
+    target: '/miningpool',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '矿池信息',
+        caption: '管理矿池信息',
+        icon: 'perm_identity',
+        target: '/miningpool/pool',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
+        label: '矿池币种信息',
+        caption: '管理币种信息',
+        icon: 'perm_identity',
+        target: '/miningpool/coin',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      }as MenuItem,
+      {
+        menuId: uid(),
+        label: '矿池提币规则',
+        caption: '管理提币规则',
+        icon: 'perm_identity',
+        target: '/miningpool/fractionrule',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
+        label: '矿池RootUser管理',
+        caption: '管理RootUser',
+        icon: 'perm_identity',
+        target: '/miningpool/rootuser',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
+        label: '矿池GoodUser管理',
+        caption: '管理GoodUser',
+        icon: 'perm_identity',
+        target: '/miningpool/gooduser',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem,
+      {
+        menuId: uid(),
+        label: 'APP矿池管理',
+        caption: '授权矿池到APP',
+        icon: 'perm_identity',
+        target: '/miningpool/app/pool',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  }as MenuItem
 ] as Array<MenuItem>
 
 export {
