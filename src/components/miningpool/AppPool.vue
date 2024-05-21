@@ -101,8 +101,8 @@ const selectedPool = ref([] as Array<miningpoolpool.Pool>)
 const { t } = useI18n({ useScope: 'global' })
 
 const getAppPools = (offset: number, limit: number) => {
-  apppoolInfo.getPools({
-    AppID: AppID.value,
+  apppoolInfo.adminGetPools({
+    TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,
     Message: {
