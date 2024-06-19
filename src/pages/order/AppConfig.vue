@@ -1,11 +1,11 @@
 <template>
-  <SimulateConfig />
+  <AppConfig />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const SimulateConfig = defineAsyncComponent(() => import('src/components/order/SimulateConfig.vue'))
+const AppConfig = defineAsyncComponent(() => import('src/components/order/AppConfig.vue'))
 
 </script>
 

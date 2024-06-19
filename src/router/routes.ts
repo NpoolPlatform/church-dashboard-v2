@@ -709,8 +709,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'order/simulateconfig',
-        component: () => import('src/pages/order/SimulateConfig.vue'),
+        path: 'order/appconfig',
+        component: () => import('src/pages/order/AppConfig.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
