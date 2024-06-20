@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppWithdraws } from 'src/api/ledger'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ledgerwithdraw, utils, sdk } from 'src/npoolstore'
@@ -25,7 +24,7 @@ const withdraw = ledgerwithdraw.useWithdrawStore()
 const withdraws = computed(() => withdraw.withdraws())
 
 const prepare = () => {
-  getAppWithdraws(0, 500)
+  sdk.adminGetLedgerWithdrawes(0, 0)
 }
 
 watch(AppID, () => {

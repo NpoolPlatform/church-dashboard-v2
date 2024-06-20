@@ -86,15 +86,14 @@
 </template>
 
 <script setup lang='ts'>
-import { getAPIs } from 'src/api/apis'
 import { npoolapi, authing, notify, utils, sdk } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const AppID = sdk.AppID
-const api = npoolapi.useNpoolAPIStore()
-const apis = computed(() => api.APIs)
+const apis = sdk.apis
+
 const selectedApi = ref([] as Array<npoolapi.API>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value)))
@@ -138,7 +137,7 @@ watch(AppID, () => {
 
 onMounted(() => {
   if (apis.value.length === 0) {
-    getAPIs(0, 500)
+    sdk.getApis(0, 0)
   }
   prepare()
 })
@@ -162,30 +161,9 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  api.updateAPI({
-    ID: target.value.ID,
-    EntID: target.value.EntID,
-    Deprecated: target.value.Deprecated,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_API',
-        Message: 'MSG_UPDATE_API_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_API',
-        Message: 'MSG_UPDATE_API_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const onSubmit = () => {
+  sdk.updateApi(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
