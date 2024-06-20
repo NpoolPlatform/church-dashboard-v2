@@ -70,10 +70,9 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appcoin, notify, sdk } from 'src/npoolstore'
+import { appcoin, sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
@@ -83,8 +82,7 @@ const { t } = useI18n({ useScope: 'global' })
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const coin = appcoin.useAppCoinStore()
-const coins = computed(() => coin.coins(AppID.value))
+const coins = sdk.appCoins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -113,33 +111,17 @@ const onMenuHide = () => {
   target.value = {} as appcoin.AppCoin
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppCoin(done) : createAppCoin(done)
+const onSubmit = () => {
+  updating.value ? updateAppCoin() : createAppCoin()
 }
 
-const updateAppCoin = (done: () => void) => {
+const updateAppCoin = () => {
   // TODO
-  done()
 }
 
-const createAppCoin = (done: () => void) => {
-  coin.createAppCoin({
-    TargetAppID: AppID.value,
-    ...target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_APP_COIN',
-        Message: 'MSG_CREATE_APP_COIN_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createAppCoin = () => {
+  sdk.adminCreateAppCoin(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
@@ -147,20 +129,7 @@ const createAppCoin = (done: () => void) => {
 const selectedCoin = ref([] as Array<appcoin.AppCoin>)
 const onDelete = () => {
   selectedCoin.value.forEach((el) => {
-    coin.deleteAppCoin({
-      ID: el.ID,
-      TargetAppID: el.AppID,
-      Message: {
-        Error: {
-          Title: 'MSG_DELETE_APP_COIN',
-          Message: 'MSG_DELETE_COIN_FAIL',
-          Popup: true,
-          Type: notify.NotifyType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
+    sdk.adminDeleteAppCoin(el)
   })
 }
 
@@ -175,13 +144,13 @@ watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
 
 watch(AppID, () => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 100)
+    sdk.getAppCoins(0, 0)
   }
 })
 
 onMounted(() => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 100)
+    sdk.getAppCoins(0, 0)
   }
 })
 

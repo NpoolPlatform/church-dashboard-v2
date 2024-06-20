@@ -21,9 +21,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getAppCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
-import { appcoin, sdk } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
@@ -37,18 +36,18 @@ const id = toRef(props, 'id')
 const updating = toRef(props, 'updating')
 const target = ref(id.value)
 
-const coin = appcoin.useAppCoinStore()
-const coins = computed(() => Array.from(coin.coins(AppID.value).filter((el) => !el.Disabled)).map((el) => {
+const appCoins = sdk.appCoins
+const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled)).map((el) => {
   return {
     value: el.CoinTypeID,
     label: `${el.Name} | ${el.CoinTypeID}`
   }
 }))
-const displayCoins = ref(coins.value)
+const displayCoins = ref(_appCoins.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayCoins.value = coins.value.filter((el) => {
+    displayCoins.value = _appCoins.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
@@ -60,14 +59,14 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (!coin.coins(AppID.value).length) {
-    getAppCoins(0, 100)
+  if (!appCoins.value.length) {
+    sdk.getAppCoins(0, 0)
   }
 })
 
 watch(AppID, () => {
-  if (!coin.coins(AppID.value).length) {
-    getAppCoins(0, 100)
+  if (!appCoins.value.length) {
+    sdk.getAppCoins(0, 0)
   }
 })
 </script>

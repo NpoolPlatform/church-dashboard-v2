@@ -54,10 +54,9 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { appfee, order, user, appcoin, sdk } from 'src/npoolstore'
+import { appfee, order, user, sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
@@ -146,9 +145,7 @@ const onSubmit = () => {
   onMenuHide()
 }
 
-const coin = appcoin.useAppCoinStore()
-const coins = computed(() => coin.coins(AppID.value))
-
+const coins = sdk.appCoins
 const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
 
 const prepare = () => {
@@ -167,13 +164,13 @@ onMounted(() => {
 
 watch(AppID, () => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 500)
+    sdk.getAppCoins(0, 0)
   }
 })
 
 onMounted(() => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 500)
+    sdk.getAppCoins(0, 0)
   }
 })
 </script>
