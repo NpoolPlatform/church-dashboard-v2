@@ -18,7 +18,6 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 import { sdk } from 'src/npoolstore'
 
@@ -44,7 +43,7 @@ const onUpdate = () => {
   emit('update:appGoodId', target.value)
 }
 
-watch(AppID, () => {
+watch(sdk.AppID, () => {
   prepare()
 })
 

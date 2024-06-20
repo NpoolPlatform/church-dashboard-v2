@@ -45,7 +45,6 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
 import { appdefaultgood, utils, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -93,7 +92,7 @@ const updateAppDefaultGood = () => {
   onMenuHide()
 }
 
-watch(AppID, () => {
+watch(sdk.AppID, () => {
   prepare()
 })
 

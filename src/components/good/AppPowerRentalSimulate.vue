@@ -60,7 +60,6 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
 import { apppowerrentalsimulate, utils, sdk } from 'src/npoolstore'
 
 const selectedSimulate = ref([] as Array<apppowerrentalsimulate.Simulate>)
@@ -116,7 +115,7 @@ const updateAppSimulateGood = () => {
   onMenuHide()
 }
 
-watch(AppID, () => {
+watch(sdk.AppID, () => {
   prepare()
 })
 

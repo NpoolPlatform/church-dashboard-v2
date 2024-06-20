@@ -182,16 +182,17 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
 import saveAs from 'file-saver'
-import { getAppDepositAccounts } from 'src/api/account'
-import { ledgerstatement, simulateledgerstatement, utils, ledger, simulateledger, notify, appcoin, useraccount, useraccountbase, user, app, accountbase } from 'src/npoolstore'
+import { ledgerstatement, simulateledgerstatement, utils, ledger, simulateledger, notify, appcoin, useraccountbase, user, app, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
+
+const depositAccounts = sdk.userDepositAccounts
+const AppID = sdk.AppID
 
 const columns = computed(() => [
   {
@@ -244,7 +245,7 @@ watch(AppID, () => {
 })
 
 const statement = ledgerstatement.useStatementStore()
-const simulatestatement = simulateledgerstatement.useStatementStore()
+const simulateStatement = simulateledgerstatement.useStatementStore()
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
@@ -280,10 +281,9 @@ const onSubmit = () => {
 const reset = () => {
   general.$reset()
   statement.$reset()
-  account.$reset()
   getAppGenerals(0, 100)
   getAppDetails(0, 100)
-  getAppDepositAccounts(0, 100)
+  sdk.getUserDepositAccounts(0, 0)
   getAppSimulateGenerals(0, 100)
   getAppSimulateDetails(0, 100)
 }
@@ -314,7 +314,7 @@ const displayDetails = computed(() => statement.statements(AppID.value).filter((
 }))
 
 const simulateDetailUsername = ref('')
-const displaySimulateDetails = computed(() => simulatestatement.statements(AppID.value).filter((el) => {
+const displaySimulateDetails = computed(() => simulateStatement.statements(AppID.value).filter((el) => {
   return el.EmailAddress?.includes(simulateDetailUsername.value) || el.PhoneNO?.includes(simulateDetailUsername.value)
 }))
 
@@ -331,8 +331,7 @@ const displaySimulateGenerals = computed(() => simulategeneral.ledgers(AppID.val
 }))
 
 const accountUsername = ref('')
-const account = useraccount.useUserAccountStore()
-const accounts = computed(() => account.accounts(AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDeposit).filter((el) => {
+const accounts = computed(() => depositAccounts.value.filter((el) => {
   return el.EmailAddress?.includes(accountUsername.value) || el.PhoneNO?.includes(accountUsername.value)
 }))
 
@@ -465,9 +464,9 @@ const prepare = () => {
     getAppGenerals(0, 100)
   }
   if (!accounts.value.length) {
-    getAppDepositAccounts(0, 100)
+    sdk.getUserDepositAccounts(0, 0)
   }
-  if (!simulatestatement.statements(AppID.value).length) {
+  if (!simulateStatement.statements(AppID.value).length) {
     getAppSimulateDetails(0, 100)
   }
   if (!simulategeneral.ledgers(AppID.value).length) {
@@ -545,7 +544,7 @@ const getAppDetails = (offset: number, limit: number) => {
 }
 
 const getAppSimulateDetails = (offset: number, limit: number) => {
-  simulatestatement.getAppStatements({
+  simulateStatement.getAppStatements({
     TargetAppID: AppID.value,
     Offset: offset,
     Limit: limit,

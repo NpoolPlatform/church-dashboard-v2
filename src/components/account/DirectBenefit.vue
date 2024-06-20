@@ -31,8 +31,7 @@
 import { getNAppUserAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
-import { accountbase, useraccount, useraccountbase } from 'src/npoolstore'
+import { accountbase, useraccount, useraccountbase, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -40,7 +39,7 @@ const { t } = useI18n({ useScope: 'global' })
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 
 const useracc = useraccount.useUserAccountStore()
-const accounts = computed(() => useracc.accounts(AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDirectBenefit))
+const accounts = computed(() => useracc.accounts(sdk.AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDirectBenefit))
 
 const blocked = ref(null)
 const active = ref(null)
@@ -48,7 +47,7 @@ const username = ref('')
 
 const displayAccounts = computed(() => accounts.value.filter((el) => {
   let flag = el.EmailAddress?.toLowerCase()?.includes?.(username.value?.toLowerCase()) ||
-                                            el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
+             el.PhoneNO?.toLowerCase()?.includes?.(username.value?.toLowerCase())
   if (blocked.value !== null) {
     flag = flag && el.Blocked === blocked.value
   }
@@ -68,7 +67,7 @@ const onRowClick = (row: useraccountbase.Account) => {
   target.value = { ...row }
 }
 
-watch(AppID, () => {
+watch(sdk.AppID, () => {
   prepare()
 })
 
