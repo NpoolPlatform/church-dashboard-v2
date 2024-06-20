@@ -2,37 +2,12 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_APP_GOODS")'
-    :rows='appGoods'
-    row-key='ID'
-    :rows-per-page-options='[100]'
-    selection='single'
-    :columns='appGoodsColumns'
-    v-model:selected='selectedGood'
-  />
-
-  <!-- q-table
-    dense
-    flat
     :title='$t("MSG_APP_GOOD_RECOMMENDS")'
     :rows='recommends'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as Recommend)'
-  >
-    <template #top-right>
-      <div class='row indent flat'>
-        <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_CREATE")'
-          :disable='selectedGood.length === 0'
-          @click='onCreate'
-        />
-      </div>
-    </template>
-  </q-table>
+    @row-click='(evt, row, index) => onRowClick(row as appgoodrecommend.Recommend)'
+  />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -40,10 +15,10 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_RECOMMEND') }}</span>
+        <span>{{ $t('MSG_UPDATE_RECOMMEND') }}</span>
       </q-card-section>
       <q-card-section>
-        <span> {{ updating? target.GoodName : selectedGood[0]?.GoodName }}</span>
+        <span> {{ target.GoodName }}</span>
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
@@ -56,36 +31,22 @@
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
-  </q-dialog -->
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
 import { AppID } from 'src/api/app'
-import { computed, /* defineAsyncComponent, */ onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { getAppGoods } from 'src/api/good'
-import { appgood, utils } from 'src/npoolstore'
+import { onMounted, ref, watch } from 'vue'
+import { sdk, appgoodrecommend } from 'src/npoolstore'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
+const appGoods = sdk.appGoods
+const recommends = sdk.goodRecommends
 
-// const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-
-const appGood = appgood.useAppGoodStore()
-const appGoods = computed(() => appGood.goods(AppID.value))
-const selectedGood = ref([] as Array<appgood.Good>)
-
-/*
 const showing = ref(false)
-const updating = ref(false)
+const target = ref(undefined as unknown as appgoodrecommend.Recommend)
 
-const onCreate = () => {
-  updating.value = false
-  showing.value = true
-}
-
-const onRowClick = () => {
-  updating.value = true
+const onRowClick = (row: appgoodrecommend.Recommend) => {
+  target.value = row
   showing.value = true
 }
 
@@ -98,9 +59,10 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
-  // TODO
+  sdk.adminUpdateGoodRecommend(target.value, () => {
+    showing.value = false
+  })
 }
-*/
 
 watch(AppID, () => {
   prepare()
@@ -112,94 +74,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (appGoods.value.length === 0) {
-    getAppGoods(0, 500)
+    sdk.getAppGoods(0, 0)
   }
 }
-
-const appGoodsColumns = computed(() => [
-  {
-    name: 'ID',
-    label: t('MSG_ID'),
-    sortable: true,
-    field: (row: appgood.Good) => row.ID
-  },
-  {
-    name: 'GOODID',
-    label: t('MSG_GOODID'),
-    sortable: true,
-    field: (row: appgood.Good) => row.GoodID
-  },
-  {
-    name: 'GOODNAME',
-    label: t('MSG_GOODNAME'),
-    sortable: true,
-    field: (row: appgood.Good) => row.GoodName
-  },
-  {
-    name: 'GOODTYPE',
-    label: t('MSG_GOOD_TYPE'),
-    sortable: true,
-    field: (row: appgood.Good) => row.GoodType
-  },
-  {
-    name: 'ONLINE',
-    label: t('MSG_ONLINE'),
-    sortable: true,
-    field: (row: appgood.Good) => row.Online
-  },
-  {
-    name: 'VISIBLE',
-    label: t('MSG_VISIBLE'),
-    sortable: true,
-    field: (row: appgood.Good) => row.Visible
-  },
-  {
-    name: 'GOODPRICE',
-    label: t('MSG_GOOD_PRICE'),
-    sortable: true,
-    field: (row: appgood.Good) => row.UnitPrice
-  },
-  {
-    name: 'GOODUNIT',
-    label: t('MSG_GOOD_UNIT'),
-    sortable: true,
-    field: (row: appgood.Good) => row.QuantityUnit
-  },
-  {
-    name: 'GOODTOTAL',
-    label: t('MSG_GOOD_TOTAL'),
-    sortable: true,
-    field: (row: appgood.Good) => row.GoodTotal
-  },
-  {
-    name: 'GOODLOCKED',
-    label: t('MSG_GOOD_LOCKED'),
-    sortable: true,
-    field: (row: appgood.Good) => row.AppGoodLocked
-  },
-  {
-    name: 'GOODINSERVICE',
-    label: t('MSG_GOOD_INSERVICE'),
-    sortable: true,
-    field: (row: appgood.Good) => row.AppGoodInService
-  },
-  {
-    name: 'COINNAME',
-    label: t('MSG_COINNAME'),
-    sortable: true,
-    field: (row: appgood.Good) => row.CoinName
-  },
-  {
-    name: 'BENEFITTYPE',
-    label: t('MSG_BENEFITTYPE'),
-    sortable: true,
-    field: (row: appgood.Good) => row.BenefitType
-  },
-  {
-    name: 'STARTAT',
-    label: t('MSG_STARTAT'),
-    sortable: true,
-    field: (row: appgood.Good) => utils.formatTime(row.StartAt)
-  }
-])
 </script>

@@ -133,18 +133,6 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/good/promotions',
-        component: () => import('pages/good/Promotion.vue'),
-        meta: {
-          ShowHeaderAnnouncement: true,
-          ShowMainHeader: false,
-          ShowBigLogo: true,
-          ShowFooterTop: true,
-          ShowSignHelper: true,
-          ShowTopTip: false,
-          NeedLogined: true
-        }
-      }, {
         path: 'app/good/recommends',
         component: () => import('pages/good/Recommend.vue'),
         meta: {

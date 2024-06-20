@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_APP_DEFAULT_GOODS")'
-    :rows='sdk.defaultGoods.value'
+    :rows='appDefaultGoods'
     row-key='ID'
     selection='single'
     :rows-per-page-options='[100]'
@@ -35,7 +35,7 @@
         <AppGoodSelector v-model:id='target.AppGoodID' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -51,8 +51,9 @@ import { appdefaultgood, utils, sdk } from 'src/npoolstore'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+
+const appDefaultGoods = sdk.appDefaultGoods
 
 const target = ref({} as appdefaultgood.Default)
 const showing = ref(false)
@@ -78,19 +79,17 @@ const onRowClick = (row: appdefaultgood.Default) => {
   showing.value = true
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppDefaultGood(done) : createAppDefaultGood(done)
+const onSubmit = () => {
+  updating.value ? updateAppDefaultGood() : createAppDefaultGood()
 }
 
-const createAppDefaultGood = (done: () => void) => {
-  done()
-  sdk.createNDefaultGood(target.value)
+const createAppDefaultGood = () => {
+  sdk.adminCreateAppDefaultGood(target.value)
   onMenuHide()
 }
 
-const updateAppDefaultGood = (done: () => void) => {
-  done()
-  sdk.updateNDefaultGood(target.value)
+const updateAppDefaultGood = () => {
+  sdk.adminUpdateAppDefaultGood(target.value)
   onMenuHide()
 }
 
@@ -103,8 +102,8 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!sdk.defaultGoods.value.length) {
-    sdk.getNDefaultGoods(0, 0)
+  if (!appDefaultGoods.value.length) {
+    sdk.adminGetAppDefaultGoods(0, 0)
   }
 }
 
