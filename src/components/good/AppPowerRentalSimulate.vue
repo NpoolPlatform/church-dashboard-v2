@@ -43,7 +43,7 @@
         <span>{{ $t('MSG_APP_SIMULATE_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector v-model:id='target.AppGoodID' />
+        <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.OrderUnits' :label='$t("MSG_ORDER_UNITS")' />

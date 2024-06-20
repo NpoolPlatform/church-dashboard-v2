@@ -18,32 +18,30 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getAppGoods } from 'src/api/good'
 import { AppID } from 'src/api/app'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
-import { appgood } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
-  id: string | undefined
+  appGoodId: string | undefined
 }
 
 const props = defineProps<Props>()
-const goodID = toRef(props, 'id')
-const target = ref(goodID.value)
+const appGoodId = toRef(props, 'appGoodId')
+const target = ref(appGoodId.value)
 
-const appGood = appgood.useAppGoodStore()
-const appGoods = computed(() => appGood.goods(AppID.value))
+const appGoods = sdk.appGoods
 
 const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
     value: el.EntID,
-    label: `${el.GoodName} | ${el.EntID}`
+    label: `${el.GoodName} | ${el.EntID} | ${el.GoodType}`
   }
 }))
 
-const emit = defineEmits<{(e: 'update:id', id: string | undefined): void}>()
+const emit = defineEmits<{(e: 'update:appGoodId', appGoodId: string | undefined): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:appGoodId', target.value)
 }
 
 watch(AppID, () => {
@@ -56,7 +54,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (appGoods.value.length === 0) {
-    getAppGoods(0, 500)
+    sdk.adminGetAppGoods(0, 0)
   }
 }
 </script>

@@ -32,7 +32,7 @@
         <span>{{ $t('MSG_APP_DEFAULT_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector v-model:id='target.AppGoodID' />
+        <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
       </q-card-section>
       <q-item class='row'>
         <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
