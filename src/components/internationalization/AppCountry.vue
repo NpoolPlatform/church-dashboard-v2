@@ -50,10 +50,11 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { getAppCountries } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { appcountry, notify } from 'src/npoolstore'
+import { appcountry, notify, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CountryPicker = defineAsyncComponent(() => import('src/components/internationalization/CountryPicker.vue'))

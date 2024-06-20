@@ -47,10 +47,11 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { getAppCoinDescriptions } from 'src/api/coin'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
-import { notify, appcoindescription } from 'src/npoolstore'
+import { notify, appcoindescription, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))

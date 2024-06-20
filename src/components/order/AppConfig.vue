@@ -61,8 +61,9 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
 import { apporderconfig, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const selectedAppConfig = ref([] as Array<apporderconfig.AppConfig>)
 

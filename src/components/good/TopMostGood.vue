@@ -61,7 +61,8 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmostgood, sdk, utils } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
+
+const AppID = sdk.AppID
 
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const TopMostSelector = defineAsyncComponent(() => import('src/components/good/TopMostSelector.vue'))

@@ -53,10 +53,11 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { applang, notify, g11nbase } from 'src/npoolstore'
+import { applang, notify, g11nbase, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const LanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/LanguagePicker.vue'))

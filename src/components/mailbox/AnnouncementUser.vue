@@ -22,10 +22,11 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { announcementuser, notify, utils } from 'src/npoolstore'
+import { announcementuser, notify, utils, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

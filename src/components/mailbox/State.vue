@@ -44,8 +44,9 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
-import { announcementsendstate, announcementreadstate, notify, utils, notifbase } from 'src/npoolstore'
+import { announcementsendstate, announcementreadstate, notify, utils, notifbase, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

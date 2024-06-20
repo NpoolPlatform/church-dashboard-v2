@@ -131,9 +131,10 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { getAppMessages } from 'src/api/g11n'
-import { AppID } from 'src/api/app'
-import { message, utils, notify, _locale, g11nbase } from 'src/npoolstore'
+import { message, utils, notify, _locale, g11nbase, sdk } from 'src/npoolstore'
 import saveAs from 'file-saver'
+
+const AppID = sdk.AppID
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))

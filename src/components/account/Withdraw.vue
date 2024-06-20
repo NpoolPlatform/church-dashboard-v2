@@ -29,10 +29,11 @@
 
 <script setup lang='ts'>
 import { getNAppUserAccounts } from 'src/api/account'
-import { AppID } from 'src/api/app'
 import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useraccount, accountbase, useraccountbase } from 'src/npoolstore'
+import { useraccount, accountbase, useraccountbase, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

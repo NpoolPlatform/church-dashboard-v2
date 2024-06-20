@@ -80,10 +80,11 @@
 
 <script setup lang='ts'>
 import { getPools } from 'src/api/miningpool'
-import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
-import { miningpoolapppool, miningpoolpool, notify } from 'src/npoolstore'
+import { miningpoolapppool, miningpoolpool, notify, sdk } from 'src/npoolstore'
 import { computed, onMounted, ref, watch } from 'vue'
+
+const AppID = sdk.AppID
 
 const apppoolInfo = miningpoolapppool.useMiningpoolAppPoolStore()
 const appPools = computed(() => apppoolInfo.pools(AppID.value))

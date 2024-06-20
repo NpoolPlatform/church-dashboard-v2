@@ -21,10 +21,11 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { getAppLangs } from 'src/api/g11n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
-import { applang } from 'src/npoolstore'
+import { applang, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 interface Props {
   language: string

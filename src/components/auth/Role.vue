@@ -100,11 +100,12 @@
 
 <script setup lang='ts'>
 import { getAPIs } from 'src/api/apis'
-import { AppID } from 'src/api/app'
-import { npoolapi, user, role, authing, notify, utils } from 'src/npoolstore'
+import { npoolapi, user, role, authing, notify, utils, sdk } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIL as NIL_UUID } from 'uuid'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

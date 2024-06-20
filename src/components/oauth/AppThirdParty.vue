@@ -64,8 +64,9 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { AppID } from 'src/api/app'
-import { appoauththirdparty, oauththirdparty, notify, oauthbase } from 'src/npoolstore'
+import { appoauththirdparty, oauththirdparty, notify, oauthbase, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 

@@ -64,7 +64,8 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmost, sdk, utils, goodbase } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
+
+const AppID = sdk.AppID
 
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const TopMostGood = defineAsyncComponent(() => import('src/components/good/TopMostGood.vue'))

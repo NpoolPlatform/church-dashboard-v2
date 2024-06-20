@@ -51,8 +51,9 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, watch, ref } from 'vue'
-import { appsubscribe, app, notify } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
+import { appsubscribe, app, notify, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const appSubscribe = appsubscribe.useAppSubscribeStore()
 const appSubscribes = computed(() => appSubscribe.AppSubscribes.get(AppID.value) ? appSubscribe.AppSubscribes.get(AppID.value) : [])

@@ -11,9 +11,10 @@
 
 <script setup lang='ts'>
 import { getNAppUserAccounts } from 'src/api/account'
-import { AppID } from 'src/api/app'
 import { computed, onMounted, watch } from 'vue'
-import { useraccount, accountbase } from 'src/npoolstore'
+import { useraccount, accountbase, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const account = useraccount.useUserAccountStore()
 const withdrawAddress = computed(() => account.accounts(AppID.value, accountbase.AccountUsedFor.UserWithdraw))

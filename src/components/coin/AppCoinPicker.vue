@@ -21,10 +21,11 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { getAppCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
-import { appcoin } from 'src/npoolstore'
+import { appcoin, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 interface Props {
   id: string

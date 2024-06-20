@@ -35,9 +35,10 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { onMounted, ref, watch } from 'vue'
 import { sdk, appgoodrecommend } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const appGoods = sdk.appGoods
 const recommends = sdk.goodRecommends

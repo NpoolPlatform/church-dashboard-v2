@@ -87,12 +87,12 @@
 
 <script setup lang='ts'>
 import { getAPIs } from 'src/api/apis'
-import { AppID } from 'src/api/app'
-import { npoolapi, authing, notify, utils } from 'src/npoolstore'
+import { npoolapi, authing, notify, utils, sdk } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
+const AppID = sdk.AppID
 const api = npoolapi.useNpoolAPIStore()
 const apis = computed(() => api.APIs)
 const selectedApi = ref([] as Array<npoolapi.API>)

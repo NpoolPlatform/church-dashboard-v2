@@ -31,14 +31,16 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
-import { AppID, MyAppID } from 'src/api/app'
-import { app, notif, user, localapp, notify } from 'src/npoolstore'
+import { app, notif, user, localapp, notify, sdk } from 'src/npoolstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
 import bellMsg from '../../assets/bell-msg.svg'
 
 const tracing = 'https://www.jaegertracing.io/img/jaeger-icon-reverse-color.svg'
 const github = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png'
+
+const AppID = sdk.AppID
+const MyAppID = sdk.MyAppID
 
 const AvatarDropdown = defineAsyncComponent(() => import('src/components/avatar/AvatarDropdown.vue'))
 const HeaderToolBtn = defineAsyncComponent(() => import('src/components/header/HeaderToolBtn.vue'))

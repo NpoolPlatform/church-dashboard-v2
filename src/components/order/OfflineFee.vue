@@ -57,8 +57,9 @@
 import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { AppID } from 'src/api/app'
 import { appfee, order, user, appcoin, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const OrderSelector = defineAsyncComponent(() => import('src/components/order/OrderSelector.vue'))

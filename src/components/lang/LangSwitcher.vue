@@ -39,8 +39,9 @@
 
 <script setup lang='ts'>
 import { ref, computed, defineProps, withDefaults, toRef, defineEmits, onMounted } from 'vue'
-import { applang, _locale, g11nbase } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
+import { applang, _locale, g11nbase, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 interface Props {
   language?: g11nbase.AppLang

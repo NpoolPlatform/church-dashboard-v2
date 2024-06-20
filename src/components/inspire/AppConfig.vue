@@ -57,9 +57,10 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
-import { inspireappconfig, notify, utils } from 'src/npoolstore'
+import { inspireappconfig, notify, utils, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
