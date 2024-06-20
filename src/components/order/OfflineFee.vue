@@ -17,13 +17,11 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_OFFLINE_ORDER') }}</span>
+        <span>{{ $t('MSG_CREATE_OFFLINE_FEE_ORDER') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_TOTAL') }}: {{ selectedGood?.value?.GoodTotal }}</q-item-label>
-        <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedGood?.value?.AppGoodLocked }}</q-item-label>
-        <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedGood?.value?.AppGoodInService }}</q-item-label>
-        <q-select :options='goods' v-model='selectedGood' :label='$t("MSG_APP_GOOD")' />
+        <q-select :options='_appFees' v-model='selectedAppFee' :label='$t("MSG_APP_FEE")' />
+        <OrderSelector v-model:order-id='selectedOrderId' />
         <q-select
           :options='displayUsers'
           use-input
@@ -32,9 +30,9 @@
           @filter='filterUser'
         />
         <q-input
-          v-model='units' :label='$t("MSG_PURCHASE_UNITS")' type='number' min='0'
-          :max='maxUnits'
-          :suffix='selectedGood?.value?.QuantityUnit'
+          :label='$t("MSG_DURATIONS")'
+          v-model='durations'
+          :suffix='durationUnit'
         />
       </q-card-section>
       <q-card-section>
@@ -48,7 +46,7 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -60,21 +58,20 @@ import { getAppCoins } from 'src/api/coin'
 import { getAppUsers } from 'src/api/user'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
 import { AppID } from 'src/api/app'
-import { appgood, order, user, appcoin, sdk } from 'src/npoolstore'
+import { appfee, order, user, appcoin, sdk } from 'src/npoolstore'
 
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const OrderSelector = defineAsyncComponent(() => import('src/components/order/OrderSelector.vue'))
 
-const good = appgood.useAppGoodStore()
-const appGoods = computed(() => good.goods(AppID.value))
+const appFees = sdk.onlineAppFees
 
 interface MyGood {
   label: string
-  value: appgood.Good
+  value: appfee.AppFee
 }
-const goods = computed(() => Array.from(appGoods.value.filter((el) => el.Online)).map((el) => {
+const _appFees = computed(() => Array.from(appFees.value).map((el) => {
   return {
-    label: `${el.GoodName} | ${el.ID}`,
+    label: `${el.GoodName} | ${el.ID} | ${el.GoodType}`,
     value: el
   } as MyGood
 }))
@@ -102,11 +99,13 @@ const filterUser = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const selectedGood = ref(undefined as unknown as MyGood)
+const selectedAppFee = ref(undefined as unknown as MyGood)
 const selectedUser = ref(undefined as unknown as MyUser)
+const selectedOrderId = ref('')
+const durations = ref(3)
 
-const units = ref(1)
-const maxUnits = computed(() => Number(selectedGood.value?.value?.GoodSpotQuantity))
+const durationUnit = computed(() => sdk.durationUnit(selectedAppFee.value?.value?.DurationDisplayType))
+const durationSeconds = computed(() => sdk.durationUnitSeconds(selectedAppFee.value?.value?.DurationDisplayType) * durations.value)
 
 const showing = ref(false)
 
@@ -120,28 +119,27 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  selectedGood.value = undefined as unknown as MyGood
+  selectedAppFee.value = undefined as unknown as MyGood
   selectedUser.value = undefined as unknown as MyUser
 }
 
 const onSubmit = () => {
-  if (units.value > maxUnits.value) {
-    return
-  }
-  if (!selectedGood.value) {
+  if (!selectedAppFee.value) {
     return
   }
   if (!selectedUser.value) {
     return
   }
-
-  sdk.createAppUserOrder({
+  if (!selectedOrderId.value.length) {
+    return
+  }
+  sdk.adminCreateFeeOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.EntID,
-    AppGoodID: selectedGood.value.value.EntID,
-    Units: `${units.value}`,
-    OrderType: orderType.value,
-    InvestmentType: order.InvestmentType.FullPayment
+    ParentOrderID: selectedOrderId.value,
+    DurationSeconds: durationSeconds.value,
+    AppGoodID: selectedAppFee.value.value.EntID,
+    OrderType: orderType.value
   })
 
   onMenuHide()

@@ -697,8 +697,20 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'order/offline',
-        component: () => import('src/pages/order/Offline.vue'),
+        path: 'order/offline/fee',
+        component: () => import('src/pages/order/OfflineFee.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'order/offline/powerrental',
+        component: () => import('src/pages/order/OfflinePowerRental.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

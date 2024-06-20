@@ -1,11 +1,11 @@
 <template>
-  <Offline />
+  <OfflineFee />
 </template>
 
 <script setup lang='ts'>
 import { defineAsyncComponent } from 'vue'
 
-const Offline = defineAsyncComponent(() => import('src/components/order/Offline.vue'))
+const OfflineFee = defineAsyncComponent(() => import('src/components/order/OfflineFee.vue'))
 
 </script>
 

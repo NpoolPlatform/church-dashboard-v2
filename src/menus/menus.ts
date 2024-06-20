@@ -760,10 +760,19 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '离线订单',
-        caption: '创建离线订单',
+        label: '离线电费/服务费订单',
+        caption: '创建离线电费/服务费订单',
         icon: 'format_list_numbered',
-        target: '/order/offline',
+        target: '/order/offline/fee',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '离线算力订单',
+        caption: '创建离线算力订单',
+        icon: 'format_list_numbered',
+        target: '/order/offline/powerrental',
         level: 1,
         sectionBegin: false,
         children: []

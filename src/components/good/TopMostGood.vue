@@ -36,7 +36,6 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' />
-        <q-input v-model='target.PackagePrice' :label='$t("MSG_PACKAGE_PRICE")' />
       </q-card-section>
       <q-card-section>
         <q-select
@@ -52,7 +51,7 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -64,11 +63,10 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmostgood, sdk, utils } from 'src/npoolstore'
 import { AppID } from 'src/api/app'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const TopMostSelector = defineAsyncComponent(() => import('src/components/good/TopMostSelector.vue'))
 
-const topMostGoods = computed(() => sdk.topMostGoods.value)
+const topMostGoods = sdk.topMostGoods
 const target = ref({} as topmostgood.TopMostGood)
 
 const showing = ref(false)
@@ -94,21 +92,15 @@ const onCancel = () => {
   showing.value = false
 }
 
-const onSubmit = (done: () => void) => {
+const onSubmit = () => {
   if (updating.value) {
-    sdk.updateNTopMostGood(target.value, (error: boolean) => {
-      done()
-      if (error) {
-        return
-      }
+    sdk.adminUpdateTopMostGood(target.value, (error: boolean) => {
+      if (error) return
       onMenuHide()
     })
   } else {
-    sdk.createNTopMostGood(target.value, (error: boolean) => {
-      done()
-      if (error) {
-        return
-      }
+    sdk.adminCreateTopMostGood(target.value, (error: boolean) => {
+      if (error) return
       onMenuHide()
     })
   }
@@ -116,13 +108,13 @@ const onSubmit = (done: () => void) => {
 
 watch(AppID, () => {
   if (!topMostGoods.value?.length) {
-    sdk.getNTopMostGoods(0, 0)
+    sdk.adminGetTopMostGoods(0, 0)
   }
 })
 
 onMounted(() => {
   if (!topMostGoods.value?.length) {
-    sdk.getNTopMostGoods(0, 0)
+    sdk.adminGetTopMostGoods(0, 0)
   }
 })
 
@@ -158,24 +150,6 @@ const columns = computed(() => [
     field: (row: topmostgood.TopMostGood) => row.AppGoodName
   },
   {
-    name: 'CoinTypeID',
-    label: 'MSG_COINTYPEID',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.CoinTypeID
-  },
-  {
-    name: 'CoinName',
-    label: 'MSG_COIN_NAME',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.CoinName
-  },
-  {
-    name: 'CoinUnit',
-    label: 'MSG_COIN_UNIT',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.CoinUnit
-  },
-  {
     name: 'TopMostID',
     label: 'MSG_TOP_MOST_ID',
     sortable: true,
@@ -198,12 +172,6 @@ const columns = computed(() => [
     label: 'MSG_UNIT_PRICE',
     sortable: true,
     field: (row: topmostgood.TopMostGood) => row.UnitPrice
-  },
-  {
-    name: 'PackagePrice',
-    label: 'MSG_PACKAGE_PRICE',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.PackagePrice
   },
   {
     name: 'Posters',
