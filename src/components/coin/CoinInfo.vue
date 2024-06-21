@@ -75,7 +75,7 @@
         <div><q-toggle dense v-model='target.CheckNewAddressBalance' :label='$t("MSG_CHECK_NEW_ADDRESS_BALANCE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -84,16 +84,14 @@
 </template>
 
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { coin, notify, basetypes, chain } from 'src/npoolstore'
+import { coin, basetypes, chain, sdk } from 'src/npoolstore'
 
 const Chain = defineAsyncComponent(() => import('src/components/coin/Chain.vue'))
 const CoinUsedFor = defineAsyncComponent(() => import('src/components/coin/CoinUsedFor.vue'))
 const AppCoin = defineAsyncComponent(() => import('src/components/coin/AppCoin.vue'))
 const CoinPickerByName = defineAsyncComponent(() => import('src/components/coin/CoinPickerByName.vue'))
 const ChainPicker = defineAsyncComponent(() => import('src/components/coin/ChainPicker.vue'))
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 enum CoinEnvironment {
   Test = 'test',
@@ -105,8 +103,7 @@ const CoinEnvironments = [
   CoinEnvironment.Test
 ]
 
-const _coin = coin.useCoinStore()
-const coins = computed(() => _coin.coins())
+const coins = sdk.coins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -152,91 +149,27 @@ const onMenuHide = () => {
   target.value = {} as coin.Coin
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateCoin(done) : createCoin(done)
+const onSubmit = () => {
+  updating.value ? updateCoin() : createCoin()
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target.value.ID,
-    Presale: target.value.Presale,
-    ReservedAmount: target.value.ReservedAmount,
-    ForPay: target.value.ForPay,
-    HomePage: target.value.HomePage?.length > 0 ? target.value.HomePage : undefined as unknown as string,
-    Specs: target.value.Specs?.length > 0 ? target.value.Specs : undefined as unknown as string,
-    FeeCoinTypeID: target.value.FeeCoinTypeID,
-    WithdrawFeeByStableUSD: target.value.WithdrawFeeByStableUSD,
-    WithdrawFeeAmount: target.value.WithdrawFeeAmount,
-    CollectFeeAmount: target.value.CollectFeeAmount,
-    HotWalletAccountAmount: target.value.HotWalletAccountAmount,
-    LowFeeAmount: target.value.LowFeeAmount,
-    HotLowFeeAmount: target.value.HotLowFeeAmount,
-    HotWalletFeeAmount: target.value.HotWalletFeeAmount,
-    PaymentAccountCollectAmount: target.value.PaymentAccountCollectAmount,
-    LeastTransferAmount: target.value.LeastTransferAmount,
-    StableUSD: target.value?.StableUSD,
-    Disabled: target.value?.Disabled,
-    NeedMemo: target.value?.NeedMemo,
-    CheckNewAddressBalance: target.value?.CheckNewAddressBalance
-  }
-})
-
-const createCoin = (done: () => void) => {
-  _coin.createCoin({
-    ...target.value,
-    ChainUnitExp: target.value?.ChainUnitExp,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_COIN',
-        Message: 'MSG_CREATE_COIN_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_COIN',
-        Message: 'MSG_CREATE_COIN_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createCoin = () => {
+  sdk.adminCreateCoin(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
-const updateCoin = (done: () => void) => {
-  _coin.updateCoin({
-    ...updateTarget.value,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_COIN',
-        Message: 'MSG_UPDATE_COIN_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_COIN',
-        Message: 'MSG_UPDATE_COIN_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateCoin = () => {
+  sdk.adminUpdateCoin(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 onMounted(() => {
   if (!coins.value.length) {
-    getCoins(0, 100)
+    sdk.getCoins(0, 0)
   }
 })
 </script>

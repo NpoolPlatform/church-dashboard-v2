@@ -67,9 +67,8 @@
 </template>
 
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { coinfiat, notify, coin } from 'src/npoolstore'
+import { coinfiat, notify, coin, sdk } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
@@ -148,8 +147,7 @@ const deleteCoinFiat = (done: () => void) => {
   })
 }
 
-const _coin = coin.useCoinStore()
-const coins = computed(() => _coin.coins())
+const coins = sdk.coins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -169,7 +167,7 @@ const ids = computed(() => {
 
 onMounted(() => {
   if (!coins.value.length) {
-    getCoins(0, 100)
+    sdk.getCoins(0, 0)
   }
 })
 
