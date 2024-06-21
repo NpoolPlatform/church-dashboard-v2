@@ -112,13 +112,13 @@ const onSubmit = () => {
 
 watch(AppID, () => {
   if (!topMosts.value?.length) {
-    sdk.getTopMosts(0, 0)
+    sdk.adminGetTopMosts(0, 0)
   }
 })
 
 onMounted(() => {
   if (!topMosts.value?.length) {
-    sdk.getTopMosts(0, 0)
+    sdk.adminGetTopMosts(0, 0)
   }
 })
 
