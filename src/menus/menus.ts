@@ -375,8 +375,8 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: 'TopMost',
-      caption: 'TopMost',
+      label: '置顶',
+      caption: '管理置顶商品',
       icon: 'perm_identity',
       target: '/app/good/topmosts',
       level: 1,
