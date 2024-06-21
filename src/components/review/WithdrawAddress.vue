@@ -10,14 +10,12 @@
 </template>
 
 <script setup lang='ts'>
-import { getNAppUserAccounts } from 'src/api/account'
-import { computed, onMounted, watch } from 'vue'
-import { useraccount, accountbase, sdk } from 'src/npoolstore'
+import { onMounted, watch } from 'vue'
+import { sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
-const account = useraccount.useUserAccountStore()
-const withdrawAddress = computed(() => account.accounts(AppID.value, accountbase.AccountUsedFor.UserWithdraw))
+const withdrawAddress = sdk.userWithdrawAccounts
 
 watch(AppID, () => {
   prepare()
@@ -29,7 +27,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (withdrawAddress.value.length === 0) {
-    getNAppUserAccounts(0, 500)
+    sdk.adminGetUserWithdrawAccounts(0, 0)
   }
 }
 

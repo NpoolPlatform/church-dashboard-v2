@@ -21,9 +21,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getCountries } from 'src/api/g11n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { country } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -42,8 +41,7 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const _country = country.useCountryStore()
-const countries = computed(() => Array.from(_country.countries()).map((el) => {
+const countries = computed(() => Array.from(sdk.countries.value).map((el) => {
   return {
     value: el.EntID,
     label: `${el.Country} | ${el.Short} | ${el.EntID}`
@@ -66,7 +64,7 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (!countries.value.length) {
-    getCountries(0, 100)
+    sdk.adminGetCountries(0, 0)
   }
 })
 </script>

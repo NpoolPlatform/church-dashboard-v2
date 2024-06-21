@@ -28,18 +28,16 @@
 </template>
 
 <script setup lang='ts'>
-import { getNAppUserAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { accountbase, useraccount, useraccountbase, sdk } from 'src/npoolstore'
+import { useraccountbase, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 
-const useracc = useraccount.useUserAccountStore()
-const accounts = computed(() => useracc.accounts(sdk.AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserDirectBenefit))
+const accounts = sdk.userBenefitAccounts
 
 const blocked = ref(null)
 const active = ref(null)
@@ -77,7 +75,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (!accounts.value.length) {
-    getNAppUserAccounts(0, 100)
+    sdk.adminGetUserBenefitAccounts(0, 0)
   }
 }
 

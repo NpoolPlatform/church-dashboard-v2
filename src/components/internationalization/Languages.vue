@@ -43,7 +43,7 @@
         <q-input v-model='target.Short' :label='$t("MSG_LANGUAGE_SHORT")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -54,15 +54,12 @@
 </template>
 
 <script setup lang='ts'>
-import { getLangs } from 'src/api/g11n'
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { language, notify } from 'src/npoolstore'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
+import { language, sdk } from 'src/npoolstore'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguage = defineAsyncComponent(() => import('src/components/internationalization/AppLanguage.vue'))
 
-const lang = language.useLangStore()
-const langs = computed(() => lang.langs())
+const langs = sdk.languages
 
 const target = ref({} as language.Lang)
 const showing = ref(false)
@@ -88,75 +85,27 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateLang(done) : createLang(done)
+const onSubmit = () => {
+  updating.value ? updateLang() : createLang()
 }
 
-const createLang = (done: () => void) => {
-  lang.createLang({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_LANGUAGE',
-        Message: 'MSG_CREATE_LANGUAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_LANGUAGE',
-        Message: 'MSG_CREATE_LANGUAGE_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createLang = () => {
+  sdk.adminCreateLang(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target.value?.ID,
-    Lang: target.value?.Lang,
-    Logo: target.value?.Logo,
-    Name: target.value?.Name,
-    Short: target.value?.Short
-  }
-})
-
-const updateLang = (done: () => void) => {
-  lang.updateLang({
-    ...updateTarget.value,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_LANGUAGE',
-        Message: 'MSG_UPDATE_LANGUAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_LANGUAGE',
-        Message: 'MSG_UPDATE_LANGUAGE_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateLang = () => {
+  sdk.adminUpdateLang(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 onMounted(() => {
   if (langs.value.length === 0) {
-    getLangs(0, 100)
+    sdk.adminGetLangs(0, 0)
   }
 })
 </script>

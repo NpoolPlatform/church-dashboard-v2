@@ -88,15 +88,13 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { getCountries } from 'src/api/g11n'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { country, notify, utils } from 'src/npoolstore'
+import { country, utils, sdk } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppCountry = defineAsyncComponent(() => import('src/components/internationalization/AppCountry.vue'))
 
-const _country = country.useCountryStore()
-const countries = computed(() => _country.countries())
+const countries = sdk.countries
 
 const target = ref({} as country.Country)
 const showing = ref(false)
@@ -122,67 +120,20 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateCountry(done) : createCountry(done)
+const onSubmit = () => {
+  updating.value ? updateCountry() : createCountry()
 }
 
-const createCountry = (done: () => void) => {
-  _country.createCountry({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_COUNTRY',
-        Message: 'MSG_CREATE_COUNTRY_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_COUNTRY',
-        Message: 'MSG_CREATE_COUNTRY_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createCountry = () => {
+  sdk.adminCreateCountry(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target?.value?.ID,
-    Country: target?.value?.Country,
-    Flag: target?.value?.Flag,
-    Short: target?.value?.Short,
-    Code: target?.value?.Code
-  }
-})
-const updateCountry = (done: () => void) => {
-  _country.updateCountry({
-    ...updateTarget.value,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_COUNTRY',
-        Message: 'MSG_UPDATE_COUNTRY_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_COUNTRY',
-        Message: 'MSG_UPDATE_COUNTRY_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateCountry = () => {
+  sdk.adminUpdateCountry(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
@@ -221,30 +172,12 @@ const importedCountries = computed(() => {
 })
 
 const onBatchCreate = () => {
-  _country.createCountries({
-    Infos: importedCountries.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_COUNTRIES',
-        Message: 'MSG_CREATE_COUNTRIES_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_BATCH_CREATE_COUNTRIES',
-        Message: 'MSG_BATCH_CREATE_COUNTRIES_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  sdk.adminCreateCountries(importedCountries.value)
 }
 
 onMounted(() => {
   if (countries.value.length === 0) {
-    getCountries(0, 100)
+    sdk.adminGetCountries(0, 0)
   }
 })
 

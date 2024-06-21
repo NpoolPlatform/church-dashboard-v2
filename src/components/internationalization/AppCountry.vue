@@ -42,7 +42,7 @@
         <CountryPicker v-model:id='target.CountryID' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
+        <q-btn loading :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -50,17 +50,14 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppCountries } from 'src/api/g11n'
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { appcountry, notify, sdk } from 'src/npoolstore'
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { appcountry, sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CountryPicker = defineAsyncComponent(() => import('src/components/internationalization/CountryPicker.vue'))
 
-const country = appcountry.useAppCountryStore()
-const countries = computed(() => country.countries(AppID.value))
+const countries = sdk.appCountries
 
 const selectedCountries = ref([] as Array<appcountry.Country>)
 
@@ -80,68 +77,28 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onAuthorize = (done: () => void) => {
-  country.createAppCountry({
-    TargetAppID: AppID.value,
-    CountryID: target.value?.CountryID,
-    Message: {
-      Error: {
-        Title: 'MSG_AUTHORIZE_COUNTRY',
-        Message: 'MSG_AUTHORIZE_COUNTRY_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_AUTHORIZE_COUNTRY',
-        Message: 'MSG_AUTHORIZE_COUNTRY_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const onAuthorize = () => {
+  sdk.adminCreateAppCountry(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 const onDelete = () => {
-  country.deleteAppCountry({
-    ID: selectedCountries.value[0].ID,
-    TargetAppID: selectedCountries.value[0].AppID,
-    Message: {
-      Error: {
-        Title: 'MSG_DELETE_COUNTRY',
-        Message: 'MSG_DELETE_COUNTRY_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_DELETE_COUNTRY',
-        Message: 'MSG_DELETE_COUNTRY_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    if (error) {
-      return
-    }
-    onMenuHide()
+  selectedCountries.value.forEach((el) => {
+    sdk.adminDeleteAppCountry(el)
   })
 }
 
 watch(AppID, () => {
   if (!countries.value.length) {
-    getAppCountries(0, 100)
+    sdk.getAppCountries(0, 0)
   }
 })
 
 onMounted(() => {
   if (!countries.value.length) {
-    getAppCountries(0, 100)
+    sdk.getAppCountries(0, 0)
   }
 })
 

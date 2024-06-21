@@ -33,7 +33,7 @@
         <span>{{ $t('MSG_CREATE_GOOD_BENEFIT_ACCOUNT') }}</span>
       </q-card-section>
       <q-card-section v-if='!updating'>
-        <GoodSelector v-model:id='target.GoodID' />
+        <GoodSelector v-model:good-id='target.GoodID' />
         <!-- <q-input
           type='number'
           min='1'
@@ -64,7 +64,7 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -72,16 +72,13 @@
 </template>
 
 <script setup lang='ts'>
-import { getGoodBenefitAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { goodbenefitaccount, notify } from 'src/npoolstore'
+import { goodbenefitaccount, sdk } from 'src/npoolstore'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const goodbenefit = goodbenefitaccount.useGoodBenefitAccountStore()
-const accounts = computed(() => goodbenefit.accounts())
+const accounts = sdk.goodBenefitAccounts
 
 const backup = ref(null)
 const blocked = ref(null)
@@ -128,74 +125,27 @@ const onRowClick = (row: goodbenefitaccount.Account) => {
   updating.value = true
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateGoodBenefitAccount(done) : createGoodBenefitAccount(done)
+const onSubmit = () => {
+  updating.value ? updateGoodBenefitAccount() : createGoodBenefitAccount()
 }
 
-const createGoodBenefitAccount = (done: () => void) => {
-  goodbenefit.createGoodBenefitAccount({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_GOOD_BENEFIT',
-        Message: 'MSG_CREATE_GOOD_BENEFIT_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_GOOD_BENEFIT',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createGoodBenefitAccount = () => {
+  sdk.adminCreateGoodBenefitAccount(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target.value.ID,
-    EntID: target.value.EntID,
-    Backup: target.value.Backup,
-    Active: target.value.Active,
-    Blocked: target.value.Blocked,
-    Locked: target.value.Locked
-  }
-})
-
-const updateGoodBenefitAccount = (done: () => void) => {
-  goodbenefit.updateGoodBenefitAccount({
-    ...updateTarget.value,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_GOOD_BENEFIT',
-        Message: 'MSG_UPDATE_GOOD_BENEFIT_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_GOOD_BENEFIT',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateGoodBenefitAccount = () => {
+  sdk.adminUpdateGoodBenefitAccount(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 onMounted(() => {
   if (!accounts.value.length) {
-    getGoodBenefitAccounts(0, 100)
+    sdk.adminGetGoodBenefitAccounts(0, 0)
   }
 })
 </script>

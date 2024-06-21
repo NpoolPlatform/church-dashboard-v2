@@ -24,12 +24,12 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 import { sdk } from 'src/npoolstore'
 
 interface Props {
-  gooId: string | undefined
+  goodId: string | undefined
 }
 
 const props = defineProps<Props>()
-const gooId = toRef(props, 'gooId')
-const target = ref(gooId.value)
+const goodId = toRef(props, 'goodId')
+const target = ref(goodId.value)
 
 const goods = sdk.goods
 const _goods = computed(() => Array.from(goods.value, (el) => {
@@ -48,9 +48,9 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:gooId', gooId: string | undefined): void}>()
+const emit = defineEmits<{(e: 'update:goodId', goodId: string | undefined): void}>()
 const onUpdate = () => {
-  emit('update:gooId', target.value)
+  emit('update:goodId', target.value)
 }
 
 onMounted(() => {

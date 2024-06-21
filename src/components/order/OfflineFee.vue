@@ -54,7 +54,6 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppUsers } from 'src/api/user'
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
 import { appfee, order, user, sdk } from 'src/npoolstore'
 
@@ -81,8 +80,7 @@ interface MyUser {
   value: user.User
 }
 
-const _user = user.useUserStore()
-const users = computed(() => Array.from(_user.appUsers(AppID.value)).map((el) => {
+const users = computed(() => Array.from(sdk.appUsers.value).map((el) => {
   return {
     label: el.EmailAddress?.length ? el.EmailAddress : el.PhoneNO,
     value: el
@@ -150,7 +148,7 @@ const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order
 
 const prepare = () => {
   if (users.value.length === 0) {
-    getAppUsers(0, 100)
+    sdk.adminGetUsers(0, 0)
   }
 }
 

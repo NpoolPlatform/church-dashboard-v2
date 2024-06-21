@@ -62,15 +62,13 @@
 </template>
 
 <script setup lang='ts'>
-import { getPaymentAccounts } from 'src/api/account'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { paymentaccount, notify } from 'src/npoolstore'
+import { paymentaccount, sdk } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const payment = paymentaccount.usePaymentAccountStore()
-const accounts = computed(() => payment.accounts())
+const accounts = sdk.paymentAccounts
 
 const address = ref('')
 const blocked = ref(null)
@@ -110,43 +108,16 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target.value.ID,
-    EntID: target.value.EntID,
-    Active: target.value.Active,
-    Blocked: target.value.Blocked,
-    Locked: target.value.Locked
-  }
-})
-
-const onSubmit = (done: () => void) => {
-  payment.updatePaymentAccount({
-    ...updateTarget.value,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const onSubmit = () => {
+  sdk.adminUpdatePaymentAccount(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 onMounted(() => {
   if (!accounts.value.length) {
-    getPaymentAccounts(0, 500)
+    sdk.adminGetPaymentAccounts(0, 0)
   }
 })
 </script>

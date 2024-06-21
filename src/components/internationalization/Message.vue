@@ -53,7 +53,7 @@
         <span>{{ updating ? $t('MSG_UPDATE_MESSAGE') : $t('MSG_CREATE_MESSAGE') }}</span>
       </q-card-section>
       <q-card-section v-if='!updating'>
-        <AppLanguagePicker v-model:id='target.LangID' label='MSG_SELECT_LANGUAGE' />
+        <AppLanguagePicker v-model:app-lang-id='target.LangID' label='MSG_SELECT_LANGUAGE' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <span> {{ target?.Lang }}</span>
@@ -118,10 +118,10 @@
         <span>{{ $t('MSG_BATCH_CREATE_MESSAGE') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppLanguagePicker v-model:id='langID' label='MSG_CURRENT_MESSAGES_LANGUAGE' />
+        <AppLanguagePicker v-model:app-lang-id='langID' label='MSG_CURRENT_MESSAGES_LANGUAGE' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onBatchCancel' />
       </q-item>
     </q-card>
@@ -130,21 +130,18 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { getAppMessages } from 'src/api/g11n'
-import { message, utils, notify, _locale, g11nbase, sdk } from 'src/npoolstore'
+import { message, utils, _locale, g11nbase, sdk } from 'src/npoolstore'
 import saveAs from 'file-saver'
 
 const AppID = sdk.AppID
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
 
 const locale = _locale.useLocaleStore()
 const _langID = computed(() => locale?.AppLang?.LangID)
 
-const _message = message.useMessageStore()
 const messages = computed(() => {
-  return _message.messages(AppID.value, undefined, undefined)?.filter((el) => el.AppID === AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN'))
+  return sdk.messages.value.filter((el) => el.AppID === AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN'))
 })
 
 const messageID = ref('')
@@ -198,97 +195,26 @@ const onExport = () => {
   })
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppMessage(done) : createAppMessage(done)
+const onSubmit = () => {
+  updating.value ? updateAppMessage() : createAppMessage()
 }
 
-const createAppMessage = (done: () => void) => {
-  _message.createAppMessage({
-    TargetAppID: AppID.value,
-    TargetLangID: target.value?.LangID,
-    ...target.value,
-    NotifyMessage: {
-      Error: {
-        Title: 'MSG_CREATE_MESSAGE',
-        Message: 'MSG_CREATE_MESSAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_MESSAGE',
-        Message: 'MSG_CREATE_MESSAGE_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createAppMessage = () => {
+  sdk.adminCreateMessage(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target?.value?.ID,
-    TargetAppID: AppID.value,
-    TargetLangID: target?.value.LangID,
-    Lang: target?.value?.Lang,
-    MessageID: target?.value?.MessageID,
-    Message: target?.value?.Message,
-    GetIndex: target?.value?.GetIndex,
-    Disabled: target?.value?.Disabled
-  }
-})
-const updateAppMessage = (done: () => void) => {
-  _message.updateAppMessage({
-    ...updateTarget.value,
-    NotifyMessage: {
-      Error: {
-        Title: 'MSG_UPDATE_MESSAGE',
-        Message: 'MSG_UPDATE_MESSAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_MESSAGE',
-        Message: 'MSG_UPDATE_MESSAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateAppMessage = () => {
+  sdk.adminUpdateMessage(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 const onDelete = () => {
-  _message.deleteAppMessage({
-    ID: selectedMessages?.value[0].ID,
-    TargetAppID: AppID.value,
-    Message: {
-      Error: {
-        Title: 'MSG_DELETE_MESSAGE',
-        Message: 'MSG_DELETE_MESSAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_DELETE_MESSAGE',
-        Message: 'MSG_DELETE_MESSAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, () => {
-    // TODO
-  })
+  sdk.adminDeleteMessage(target.value)
 }
 
 const loadedMessages = ref([] as Array<g11nbase.Message>)
@@ -331,37 +257,13 @@ const onBatchCancel = () => {
   batchCreating.value = false
 }
 
-const onBatchSubmit = (done: () => void) => {
-  _message.createAppMessages({
-    TargetAppID: AppID.value,
-    TargetLangID: langID.value,
-    Infos: importMessages.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_COUNTRIES',
-        Message: 'MSG_CREATE_COUNTRIES_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_BATCH_CREATE_COUNTRIES',
-        Message: 'MSG_BATCH_CREATE_COUNTRIES_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
-    onBatchCancel()
-  })
+const onBatchSubmit = () => {
+  sdk.adminCreateMessages(langID.value, importMessages.value)
 }
 
 const prepare = () => {
   if (!messages.value?.length) {
-    getAppMessages(0, 500)
+    sdk.getMessages(0, 0)
   }
 }
 

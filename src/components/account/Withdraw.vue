@@ -28,10 +28,9 @@
 </template>
 
 <script setup lang='ts'>
-import { getNAppUserAccounts } from 'src/api/account'
 import { computed, onMounted, watch, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useraccount, accountbase, useraccountbase, sdk } from 'src/npoolstore'
+import { useraccountbase, sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
@@ -41,8 +40,7 @@ const { t } = useI18n({ useScope: 'global' })
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const account = useraccount.useUserAccountStore()
-const accounts = computed(() => account.accounts(AppID.value, undefined, undefined, accountbase.AccountUsedFor.UserWithdraw))
+const accounts = computed(() => sdk.userWithdrawAccounts(undefined, undefined))
 
 const blocked = ref(null)
 const active = ref(null)
@@ -80,7 +78,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (!accounts.value.length) {
-    getNAppUserAccounts(0, 100)
+    sdk.adminGetUserWithdrawAccounts(0, 0)
   }
 }
 
