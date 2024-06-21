@@ -23,10 +23,11 @@ const router = useRouter()
 const _setting = useSettingStore()
 const logined = user.useLocalUserStore()
 const langName = computed(() => router.currentRoute.value.path.split('/')?.[1])
-const targetLangID = computed(() => sdk.langIdWithName(langName.value) || logined.selectedLangID || sdk.mainLangId.value)
+const langs = sdk.appLanguages
+const targetLangID = computed(() => sdk.langIdWithName(langName.value) || logined.selectedLangID || sdk.mainLangId.value || langs.value[0]?.LangID)
 
 const setLang = () => {
-  const _lang = sdk.appLangWithLangId(targetLangID.value as string)
+  const _lang = sdk.appLangWithLangId(targetLangID.value)
   if (!_lang) return
   setTimeout(() => {
     if (_setting.LangThrottling) {
@@ -42,7 +43,7 @@ watch(targetLangID, () => {
 })
 
 onMounted(() => {
-  if (!sdk.appLanguages.value.length) {
+  if (!langs.value.length) {
     sdk.getAppLangs(0, 0, (error: boolean) => {
       if (error) return
       setLang()
