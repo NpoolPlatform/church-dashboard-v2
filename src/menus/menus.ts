@@ -420,6 +420,24 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '置顶类别海报',
+      caption: '管理置顶类别海报',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/posters',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '置顶商品',
+      caption: '管理置顶商品',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/goods',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '评论',
       caption: '管理商品评论',
       icon: 'perm_identity',

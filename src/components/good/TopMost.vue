@@ -58,7 +58,6 @@
       </q-item>
     </q-card>
   </q-dialog>
-  <TopMostGood />
 </template>
 
 <script setup lang='ts'>
@@ -68,7 +67,6 @@ import { topmost, sdk, utils, goodbase } from 'src/npoolstore'
 const AppID = sdk.AppID
 
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
-const TopMostGood = defineAsyncComponent(() => import('src/components/good/TopMostGood.vue'))
 
 const topMosts = sdk.topMosts
 const target = ref({} as topmost.TopMost)

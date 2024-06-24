@@ -31,28 +31,15 @@
         <span>{{ $t('MSG_TOPMOST_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector :label='$t("MSG_APP_GOOD")' v-model:id='target.AppGoodID' />
-        <TopMostSelector :label='$t("MSG_TOP_MOST")' v-model:id='target.TopMostID' />
+        <AppGoodSelector :label='$t("MSG_APP_GOOD")' v-model:app-good-id='target.AppGoodID' />
+        <TopMostSelector :label='$t("MSG_TOP_MOST")' v-model:top-most-id='target.TopMostID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' />
       </q-card-section>
-      <q-card-section>
-        <q-select
-          label='MSG_POSTERS'
-          filled
-          v-model='target.Posters'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
-      </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -72,6 +59,7 @@ const target = ref({} as topmostgood.TopMostGood)
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
