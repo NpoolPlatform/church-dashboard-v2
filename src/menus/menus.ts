@@ -445,6 +445,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品展示名称',
+      caption: '创建和编辑商品展示名称',
+      icon: 'perm_identity',
+      target: '/app/good/displaynames',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
