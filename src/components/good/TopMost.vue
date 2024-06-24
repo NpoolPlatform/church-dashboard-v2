@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_TOPMOST")'
+    :title='$t("MSG_TOPMOSTS")'
     :rows='topMosts'
     row-key='ID'
     :columns='columns'

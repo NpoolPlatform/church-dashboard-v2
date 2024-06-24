@@ -74,8 +74,11 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (appGoods.value.length === 0) {
+  if (!appGoods.value.length) {
     sdk.adminGetAppGoods(0, 0)
+  }
+  if (!recommends.value.length) {
+    sdk.adminGetGoodRecommends(0, 0)
   }
 }
 </script>

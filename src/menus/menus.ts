@@ -418,6 +418,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '默认商品',
+      caption: '设置币种默认商品',
+      icon: 'perm_identity',
+      target: '/app/good/defaults',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),

@@ -9,18 +9,15 @@
     selection='single'
     :rows-per-page-options='[100]'
   />
-  <AppDefaultGood />
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { appgood, utils, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
-
-const AppDefaultGood = defineAsyncComponent(() => import('src/components/good/AppDefaultGood.vue'))
 
 const appGoods = sdk.appGoods
 
