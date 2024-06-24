@@ -121,7 +121,7 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/good/appgoods',
+        path: 'good/appgoods',
         component: () => import('pages/good/AppGood.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
@@ -433,8 +433,20 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/good/goods',
+        path: 'good/goods',
         component: () => import('pages/good/Good.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/powerrentals',
+        component: () => import('pages/good/PowerRental.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

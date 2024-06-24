@@ -75,7 +75,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (appGoods.value.length === 0) {
-    sdk.getAppGoods(0, 0)
+    sdk.adminGetAppGoods(0, 0)
   }
 }
 </script>

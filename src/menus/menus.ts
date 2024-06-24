@@ -340,27 +340,27 @@ const MainDrawerMenus = [
     children: [{
       menuId: uid(),
       label: '商品管理',
-      caption: '添加与编辑商品',
+      caption: '查看所有商品',
       icon: 'perm_identity',
-      target: '/app/good/goods',
+      target: '/goods',
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, /* {
+    } as MenuItem, {
       menuId: uid(),
-      label: '库存',
-      caption: '管理与展示商品库存',
+      label: '算力租赁',
+      caption: '添加与编辑算力租赁商品',
       icon: 'perm_identity',
-      target: '/stock',
+      target: '/good/powerrentals',
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, */ {
+    } as MenuItem, {
       menuId: uid(),
       label: 'APP商品管理',
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',
-      target: '/app/good/appgoods',
+      target: '/good/appgoods',
       level: 1,
       sectionBegin: false,
       children: []
