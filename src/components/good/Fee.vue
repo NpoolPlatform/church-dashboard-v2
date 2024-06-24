@@ -72,12 +72,12 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { good, utils, sdk, powerrental, goodbase } from 'src/npoolstore'
+import { good, utils, sdk, fee, goodbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const goods = sdk.powerRentals
+const goods = sdk.fees
 
 const goodName = ref('')
 const displayFees = computed(() => {
@@ -90,7 +90,7 @@ const displayFees = computed(() => {
 
 onMounted(() => {
   if (!goods.value.length) {
-    sdk.getPowerRentals(0, 0)
+    sdk.getFees(0, 0)
   }
 })
 
@@ -142,7 +142,7 @@ const columns = computed(() => [
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
-const target = ref({} as powerrental.PowerRental)
+const target = ref({} as fee.Fee)
 
 const onCreate = () => {
   showing.value = true
@@ -152,26 +152,26 @@ const onCreate = () => {
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
-  target.value = {} as powerrental.PowerRental
+  target.value = {} as fee.Fee
 }
 
 const onSubmit = () => {
   submitting.value = true
-  updating.value ? updatePowerRental() : createPowerRental()
+  updating.value ? updateFee() : createFee()
 }
 
 const onCancel = () => {
   onMenuHide()
 }
 
-const createPowerRental = () => {
-  sdk.adminCreatePowerRental(target.value, (error: boolean) => {
+const createFee = () => {
+  sdk.adminCreateFee(target.value, (error: boolean) => {
     if (error) return
     onMenuHide()
   })
 }
 
-const updatePowerRental = () => {
+const updateFee = () => {
   // TODO
 }
 

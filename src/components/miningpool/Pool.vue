@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_MININGPOOLS")'
-    :rows='devices'
+    :rows='miningPools'
     :columns='poolColums'
     row-key='ID'
     :rows-per-page-options='[100]'
