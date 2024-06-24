@@ -438,6 +438,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '置顶商品购买约束',
+      caption: '管理置顶商品购买约束',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/good/constraints',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '评论',
       caption: '管理商品评论',
       icon: 'perm_identity',
