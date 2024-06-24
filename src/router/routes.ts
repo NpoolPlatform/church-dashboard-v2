@@ -241,6 +241,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'app/good/labels',
+        component: () => import('pages/good/Label.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'review/kyc',
         component: () => import('pages/review/KYC.vue'),
         meta: {
