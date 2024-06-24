@@ -447,6 +447,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '置顶商品海报',
+      caption: '管理置顶商品海报',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/good/posters',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '评论',
       caption: '管理商品评论',
       icon: 'perm_identity',
