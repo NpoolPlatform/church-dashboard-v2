@@ -79,58 +79,6 @@
         <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
       </q-card-section>
       <q-card-section>
-        <q-select
-          label='MSG_DISPLAY_NAMES'
-          filled
-          v-model='target.DisplayNames'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
-      </q-card-section>
-      <q-card-section>
-        <q-select
-          label='MSG_DESCRIPTIONS'
-          filled
-          v-model='target.Descriptions'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
-      </q-card-section>
-      <q-card-section>
-        <q-select
-          label='MSG_DISPLAY_COLORS'
-          filled
-          v-model='target.DisplayColors'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
-      </q-card-section>
-      <q-card-section>
-        <q-select
-          label='MSG_POSTERS'
-          filled
-          v-model='target.Posters'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
-      </q-card-section>
-      <q-card-section>
         <div v-if='!updating'>
           <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
         </div>
