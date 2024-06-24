@@ -436,6 +436,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品展示颜色',
+      caption: '创建和编辑商品展示颜色',
+      icon: 'perm_identity',
+      target: '/app/good/displaycolors',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),

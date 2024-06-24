@@ -2,11 +2,11 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_APP_GOOD_DESCRIPTIONS")'
-    :rows='descriptions'
+    :title='$t("MSG_APP_GOOD_DISPLAY_COLORS")'
+    :rows='displaycolors'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as appgooddescription.Description)'
+    @row-click='(evt, row, index) => onRowClick(row as appgooddisplaycolor.DisplayColor)'
   />
   <q-dialog
     v-model='showing'
@@ -15,16 +15,16 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_UPDATE_DESCRIPTION') }}</span>
+        <span>{{ $t('MSG_UPDATE_DISPLAY_COLOR') }}</span>
       </q-card-section>
       <q-card-section>
         <span> {{ target.GoodName }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Description' :label='$t("MSG_DESCRIPTION")' />
+        <q-input v-model='target.DisplayColor' :label='$t("MSG_DISPLAY_COLOR")' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model.number='target.Index' :label='$t("MSG_DESCRIPTION_INDEX")' />
+        <q-input v-model.number='target.Index' :label='$t("MSG_DISPLAY_COLOR_INDEX")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -36,17 +36,17 @@
 
 <script setup lang='ts'>
 import { onMounted, ref, watch } from 'vue'
-import { sdk, appgooddescription } from 'src/npoolstore'
+import { sdk, appgooddisplaycolor } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
 const appGoods = sdk.appGoods
-const descriptions = sdk.goodDescriptions
+const displaycolors = sdk.goodDisplayColors
 
 const showing = ref(false)
-const target = ref(undefined as unknown as appgooddescription.Description)
+const target = ref(undefined as unknown as appgooddisplaycolor.DisplayColor)
 
-const onRowClick = (row: appgooddescription.Description) => {
+const onRowClick = (row: appgooddisplaycolor.DisplayColor) => {
   target.value = row
   showing.value = true
 }
@@ -60,7 +60,7 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
-  sdk.adminUpdateGoodDescription(target.value, () => {
+  sdk.adminUpdateGoodDisplayColor(target.value, () => {
     showing.value = false
   })
 }
@@ -77,8 +77,8 @@ const prepare = () => {
   if (!appGoods.value.length) {
     sdk.adminGetAppGoods(0, 0)
   }
-  if (!descriptions.value.length) {
-    sdk.adminGetGoodDescriptions(0, 0)
+  if (!displaycolors.value.length) {
+    sdk.adminGetGoodDisplayColors(0, 0)
   }
 }
 </script>
