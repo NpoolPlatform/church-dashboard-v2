@@ -38,28 +38,9 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
-        <q-input v-model='target.QuantityUnit' :label='$t("MSG_UNIT")' />
-        <q-input v-model='target.QuantityUnitAmount' :label='$t("MSG_UNIT_POWER")' />
-        <q-input v-model='target.UnitPrice' :label='$t("MSG_PRICE")' type='number' :min='0' />
-        <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
-        <DatePicker v-model:date='target.ServiceStartAt' :updating='updating' :label='$t("MSG_SERVICE_START_AT")' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
-        <q-input v-model.number='target.BenefitIntervalHours' :label='$t("MSG_BENEFIT_INTERVAL_HOURS")' type='number' :min='1' />
-        <q-input v-model='target.UnitLockDeposit' :label='$t("MSG_UNIT_LOCK_DEPOSIT")' />
-      </q-card-section>
-      <q-card-section>
-        <DeviceInfoPicker v-model:device='target.DeviceTypeID' />
-        <VendorLocationPicker v-model:location='target.VendorLocationID' />
-      </q-card-section>
-      <q-card-section>
-        <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
-        <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
-      </q-card-section>
-      <q-card-section>
-        <q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TESTONLY")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
