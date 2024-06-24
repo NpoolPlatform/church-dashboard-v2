@@ -427,6 +427,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品描述',
+      caption: '创建和编辑商品描述',
+      icon: 'perm_identity',
+      target: '/app/good/descriptions',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
