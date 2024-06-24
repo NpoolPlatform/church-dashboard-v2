@@ -481,6 +481,15 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'APP商品依赖',
+      caption: '管理APP商品依赖关系',
+      icon: 'perm_identity',
+      target: '/app/good/requireds',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
