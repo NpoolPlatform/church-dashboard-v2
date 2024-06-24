@@ -375,6 +375,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: 'APP算力租赁管理',
+      caption: '授权、价格与上下架管理',
+      icon: 'perm_identity',
+      target: '/good/apppowerrentals',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '推荐',
       caption: '添加商品推荐',
       icon: 'perm_identity',

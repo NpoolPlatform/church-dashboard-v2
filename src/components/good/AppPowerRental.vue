@@ -1,0 +1,331 @@
+<template>
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_POWER_RENTALS")'
+    :rows='powerRentals'
+    :columns='powerRentalColumns'
+    row-key='ID'
+    selection='single'
+    :rows-per-page-options='[20]'
+    :selected='selectedPowerRentals'
+  />
+  <q-table
+    dense
+    flat
+    :title='$t("MSG_APP_POWER_RENTALS")'
+    :rows='appPowerRentals'
+    :columns='appPowerRentalsColumns'
+    row-key='ID'
+    selection='single'
+    :rows-per-page-options='[20]'
+  />
+  <q-dialog
+    v-model='showing'
+    @hide='onMenuHide'
+    position='right'
+  >
+    <q-card class='popup-menu'>
+      <q-card-section>
+        <span>{{ $t('MSG_CREATE_APP_GOOD') }} : {{ updating? target.GoodName : selectedPowerRental?.Name }}</span>
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
+        <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
+        <q-input v-model='target.MinOrderAmount' :label='$t("MSG_MIN_ORDER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MaxOrderAmount' :label='$t("MSG_MAX_ORDER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MaxUserAmount' :label='$t("MSG_MAX_USER_AMOUNT")' type='number' :min='0' />
+        <q-input v-model='target.MinOrderDurationSeconds' :label='$t("MSG_MIN_ORDER_DURATION_SECONDS")' type='number' :min='0' />
+        <q-input v-model='target.MaxOrderDurationSeconds' :label='$t("MSG_MAX_ORDER_DURATION_SECONDS")' type='number' :min='0' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          :options='goodbase.CancelModes'
+          v-model='target.CancelMode'
+          :label='$t("MSG_CANCEL_MODE")'
+        />
+        <q-input
+          v-model.number='target.CancelableBeforeStartSeconds'
+          :label='$t("MSG_CANCELLABLE_BEFORE_START")'
+          type='number'
+          :min='0'
+          suffix='h'
+          :disable='!sdk.appPowerRentalCancelable(target.EntID)'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model.number='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' :min='0' />
+        <q-input v-model='target.Banner' :label='$t("MSG_BANNER")' />
+        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_DISPLAY_NAMES'
+          filled
+          v-model='target.DisplayNames'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_DESCRIPTIONS'
+          filled
+          v-model='target.Descriptions'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_DISPLAY_COLORS'
+          filled
+          v-model='target.DisplayColors'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          label='MSG_POSTERS'
+          filled
+          v-model='target.Posters'
+          use-input
+          use-chips
+          multiple
+          hide-dropdown-icon
+          input-debounce='0'
+          new-value-mode='add'
+        />
+      </q-card-section>
+      <q-card-section>
+        <div v-if='!updating'>
+          <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
+        </div>
+        <div v-if='!updating'>
+          <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
+        </div>
+        <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
+      </q-card-section>
+      <q-card-section>
+        <div><q-toggle dense v-model='target.EnableSetCommission' :label='$t("MSG_ENABLE_SET_COMMISSION")' /></div>
+        <div><q-toggle dense v-model='target.AppGoodPurchasable' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
+        <div><q-toggle dense v-model='target.EnableProductPage' :label='$t("MSG_ENABLE_PRODUCT_PAGE")' /></div>
+        <div><q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' /></div>
+        <div><q-toggle dense v-model='target.AppGoodOnline' :label='$t("MSG_ONLINE")' /></div>
+        <div><q-toggle dense v-model='target.PackageWithRequireds' :label='$t("MSG_PACKAGE_WITH_REQUIREDS")' /></div>
+      </q-card-section>
+      <q-item class='row'>
+        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+      </q-item>
+    </q-card>
+  </q-dialog>
+  <AppPowerRentalSimulate />
+</template>
+
+<script setup lang='ts'>
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { apppowerrental, utils, sdk, goodbase, powerrental } from 'src/npoolstore'
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
+
+const AppPowerRentalSimulate = defineAsyncComponent(() => import('src/components/good/AppPowerRentalSimulate.vue'))
+
+const powerRentals = sdk.powerRentals
+const appPowerRentals = sdk.appPowerRentals
+const selectedPowerRentals = ref([] as powerrental.PowerRental[])
+const selectedPowerRental = computed(() => selectedPowerRentals.value[0])
+
+onMounted(() => {
+  if (!appPowerRentals.value.length) {
+    sdk.adminGetAppPowerRentals(0, 0)
+  }
+  if (!powerRentals.value.length) {
+    sdk.getPowerRentals(0, 0)
+  }
+})
+
+const powerRentalColumns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.EntID
+  },
+  {
+    name: 'Title',
+    label: t('MSG_GOOD_NAME'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Name
+  },
+  {
+    name: 'GOODTYPE',
+    label: t('MSG_GOOD_TYPE'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.GoodType
+  },
+  {
+    name: 'GOODPRICE',
+    label: t('MSG_GOOD_UNIT_PRICE'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.UnitPrice
+  },
+  {
+    name: 'GOODQUANTITYUNIT',
+    label: t('MSG_GOOD_UNIT'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => t(row.QuantityUnit)
+  },
+  {
+    name: 'GOODQUANTITYUNITAMOUNT',
+    label: t('MSG_GOOD_UNIT'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => t(row.QuantityUnitAmount)
+  },
+  {
+    name: 'GOODTOTAL',
+    label: t('MSG_GOOD_TOTAL'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Total
+  },
+  {
+    name: 'GOODSOLD',
+    label: t('MSG_GOOD_SOLD'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Sold
+  },
+  {
+    name: 'GOODLOCKED',
+    label: t('MSG_GOOD_LOCKED'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Locked
+  },
+  {
+    name: 'GOODINSERVICE',
+    label: t('MSG_GOOD_INSERVICE'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.InService
+  },
+  {
+    name: 'WaitStart',
+    label: t('MSG_GOOD_WAITSTART'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.WaitStart
+  },
+  {
+    name: 'BENEFITTYPE',
+    label: t('MSG_BENEFITTYPE'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.BenefitType
+  },
+  {
+    name: 'STARTAT',
+    label: t('MSG_STARTAT'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => utils.formatTime(row.ServiceStartAt)
+  }
+])
+
+const appPowerRentalsColumns = computed(() => [
+  {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.EntID
+  },
+  {
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodID
+  },
+  {
+    name: 'GoodName',
+    label: t('MSG_GOOD_NAME'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodName
+  },
+  {
+    name: 'GoodType',
+    label: t('MSG_GOOD_TYPE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodType
+  },
+  {
+    name: 'Online',
+    label: t('MSG_ONLINE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodOnline && row.AppGoodOnline
+  },
+  {
+    name: 'Visible',
+    label: t('MSG_VISIBLE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.Visible
+  },
+  {
+    name: 'BenefitType',
+    label: t('MSG_BENEFIT_TYPE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.BenefitType
+  },
+  {
+    name: 'StartAt',
+    label: t('MSG_START_AT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row.ServiceStartAt)
+  }
+])
+
+const showing = ref(false)
+const updating = ref(false)
+const submitting = ref(false)
+const target = ref({} as apppowerrental.AppPowerRental)
+
+const onMenuHide = () => {
+  showing.value = false
+  submitting.value = false
+  target.value = {} as apppowerrental.AppPowerRental
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = () => {
+  // TODO
+}
+
+</script>
+<style lang='sass' scoped>
+.commission-percent
+  ::v-deep .q-field__append
+    align-items: flex-end
+</style>

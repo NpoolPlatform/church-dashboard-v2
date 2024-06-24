@@ -10,7 +10,6 @@
     :rows-per-page-options='[100]'
   />
   <AppDefaultGood />
-  <AppPowerRentalSimulate />
 </template>
 
 <script setup lang='ts'>
@@ -22,7 +21,6 @@ import { appgood, utils, sdk } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const AppDefaultGood = defineAsyncComponent(() => import('src/components/good/AppDefaultGood.vue'))
-const AppPowerRentalSimulate = defineAsyncComponent(() => import('src/components/good/AppPowerRentalSimulate.vue'))
 
 const appGoods = sdk.appGoods
 
