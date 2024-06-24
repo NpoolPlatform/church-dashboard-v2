@@ -661,6 +661,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'good/goodcoins',
+        component: () => import('pages/good/GoodCoin.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'good/powerrentals',
         component: () => import('pages/good/PowerRental.vue'),
         meta: {

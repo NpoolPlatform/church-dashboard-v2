@@ -348,6 +348,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '商品币种管理',
+      caption: '添加与编辑商品币种',
+      icon: 'perm_identity',
+      target: '/good/goodcoins',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '算力租赁',
       caption: '添加与编辑算力租赁商品',
       icon: 'perm_identity',

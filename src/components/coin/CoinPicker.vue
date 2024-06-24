@@ -25,14 +25,14 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 import { sdk } from 'src/npoolstore'
 
 interface Props {
-  id: string
+  coinTypeId: string
   updating?: boolean
   label?: string,
   getData?: boolean
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const coinTypeId = toRef(props, 'coinTypeId')
 const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
 const getData = toRef(props, 'getData')
@@ -41,7 +41,7 @@ const myLabel = computed(() => {
   return !label.value ? 'MSG_COINS' : label.value
 })
 
-const target = ref(id.value)
+const target = ref(coinTypeId.value)
 
 const coins = computed(() => Array.from(sdk.coins.value).map((el) => {
   return {
@@ -59,9 +59,9 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:coinTypeId', coinTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:coinTypeId', target.value)
 }
 
 onMounted(() => {
