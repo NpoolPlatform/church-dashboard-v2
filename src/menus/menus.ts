@@ -550,7 +550,16 @@ const MainDrawerMenus = [
         label: '设备',
         caption: '管理设备型号',
         icon: 'perm_identity',
-        target: '/supply/devices',
+        target: '/supply/devicetypes',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '设备供应商',
+        caption: '管理设备供应商',
+        icon: 'perm_identity',
+        target: '/supply/device/manufacturers',
         level: 1,
         sectionBegin: false,
         children: []
