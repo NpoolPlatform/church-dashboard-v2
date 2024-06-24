@@ -402,10 +402,19 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: '置顶',
-      caption: '管理置顶商品',
+      label: '置顶类别',
+      caption: '管理商品置顶类别',
       icon: 'perm_identity',
       target: '/app/good/topmosts',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '置顶购买约束',
+      caption: '管理置顶购买约束',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/constraints',
       level: 1,
       sectionBegin: false,
       children: []
