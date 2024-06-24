@@ -129,7 +129,9 @@ const feeColumns = computed(() => [
     name: 'GoodPrice',
     label: t('MSG_GOOD_UNIT_PRICE'),
     sortable: true,
-    field: (row: fee.Fee) => row.UnitValue
+    field: (row: fee.Fee) => row.UnitValue +
+                            (row.SettlementType === goodbase.GoodSettlementType.GoodSettledByPaymentAmount ? ' USDT' : (' % of ' +
+                              (row.SettlementType === goodbase.GoodSettlementType.GoodSettledByPaymentPercent ? 'Payment' : 'Reward')))
   }
 ])
 
