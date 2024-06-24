@@ -70,7 +70,7 @@
         <div><q-toggle dense v-model='target.AppGoodOnline' :label='$t("MSG_ONLINE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -127,7 +127,7 @@ const feeColumns = computed(() => [
   },
   {
     name: 'GoodPrice',
-    label: t('MSG_GOOD_UNIT_PRICE'),
+    label: t('MSG_GOOD_UNIT_VALUE'),
     sortable: true,
     field: (row: fee.Fee) => row.UnitValue +
                             (row.SettlementType === goodbase.GoodSettlementType.GoodSettledByPaymentAmount ? ' USDT' : (' % of ' +
@@ -190,7 +190,21 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
-  // TODO
+  updating.value ? updateAppFee() : createAppFee()
+}
+
+const createAppFee = () => {
+  sdk.adminCreateAppFee(target.value, (error: boolean) => {
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const updateAppFee = () => {
+  sdk.adminUpdateAppFee(target.value, (error: boolean) => {
+    if (error) return
+    onMenuHide()
+  })
 }
 
 const onAuthorizeClick = () => {
