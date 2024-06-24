@@ -8,8 +8,28 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
-    :selected='selectedPowerRentals'
-  />
+    v-model:selected='selectedPowerRentals'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='goodName'
+          :label='$t("MSG_GOOD_NAME")'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_AUTHORIZE")'
+          @click='onAuthorizeClick'
+          :disable='selectedPowerRentals.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-table
     dense
     flat
@@ -150,6 +170,7 @@ const powerRentals = sdk.powerRentals
 const appPowerRentals = sdk.appPowerRentals
 const selectedPowerRentals = ref([] as powerrental.PowerRental[])
 const selectedPowerRental = computed(() => selectedPowerRentals.value[0])
+const goodName = ref('')
 
 onMounted(() => {
   if (!appPowerRentals.value.length) {
@@ -321,6 +342,11 @@ const onCancel = () => {
 
 const onSubmit = () => {
   // TODO
+}
+
+const onAuthorizeClick = () => {
+  showing.value = true
+  updating.value = false
 }
 
 </script>
