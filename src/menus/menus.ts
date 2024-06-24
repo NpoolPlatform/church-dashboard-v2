@@ -565,6 +565,15 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
+        label: '设备海报',
+        caption: '管理设备海报',
+        icon: 'perm_identity',
+        target: '/supply/device/posters',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
         label: '场地',
         caption: '管理托管场地',
         icon: 'perm_identity',

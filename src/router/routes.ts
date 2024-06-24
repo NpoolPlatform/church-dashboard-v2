@@ -613,6 +613,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'supply/device/posters',
+        component: () => import('pages/supply/DevicePoster.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'supply/vendorbrands',
         component: () => import('pages/supply/Brand.vue'),
         meta: {
