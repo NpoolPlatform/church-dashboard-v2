@@ -10,12 +10,12 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, computed } from 'vue'
 import { sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
-const withdrawAddress = sdk.userWithdrawAccounts
+const withdrawAddress = computed(() => sdk.userWithdrawAccounts(undefined, undefined))
 
 watch(AppID, () => {
   prepare()

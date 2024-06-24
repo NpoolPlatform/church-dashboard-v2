@@ -21,25 +21,20 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { useI18n } from 'vue-i18n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { miningpoolpool, notify } from 'src/npoolstore'
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
+import { sdk } from 'src/npoolstore'
 
 interface Props {
-  id: string
+  miningPoolId: string
   updating?: boolean
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const miningPoolId = toRef(props, 'miningPoolId')
 const updating = toRef(props, 'updating')
-const target = ref(id.value)
+const target = ref(miningPoolId.value)
 
-const poolInfo = miningpoolpool.useMiningpoolPoolStore()
-const pools = computed(() => Array.from(poolInfo.pools()).map((el) => {
+const pools = computed(() => Array.from(sdk.miningPools.value).map((el) => {
   return {
     value: el.EntID,
     label: `${el.Name} | ${el.MiningpoolType} | ${el.EntID}`
@@ -56,33 +51,14 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:miningPoolId', miningPoolId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
-}
-
-const getPools = (offset: number, limit: number) => {
-  poolInfo.getPools({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_ADMIN_GET_POOLS'),
-        Message: t('MSG_ADMIN_GET_POOL_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, pools?: Array<miningpoolpool.Pool>) => {
-    if (error || !pools?.length) {
-      console.log('get pools end')
-    }
-  })
+  emit('update:miningPoolId', target.value)
 }
 
 onMounted(() => {
   if (!pools.value?.length) {
-    getPools(0, 0)
+    sdk.getMiningPools(0, 0)
   }
 })
 

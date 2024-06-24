@@ -357,6 +357,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '电费/服务费',
+      caption: '添加与编辑电费/服务费商品',
+      icon: 'perm_identity',
+      target: '/good/fees',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: 'APP商品管理',
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',

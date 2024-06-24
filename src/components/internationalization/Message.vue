@@ -141,7 +141,7 @@ const locale = _locale.useLocaleStore()
 const _langID = computed(() => locale?.AppLang?.LangID)
 
 const messages = computed(() => {
-  return sdk.messages.value.filter((el) => el.AppID === AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN'))
+  return sdk.messages(_langID.value).filter((el) => el.AppID === AppID.value).sort((a, b) => a.MessageID.localeCompare(b.MessageID, 'zh-CN'))
 })
 
 const messageID = ref('')
