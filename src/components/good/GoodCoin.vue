@@ -38,11 +38,11 @@
     <q-card class='popup-menu'>
       <q-card-section>
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
-        <GoodSelector v-model:good-id='target.CoinTypeID' label='MSG_GOOD_ID' />
+        <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -65,6 +65,7 @@ const goodCoins = sdk.goodCoins
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as goodcoin.GoodCoin)
 
 const onCreate = () => {
@@ -78,15 +79,20 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as goodcoin.GoodCoin
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateAppCoin() : createAppCoin()
 }
 
 const updateAppCoin = () => {
-  // TODO
+  sdk.adminUpdateGoodCoin(target.value, (error: boolean) => {
+    if (error) return
+    onMenuHide()
+  })
 }
 
 const createAppCoin = () => {

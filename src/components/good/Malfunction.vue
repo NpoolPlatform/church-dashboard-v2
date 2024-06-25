@@ -37,7 +37,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <GoodSelector v-model:good-id='target.CoinTypeID' label='MSG_GOOD_ID' />
+        <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
       </q-card-section>
       <q-item class='row'>
         <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
