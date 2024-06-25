@@ -5,7 +5,7 @@
     :title='$t("MSG_GOOD_PAYMENT_ADDRESSES")'
     :rows='displayAccounts'
     row-key='ID'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as paymentaccount.Account)'
   >
     <template #top>
@@ -54,8 +54,8 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -65,7 +65,6 @@
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { paymentaccount, sdk } from 'src/npoolstore'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
 const accounts = sdk.paymentAccounts
@@ -91,10 +90,12 @@ const displayAccounts = computed(() => accounts.value.filter((el) => {
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as paymentaccount.Account)
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as paymentaccount.Account
 }
 
@@ -109,6 +110,7 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   sdk.adminUpdatePaymentAccount(target.value, (error: boolean) => {
     if (error) return
     onMenuHide()
