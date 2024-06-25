@@ -6,7 +6,7 @@
     :rows='displayCoins'
     row-key='ID'
     :title='$t("MSG_COINS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as coin.Coin)'
   >
     <template #top-right>

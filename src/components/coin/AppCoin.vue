@@ -6,7 +6,7 @@
     row-key='ID'
     selection='multiple'
     :title='$t("MSG_APP_COINS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     v-model:selected='selectedCoin'
     :columns='coinColumns'
   >
@@ -44,7 +44,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
