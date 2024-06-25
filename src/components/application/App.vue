@@ -90,6 +90,10 @@ const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
 
+watch(newName, () => {
+  target.value.Name = newName.value
+})
+
 const onRowClick = (row: app.App) => {
   target.value = { ...row }
   commitButtonTargets.value = row.CommitButtonTargets?.join(',')
