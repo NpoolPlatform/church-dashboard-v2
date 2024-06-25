@@ -5,7 +5,7 @@
     :title='$t("MSG_GOOD_BENEFIT_ADDRESSES")'
     :rows='displayGbAccounts'
     row-key='ID'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as goodbenefitaccount.Account)'
   >
     <template #top>
@@ -34,14 +34,6 @@
       </q-card-section>
       <q-card-section v-if='!updating'>
         <GoodSelector v-model:good-id='target.GoodID' />
-        <!-- <q-input
-          type='number'
-          min='1'
-          max='24'
-          v-model='target.BenefitIntervalHours'
-          :label='$t("MSG_ADDRESS")'
-          :suffix='$t("MSG_HOUR")'
-        /> -->
       </q-card-section>
       <q-card-section v-if='updating'>
         <div><span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span></div>
@@ -64,8 +56,8 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -103,10 +95,12 @@ const displayGbAccounts = computed(() => accounts.value.filter((el) => {
 }))
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as goodbenefitaccount.Account)
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as goodbenefitaccount.Account
 }
 
@@ -126,6 +120,7 @@ const onRowClick = (row: goodbenefitaccount.Account) => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateGoodBenefitAccount() : createGoodBenefitAccount()
 }
 
