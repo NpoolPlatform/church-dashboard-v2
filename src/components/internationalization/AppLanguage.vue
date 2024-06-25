@@ -45,8 +45,8 @@
         <div><q-toggle dense v-model='target.Main' :label='$t("MSG_MAIN_LANGUAGE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -67,6 +67,7 @@ const target = ref({} as g11nbase.AppLang)
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -76,6 +77,7 @@ const onCreate = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as g11nbase.AppLang
 }
 
@@ -84,6 +86,7 @@ const onCancel = () => {
 }
 
 const onAuthorize = () => {
+  submitting.value = true
   sdk.adminCreateAppLang(target.value, (error: boolean) => {
     if (error) return
     onMenuHide()
