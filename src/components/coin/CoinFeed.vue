@@ -5,7 +5,7 @@
     :rows='displayFeeds'
     row-key='ID'
     :title='$t("MSG_COIN_FEEDS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as coincurrencyfeed.CoinFeed)'
   >
