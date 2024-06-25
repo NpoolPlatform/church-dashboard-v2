@@ -29,7 +29,7 @@
         <span>{{ $t('MSG_CREATE_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />

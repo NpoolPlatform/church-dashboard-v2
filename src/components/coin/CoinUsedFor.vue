@@ -48,7 +48,7 @@
         <span>{{ $t('MSG_COIN_USED_FOR') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section>
         <q-select :options='coinusedfor.CoinUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />

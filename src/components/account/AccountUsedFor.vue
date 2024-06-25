@@ -6,7 +6,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section v-if='!updating'>
-        <CoinPicker v-model:id='target.CoinTypeID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
         <q-input v-if='hiddenAddress ' v-model='target.Address' :label='$t("MSG_ADDRESS")' />
         <q-select :options='accountbase.AccountUsedFors' v-model='target.UsedFor' disable :label='$t("MSG_ACCOUNT_USED_FOR")' />
       </q-card-section>

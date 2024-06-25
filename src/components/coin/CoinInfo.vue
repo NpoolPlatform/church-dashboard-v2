@@ -36,7 +36,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section v-if='updating'>
-        <CoinPicker v-model:id='target.FeeCoinTypeID' label='MSG_FEE_COIN_TYPE_ID' :get-data='false' />
+        <CoinPicker v-model:coin-type-id='target.FeeCoinTypeID' label='MSG_FEE_COIN_TYPE_ID' :get-data='false' />
         <q-input v-model='target.ReservedAmount' :label='$t("MSG_COIN_RESERVED_AMOUNT")' />
         <q-input v-model='target.HomePage' :label='$t("MSG_COIN_HOMEPAGE")' />
         <q-input v-model='target.Specs' :label='$t("MSG_COIN_SPECS")' />

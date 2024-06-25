@@ -55,7 +55,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
         <FiatPicker v-model:id='target.FiatID' label='MSG_FIAT_ID' />
       </q-card-section>
       <q-item class='row'>
