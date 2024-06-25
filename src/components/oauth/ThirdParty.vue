@@ -95,7 +95,7 @@ const onSubmit = (done: () => void) => {
 }
 
 const createOAuthThirdParty = (done: () => void) => {
-  thirdParty.createOAuthThirdParty({
+  thirdParty.adminCreateOAuthThirdParty({
     ...target.value,
     Message: {
       Error: {
@@ -121,7 +121,7 @@ const createOAuthThirdParty = (done: () => void) => {
 }
 
 const updateOAuthThirdParty = (done: () => void) => {
-  thirdParty.updateOAuthThirdParty({
+  thirdParty.adminUpdateOAuthThirdParty({
     ...target.value,
     Message: {
       Error: {
