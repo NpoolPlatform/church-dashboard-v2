@@ -75,8 +75,8 @@
         <div><q-toggle dense v-model='target.CheckNewAddressBalance' :label='$t("MSG_CHECK_NEW_ADDRESS_BALANCE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -115,6 +115,7 @@ const displayCoins = computed(() => {
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as coin.Coin)
 
 const _chain = chain.useChainStore()
@@ -146,10 +147,12 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as coin.Coin
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateCoin() : createCoin()
 }
 
