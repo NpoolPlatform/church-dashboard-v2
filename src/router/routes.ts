@@ -649,7 +649,7 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'good/goods',
+        path: 'goods',
         component: () => import('pages/good/Good.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
