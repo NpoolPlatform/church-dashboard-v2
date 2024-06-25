@@ -29,14 +29,14 @@ import { miningpoolcoin, notify } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 interface Props {
-  id: string
+  miningPoolCoinTypeId: string
   updating?: boolean
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const miningPoolCoinTypeId = toRef(props, 'miningPoolCoinTypeId')
 const updating = toRef(props, 'updating')
-const target = ref(id.value)
+const target = ref(miningPoolCoinTypeId.value)
 
 const coinInfo = miningpoolcoin.useMiningpoolCoinStore()
 const coins = computed(() => Array.from(coinInfo.coins()).map((el) => {
@@ -56,9 +56,9 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:miningPoolCoinTypeId', miningPoolCoinTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:miningPoolCoinTypeId', target.value)
 }
 
 const getCoins = (offset: number, limit: number) => {
