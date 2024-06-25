@@ -961,7 +961,7 @@ const MainDrawerMenus = [
         label: '模拟订单配置',
         caption: '模拟订单配置',
         icon: 'format_list_numbered',
-        target: '/order/simulateconfig',
+        target: '/order/appconfig',
         level: 1,
         sectionBegin: false,
         children: []
