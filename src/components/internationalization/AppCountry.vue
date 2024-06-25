@@ -92,13 +92,13 @@ const onDelete = () => {
 
 watch(AppID, () => {
   if (!countries.value.length) {
-    sdk.getAppCountries(0, 0)
+    sdk.adminGetAppCountries(0, 0)
   }
 })
 
 onMounted(() => {
   if (!countries.value.length) {
-    sdk.getAppCountries(0, 0)
+    sdk.adminGetAppCountries(0, 0)
   }
 })
 
