@@ -58,8 +58,7 @@ const AppID = sdk.AppID
 const appSubscribe = appsubscribe.useAppSubscribeStore()
 const appSubscribes = computed(() => appSubscribe.AppSubscribes.get(AppID.value) ? appSubscribe.AppSubscribes.get(AppID.value) : [])
 
-const _app = app.useApplicationStore()
-const apps = computed(() => _app.apps())
+const apps = sdk.applications
 
 const targetApp = ref(undefined as unknown as app.App)
 const subscribeApp = ref(undefined as unknown as app.App)
@@ -87,28 +86,10 @@ watch(AppID, () => {
   prepare()
 })
 
-const getApps = (offset: number, limit: number) => {
-  _app.getApps({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APPS',
-        Message: 'MSG_GET_APPS_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, apps?: Array<app.App>) => {
-    if (error || !apps?.length) {
-      return
-    }
-    getApps(offset + limit, limit)
-  })
-}
-
 onMounted(() => {
-  getApps(0, 100)
+  if (!apps.value.length) {
+    sdk.getApplications(0, 0)
+  }
   prepare()
 })
 
@@ -120,6 +101,7 @@ const onDelete = () => {
   selectedAppSubscribe.value.forEach((el) => {
     appSubscribe.deleteAppSubscribe({
       ID: el.ID,
+      EntID: el.EntID,
       TargetAppID: el.AppID,
       Message: {
         Error: {
@@ -146,8 +128,8 @@ const onSubmit = () => {
     return
   }
   appSubscribe.createAppSubscribe({
-    TargetAppID: targetApp.value.ID,
-    SubscribeAppID: subscribeApp.value.ID,
+    TargetAppID: targetApp.value.EntID,
+    SubscribeAppID: subscribeApp.value.EntID,
     Message: {
       Error: {
         Title: 'MSG_CREATE_APP_SUBSCRIBE',

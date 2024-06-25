@@ -22,20 +22,20 @@
 </template>
 <script setup lang='ts'>
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { app, notify } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
-  id: string
+  appId: string
   updating?: boolean
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const appId = toRef(props, 'appId')
 const updating = toRef(props, 'updating')
-const target = ref(id.value)
+const target = ref(appId.value)
 
-const application = app.useApplicationStore()
-const applications = computed(() => application.apps().map((el) => {
+const apps = sdk.applications
+const applications = computed(() => apps.value.map((el) => {
   return {
     value: el.EntID,
     label: `${el.Name} | ${el.EntID}`
@@ -51,34 +51,14 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:appId', appId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:appId', target.value)
 }
 
 onMounted(() => {
-  if (!application.apps().length) {
-    getApps(0, 100)
+  if (!apps.value.length) {
+    sdk.getApplications(0, 0)
   }
 })
-
-const getApps = (offset: number, limit: number) => {
-  application.getApps({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: 'MSG_GET_APPS',
-        Message: 'MSG_GET_APPS_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, apps?: Array<app.App>) => {
-    if (error || !apps?.length) {
-      return
-    }
-    getApps(offset + limit, limit)
-  })
-}
 </script>
