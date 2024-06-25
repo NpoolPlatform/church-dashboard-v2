@@ -17,13 +17,6 @@
           :label='$t("MSG_CREATE")'
           @click='onCreate'
         />
-        <!-- <q-btn
-          dense
-          flat
-          class='btn flat'
-          :label='$t("MSG_EXPORT")'
-          @click='onExport'
-        /> -->
       </div>
     </template>
   </q-table>
@@ -43,8 +36,8 @@
         <q-input v-model='target.Short' :label='$t("MSG_LANGUAGE_SHORT")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -64,6 +57,7 @@ const langs = sdk.languages
 const target = ref({} as language.Lang)
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -73,6 +67,7 @@ const onCreate = () => {
 const onMenuHide = () => {
   target.value = {} as language.Lang
   showing.value = false
+  submitting.value = false
 }
 
 const onRowClick = (row: language.Lang) => {
@@ -86,6 +81,7 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateLang() : createLang()
 }
 
