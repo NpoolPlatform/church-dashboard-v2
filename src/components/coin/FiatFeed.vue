@@ -35,7 +35,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <FiatPicker v-model:id='target.FiatID' :updating='updating' :label='"MSG_FIAT_ID"' />
+        <FiatPicker v-model:fiat-id='target.FiatID' :updating='updating' :label='"MSG_FIAT_ID"' />
         <q-input v-model='target.FeedFiatName' :label='$t("MSG_FEED_FIAT_NAME")' />
         <q-select :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>
