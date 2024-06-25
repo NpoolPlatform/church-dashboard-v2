@@ -101,13 +101,13 @@ const onDelete = () => {
 
 watch(AppID, () => {
   if (langs.value.length === 0) {
-    sdk.getAppLangs(0, 0)
+    sdk.adminGetAppLangs(0, 0)
   }
 })
 
 onMounted(() => {
   if (langs.value.length === 0) {
-    sdk.getAppLangs(0, 0)
+    sdk.adminGetAppLangs(0, 0)
   }
 })
 </script>
