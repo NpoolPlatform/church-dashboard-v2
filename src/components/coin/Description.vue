@@ -94,7 +94,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (!descriptions.value?.length) {
-    sdk.getAppCoinDescriptions(0, 0)
+    sdk.adminGetAppCoinDescriptions(0, 0)
   }
 }
 
