@@ -92,6 +92,15 @@ const selectedFees = ref([] as fee.Fee[])
 const selectedFee = computed(() => selectedFees.value[0])
 const goodName = ref('')
 
+watch(sdk.AppID, () => {
+  if (!appFees.value.length) {
+    sdk.adminGetAppFees(0, 0)
+  }
+  if (!fees.value.length) {
+    sdk.getFees(0, 0)
+  }
+})
+
 onMounted(() => {
   if (!appFees.value.length) {
     sdk.adminGetAppFees(0, 0)
