@@ -5,7 +5,7 @@
     :title='$t("MSG_POWER_RENTALS")'
     :rows='displayPowerRentals'
     row-key='ID'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     :columns='columns'
   >
     <template #top-right>
@@ -165,8 +165,7 @@ const onCancel = () => {
 }
 
 const createPowerRental = () => {
-  sdk.adminCreatePowerRental(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreatePowerRental(target.value, () => {
     onMenuHide()
   })
 }
