@@ -7,6 +7,7 @@
     row-key='ID'
     :rows-per-page-options='[20]'
     :columns='columns'
+    @row-click='(ev, row, index) => onRowClick(row as powerrental.PowerRental)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -149,6 +150,12 @@ const onCreate = () => {
   updating.value = false
 }
 
+const onRowClick = (row: powerrental.PowerRental) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
+}
+
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
@@ -171,7 +178,9 @@ const createPowerRental = () => {
 }
 
 const updatePowerRental = () => {
-  // TODO
+  sdk.adminUpdatePowerRental(target.value, () => {
+    onMenuHide()
+  })
 }
 
 </script>
