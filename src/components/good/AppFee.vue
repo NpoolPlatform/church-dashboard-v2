@@ -39,6 +39,7 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
+    @row-click='(ev, row, index) => onRowClick(row as appfee.AppFee)'
   />
   <q-dialog
     v-model='showing'
@@ -212,6 +213,12 @@ const updateAppFee = () => {
 const onAuthorizeClick = () => {
   showing.value = true
   updating.value = false
+}
+
+const onRowClick = (row: appfee.AppFee) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
 }
 
 </script>
