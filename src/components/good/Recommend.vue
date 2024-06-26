@@ -27,8 +27,8 @@
         <q-input v-model.number='target.RecommendIndex' :label='$t("MSG_RECOMMEND_INDEX")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -44,6 +44,7 @@ const appGoods = sdk.appGoods
 const recommends = sdk.goodRecommends
 
 const showing = ref(false)
+const submitting = ref(false)
 const target = ref(undefined as unknown as appgoodrecommend.Recommend)
 
 const onRowClick = (row: appgoodrecommend.Recommend) => {
@@ -60,8 +61,13 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
+  updateRecommend()
+}
+
+const updateRecommend = () => {
   sdk.adminUpdateGoodRecommend(target.value, () => {
-    showing.value = false
+    onMenuHide()
   })
 }
 
