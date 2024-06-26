@@ -2,13 +2,13 @@
   <q-table
     dense
     flat
-    :rows='goodCoins'
+    :rows='malfunctions'
     row-key='ID'
     selection='multiple'
     :title='$t("MSG_GOOD_MALFUNCTIONS")'
     :rows-per-page-options='[20]'
     v-model:selected='selectedMalfunctions'
-    :columns='coinColumns'
+    :columns='columns'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -58,7 +58,7 @@ const { t } = useI18n({ useScope: 'global' })
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 
 const goods = sdk.goods
-const goodCoins = sdk.goodCoins
+const malfunctions = sdk.goodMalfunctions
 
 const showing = ref(false)
 const updating = ref(false)
@@ -104,12 +104,12 @@ onMounted(() => {
   if (!goods.value.length) {
     sdk.getGoods(0, 0)
   }
-  if (!goodCoins.value.length) {
+  if (!malfunctions.value.length) {
     sdk.getMalfunctions(0, 0)
   }
 })
 
-const coinColumns = computed(() => [
+const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),

@@ -135,6 +135,24 @@ const coinColumns = computed(() => [
     field: (row: goodcoin.GoodCoin) => row.EntID
   },
   {
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
+    sortable: true,
+    field: (row: goodcoin.GoodCoin) => row.GoodID
+  },
+  {
+    name: 'GoodName',
+    label: t('MSG_GOOD_NAME'),
+    sortable: true,
+    field: (row: goodcoin.GoodCoin) => row.GoodName
+  },
+  {
+    name: 'GoodType',
+    label: t('MSG_GOOD_TYPE'),
+    sortable: true,
+    field: (row: goodcoin.GoodCoin) => row.GoodType
+  },
+  {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
     sortable: true,
@@ -145,6 +163,12 @@ const coinColumns = computed(() => [
     label: t('MSG_APP_COIN_NAME'),
     sortable: true,
     field: (row: goodcoin.GoodCoin) => row.CoinName
+  },
+  {
+    name: 'MainCoin',
+    label: t('MSG_MAIN_COIN'),
+    sortable: true,
+    field: (row: goodcoin.GoodCoin) => row.Main
   }
 ])
 </script>
