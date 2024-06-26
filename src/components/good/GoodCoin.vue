@@ -9,6 +9,7 @@
     :rows-per-page-options='[20]'
     v-model:selected='selectedGoodCoins'
     :columns='coinColumns'
+    @row-click='(ev, row, index) => onRowClick(row as goodcoin.GoodCoin)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -39,6 +40,10 @@
       <q-card-section>
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
         <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
+      </q-card-section>
+      <q-card-section>
+        <q-toggle v-model='target.Main' :label='$t("MSG_MAIN")' />
+        <q-input v-model='target.Index' type='number' :label='$t("MSG_DISPLAY_INDEX")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -71,6 +76,12 @@ const target = ref({} as goodcoin.GoodCoin)
 const onCreate = () => {
   showing.value = true
   updating.value = false
+}
+
+const onRowClick = (row: goodcoin.GoodCoin) => {
+  target.value = row
+  showing.value = true
+  updating.value = true
 }
 
 const onCancel = () => {
