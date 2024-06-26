@@ -9,6 +9,7 @@
     selection='single'
     :rows-per-page-options='[20]'
     v-model:selected='selectedPowerRentals'
+    @row-click='(ev, row, index) => onRowClick(row as apppowerrental.AppPowerRental)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -96,8 +97,8 @@
         <div><q-toggle dense v-model='target.PackageWithRequireds' :label='$t("MSG_PACKAGE_WITH_REQUIREDS")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -149,49 +150,49 @@ const powerRentalColumns = computed(() => [
     field: (row: powerrental.PowerRental) => row.Name
   },
   {
-    name: 'GOODTYPE',
+    name: 'GoodType',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.GoodType
   },
   {
-    name: 'GOODPRICE',
+    name: 'UnitPrice',
     label: t('MSG_GOOD_UNIT_PRICE'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.UnitPrice
   },
   {
-    name: 'GOODQUANTITYUNIT',
+    name: 'QuantityUnit',
     label: t('MSG_GOOD_UNIT'),
     sortable: true,
     field: (row: powerrental.PowerRental) => t(row.QuantityUnit)
   },
   {
-    name: 'GOODQUANTITYUNITAMOUNT',
-    label: t('MSG_GOOD_UNIT'),
+    name: 'QuantityUnitAmount',
+    label: t('MSG_GOOD_UNIT_AMOUNT'),
     sortable: true,
     field: (row: powerrental.PowerRental) => t(row.QuantityUnitAmount)
   },
   {
-    name: 'GOODTOTAL',
+    name: 'Total',
     label: t('MSG_GOOD_TOTAL'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.Total
   },
   {
-    name: 'GOODSOLD',
+    name: 'Sold',
     label: t('MSG_GOOD_SOLD'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.Sold
   },
   {
-    name: 'GOODLOCKED',
+    name: 'Locked',
     label: t('MSG_GOOD_LOCKED'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.Locked
   },
   {
-    name: 'GOODINSERVICE',
+    name: 'InService',
     label: t('MSG_GOOD_INSERVICE'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.InService
@@ -203,13 +204,13 @@ const powerRentalColumns = computed(() => [
     field: (row: powerrental.PowerRental) => row.WaitStart
   },
   {
-    name: 'BENEFITTYPE',
+    name: 'BenefitType',
     label: t('MSG_BENEFITTYPE'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.BenefitType
   },
   {
-    name: 'STARTAT',
+    name: 'StartAt',
     label: t('MSG_STARTAT'),
     sortable: true,
     field: (row: powerrental.PowerRental) => utils.formatTime(row.ServiceStartAt)
@@ -289,12 +290,31 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
-  // TODO
+  submitting.value = true
+  updating.value ? updateAppPowerRental() : createAppPowerRental()
+}
+
+const updateAppPowerRental = () => {
+  sdk.adminUpdateAppPowerRental(target.value, () => {
+    onMenuHide()
+  })
+}
+
+const createAppPowerRental = () => {
+  sdk.adminCreateAppPowerRental(target.value, () => {
+    onMenuHide()
+  })
 }
 
 const onAuthorizeClick = () => {
   showing.value = true
   updating.value = false
+}
+
+const onRowClick = (row: apppowerrental.AppPowerRental) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
 }
 
 </script>
