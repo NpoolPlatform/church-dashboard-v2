@@ -20,8 +20,6 @@
           :label='$t("MSG_CREATE")'
           @click='onCreate'
         />
-      </div>
-      <div class='row indent flat'>
         <q-btn
           dense
           flat
@@ -50,8 +48,8 @@
         <q-input v-model='target.OrderDurationSeconds' :label='$t("MSG_ORDER_DURATION")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -74,10 +72,12 @@ const simulates = sdk.appPowerRentalSimulates
 const target = ref({} as apppowerrentalsimulate.Simulate)
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onMenuHide = () => {
   target.value = {} as apppowerrentalsimulate.Simulate
   showing.value = false
+  submitting.value = false
 }
 
 const onCreate = () => {
@@ -96,6 +96,7 @@ const onRowClick = (row: apppowerrentalsimulate.Simulate) => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateAppSimulateGood() : createAppSimulateGood()
 }
 
@@ -106,13 +107,15 @@ const onDelete = () => {
 }
 
 const createAppSimulateGood = () => {
-  sdk.adminCreateAppPowerRentalSimulate(target.value)
-  onMenuHide()
+  sdk.adminCreateAppPowerRentalSimulate(target.value, () => {
+    onMenuHide()
+  })
 }
 
 const updateAppSimulateGood = () => {
-  sdk.adminUpdateAppPowerRentalSimulate(target.value)
-  onMenuHide()
+  sdk.adminUpdateAppPowerRentalSimulate(target.value, () => {
+    onMenuHide()
+  })
 }
 
 watch(sdk.AppID, () => {
