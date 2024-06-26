@@ -7,12 +7,12 @@
     :columns='appGoodsColumns'
     row-key='ID'
     selection='single'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
   />
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { appgood, utils, sdk } from 'src/npoolstore'
 
@@ -20,6 +20,12 @@ import { appgood, utils, sdk } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const appGoods = sdk.appGoods
+
+watch(sdk.AppID, () => {
+  if (!appGoods.value.length) {
+    sdk.adminGetAppGoods(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!appGoods.value.length) {
