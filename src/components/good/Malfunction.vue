@@ -40,8 +40,8 @@
         <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -62,6 +62,7 @@ const malfunctions = sdk.goodMalfunctions
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as goodmalfunction.Malfunction)
 
 const onCreate = () => {
@@ -75,10 +76,12 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as goodmalfunction.Malfunction
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateAppCoin() : createAppCoin()
 }
 
