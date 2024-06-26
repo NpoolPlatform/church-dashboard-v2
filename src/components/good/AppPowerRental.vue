@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apppowerrental, utils, sdk, goodbase, powerrental } from 'src/npoolstore'
 
@@ -120,6 +120,15 @@ const appPowerRentals = sdk.appPowerRentals
 const selectedPowerRentals = ref([] as powerrental.PowerRental[])
 const selectedPowerRental = computed(() => selectedPowerRentals.value[0])
 const goodName = ref('')
+
+watch(sdk.AppID, () => {
+  if (!appPowerRentals.value.length) {
+    sdk.adminGetAppPowerRentals(0, 0)
+  }
+  if (!powerRentals.value.length) {
+    sdk.getPowerRentals(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!appPowerRentals.value.length) {
