@@ -53,8 +53,8 @@
         <div> <DateTimePicker v-model:date='target.EndAt' label='MSG_END_AT' /></div>
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -73,6 +73,7 @@ const target = ref({} as topmost.TopMost)
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -88,6 +89,7 @@ const onRowClick = (row: topmost.TopMost) => {
 const onMenuHide = () => {
   target.value = {} as topmost.TopMost
   showing.value = false
+  submitting.value = false
 }
 
 const onCancel = () => {
@@ -95,14 +97,13 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   if (updating.value) {
-    sdk.adminUpdateTopMost(target.value, (error: boolean) => {
-      if (error) return
+    sdk.adminUpdateTopMost(target.value, () => {
       onMenuHide()
     })
   } else {
-    sdk.adminCreateTopMost(target.value, (error: boolean) => {
-      if (error) return
+    sdk.adminCreateTopMost(target.value, () => {
       onMenuHide()
     })
   }
