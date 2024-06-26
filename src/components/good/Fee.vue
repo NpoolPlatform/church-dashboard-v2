@@ -7,6 +7,7 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     :columns='columns'
+    @row-click='(ev, row, index) => onRowClick(row as fee.Fee)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -130,6 +131,12 @@ const onCreate = () => {
   updating.value = false
 }
 
+const onRowClick = (row: fee.Fee) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
+}
+
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
@@ -146,14 +153,15 @@ const onCancel = () => {
 }
 
 const createFee = () => {
-  sdk.adminCreateFee(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreateFee(target.value, () => {
     onMenuHide()
   })
 }
 
 const updateFee = () => {
-  // TODO
+  sdk.adminUpdateFee(target.value, () => {
+    onMenuHide()
+  })
 }
 
 </script>
