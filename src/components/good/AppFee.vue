@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { appfee, sdk, goodbase, fee } from 'src/npoolstore'
 
@@ -179,6 +179,10 @@ const updating = ref(false)
 const submitting = ref(false)
 const target = ref({} as appfee.AppFee)
 
+watch(selectedFee, () => {
+  target.value.GoodID = selectedFee.value?.GoodID
+})
+
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
@@ -194,15 +198,13 @@ const onSubmit = () => {
 }
 
 const createAppFee = () => {
-  sdk.adminCreateAppFee(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreateAppFee(target.value, () => {
     onMenuHide()
   })
 }
 
 const updateAppFee = () => {
-  sdk.adminUpdateAppFee(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminUpdateAppFee(target.value, () => {
     onMenuHide()
   })
 }
