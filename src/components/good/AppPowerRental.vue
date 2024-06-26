@@ -9,7 +9,6 @@
     selection='single'
     :rows-per-page-options='[20]'
     v-model:selected='selectedPowerRentals'
-    @row-click='(ev, row, index) => onRowClick(row as apppowerrental.AppPowerRental)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -40,6 +39,7 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
+    @row-click='(ev, row, index) => onRowClick(row as apppowerrental.AppPowerRental)'
   />
   <q-dialog
     v-model='showing'
