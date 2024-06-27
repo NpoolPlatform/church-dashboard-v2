@@ -31,7 +31,7 @@
         <span>{{ $t('MSG_TOPMOST_POSTER') }}</span>
       </q-card-section>
       <q-card-section>
-        <TopMostSelector v-model:top-most-id='target.TopMostID' />
+        <TopMostSelector v-model:top-most-id='target.TopMostID' :read-only='updating' />
         <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
         <q-input v-model='target.Index' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>

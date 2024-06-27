@@ -8,6 +8,8 @@
     :columns='columns'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as topmostgood.TopMostGood)'
+    selection='single'
+    v-model:selected='selectedTopMostGoods'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedTopMostGood === undefined'
         />
       </div>
     </template>
@@ -56,6 +66,8 @@ const TopMostSelector = defineAsyncComponent(() => import('src/components/good/T
 
 const topMostGoods = sdk.topMostGoods
 const target = ref({} as topmostgood.TopMostGood)
+const selectedTopMostGoods = ref([] as topmostgood.TopMostGood[])
+const selectedTopMostGood = computed(() => selectedTopMostGoods.value[0])
 
 const showing = ref(false)
 const updating = ref(false)
@@ -93,6 +105,10 @@ const onSubmit = () => {
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMostGood(selectedTopMostGood.value)
 }
 
 watch(AppID, () => {
