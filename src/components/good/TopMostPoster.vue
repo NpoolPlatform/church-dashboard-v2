@@ -31,7 +31,7 @@
         <span>{{ $t('MSG_TOPMOST_POSTER') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='goodbase.GoodTypeMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
+        <TopMostSelector v-model:top-most-id='target.TopMostID' />
         <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
         <q-input v-model='target.Index' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>
@@ -45,7 +45,9 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { sdk, utils, topmostposter, goodbase } from 'src/npoolstore'
+import { sdk, utils, topmostposter } from 'src/npoolstore'
+
+import TopMostSelector from './TopMostSelector.vue'
 
 const AppID = sdk.AppID
 
