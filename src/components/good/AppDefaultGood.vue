@@ -44,6 +44,7 @@
         <span>{{ $t('MSG_APP_DEFAULT_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :coin-type-ids='goodCoinTypeIds' />
         <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
       </q-card-section>
       <q-item class='row'>
@@ -57,17 +58,29 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appdefaultgood, utils, sdk, appgood } from 'src/npoolstore'
+import { appdefaultgood, utils, sdk, appgood, goodbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 
-const appGoods = sdk.appGoods
+const appGoods = computed(() => sdk.appGoodsWithGoodTypes([goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]))
 const appDefaultGoods = sdk.appDefaultGoods
+const appPowerRentals = sdk.appPowerRentals
+
 const selectedAppGoods = ref([] as appgood.Good[])
 const selectedAppGood = computed(() => selectedAppGoods.value[0])
+const goodCoinTypeIds = computed(() => {
+  switch (selectedAppGood.value.GoodType) {
+    case goodbase.GoodType.PowerRental:
+    case goodbase.GoodType.LegacyPowerRental:
+      return appPowerRentals.value.find((el) => el.AppGoodID === selectedAppGood.value.EntID)?.GoodCoins?.map((el) => el.CoinTypeID)
+    default:
+      return []
+  }
+})
 
 const target = ref({} as appdefaultgood.Default)
 const showing = ref(false)
@@ -105,15 +118,13 @@ const onSubmit = () => {
 }
 
 const createAppDefaultGood = () => {
-  sdk.adminCreateAppDefaultGood(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreateAppDefaultGood(target.value, () => {
     onMenuHide()
   })
 }
 
 const updateAppDefaultGood = () => {
-  sdk.adminUpdateAppDefaultGood(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminUpdateAppDefaultGood(target.value, () => {
     onMenuHide()
   })
 }
@@ -125,6 +136,9 @@ watch(sdk.AppID, () => {
   if (!appGoods.value.length) {
     sdk.adminGetAppGoods(0, 0)
   }
+  if (!appPowerRentals.value.length) {
+    sdk.adminGetAppPowerRentals(0, 0)
+  }
 })
 
 onMounted(() => {
@@ -133,6 +147,9 @@ onMounted(() => {
   }
   if (!appGoods.value.length) {
     sdk.adminGetAppGoods(0, 0)
+  }
+  if (!appPowerRentals.value.length) {
+    sdk.adminGetAppPowerRentals(0, 0)
   }
 })
 

@@ -26,6 +26,7 @@ import { sdk } from 'src/npoolstore'
 
 interface Props {
   coinTypeId: string
+  coinTypeIds?: string[]
   updating?: boolean
   label?: string,
   getData?: boolean
@@ -33,6 +34,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const coinTypeId = toRef(props, 'coinTypeId')
+const coinTypeIds = toRef(props, 'coinTypeIds')
 const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
 const getData = toRef(props, 'getData')
@@ -43,7 +45,7 @@ const myLabel = computed(() => {
 
 const target = ref(coinTypeId.value)
 
-const coins = computed(() => Array.from(sdk.coins.value).map((el) => {
+const coins = computed(() => Array.from(sdk.coins.value.filter((el) => coinTypeIds.value === undefined || coinTypeIds.value.includes(el.EntID))).map((el) => {
   return {
     value: el.EntID,
     label: `${el.Name} | ${el.EntID}`
