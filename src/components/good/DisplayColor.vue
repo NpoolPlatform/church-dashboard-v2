@@ -7,7 +7,29 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as appgooddisplaycolor.DisplayColor)'
-  />
+    selection='single'
+    v-model:selected='selectedDisplayColors'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_CREATE")'
+          @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedDisplayColor === undefined'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -18,9 +40,10 @@
         <span>{{ $t('MSG_UPDATE_DISPLAY_COLOR') }}</span>
       </q-card-section>
       <q-card-section>
-        <span> {{ target.GoodName }}</span>
+        <span> {{ selectedAppGood?.AppGoodName }}</span>
       </q-card-section>
       <q-card-section>
+        <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
         <q-input v-model='target.Color' :label='$t("MSG_DISPLAY_COLOR")' />
       </q-card-section>
       <q-card-section>
@@ -35,8 +58,10 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { sdk, appgooddisplaycolor } from 'src/npoolstore'
+
+import AppGoodSelector from './AppGoodSelector.vue'
 
 const AppID = sdk.AppID
 
@@ -44,11 +69,22 @@ const appGoods = sdk.appGoods
 const displaycolors = sdk.goodDisplayColors
 
 const showing = ref(false)
-const target = ref(undefined as unknown as appgooddisplaycolor.DisplayColor)
+const updating = ref(false)
+const target = ref({} as appgooddisplaycolor.DisplayColor)
+const selectedDisplayColors = ref([] as appgooddisplaycolor.DisplayColor[])
+const selectedDisplayColor = computed(() => selectedDisplayColors.value[0])
+
+const selectedAppGood = computed(() => sdk.appGood(target.value?.AppGoodID))
+
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
 
 const onRowClick = (row: appgooddisplaycolor.DisplayColor) => {
   target.value = row
   showing.value = true
+  updating.value = true
 }
 
 const onCancel = () => {
@@ -60,8 +96,20 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
-  sdk.adminUpdateGoodDisplayColor(target.value, () => {
-    showing.value = false
+  if (updating.value) {
+    sdk.adminUpdateGoodDisplayColor(target.value, () => {
+      showing.value = false
+    })
+  } else {
+    sdk.adminCreateGoodDisplayColor(target.value, () => {
+      showing.value = false
+    })
+  }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteGoodDisplayColor(selectedDisplayColor.value, () => {
+    selectedDisplayColors.value = []
   })
 }
 
