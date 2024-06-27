@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_TOPMOST_GOOD_POSTERS")'
-    :rows='topMostGoods'
+    :rows='topMostGoodPosters'
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
@@ -54,7 +54,7 @@ const AppID = sdk.AppID
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const TopMostSelector = defineAsyncComponent(() => import('src/components/good/TopMostSelector.vue'))
 
-const topMostGoods = sdk.topMostGoods
+const topMostGoodPosters = sdk.topMostGoodPosters
 const target = ref({} as topmostgoodposter.Poster)
 
 const showing = ref(false)
@@ -96,13 +96,13 @@ const onSubmit = () => {
 }
 
 watch(AppID, () => {
-  if (!topMostGoods.value?.length) {
+  if (!topMostGoodPosters.value?.length) {
     sdk.adminGetTopMostGoodPosters(0, 0)
   }
 })
 
 onMounted(() => {
-  if (!topMostGoods.value?.length) {
+  if (!topMostGoodPosters.value?.length) {
     sdk.adminGetTopMostGoodPosters(0, 0)
   }
 })

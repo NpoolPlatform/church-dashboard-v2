@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_TOPMOST_GOOD_CONSTRAINTS")'
-    :rows='topMostGoods'
+    :rows='topMostGoodConstraints'
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
@@ -54,7 +54,7 @@ const AppID = sdk.AppID
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const TopMostSelector = defineAsyncComponent(() => import('src/components/good/TopMostSelector.vue'))
 
-const topMostGoods = sdk.topMostGoods
+const topMostGoodConstraints = sdk.topMostGoodConstraints
 const target = ref({} as topmostgoodconstraint.TopMostGoodConstraint)
 
 const showing = ref(false)
@@ -96,13 +96,13 @@ const onSubmit = () => {
 }
 
 watch(AppID, () => {
-  if (!topMostGoods.value?.length) {
+  if (!topMostGoodConstraints.value?.length) {
     sdk.adminGetTopMostGoodConstraints(0, 0)
   }
 })
 
 onMounted(() => {
-  if (!topMostGoods.value?.length) {
+  if (!topMostGoodConstraints.value?.length) {
     sdk.adminGetTopMostGoodConstraints(0, 0)
   }
 })
