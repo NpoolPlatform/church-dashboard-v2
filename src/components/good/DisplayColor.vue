@@ -50,8 +50,8 @@
         <q-input v-model.number='target.Index' :label='$t("MSG_DISPLAY_COLOR_INDEX")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -70,6 +70,7 @@ const displaycolors = sdk.goodDisplayColors
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as appgooddisplaycolor.DisplayColor)
 const selectedDisplayColors = ref([] as appgooddisplaycolor.DisplayColor[])
 const selectedDisplayColor = computed(() => selectedDisplayColors.value[0])
@@ -93,6 +94,7 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
 }
 
 const onSubmit = () => {

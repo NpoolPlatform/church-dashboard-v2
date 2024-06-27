@@ -94,9 +94,11 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
 }
 
 const onSubmit = () => {
+  submitting.value = true
   if (updating.value) {
     sdk.adminUpdateGoodDescription(target.value, () => {
       showing.value = false
