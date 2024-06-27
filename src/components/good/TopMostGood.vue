@@ -46,6 +46,7 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' />
+        <q-input v-model='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
