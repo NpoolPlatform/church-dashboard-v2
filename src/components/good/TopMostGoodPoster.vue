@@ -8,6 +8,8 @@
     :columns='columns'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as topmostgoodposter.Poster)'
+    selection='single'
+    v-model:selected='selectedTopMostGoodPosters'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedTopMostGoodPoster === undefined'
         />
       </div>
     </template>
@@ -55,6 +65,8 @@ const AppID = sdk.AppID
 
 const topMostGoodPosters = sdk.topMostGoodPosters
 const target = ref({} as topmostgoodposter.Poster)
+const selectedTopMostGoodPosters = ref([] as topmostgoodposter.Poster[])
+const selectedTopMostGoodPoster = computed(() => selectedTopMostGoodPosters.value[0])
 
 const showing = ref(false)
 const updating = ref(false)
@@ -92,6 +104,12 @@ const onSubmit = () => {
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMostGoodPoster(selectedTopMostGoodPoster.value, () => {
+    selectedTopMostGoodPosters.value = []
+  })
 }
 
 watch(AppID, () => {
