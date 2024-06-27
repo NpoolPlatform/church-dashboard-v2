@@ -33,7 +33,7 @@
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
-        <q-select :options='goodbase.GoodTypeMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
+        <q-select :options='goodbase.GoodTopMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
       </q-card-section>
       <q-card-section>
         <q-select

@@ -31,7 +31,8 @@
         <span>{{ $t('MSG_TOPMOST_CONSTRAINT') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-select :options='goodbase.GoodTypeMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
+        <q-select :options='goodbase.GoodTopMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
+        <q-select :options='goodbase.GoodTopMostConstraints' :disable='updating' v-model='target.Constraint' :label='$t("MSG_TOPMOST_TYPE")' />
         <q-input v-model='target.TargetValue' :label='$t("MSG_TARGET_VALUE")' />
         <q-input v-model='target.Index' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>
