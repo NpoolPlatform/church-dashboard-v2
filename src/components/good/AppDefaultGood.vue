@@ -20,6 +20,7 @@
     :rows-per-page-options='[20]'
     :columns='appDefaultGoodsColumns'
     @row-click='(evt, row, index) => onRowClick(row as appdefaultgood.Default)'
+    v-model:selected='selectedAppDefaultGoods'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -29,7 +30,15 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
-          :disable='!selectedAppGoods.length'
+          :disable='selectedAppGood === undefined'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedAppDefaultGood === undefined'
         />
       </div>
     </template>
@@ -72,6 +81,9 @@ const appPowerRentals = sdk.appPowerRentals
 
 const selectedAppGoods = ref([] as appgood.Good[])
 const selectedAppGood = computed(() => selectedAppGoods.value[0])
+const selectedAppDefaultGoods = ref([] as appdefaultgood.Default[])
+const selectedAppDefaultGood = computed(() => selectedAppDefaultGoods.value[0])
+
 const goodCoinTypeIds = computed(() => {
   switch (selectedAppGood.value.GoodType) {
     case goodbase.GoodType.PowerRental:
@@ -126,6 +138,12 @@ const createAppDefaultGood = () => {
 const updateAppDefaultGood = () => {
   sdk.adminUpdateAppDefaultGood(target.value, () => {
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteAppDefaultGood(selectedAppDefaultGood.value, () => {
+    selectedAppDefaultGoods.value = []
   })
 }
 
