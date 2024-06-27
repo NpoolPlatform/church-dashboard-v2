@@ -31,11 +31,11 @@
         <span>{{ $t('MSG_TOPMOST_GOOD_POSTER') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector :label='$t("MSG_APP_GOOD")' v-model:app-good-id='target.AppGoodID' />
-        <TopMostSelector :label='$t("MSG_TOP_MOST")' v-model:top-most-id='target.TopMostID' />
+        <TopMostGoodSelector v-model:top-most-good-id='target.TopMostGoodID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
+        <q-input v-model='target.Index' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -46,13 +46,12 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { topmostgoodposter, sdk, utils } from 'src/npoolstore'
 
-const AppID = sdk.AppID
+import TopMostGoodSelector from './TopMostGoodSelector.vue'
 
-const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
-const TopMostSelector = defineAsyncComponent(() => import('src/components/good/TopMostSelector.vue'))
+const AppID = sdk.AppID
 
 const topMostGoodPosters = sdk.topMostGoodPosters
 const target = ref({} as topmostgoodposter.Poster)
