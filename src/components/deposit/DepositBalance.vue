@@ -274,19 +274,8 @@ const onSubmit = () => {
     if (error) {
       return
     }
-    reset()
     onMenuHide()
   })
-}
-
-const reset = () => {
-  general.$reset()
-  statement.$reset()
-  getAppGenerals(0, 100)
-  getAppDetails(0, 100)
-  sdk.getUserDepositAccounts(0, 0)
-  getAppSimulateGenerals(0, 100)
-  getAppSimulateDetails(0, 100)
 }
 
 const onCancel = () => {
