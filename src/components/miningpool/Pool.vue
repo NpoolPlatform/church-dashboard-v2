@@ -38,8 +38,8 @@
         <q-input v-model='target.Description' :label='$t("MSG_DESCRIPTION")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -58,6 +58,7 @@ const miningPools = sdk.miningPools
 const target = ref({} as miningpoolpool.Pool)
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -71,17 +72,18 @@ const onRowClick = (row: miningpoolpool.Pool) => {
 }
 
 const onSubmit = () => {
-  showing.value = false
+  submitting.value = true
   updating.value ? updatePool() : createPool()
 }
 
 const onCancel = () => {
-  showing.value = false
+  onMenuHide()
 }
 
 const onMenuHide = () => {
   target.value = {} as miningpoolpool.Pool
   showing.value = false
+  submitting.value = false
 }
 
 const updatePool = () => {
