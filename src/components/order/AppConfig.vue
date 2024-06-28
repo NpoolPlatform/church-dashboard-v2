@@ -51,8 +51,8 @@
         <div><q-toggle dense v-model='target.EnableSimulateOrder' :label='$t("MSG_ENABLE_SIMULATE_ORDER")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -75,10 +75,12 @@ const appOrderConfigs = sdk.appOrderConfigs
 const target = ref({} as apporderconfig.AppConfig)
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onMenuHide = () => {
   target.value = {} as apporderconfig.AppConfig
   showing.value = false
+  submitting.value = false
 }
 
 const onCreate = () => {
@@ -96,8 +98,9 @@ const onRowClick = (row: apporderconfig.AppConfig) => {
   showing.value = true
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppConfig(done) : createAppConfig(done)
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateAppConfig() : createAppConfig()
 }
 
 const onDelete = () => {
@@ -106,14 +109,12 @@ const onDelete = () => {
   })
 }
 
-const createAppConfig = (done: () => void) => {
-  done()
+const createAppConfig = () => {
   sdk.adminCreateAppOrderConfig(target.value)
   onMenuHide()
 }
 
-const updateAppConfig = (done: () => void) => {
-  done()
+const updateAppConfig = () => {
   sdk.adminUpdateAppOrderConfig(target.value)
   onMenuHide()
 }

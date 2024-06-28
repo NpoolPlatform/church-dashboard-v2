@@ -48,8 +48,8 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -105,6 +105,7 @@ const units = ref(1)
 const maxPurchaseUnits = computed(() => sdk.appPowerRentalMaxPurchasedUnits(selectedAppPowerRental.value?.value?.AppGoodID))
 
 const showing = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -118,6 +119,7 @@ const onMenuHide = () => {
   showing.value = false
   selectedAppPowerRental.value = undefined as unknown as MyGood
   selectedUser.value = undefined as unknown as MyUser
+  submitting.value = false
 }
 
 const onSubmit = () => {
@@ -150,6 +152,12 @@ const prepare = () => {
   if (users.value.length === 0) {
     sdk.adminGetUsers(0, 0)
   }
+  if (coins.value?.length === 0) {
+    sdk.adminGetAppCoins(0, 0)
+  }
+  if (appPowerRentals.value?.length === 0) {
+    sdk.adminGetAppPowerRentals(0, 0)
+  }
 }
 
 watch(AppID, () => {
@@ -158,17 +166,5 @@ watch(AppID, () => {
 
 onMounted(() => {
   prepare()
-})
-
-watch(AppID, () => {
-  if (coins.value?.length === 0) {
-    sdk.getAppCoins(0, 0)
-  }
-})
-
-onMounted(() => {
-  if (coins.value?.length === 0) {
-    sdk.getAppCoins(0, 0)
-  }
 })
 </script>
