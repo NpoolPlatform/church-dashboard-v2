@@ -5,7 +5,7 @@
     :options='displayChains'
     options-selected-class='text-deep-orange'
     emit-value
-    label='MSG_DEVICE_MANUFACTURERS'
+    label='MSG_DEVICE_TYPES'
     map-options
     @update:model-value='onUpdate'
     use-input
@@ -25,40 +25,40 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 import { sdk } from 'src/npoolstore'
 
 interface Props {
-  deviceManufacturerId: string
+  deviceTypeId: string
   readOnly?: boolean
 }
 
 const props = defineProps<Props>()
-const deviceManufacturerId = toRef(props, 'deviceManufacturerId')
+const deviceTypeId = toRef(props, 'deviceTypeId')
 const readOnly = toRef(props, 'readOnly')
-const target = ref(deviceManufacturerId.value)
+const target = ref(deviceTypeId.value)
 
-const manufacturers = computed(() => Array.from(sdk.deviceManufactueres.value).map((el) => {
+const deviceTypes = computed(() => Array.from(sdk.deviceTypes.value).map((el) => {
   return {
     value: el.EntID,
-    label: `${el.Name} | ${el.EntID}`
+    label: `${el.Type} | ${el.EntID}`
   }
 }))
 
-const displayChains = ref(manufacturers.value)
+const displayChains = ref(deviceTypes.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayChains.value = manufacturers.value.filter((el) => {
+    displayChains.value = deviceTypes.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
 }
 
-const emit = defineEmits<{(e: 'update:deviceManufacturerId', deviceManufacturerId: string): void}>()
+const emit = defineEmits<{(e: 'update:deviceTypeId', deviceTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:deviceManufacturerId', target.value)
+  emit('update:deviceTypeId', target.value)
 }
 
 onMounted(() => {
-  if (!manufacturers.value?.length) {
-    sdk.getDeviceManufacturers(0, 0)
+  if (!deviceTypes.value?.length) {
+    sdk.getDeviceTypes(0, 0)
   }
 })
 

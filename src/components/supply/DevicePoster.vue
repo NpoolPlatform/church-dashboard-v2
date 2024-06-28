@@ -18,6 +18,14 @@
           :label='$t("MSG_CREATE")'
           @click='onCreate'
         />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedPoster === undefined'
+        />
       </div>
     </template>
   </q-table>
@@ -31,11 +39,12 @@
         <span>{{ $t('MSG_DEVICE_POSTER') }}</span>
       </q-card-section>
       <q-card-section>
+        <DeviceSelector v-model:device-type-id='target.DeviceTypeID' />
         <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -46,14 +55,20 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { deviceposter, utils, sdk } from 'src/npoolstore'
 
+import DeviceSelector from './DeviceSelector.vue'
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const posters = sdk.devicePosters
 
 const target = ref({} as deviceposter.DevicePoster)
+const selectedPosters = ref([] as deviceposter.DevicePoster[])
+const selectedPoster = computed(() => selectedPosters.value[0])
+
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -67,7 +82,7 @@ const onRowClick = (row: deviceposter.DevicePoster) => {
 }
 
 const onSubmit = () => {
-  showing.value = false
+  submitting.value = true
   updating.value ? updateDevice() : createDevice()
 }
 
@@ -78,6 +93,7 @@ const onCancel = () => {
 const onMenuHide = () => {
   target.value = {} as deviceposter.DevicePoster
   showing.value = false
+  submitting.value = false
 }
 
 const updateDevice = () => {
@@ -89,6 +105,12 @@ const updateDevice = () => {
 const createDevice = () => {
   sdk.adminCreateDevicePoster(target.value, () => {
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteDevicePoster(selectedPoster.value, () => {
+    selectedPosters.value = []
   })
 }
 
