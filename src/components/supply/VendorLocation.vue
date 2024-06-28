@@ -46,7 +46,7 @@
         <q-input v-model='target.Address' :label='$t("MSG_ADDRESS")' />
       </q-card-section>
       <q-card-section>
-        <BrandPicker v-model:id='target.BrandID' />
+        <BrandPicker v-model:vendor-brand-id='target.BrandID' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
