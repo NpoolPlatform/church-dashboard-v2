@@ -52,11 +52,11 @@
       </q-card-section>
       <q-card-section>
         <div>{{ $t('MSG_SELECT_MAIN_APP_GOOD') }}</div>
-        <GoodSelector v-model:good-id='mainAppGoodId' />
+        <GoodSelector v-model:good-id='target.MainAppGoodID' />
       </q-card-section>
       <q-card-section>
         <div>{{ $t('MSG_SELECT_REQUIRED_APP_GOOD') }}</div>
-        <GoodSelector v-model:good-id='requiredAppGoodId' />
+        <GoodSelector v-model:good-id='target.RequiredAppGoodID' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -155,8 +155,6 @@ const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
 const target = ref({} as requiredappgood.Required)
-const mainAppGoodId = ref('')
-const requiredAppGoodId = ref('')
 
 const onCreateClick = () => {
   showing.value = true
@@ -172,15 +170,13 @@ const onCancel = () => {
 }
 
 const createRequiredGood = () => {
-  sdk.adminCreateRequiredGood(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreateRequiredAppGood(target.value, () => {
     onMenuHide()
   })
 }
 
 const updateRequiredGood = () => {
-  sdk.adminUpdateRequiredGood(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminUpdateRequiredAppGood(target.value, () => {
     onMenuHide()
   })
 }
@@ -188,7 +184,7 @@ const updateRequiredGood = () => {
 const onRowClick = (required: requiredappgood.Required) => {
   showing.value = true
   updating.value = true
-  console.log(required)
+  target.value = required
 }
 
 const onMenuHide = () => {
