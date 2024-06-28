@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
+import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { appgood, utils, sdk, requiredappgood } from 'src/npoolstore'
 
@@ -86,6 +86,15 @@ const displayGoods = computed(() => {
     return el.EntID.toLowerCase().includes(name) ||
           el.AppGoodName.toLowerCase().includes(name)
   })
+})
+
+watch(sdk.AppID, () => {
+  if (!goods.value.length) {
+    sdk.adminGetAppGoods(0, 0)
+  }
+  if (!requireds.value.length) {
+    sdk.adminGetRequiredAppGoods(0, 0)
+  }
 })
 
 onMounted(() => {
