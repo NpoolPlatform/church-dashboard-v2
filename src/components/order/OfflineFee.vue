@@ -62,7 +62,7 @@ const AppID = sdk.AppID
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const OrderSelector = defineAsyncComponent(() => import('src/components/order/OrderSelector.vue'))
 
-const appFees = sdk.onlineAppFees
+const appFees = sdk.appFees
 
 interface MyGood {
   label: string
@@ -140,9 +140,9 @@ const onSubmit = () => {
     DurationSeconds: durationSeconds.value,
     AppGoodID: selectedAppFee.value.value.EntID,
     OrderType: orderType.value
+  }, () => {
+    onMenuHide()
   })
-
-  onMenuHide()
 }
 
 const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
