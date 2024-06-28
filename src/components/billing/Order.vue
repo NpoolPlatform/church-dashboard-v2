@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { utils, constant, sdk, order } from 'src/npoolstore'
 
@@ -69,6 +69,12 @@ const displayOrders = computed(() => orders.value.filter((el) => {
   display = display && (el.Simulate === showSimulate.value)
   return display
 }))
+
+watch(sdk.AppID, () => {
+  if (!orders.value.length) {
+    sdk.adminGetOrders(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!orders.value.length) {
