@@ -8,6 +8,8 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as devicemanufacturer.Manufacturer)'
+    selection='single'
+    v-model:selected='selectedManufacturers'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedManufacturer === undefined'
         />
       </div>
     </template>
@@ -53,8 +63,12 @@ const { t } = useI18n({ useScope: 'global' })
 const manufacturers = sdk.deviceManufactueres
 
 const target = ref({} as devicemanufacturer.Manufacturer)
+const selectedManufacturers = ref([] as devicemanufacturer.Manufacturer[])
+const selectedManufacturer = computed(() => selectedManufacturers.value[0])
+
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -68,7 +82,7 @@ const onRowClick = (row: devicemanufacturer.Manufacturer) => {
 }
 
 const onSubmit = () => {
-  showing.value = false
+  submitting.value = true
   updating.value ? updateDevice() : createDevice()
 }
 
@@ -79,19 +93,24 @@ const onCancel = () => {
 const onMenuHide = () => {
   target.value = {} as devicemanufacturer.Manufacturer
   showing.value = false
+  submitting.value = false
 }
 
 const updateDevice = () => {
-  sdk.adminUpdateDeviceManufacturer(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminUpdateDeviceManufacturer(target.value, () => {
     onMenuHide()
   })
 }
 
 const createDevice = () => {
-  sdk.adminCreateDeviceManufacturer(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreateDeviceManufacturer(target.value, () => {
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteDeviceManufacturer(selectedManufacturer.value, () => {
+    selectedManufacturers.value = []
   })
 }
 
