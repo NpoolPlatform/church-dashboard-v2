@@ -21,7 +21,7 @@
       </q-card-section>
       <q-card-section>
         <q-select :options='_appFees' v-model='selectedAppFee' :label='$t("MSG_APP_FEE")' />
-        <OrderSelector v-model:order-id='selectedOrderId' />
+        <OrderSelector v-model:order-id='parentOrderId' />
         <q-select
           :options='displayUsers'
           use-input
@@ -46,8 +46,8 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -99,13 +99,14 @@ const filterUser = (val: string, doneFn: (callbackFn: () => void) => void) => {
 
 const selectedAppFee = ref(undefined as unknown as MyGood)
 const selectedUser = ref(undefined as unknown as MyUser)
-const selectedOrderId = ref('')
+const parentOrderId = ref('')
 const durations = ref(3)
 
 const durationUnit = computed(() => sdk.durationUnit(selectedAppFee.value?.value?.DurationDisplayType))
 const durationSeconds = computed(() => sdk.durationUnitSeconds(selectedAppFee.value?.value?.DurationDisplayType) * durations.value)
 
 const showing = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -119,6 +120,7 @@ const onMenuHide = () => {
   showing.value = false
   selectedAppFee.value = undefined as unknown as MyGood
   selectedUser.value = undefined as unknown as MyUser
+  submitting.value = false
 }
 
 const onSubmit = () => {
@@ -128,13 +130,13 @@ const onSubmit = () => {
   if (!selectedUser.value) {
     return
   }
-  if (!selectedOrderId.value.length) {
+  if (!parentOrderId.value.length) {
     return
   }
   sdk.adminCreateFeeOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.EntID,
-    ParentOrderID: selectedOrderId.value,
+    ParentOrderID: parentOrderId.value,
     DurationSeconds: durationSeconds.value,
     AppGoodID: selectedAppFee.value.value.EntID,
     OrderType: orderType.value
@@ -143,12 +145,14 @@ const onSubmit = () => {
   onMenuHide()
 }
 
-const coins = sdk.appCoins
 const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
 
 const prepare = () => {
   if (users.value.length === 0) {
     sdk.adminGetUsers(0, 0)
+  }
+  if (appFees.value?.length === 0) {
+    sdk.adminGetAppFees(0, 0)
   }
 }
 
@@ -158,17 +162,5 @@ watch(AppID, () => {
 
 onMounted(() => {
   prepare()
-})
-
-watch(AppID, () => {
-  if (coins.value?.length === 0) {
-    sdk.getAppCoins(0, 0)
-  }
-})
-
-onMounted(() => {
-  if (coins.value?.length === 0) {
-    sdk.getAppCoins(0, 0)
-  }
 })
 </script>

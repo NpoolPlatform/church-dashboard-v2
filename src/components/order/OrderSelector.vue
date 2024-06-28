@@ -18,7 +18,7 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
 import { order, sdk } from 'src/npoolstore'
 
 interface Props {
@@ -43,6 +43,12 @@ const emit = defineEmits<{(e: 'update:orderId', orderId: string): void}>()
 const onUpdate = () => {
   emit('update:orderId', target.value)
 }
+
+watch(sdk.AppID, () => {
+  if (!orders.value.length) {
+    sdk.getOrders(0, 0)
+  }
+})
 
 onMounted(() => {
   if (!orders.value.length) {
