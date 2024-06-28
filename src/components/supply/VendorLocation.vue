@@ -7,6 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as vendorlocation.VendorLocation)'
+    selection='single'
+    v-model:selected='selectedLocations'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -16,6 +18,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedLocation === undefined'
         />
       </div>
     </template>
@@ -39,8 +49,8 @@
         <BrandPicker v-model:id='target.BrandID' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -48,22 +58,19 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { vendorlocation, notify } from 'src/npoolstore'
+import { vendorlocation, sdk } from 'src/npoolstore'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
-
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const BrandPicker = defineAsyncComponent(() => import('src/components/supply/BrandPicker.vue'))
 
-const vendor = vendorlocation.useVendorLocationStore()
-const locations = computed(() => vendor.vendorLocations())
+const locations = sdk.vendorLocations
 
 const target = ref({} as vendorlocation.VendorLocation)
+const selectedLocations = ref([] as vendorlocation.VendorLocation[])
+const selectedLocation = computed(() => selectedLocations.value[0])
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -79,93 +86,39 @@ const onRowClick = (row: vendorlocation.VendorLocation) => {
 const onMenuHide = () => {
   target.value = {} as vendorlocation.VendorLocation
   showing.value = false
+  submitting.value = false
 }
 
 const onCancel = () => {
-  showing.value = false
+  onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  showing.value = false
-  console.log('target: ', target.value)
-  updating.value ? updateVendorLocation(done) : createVendorLocation(done)
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateVendorLocation() : createVendorLocation()
 }
 
-const createVendorLocation = (done: () => void) => {
-  vendor.createVendorLocation({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_CREATE_VENDOR_LOCATION'),
-        Message: t('MSG_CREATE_VENDOR_LOCATION_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_CREATE_VENDOR_LOCATION'),
-        Message: t('MSG_CREATE_VENDOR_LOCATION_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createVendorLocation = () => {
+  sdk.adminCreateVendorLocation(target.value, () => {
     onMenuHide()
   })
 }
 
-const updateVendorLocation = (done: () => void) => {
-  vendor.updateVendorLocation({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
-        Message: t('MSG_UPDATE_VENDOR_LOCATION_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_UPDATE_VENDOR_LOCATION'),
-        Message: t('MSG_UPDATE_VENDOR_LOCATION_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateVendorLocation = () => {
+  sdk.adminUpdateVendorLocation(target.value, () => {
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteVendorLocation(selectedLocation.value, () => {
+    selectedLocations.value = []
   })
 }
 
 onMounted(() => {
   if (!locations.value.length) {
-    getVendorLocations(0, 100)
+    sdk.getVendorLocations(0, 0)
   }
 })
-
-const getVendorLocations = (offset: number, limit: number) => {
-  vendor.getVendorLocations({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_VENDOR_LOCATIONS'),
-        Message: t('MSG_GET_VENDOR_LOCATIONS_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, vendorLocations?: Array<vendorlocation.VendorLocation>) => {
-    if (error || !vendorLocations?.length) {
-      return
-    }
-    getVendorLocations(offset + limit, limit)
-  })
-}
 </script>
