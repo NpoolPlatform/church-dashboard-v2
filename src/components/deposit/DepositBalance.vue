@@ -249,6 +249,7 @@ const simulateStatement = simulateledgerstatement.useStatementStore()
 const showing = ref(false)
 const amount = ref(undefined)
 const submitting = ref(false)
+
 const onSubmit = () => {
   submitting.value = true
   statement.createAppUserDeposit({
@@ -291,9 +292,11 @@ const reset = () => {
 const onCancel = () => {
   onMenuHide()
 }
+
 const onCreate = () => {
   showing.value = true
 }
+
 const onMenuHide = () => {
   showing.value = false
   submitting.value = false
@@ -464,7 +467,7 @@ const prepare = () => {
     getAppGenerals(0, 100)
   }
   if (!accounts.value.length) {
-    sdk.getUserDepositAccounts(0, 0)
+    sdk.adminGetUserDepositAccounts(0, 0)
   }
   if (!simulateStatement.statements(AppID.value).length) {
     getAppSimulateDetails(0, 100)
