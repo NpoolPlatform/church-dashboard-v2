@@ -49,7 +49,7 @@ import { deviceposter, utils, sdk } from 'src/npoolstore'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const posters = sdk.deviceManufactueres
+const posters = sdk.devicePosters
 
 const target = ref({} as deviceposter.DevicePoster)
 const showing = ref(false)
@@ -81,15 +81,13 @@ const onMenuHide = () => {
 }
 
 const updateDevice = () => {
-  sdk.adminUpdateDevicePoster(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminUpdateDevicePoster(target.value, () => {
     onMenuHide()
   })
 }
 
 const createDevice = () => {
-  sdk.adminCreateDevicePoster(target.value, (error: boolean) => {
-    if (error) return
+  sdk.adminCreateDevicePoster(target.value, () => {
     onMenuHide()
   })
 }
