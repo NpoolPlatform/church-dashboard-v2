@@ -7,6 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as appgoodlabel.Label)'
+    selection='single'
+    v-model:selected='selectedLabels'
   >
     <template #top-right>
       <div class='row indent flat'>

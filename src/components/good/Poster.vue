@@ -7,7 +7,29 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as appgoodposter.Poster)'
-  />
+    selection='single'
+    v-model:selected='selectedPosters'
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_CREATE")'
+          @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedPoster === undefined'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -18,7 +40,7 @@
         <span>{{ $t('MSG_UPDATE_POSTER') }}</span>
       </q-card-section>
       <q-card-section>
-        <span> {{ target.GoodName }}</span>
+        <span> {{ selectedAppGood?.AppGoodName }}</span>
       </q-card-section>
       <q-card-section>
         <span>{{ target.Poster }}</span>
@@ -32,19 +54,30 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import { sdk, appgoodposter } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 const posters = sdk.goodPosters
 
 const showing = ref(false)
+const updating = ref(false)
 const submitting = ref(false)
-const target = ref(undefined as unknown as appgoodposter.Poster)
+const target = ref({} as appgoodposter.Poster)
+const selectedPosters = ref([] as appgoodposter.Poster[])
+const selectedPoster = computed(() => selectedPosters.value[0])
+
+const selectedAppGood = computed(() => sdk.appGood(target.value?.AppGoodID))
+
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
 
 const onRowClick = (row: appgoodposter.Poster) => {
   target.value = row
   showing.value = true
+  target.value = row
 }
 
 const onCancel = () => {
@@ -53,11 +86,25 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
+  target.value = {} as appgoodposter.Poster
 }
 
 const onSubmit = () => {
-  sdk.adminUpdateGoodPoster(target.value, () => {
-    showing.value = false
+  if (updating.value) {
+    sdk.adminUpdateGoodPoster(target.value, () => {
+      onMenuHide()
+    })
+  } else {
+    sdk.adminCreateGoodPoster(target.value, () => {
+      onMenuHide()
+    })
+  }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteGoodPoster(selectedPoster.value, () => {
+    selectedPosters.value = []
   })
 }
 
