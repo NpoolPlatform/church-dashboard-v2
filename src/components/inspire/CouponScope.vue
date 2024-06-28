@@ -48,7 +48,7 @@
         <span>{{ $t('MSG_COUPON') }}</span>
       </q-card-section>
       <q-card-section>
-        <GoodSelector v-model:id='target.GoodID' :label='"MSG_GOOD"' />
+        <GoodSelector v-model:good-id='target.GoodID' :label='"MSG_GOOD"' />
         <CouponSelector v-model:id='target.CouponID' />
         <q-select
           :options='[
