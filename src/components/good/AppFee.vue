@@ -66,10 +66,6 @@
         <q-input v-model='target.Banner' :label='$t("MSG_BANNER")' />
         <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
       </q-card-section>
-      <q-card-section>
-        <div><q-toggle dense v-model='target.AppGoodPurchasable' :label='$t("MSG_ENABLE_PURCHASE")' /></div>
-        <div><q-toggle dense v-model='target.AppGoodOnline' :label='$t("MSG_ONLINE")' /></div>
-      </q-card-section>
       <q-item class='row'>
         <q-btn class='btn alt round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
@@ -175,12 +171,6 @@ const appFeesColumns = computed(() => [
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
     field: (row: appfee.AppFee) => row.GoodType
-  },
-  {
-    name: 'Online',
-    label: t('MSG_ONLINE'),
-    sortable: true,
-    field: (row: appfee.AppFee) => row.GoodOnline && row.AppGoodOnline
   }
 ])
 
