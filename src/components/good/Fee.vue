@@ -35,13 +35,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_GOOD') }}</span>
-      </q-card-section>
-      <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
+        <q-input v-model.number='target.UnitValue' :label='$t("MSG_UNIT_VALUE")' />
       </q-card-section>
       <q-card-section>
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
+        <q-select :options='goodbase.GoodSettlementTypes' v-model='target.SettlementType' :label='$t("MSG_SETTLEMENT_TYPE")' />
+        <q-select :options='goodbase.GoodDurationTypes' v-model='target.DurationDisplayType' :label='$t("MSG_DURATION_DISPLAY_TYPE")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />

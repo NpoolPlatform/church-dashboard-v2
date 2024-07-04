@@ -56,15 +56,15 @@
         <q-input v-model='target.MinOrderDurationSeconds' :label='$t("MSG_MIN_ORDER_DURATION_SECONDS")' type='number' :min='0' />
       </q-card-section>
       <q-card-section>
+        <q-input v-model='target.Banner' :label='$t("MSG_BANNER")' />
+        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
+      </q-card-section>
+      <q-card-section>
         <q-select
           :options='goodbase.CancelModes'
           v-model='target.CancelMode'
           :label='$t("MSG_CANCEL_MODE")'
         />
-      </q-card-section>
-      <q-card-section>
-        <q-input v-model='target.Banner' :label='$t("MSG_BANNER")' />
-        <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn alt round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
