@@ -47,16 +47,16 @@
     position='right'
   >
     <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_CREATE_REQUIRED_GOOD') }}</span>
-      </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
         <div>{{ $t('MSG_SELECT_MAIN_GOOD') }}</div>
         <GoodSelector v-model:good-id='target.MainGoodID' />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if='!updating'>
         <div>{{ $t('MSG_SELECT_REQUIRED_GOOD') }}</div>
         <GoodSelector v-model:good-id='target.RequiredGoodID' />
+      </q-card-section>
+      <q-card-section>
+        <div><q-toggle dense v-model='target.Must' :label='$t("MSG_MUST")' /></div>
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
