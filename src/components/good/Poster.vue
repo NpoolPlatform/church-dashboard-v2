@@ -37,17 +37,16 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_UPDATE_POSTER') }}</span>
-      </q-card-section>
-      <q-card-section>
         <span> {{ selectedAppGood?.AppGoodName }}</span>
       </q-card-section>
       <q-card-section>
-        <span>{{ target.Poster }}</span>
+        <AppGoodSelector v-if='!updating' v-model:app-good-id='target.AppGoodID' />
+        <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
+        <q-input v-model.number='target.Index' :label='$t("MSG_DISPLAY_NAME_INDEX")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round' :loading='submitting' :poster='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn alt round' :poster='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -56,6 +55,7 @@
 <script setup lang='ts'>
 import { onMounted, ref, watch, computed } from 'vue'
 import { sdk, appgoodposter } from 'src/npoolstore'
+import AppGoodSelector from './AppGoodSelector.vue'
 
 const AppID = sdk.AppID
 const posters = sdk.goodPosters
@@ -75,9 +75,9 @@ const onCreate = () => {
 }
 
 const onRowClick = (row: appgoodposter.Poster) => {
-  target.value = row
+  updating.value = true
   showing.value = true
-  target.value = row
+  target.value = { ...row }
 }
 
 const onCancel = () => {

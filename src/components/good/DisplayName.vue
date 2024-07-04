@@ -45,8 +45,6 @@
       <q-card-section>
         <AppGoodSelector v-if='!updating' v-model:app-good-id='target.AppGoodID' />
         <q-input v-model='target.Name' :label='$t("MSG_DISPLAY_NAME")' />
-      </q-card-section>
-      <q-card-section>
         <q-input v-model.number='target.Index' :label='$t("MSG_DISPLAY_NAME_INDEX")' />
       </q-card-section>
       <q-item class='row'>
