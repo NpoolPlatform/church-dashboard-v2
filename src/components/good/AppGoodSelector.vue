@@ -1,12 +1,14 @@
 <template>
   <q-select
     v-model='target'
-    :options='goods'
+    :options='displayAppGoods'
     options-selected-class='text-deep-orange'
     emit-value
     label='MSG_APP_GOODS'
     map-options
+    use-input
     @update:model-value='onUpdate'
+    @filter='onFilter'
   >
     <template #option='scope'>
       <q-item v-bind='scope.itemProps'>
@@ -30,17 +32,25 @@ const appGoodId = toRef(props, 'appGoodId')
 const target = ref(appGoodId.value)
 
 const appGoods = sdk.appGoods
-
 const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
     value: el.EntID,
     label: `${el.GoodName} | ${el.EntID} | ${el.GoodType}`
   }
 }))
+const displayAppGoods = ref(goods.value)
 
 const emit = defineEmits<{(e: 'update:appGoodId', appGoodId: string | undefined): void}>()
 const onUpdate = () => {
   emit('update:appGoodId', target.value)
+}
+
+const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
+  doneFn(() => {
+    displayAppGoods.value = goods.value.filter((el) => {
+      return el?.label?.toLowerCase().includes(val.toLowerCase())
+    })
+  })
 }
 
 watch(sdk.AppID, () => {
