@@ -48,9 +48,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_APP_GOOD') }} : {{ updating? target.GoodName : selectedPowerRental?.Name }}</span>
-      </q-card-section>
-      <q-card-section>
         <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
         <q-input v-model='target.MinOrderAmount' :label='$t("MSG_MIN_ORDER_AMOUNT")' type='number' :min='0' />
@@ -118,7 +115,6 @@ const AppPowerRentalSimulate = defineAsyncComponent(() => import('src/components
 const powerRentals = sdk.powerRentals
 const appPowerRentals = sdk.appPowerRentals
 const selectedPowerRentals = ref([] as powerrental.PowerRental[])
-const selectedPowerRental = computed(() => selectedPowerRentals.value[0])
 const goodName = ref('')
 
 watch(sdk.AppID, () => {
@@ -304,13 +300,17 @@ const onSubmit = () => {
 }
 
 const updateAppPowerRental = () => {
-  sdk.adminUpdateAppPowerRental(target.value, () => {
+  sdk.adminUpdateAppPowerRental(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
     onMenuHide()
   })
 }
 
 const createAppPowerRental = () => {
-  sdk.adminCreateAppPowerRental(target.value, () => {
+  sdk.adminCreateAppPowerRental(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
     onMenuHide()
   })
 }
