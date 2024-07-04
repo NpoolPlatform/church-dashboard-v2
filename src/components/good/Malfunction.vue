@@ -9,6 +9,7 @@
     :rows-per-page-options='[20]'
     v-model:selected='selectedMalfunctions'
     :columns='columns'
+    @row-click='(evt, row, index) => onRowClick(row as goodmalfunction.Malfunction)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -37,7 +38,14 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
+        <GoodSelector v-if='!updating' v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
+        <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
+        <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
+        <q-input v-model.number='target.DurationSeconds' :label='$t("MSG_DURATION_SECONDS")' />
+        <q-input v-model.number='target.CompensateOrders' :label='$t("MSG_COMPENSATE_ORDERS")' />
+      </q-card-section>
+      <q-card-section>
+        <DateTimePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -56,6 +64,7 @@ import { goodmalfunction, sdk } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
+const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 
 const goods = sdk.goods
 const malfunctions = sdk.goodMalfunctions
@@ -64,6 +73,12 @@ const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
 const target = ref({} as goodmalfunction.Malfunction)
+
+const onRowClick = (row: goodmalfunction.Malfunction) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
+}
 
 const onCreate = () => {
   showing.value = true
@@ -82,15 +97,20 @@ const onMenuHide = () => {
 
 const onSubmit = () => {
   submitting.value = true
-  updating.value ? updateAppCoin() : createAppCoin()
+  updating.value ? adminUpdateMalfunction() : adminCreateMalfunction()
 }
 
-const updateAppCoin = () => {
-  // TODO
-}
-
-const createAppCoin = () => {
+const adminCreateMalfunction = () => {
   sdk.adminCreateMalfunction(target.value, (error: boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const adminUpdateMalfunction = () => {
+  sdk.adminUpdateMalfunction(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
