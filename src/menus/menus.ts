@@ -385,7 +385,7 @@ const MainDrawerMenus = [
     } as MenuItem, {
       menuId: uid(),
       label: 'APP商品管理',
-      caption: '授权、价格与上下架管理',
+      caption: '查看商品',
       icon: 'perm_identity',
       target: '/good/appgoods',
       level: 1,
