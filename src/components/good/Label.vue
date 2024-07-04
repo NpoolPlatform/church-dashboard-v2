@@ -37,16 +37,15 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_UPDATE_LABEL') }}</span>
-      </q-card-section>
-      <q-card-section>
         <span> {{ selectedAppGood?.AppGoodName }}</span>
       </q-card-section>
       <q-card-section>
+        <AppGoodSelector v-if='!updating' v-model:app-good-id='target.AppGoodID' />
         <q-input v-model='target.Icon' :label='$t("MSG_LABEL_ICON")' />
         <q-input v-model='target.IconBgColor' :label='$t("MSG_LABEL_ICON_BG_COLOR")' />
         <q-select :options='goodbase.GoodLabels' v-model='target.Label' :label='$t("MSG_LABEL")' />
         <q-input v-model='target.LabelBgColor' :label='$t("MSG_LABEL_BG_COLOR")' />
+        <q-input v-model.number='target.Index' :label='$t("MSG_INDEX")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -59,6 +58,7 @@
 <script setup lang='ts'>
 import { onMounted, ref, watch, computed } from 'vue'
 import { sdk, appgoodlabel, goodbase } from 'src/npoolstore'
+import AppGoodSelector from './AppGoodSelector.vue'
 
 const AppID = sdk.AppID
 const labels = sdk.goodLabels
@@ -78,8 +78,9 @@ const onCreate = () => {
 }
 
 const onRowClick = (row: appgoodlabel.Label) => {
-  target.value = row
   showing.value = true
+  updating.value = true
+  target.value = row
 }
 
 const onCancel = () => {
@@ -95,7 +96,9 @@ const onMenuHide = () => {
 const onSubmit = () => {
   submitting.value = true
   if (updating.value) {
-    sdk.adminUpdateGoodLabel(target.value, () => {
+    sdk.adminUpdateGoodLabel(target.value, (error:boolean) => {
+      submitting.value = false
+      if (error) return
       onMenuHide()
     })
   } else {
