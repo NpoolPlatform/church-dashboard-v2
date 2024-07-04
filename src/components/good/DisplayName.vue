@@ -37,13 +37,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_UPDATE_DISPLAY_NAME') }}</span>
+        <span>{{ updating ? $t('MSG_UPDATE_DISPLAY_NAME') : $t('MSG_CREATE_DISPLAY_NAME') }}</span>
       </q-card-section>
       <q-card-section>
         <span> {{ selectedAppGood?.AppGoodName }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
+        <AppGoodSelector v-if='!updating' v-model:app-good-id='target.AppGoodID' />
         <q-input v-model='target.Name' :label='$t("MSG_DISPLAY_NAME")' />
       </q-card-section>
       <q-card-section>
