@@ -102,7 +102,9 @@ const onSubmit = () => {
       onMenuHide()
     })
   } else {
-    sdk.adminCreateGoodLabel(target.value, () => {
+    sdk.adminCreateGoodLabel(target.value, (error:boolean) => {
+      submitting.value = false
+      if (error) return
       onMenuHide()
     })
   }
