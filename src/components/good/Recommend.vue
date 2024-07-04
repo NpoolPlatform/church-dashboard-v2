@@ -15,16 +15,17 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_UPDATE_RECOMMEND') }}</span>
-      </q-card-section>
-      <q-card-section>
         <span> {{ target.GoodName }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
+        <div><q-toggle dense v-model='target.Hide' :label='$t("MSG_HIDE")' /></div>
       </q-card-section>
       <q-card-section>
-        <q-input v-model.number='target.RecommendIndex' :label='$t("MSG_RECOMMEND_INDEX")' />
+        <q-select
+          :options='goodbase.GoodCommentHideReasons'
+          v-model='target.HideReason'
+          :label='$t("MSG_HIDE_REASON")'
+        />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -36,7 +37,7 @@
 
 <script setup lang='ts'>
 import { onMounted, ref, watch } from 'vue'
-import { sdk, appgoodrecommend } from 'src/npoolstore'
+import { sdk, appgoodrecommend, goodbase } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
@@ -61,12 +62,13 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
-  submitting.value = true
   updateRecommend()
 }
 
 const updateRecommend = () => {
+  submitting.value = true
   sdk.adminUpdateGoodRecommend(target.value, () => {
+    submitting.value = false
     onMenuHide()
   })
 }

@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_APP_GOOD_DISPLAY_NAMES")'
-    :rows='displaynames'
+    :rows='displayNames'
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as appgooddisplayname.DisplayName)'
@@ -63,14 +63,13 @@ import AppGoodSelector from './AppGoodSelector.vue'
 
 const AppID = sdk.AppID
 
-const appGoods = sdk.appGoods
-const displaynames = sdk.goodDisplayNames
+const displayNames = sdk.goodDisplayNames
 
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
-const target = ref(undefined as unknown as appgooddisplayname.DisplayName)
-const selectedDisplayNames = ref([] as appgooddisplayname.DisplayName[])
+const target = ref({} as appgooddisplayname.DisplayName)
+const selectedDisplayNames = ref([] as Array<appgooddisplayname.DisplayName>)
 const selectedDisplayName = computed(() => selectedDisplayNames.value[0])
 
 const selectedAppGood = computed(() => sdk.appGood(target.value?.AppGoodID))
@@ -123,10 +122,7 @@ onMounted(() => {
 })
 
 const prepare = () => {
-  if (!appGoods.value.length) {
-    sdk.adminGetAppGoods(0, 0)
-  }
-  if (!displaynames.value.length) {
+  if (!displayNames.value.length) {
     sdk.adminGetGoodDisplayNames(0, 0)
   }
 }
