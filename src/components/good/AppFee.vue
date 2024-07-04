@@ -215,6 +215,7 @@ const onSubmit = () => {
 }
 
 const createAppFee = () => {
+  target.value.GoodID = selectedFee.value.GoodID
   sdk.adminCreateAppFee(target.value, () => {
     onMenuHide()
   })
