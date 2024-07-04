@@ -39,9 +39,9 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
-        <q-input v-model='target.QuantityUnit' :label='$t("MSG_UNIT")' />
-        <q-input v-model='target.QuantityUnitAmount' :label='$t("MSG_UNIT_POWER")' />
-        <q-input v-model='target.UnitPrice' :label='$t("MSG_PRICE")' type='number' :min='0' />
+        <q-input v-model='target.QuantityUnit' :label='$t("MSG_QUANTITY_UNIT")' />
+        <q-input v-model='target.QuantityUnitAmount' :label='$t("MSG_QUANTITY_UNIT_AMOUNT")' />
+        <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
         <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
         <DatePicker v-model:date='target.ServiceStartAt' :updating='updating' :label='$t("MSG_SERVICE_START_AT")' />
       </q-card-section>
@@ -60,7 +60,9 @@
         <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
       </q-card-section>
       <q-card-section>
-        <q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TESTONLY")' />
+        <q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TEST_ONLY")' />
+        <div><q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' /></div>
+        <div><q-toggle dense v-model='target.Purchase' :label='$t("MSG_PURCHASEABLE")' /></div>
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
