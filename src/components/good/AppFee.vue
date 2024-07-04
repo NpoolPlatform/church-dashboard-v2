@@ -45,7 +45,6 @@
     <template #top-right>
       <div>
         <q-btn
-          v-if='false'
           dense
           flat
           class='btn flat'
@@ -239,7 +238,9 @@ const onRowClick = (row: appfee.AppFee) => {
 }
 
 const onUnauthorize = () => {
-  // TODO
+  sdk.adminDeleteAppFee(target.value, () => {
+    // NOTHING TODO
+  })
 }
 </script>
 <style lang='sass' scoped>
