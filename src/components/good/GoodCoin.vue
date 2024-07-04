@@ -103,6 +103,7 @@ const onSubmit = () => {
 
 const updateAppCoin = () => {
   sdk.adminUpdateGoodCoin(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
@@ -110,6 +111,7 @@ const updateAppCoin = () => {
 
 const createAppCoin = () => {
   sdk.adminCreateGoodCoin(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
