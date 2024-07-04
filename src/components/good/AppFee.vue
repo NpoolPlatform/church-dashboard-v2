@@ -39,8 +39,23 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
+    v-model:selected='selectedAppFees'
     @row-click='(ev, row, index) => onRowClick(row as appfee.AppFee)'
-  />
+  >
+    <template #top-right>
+      <div>
+        <q-btn
+          v-if='false'
+          dense
+          flat
+          class='btn flat'
+          :disable='selectedAppFees.length === 0'
+          :label='$t("MSG_UNAUTHORIZE")'
+          @click='onUnauthorize'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -82,11 +97,14 @@ import { appfee, sdk, goodbase, fee } from 'src/npoolstore'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
+const goodName = ref('')
+
 const fees = sdk.fees
-const appFees = sdk.appFees
 const selectedFees = ref([] as fee.Fee[])
 const selectedFee = computed(() => selectedFees.value[0])
-const goodName = ref('')
+
+const appFees = sdk.appFees
+const selectedAppFees = ref([] as Array<appfee.AppFee>)
 
 watch(sdk.AppID, () => {
   if (!appFees.value.length) {
@@ -220,6 +238,9 @@ const onRowClick = (row: appfee.AppFee) => {
   target.value = row
 }
 
+const onUnauthorize = () => {
+  // TODO
+}
 </script>
 <style lang='sass' scoped>
 .commission-percent
