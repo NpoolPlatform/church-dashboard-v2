@@ -40,9 +40,13 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
+        <q-input v-model.number='target.SimulateOrderCouponProbability' :label='$t("MSG_SIMULATE_ORDER_COUPON_PROBABILITY")' />
+        <q-input v-model.number='target.SimulateOrderCashableProfitProbability' :label='$t("MSG_SIMULATE_ORDER_CASHABLE_PROFIT_PROBABILITY")' />
+        <q-input v-model.number='target.MaxUnpaidOrders' :label='$t("MSG_MAX_UNPAID_ORDERS")' />
+        <q-input v-model.number='target.MaxTypedCouponsPerOrder' :label='$t("MSG_MAX_TYPED_COUPONS_PER_ORDER")' />
+      </q-card-section>
+      <q-card-section>
         <q-select :options='apporderconfig.SimulateOrderCouponModes' v-model='target.SimulateOrderCouponMode' :label='$t("MSG_SIMULATE_ORDER_COUPON_MODE")' />
-        <q-input v-model='target.SimulateOrderCouponProbability' :label='$t("MSG_SIMULATE_ORDER_COUPON_PROBABILITY")' />
-        <q-input v-model='target.SimulateOrderCashableProfitProbability' :label='$t("MSG_SIMULATE_ORDER_CASHABLE_PROFIT_PROBABILITY")' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.EnableSimulateOrder' :label='$t("MSG_ENABLE_SIMULATE_ORDER")' /></div>
