@@ -57,6 +57,7 @@
       <q-card-section>
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
         <FiatPicker v-model:fiat-id='target.FiatID' label='MSG_FIAT_ID' />
+        <q-select :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEE_TYPE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -68,7 +69,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { coinfiat, notify, coin, sdk } from 'src/npoolstore'
+import { coinfiat, notify, coin, sdk, chainbase } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
