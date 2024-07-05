@@ -33,7 +33,8 @@
         <span>{{ $t('MSG_CREATE_GOOD_BENEFIT_ACCOUNT') }}</span>
       </q-card-section>
       <q-card-section v-if='!updating'>
-        <GoodSelector v-model:good-id='target.GoodID' />
+        <PowerRentalSelector v-model:good-id='target.GoodID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div><span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span></div>
@@ -67,7 +68,8 @@
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { goodbenefitaccount, sdk } from 'src/npoolstore'
 
-const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
+const PowerRentalSelector = defineAsyncComponent(() => import('src/components/good/PowerRentalSelector.vue'))
+const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
 const accounts = sdk.goodBenefitAccounts
@@ -121,11 +123,13 @@ const onRowClick = (row: goodbenefitaccount.Account) => {
 
 const onSubmit = () => {
   submitting.value = true
+  console.log('CoinTypeID: ', target.value)
   updating.value ? updateGoodBenefitAccount() : createGoodBenefitAccount()
 }
 
 const createGoodBenefitAccount = () => {
   sdk.adminCreateGoodBenefitAccount(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })

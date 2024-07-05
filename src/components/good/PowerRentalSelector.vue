@@ -34,8 +34,8 @@ const target = ref(goodId.value)
 const powerRentals = sdk.powerRentals
 const _powerRentals = computed(() => Array.from(powerRentals.value, (el) => {
   return {
-    value: el.EntID,
-    label: `${el.EntID} | ${el.Name} | ${el.GoodType}`
+    value: el.GoodID,
+    label: `${el.GoodID} | ${el.Name} | ${el.GoodType}`
   }
 }))
 const displayPowerRentals = ref(_powerRentals.value)
