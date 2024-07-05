@@ -123,7 +123,6 @@ const onRowClick = (row: goodbenefitaccount.Account) => {
 
 const onSubmit = () => {
   submitting.value = true
-  console.log('CoinTypeID: ', target.value)
   updating.value ? updateGoodBenefitAccount() : createGoodBenefitAccount()
 }
 

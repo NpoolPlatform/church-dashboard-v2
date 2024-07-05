@@ -77,7 +77,9 @@ onMounted(() => {
 })
 
 const prepare = () => {
+  console.log('accounts: ', accounts.value)
   if (!accounts.value.length) {
+    console.log('accounts1: ', accounts.value)
     sdk.adminGetUserWithdrawAccounts(0, 0)
   }
 }
