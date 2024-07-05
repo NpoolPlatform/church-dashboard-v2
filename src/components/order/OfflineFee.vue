@@ -17,9 +17,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_OFFLINE_FEE_ORDER') }}</span>
-      </q-card-section>
-      <q-card-section>
         <q-select :options='_appFees' v-model='selectedAppFee' :label='$t("MSG_APP_FEE")' />
         <OrderSelector v-model:order-id='parentOrderId' />
         <q-select
@@ -138,9 +135,11 @@ const onSubmit = () => {
     TargetUserID: selectedUser.value.value.EntID,
     ParentOrderID: parentOrderId.value,
     DurationSeconds: durationSeconds.value,
-    AppGoodID: selectedAppFee.value.value.EntID,
+    AppGoodID: selectedAppFee.value.value.AppGoodID,
     OrderType: orderType.value
-  }, () => {
+  }, (error:boolean) => {
+    submitting.value = false
+    if (error) return
     onMenuHide()
   })
 }

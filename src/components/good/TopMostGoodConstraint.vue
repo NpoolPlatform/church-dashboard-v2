@@ -38,9 +38,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_TOPMOST_GOOD_CONSTRAINT') }}</span>
-      </q-card-section>
-      <q-card-section>
         <TopMostGoodSelector v-if='!updating' v-model:top-most-good-id='target.TopMostGoodID' />
       </q-card-section>
       <q-card-section>
