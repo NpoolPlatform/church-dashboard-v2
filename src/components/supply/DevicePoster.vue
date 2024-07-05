@@ -39,8 +39,9 @@
         <span>{{ $t('MSG_DEVICE_POSTER') }}</span>
       </q-card-section>
       <q-card-section>
-        <DeviceSelector v-model:device-type-id='target.DeviceTypeID' />
+        <DeviceSelector v-if='!updating' v-model:device-type-id='target.DeviceTypeID' />
         <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
+        <q-input v-model.number='target.Index' :label='$t("MSG_INDEX")' />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
