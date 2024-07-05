@@ -39,8 +39,22 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
+    v-model:selected='selectedAppPowerRentals'
     @row-click='(ev, row, index) => onRowClick(row as apppowerrental.AppPowerRental)'
-  />
+  >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_UNAUTHORIZE")'
+          @click='onUnAuthorizeClick'
+          :disable='selectedAppPowerRentals.length === 0'
+        />
+      </div>
+    </template>
+  </q-table>
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -112,10 +126,12 @@ const { t } = useI18n({ useScope: 'global' })
 
 const AppPowerRentalSimulate = defineAsyncComponent(() => import('src/components/good/AppPowerRentalSimulate.vue'))
 
-const powerRentals = sdk.powerRentals
-const appPowerRentals = sdk.appPowerRentals
-const selectedPowerRentals = ref([] as powerrental.PowerRental[])
 const goodName = ref('')
+const powerRentals = sdk.powerRentals
+const selectedPowerRentals = ref([] as powerrental.PowerRental[])
+
+const appPowerRentals = sdk.appPowerRentals
+const selectedAppPowerRentals = ref([] as Array<apppowerrental.AppPowerRental>)
 
 watch(sdk.AppID, () => {
   if (!appPowerRentals.value.length) {
@@ -326,6 +342,11 @@ const onRowClick = (row: apppowerrental.AppPowerRental) => {
   target.value = row
 }
 
+const onUnAuthorizeClick = () => {
+  sdk.adminDeleteAppPowerRental(selectedAppPowerRentals.value?.[0], () => {
+    // TODO
+  })
+}
 </script>
 <style lang='sass' scoped>
 .commission-percent
