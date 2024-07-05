@@ -7,6 +7,8 @@
     :columns='columns'
     row-key='ID'
     :rows-per-page-options='[100]'
+    selection='single'
+    v-model:selected='selectedPosters'
     @row-click='(evt, row, index) => onRowClick(row as deviceposter.DevicePoster)'
   >
     <template #top-right>
