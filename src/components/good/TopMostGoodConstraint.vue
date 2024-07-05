@@ -8,6 +8,8 @@
     :columns='columns'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as topmostgoodconstraint.TopMostGoodConstraint)'
+    selection='single'
+    v-model:selected='selectedConstraints'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='selectedConstraints.length === 0'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -31,11 +41,18 @@
         <span>{{ $t('MSG_TOPMOST_GOOD_CONSTRAINT') }}</span>
       </q-card-section>
       <q-card-section>
-        <TopMostGoodSelector v-model:top-most-good-id='target.TopMostGoodID' />
+        <TopMostGoodSelector v-if='!updating' v-model:top-most-good-id='target.TopMostGoodID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.TargetValue' :label='$t("MSG_TARGET_VALUE")' />
         <q-input v-model='target.Index' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
+      </q-card-section>
+      <q-card-section>
+        <q-select
+          :options='goodbase.GoodTopMostConstraints'
+          v-model='target.Constraint'
+          :label='$t("MSG_CONSTRAINT")'
+        />
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -47,13 +64,14 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { topmostgoodconstraint, sdk, utils } from 'src/npoolstore'
+import { topmostgoodconstraint, sdk, utils, goodbase } from 'src/npoolstore'
 
 import TopMostGoodSelector from 'src/components/good/TopMostGoodSelector.vue'
 
 const AppID = sdk.AppID
 
 const topMostGoodConstraints = sdk.topMostGoodConstraints
+const selectedConstraints = ref([] as Array<topmostgoodconstraint.TopMostGoodConstraint>)
 const target = ref({} as topmostgoodconstraint.TopMostGoodConstraint)
 
 const showing = ref(false)
@@ -92,6 +110,12 @@ const onSubmit = () => {
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMostGoodConstraint(selectedConstraints.value?.[0], () => {
+    // TODO
+  })
 }
 
 watch(AppID, () => {
