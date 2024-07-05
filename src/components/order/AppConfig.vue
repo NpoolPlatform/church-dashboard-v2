@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_ORDER_CONFIGS")'
+    :title='$t("MSG_SIMULATE_ORDER_CONFIGS")'
     :rows='appOrderConfigs'
     row-key='ID'
     :rows-per-page-options='[100]'
@@ -40,9 +40,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_ORDER_CONFIG') }}</span>
-      </q-card-section>
-      <q-card-section>
         <q-select :options='apporderconfig.SimulateOrderCouponModes' v-model='target.SimulateOrderCouponMode' :label='$t("MSG_SIMULATE_ORDER_COUPON_MODE")' />
         <q-input v-model='target.SimulateOrderCouponProbability' :label='$t("MSG_SIMULATE_ORDER_COUPON_PROBABILITY")' />
         <q-input v-model='target.SimulateOrderCashableProfitProbability' :label='$t("MSG_SIMULATE_ORDER_CASHABLE_PROFIT_PROBABILITY")' />
@@ -70,9 +67,16 @@ const selectedAppConfig = ref([] as Array<apporderconfig.AppConfig>)
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const appOrderConfigs = sdk.appOrderConfigs
-
+const appOrderConfigs = computed(() => {
+  const configs = [] as Array<apporderconfig.AppConfig>
+  const config = sdk.appOrderConfig(AppID.value)
+  if (config) {
+    configs.push(config)
+  }
+  return configs
+})
 const target = ref({} as apporderconfig.AppConfig)
+
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)

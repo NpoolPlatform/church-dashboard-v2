@@ -42,7 +42,7 @@
         <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Index' type='number' :label='$t("MSG_DISPLAY_INDEX")' />
+        <q-input v-model.number='target.Index' type='number' :label='$t("MSG_DISPLAY_INDEX")' />
       </q-card-section>
       <q-card-section>
         <q-toggle v-model='target.Main' :label='$t("MSG_MAIN")' />
