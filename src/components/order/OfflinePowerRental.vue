@@ -135,7 +135,7 @@ const onSubmit = () => {
   sdk.adminCreatePowerRentalOrder({
     TargetAppID: AppID.value,
     TargetUserID: selectedUser.value.value.EntID,
-    AppGoodID: selectedAppPowerRental.value.value.EntID,
+    AppGoodID: selectedAppPowerRental.value.value.AppGoodID,
     Units: `${units.value}`,
     OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment,
