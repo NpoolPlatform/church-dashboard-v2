@@ -37,9 +37,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ updating ? $t('MSG_UPDATE_DISPLAY_COLOR') : $t('MSG_CREATE_DISPLAY_COLOR') }}</span>
-      </q-card-section>
-      <q-card-section>
         <span> {{ selectedAppGood?.AppGoodName }}</span>
       </q-card-section>
       <q-card-section>
