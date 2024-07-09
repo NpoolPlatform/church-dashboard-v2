@@ -42,7 +42,7 @@
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
         <q-input v-model.number='target.DurationSeconds' :label='$t("MSG_DURATION_SECONDS")' />
-        <q-input v-model.number='target.CompensateOrders' :label='$t("MSG_COMPENSATE_ORDERS")' />
+        <q-input v-model.number='target.CompensatedOrders' :label='$t("MSG_COMPENSATE_ORDERS")' />
       </q-card-section>
       <q-card-section>
         <DateTimePicker v-model:date='target.StartAt' :updating='updating' :label='$t("MSG_START_AT")' />
