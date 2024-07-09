@@ -62,7 +62,7 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { apporderconfig, sdk } from 'src/npoolstore'
+import { apporderconfig, sdk, utils } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
@@ -167,6 +167,18 @@ const columns = computed(() => [
     field: (row: apporderconfig.AppConfig) => row.SimulateOrderCouponMode
   },
   {
+    name: 'MaxUnpaidOrders',
+    label: t('MSG_MAX_UNPAID_ORDERS'),
+    sortable: true,
+    field: (row: apporderconfig.AppConfig) => row.MaxUnpaidOrders
+  },
+  {
+    name: 'MaxTypedCouponsPerOrder',
+    label: t('MSG_MAX_TYPED_COUPONS_PER_ORDER'),
+    sortable: true,
+    field: (row: apporderconfig.AppConfig) => row.MaxTypedCouponsPerOrder
+  },
+  {
     name: 'SimulateOrderCouponProbability',
     label: t('MSG_SIMULATE_ORDER_COUPON_PROBABILITY'),
     sortable: true,
@@ -183,6 +195,12 @@ const columns = computed(() => [
     label: t('MSG_ENABLE_SIMULATE_ORDER'),
     sortable: true,
     field: (row: apporderconfig.AppConfig) => row.EnableSimulateOrder
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATED'),
+    sortable: true,
+    field: (row: apporderconfig.AppConfig) => utils.formatTime(row.CreatedAt)
   }
 ])
 </script>
