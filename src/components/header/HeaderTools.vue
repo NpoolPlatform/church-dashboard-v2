@@ -1,18 +1,25 @@
 <template>
   <div class='row'>
     <q-btn-dropdown
-      delse
+      dense
       flat
       :options='applications'
       :label='selectedApp ? selectedApp.Name : $t("MSG_SELECT_APPLICATION")'
-      auto-close
       no-caps
+      v-model='visible'
       v-if='logined'
     >
       <q-list>
+        <div class='q-mb-sm q-pa-md'>
+          <q-input
+            v-model='name'
+            label='Search'
+            dense
+          />
+        </div>
         <q-item
           dense
-          v-for='_app in applications.values()'
+          v-for='_app in displayApplications'
           :key='_app.EntID'
           clickable
           @click='onAppSelected(_app)'
@@ -30,7 +37,7 @@
 </template>
 
 <script setup lang='ts'>
-import { defineAsyncComponent, computed, watch, onMounted } from 'vue'
+import { defineAsyncComponent, computed, watch, onMounted, ref } from 'vue'
 import { app, notif, user, localapp, notify, sdk } from 'src/npoolstore'
 
 import bellNoMsg from '../../assets/bell-no-msg.svg'
@@ -51,7 +58,22 @@ const logined = computed(() => loginedUser.logined)
 
 const localApplication = localapp.useLocalApplicationStore()
 const application = app.useApplicationStore()
+
 const applications = computed(() => application.Apps)
+
+const name = ref('')
+const displayApplications = computed(() => {
+  const _applications = [] as Array<app.App>
+  application.Apps.forEach((el) => {
+    if (el.Name?.toLowerCase().includes(name.value?.toLowerCase())) {
+      _applications.push(el)
+    }
+  })
+  return _applications
+})
+
+const visible = ref(false)
+
 const selectedApp = computed({
   get: () => application.app(AppID.value) as app.App,
   set: (val: app.App) => {
@@ -64,6 +86,8 @@ const bellIcon = computed(() => mailbox.notifs(MyAppID.value, loginedUser.logine
 
 const onAppSelected = (app: app.App) => {
   selectedApp.value = app
+  visible.value = false
+  name.value = ''
 }
 
 watch(logined, () => {
@@ -83,6 +107,7 @@ onMounted(() => {
     getApps(0, 500)
   }
 })
+
 const getApps = (offset: number, limit: number) => {
   application.getApps({
     Offset: offset,
