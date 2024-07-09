@@ -14,6 +14,11 @@
           {{ value }}
         </option>
       </select>
+      <select class='good-type' name='good-type' v-model='selectedGoodType'>
+        <option v-for='value in goodbase.GoodTypes' :key='value'>
+          {{ value }}
+        </option>
+      </select>
       <q-toggle dense v-model='showSimulate' :label='$t("MSG_SHOW_SIMULATE")' size='xs' />
       <q-input
         dense
@@ -40,17 +45,28 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, defineProps, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { utils, constant, sdk, order } from 'src/npoolstore'
+import { utils, constant, sdk, order, goodbase } from 'src/npoolstore'
+import { OrderType } from 'src/npoolstore/order/const'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+interface Props {
+  goodTypes?: Array<goodbase.GoodType>
+  orderTypes?: Array<OrderType>
+}
+
+const props = defineProps<Props>()
+const goodTypes = toRef(props, 'goodTypes')
+const orderTypes = toRef(props, 'orderTypes')
 
 const goodID = ref('')
 const start = ref('')
 const end = ref('')
 const selectedOrderType = ref('ALL')
+const selectedGoodType = ref('ALL')
 
 const showSimulate = ref(false)
 
@@ -63,8 +79,19 @@ const displayOrders = computed(() => orders.value.filter((el) => {
   if (end.value.length) {
     display = display && (el.CreatedAt <= new Date(end.value).getTime() / 1000)
   }
+  if (goodTypes.value !== undefined && goodTypes.value?.length > 0) {
+    const index = goodTypes.value.findIndex((gl) => gl === el.GoodType)
+    display = display && (index > -1)
+  }
+  if (orderTypes.value !== undefined && orderTypes.value?.length > 0) {
+    const index = orderTypes.value.findIndex((gl) => gl === el.OrderType)
+    display = display && (index > -1)
+  }
   if (selectedOrderType.value !== 'ALL') {
     display = display && (el.OrderType === selectedOrderType.value)
+  }
+  if (selectedGoodType.value !== 'ALL') {
+    display = display && (el.GoodType === selectedGoodType.value)
   }
   display = display && (el.Simulate === showSimulate.value)
   return display
@@ -112,6 +139,12 @@ const columns = computed(() => [
     label: t('MSG_GOOD_NAME'),
     sortable: true,
     field: (row: order.Order) => row.GoodName
+  },
+  {
+    name: 'GoodType',
+    label: t('MSG_GOOD_TYPE'),
+    sortable: true,
+    field: (row: order.Order) => row.GoodType
   },
   {
     name: 'Type',

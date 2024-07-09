@@ -9,7 +9,9 @@
       @click='onCreate'
     />
   </div>
-  <OrderPage />
+  <OrderPage
+    :good-types='[goodbase.GoodType.TechniqueServiceFee, goodbase.GoodType.ElectricityFee]'
+  />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -52,7 +54,7 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { appfee, order, user, sdk } from 'src/npoolstore'
+import { appfee, order, user, sdk, goodbase } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 

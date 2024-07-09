@@ -9,7 +9,10 @@
       @click='onCreate'
     />
   </div>
-  <OrderPage />
+  <OrderPage
+    :good-types='[goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]'
+    :order-types='[OrderType.Offline]'
+  />
   <q-dialog
     v-model='showing'
     @hide='onMenuHide'
@@ -57,7 +60,8 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { apppowerrental, order, user, sdk } from 'src/npoolstore'
+import { apppowerrental, order, user, sdk, goodbase } from 'src/npoolstore'
+import { OrderType } from 'src/npoolstore/order/const'
 
 const AppID = sdk.AppID
 
