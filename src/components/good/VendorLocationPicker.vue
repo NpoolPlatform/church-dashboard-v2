@@ -8,6 +8,8 @@
     map-options
     label='MSG_VENDOR_LOCATION'
     @update:model-value='onUpdate'
+    use-input
+    @filter='onFilter'
   >
     <template #option='scope'>
       <q-item v-bind='scope.itemProps'>
@@ -38,6 +40,16 @@ const locations = computed(() => Array.from(sdk.vendorLocations.value).map((el) 
     label: el.Country + ' ' + el.Province + ' ' + el.City + ' ' + el.Address
   }
 }))
+
+const displayPowerRentals = ref(locations.value)
+
+const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
+  doneFn(() => {
+    displayPowerRentals.value = locations.value.filter((el) => {
+      return el.label.toLowerCase().includes(val.toLowerCase())
+    })
+  })
+}
 
 const emit = defineEmits<{(e: 'update:vendorLocationId', vendorLocationId: string): void}>()
 const onUpdate = () => {

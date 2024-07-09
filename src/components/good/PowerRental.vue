@@ -35,29 +35,34 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_GOOD') }}</span>
-      </q-card-section>
-      <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input v-model='target.QuantityUnit' :label='$t("MSG_QUANTITY_UNIT")' />
         <q-input v-model='target.QuantityUnitAmount' :label='$t("MSG_QUANTITY_UNIT_AMOUNT")' />
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
-        <DatePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
-        <DatePicker v-model:date='target.ServiceStartAt' :updating='updating' :label='$t("MSG_SERVICE_START_AT")' />
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model.number='target.BenefitIntervalHours' :label='$t("MSG_BENEFIT_INTERVAL_HOURS")' type='number' :min='1' />
+        <q-input v-model.number='target.UnitLockDeposit' type='number' :min='0' :label='$t("MSG_UNIT_LOCK_DEPOSIT")' />
+      </q-card-section>
+      <q-card-section>
+        <DeviceInfoPicker v-model:device-type-id='target.DeviceTypeID' />
+        <VendorLocationPicker v-model:vendor-location-id='target.VendorLocationID' />
+      </q-card-section>
+      <q-card-section>
+        <DateTimePicker v-model:date='target.DeliveryAt' :updating='updating' :label='$t("MSG_DELIVERY_AT")' />
+      </q-card-section>
+      <q-card-section>
+        <DateTimePicker v-model:date='target.ServiceStartAt' :updating='updating' :label='$t("MSG_SERVICE_START_AT")' />
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
-        <q-input v-model.number='target.BenefitIntervalHours' :label='$t("MSG_BENEFIT_INTERVAL_HOURS")' type='number' :min='1' />
-        <q-input v-model='target.UnitLockDeposit' :label='$t("MSG_UNIT_LOCK_DEPOSIT")' />
-      </q-card-section>
-      <q-card-section>
-        <DeviceInfoPicker v-model:device='target.DeviceTypeID' />
-        <VendorLocationPicker v-model:location='target.VendorLocationID' />
       </q-card-section>
       <q-card-section>
         <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
         <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
+        <q-select :options='goodbase.GoodDurationTypes' v-model='target.DurationDisplayType' :label='$t("MSG_DURATION_DISPLAY_TYPE")' />
+        <q-select :options='goodbase.GoodStockModes' v-model='target.StockMode' :label='$t("MSG_STOCK_MODE")' />
       </q-card-section>
       <q-card-section>
         <q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TEST_ONLY")' />
@@ -73,12 +78,15 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { good, utils, sdk, powerrental, goodbase } from 'src/npoolstore'
-
+import DeviceInfoPicker from './DeviceInfoPicker.vue'
+import VendorLocationPicker from './VendorLocationPicker.vue'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
+
+const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 
 const goods = sdk.powerRentals
 
@@ -96,6 +104,53 @@ onMounted(() => {
     sdk.getPowerRentals(0, 0)
   }
 })
+
+const showing = ref(false)
+const updating = ref(false)
+const submitting = ref(false)
+const target = ref({} as powerrental.PowerRental)
+
+const onCreate = () => {
+  showing.value = true
+  updating.value = false
+}
+
+const onRowClick = (row: powerrental.PowerRental) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
+}
+
+const onMenuHide = () => {
+  showing.value = false
+  submitting.value = false
+  target.value = {} as powerrental.PowerRental
+}
+
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updatePowerRental() : createPowerRental()
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const createPowerRental = () => {
+  sdk.adminCreatePowerRental(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const updatePowerRental = () => {
+  sdk.adminUpdatePowerRental(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
 
 const columns = computed(() => [
   {
@@ -141,49 +196,6 @@ const columns = computed(() => [
     field: (row: good.Good) => utils.formatTime(row.CreatedAt)
   }
 ])
-
-const showing = ref(false)
-const updating = ref(false)
-const submitting = ref(false)
-const target = ref({} as powerrental.PowerRental)
-
-const onCreate = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (row: powerrental.PowerRental) => {
-  showing.value = true
-  updating.value = true
-  target.value = row
-}
-
-const onMenuHide = () => {
-  showing.value = false
-  submitting.value = false
-  target.value = {} as powerrental.PowerRental
-}
-
-const onSubmit = () => {
-  submitting.value = true
-  updating.value ? updatePowerRental() : createPowerRental()
-}
-
-const onCancel = () => {
-  onMenuHide()
-}
-
-const createPowerRental = () => {
-  sdk.adminCreatePowerRental(target.value, () => {
-    onMenuHide()
-  })
-}
-
-const updatePowerRental = () => {
-  sdk.adminUpdatePowerRental(target.value, () => {
-    onMenuHide()
-  })
-}
 
 </script>
 

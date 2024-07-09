@@ -6,6 +6,8 @@
     emit-value
     map-options
     label='MSG_DEVICE'
+    use-input
+    @filter='onFilter'
     @update:model-value='onUpdate'
   >
     <template #option='scope'>
@@ -33,13 +35,23 @@ const deviceTypes = sdk.deviceTypes
 const _deviceTypes = computed(() => Array.from(deviceTypes.value).map((el) => {
   return {
     value: el.EntID,
-    label: el.Type
+    label: `${el.EntID} | ${el.Type} | ${el.ManufacturerName}| ${el.PowerConsumption}`
   }
 }))
 
-const emit = defineEmits<{(e: 'update:device', device: string): void}>()
+const displayDeviceTypes = ref(_deviceTypes.value)
+
+const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
+  doneFn(() => {
+    displayDeviceTypes.value = _deviceTypes.value.filter((el) => {
+      return el.label.toLowerCase().includes(val.toLowerCase())
+    })
+  })
+}
+
+const emit = defineEmits<{(e: 'update:deviceTypeId', deviceTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:device', target.value)
+  emit('update:deviceTypeId', target.value)
 }
 
 onMounted(() => {

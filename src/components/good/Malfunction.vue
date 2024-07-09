@@ -188,10 +188,10 @@ const columns = computed(() => [
     field: (row: goodmalfunction.Malfunction) => row.CompensateSeconds
   },
   {
-    name: 'CompensateOrders',
-    label: t('MSG_COMPENSATE_ORDERS'),
+    name: 'CompensatedOrders',
+    label: t('MSG_COMPENSATED_ORDERS'),
     sortable: true,
-    field: (row: goodmalfunction.Malfunction) => row.CompensateOrders
+    field: (row: goodmalfunction.Malfunction) => row.CompensatedOrders
   }
 ])
 </script>
