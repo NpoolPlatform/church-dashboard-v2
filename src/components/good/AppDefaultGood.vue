@@ -53,7 +53,7 @@
         <span>{{ $t('MSG_APP_DEFAULT_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :coin-type-ids='goodCoinTypeIds' />
+        <AppCoinPicker v-model:coin-type-id='target.CoinTypeID' :coin-type-ids='goodCoinTypeIds' />
         <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
       </q-card-section>
       <q-item class='row'>
@@ -73,7 +73,7 @@ import { appdefaultgood, utils, sdk, appgood, goodbase } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
-const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
+const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
 
 const appGoods = computed(() => sdk.appGoodsWithGoodTypes([goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]))
 const appDefaultGoods = sdk.appDefaultGoods
@@ -85,7 +85,7 @@ const selectedAppDefaultGoods = ref([] as appdefaultgood.Default[])
 const selectedAppDefaultGood = computed(() => selectedAppDefaultGoods.value[0])
 
 const goodCoinTypeIds = computed(() => {
-  switch (selectedAppGood.value.GoodType) {
+  switch (selectedAppGood.value?.GoodType) {
     case goodbase.GoodType.PowerRental:
     case goodbase.GoodType.LegacyPowerRental:
       return appPowerRentals.value.find((el) => el.AppGoodID === selectedAppGood.value.EntID)?.GoodCoins?.map((el) => el.CoinTypeID)
@@ -106,6 +106,7 @@ watch(() => selectedAppGood.value?.EntID, () => {
 const onMenuHide = () => {
   target.value = {} as appdefaultgood.Default
   showing.value = false
+  submitting.value = false
 }
 
 const onCreate = () => {
@@ -147,6 +148,8 @@ const onDelete = () => {
   })
 }
 
+const appCoins = computed(() => sdk.appCoins.value)
+
 watch(sdk.AppID, () => {
   if (!appDefaultGoods.value.length) {
     sdk.adminGetAppDefaultGoods(0, 0)
@@ -156,6 +159,9 @@ watch(sdk.AppID, () => {
   }
   if (!appPowerRentals.value.length) {
     sdk.adminGetAppPowerRentals(0, 0)
+  }
+  if (!appCoins.value.length) {
+    sdk.adminGetAppCoins(0, 0)
   }
 })
 
@@ -168,6 +174,9 @@ onMounted(() => {
   }
   if (!appPowerRentals.value.length) {
     sdk.adminGetAppPowerRentals(0, 0)
+  }
+  if (!appCoins.value.length) {
+    sdk.adminGetAppCoins(0, 0)
   }
 })
 

@@ -27,17 +27,19 @@ import { sdk } from 'src/npoolstore'
 const AppID = sdk.AppID
 
 interface Props {
-  id: string
+  coinTypeId: string
   updating?: boolean
+  coinTypeIds?: string[]
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const coinTypeId = toRef(props, 'coinTypeId')
+const coinTypeIds = toRef(props, 'coinTypeIds')
 const updating = toRef(props, 'updating')
-const target = ref(id.value)
+const target = ref(coinTypeId.value)
 
 const appCoins = sdk.appCoins
-const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled)).map((el) => {
+const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled || coinTypeIds.value === undefined || coinTypeIds.value.includes(el.CoinTypeID))).map((el) => {
   return {
     value: el.CoinTypeID,
     label: `${el.Name} | ${el.CoinTypeID}`
@@ -53,9 +55,9 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:coinTypeId', coinTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:coinTypeId', target.value)
 }
 
 onMounted(() => {

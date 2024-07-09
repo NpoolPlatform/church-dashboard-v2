@@ -167,7 +167,7 @@
           v-model='target.Amount'
           :label='$t("MSG_AMOUNT")'
         />
-        <AppCoinPicker v-model:id='target.CoinTypeID' />
+        <AppCoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-item class='row'>
         <q-item-label>{{ $t("MSG_COIN_UNIT") }} : {{ selectedCoin?.Unit }}</q-item-label>
