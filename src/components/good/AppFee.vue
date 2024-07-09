@@ -7,7 +7,7 @@
     :columns='feeColumns'
     row-key='ID'
     selection='single'
-    :rows-per-page-options='[20]'
+    :rows-per-page-options='[100]'
     v-model:selected='selectedFees'
   >
     <template #top-right>
@@ -62,10 +62,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_APP_GOOD') }} : {{ updating? target.GoodName : selectedFee?.Name }}</span>
-      </q-card-section>
-      <q-card-section>
-        <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
+        <q-input v-model='target.AppGoodName' :label='$t("MSG_NAME")' />
         <q-input v-model='target.UnitValue' :label='$t("MSG_UNIT_VALUE")' type='number' :min='0' />
         <q-input v-model='target.MinOrderDurationSeconds' :label='$t("MSG_MIN_ORDER_DURATION_SECONDS")' type='number' :min='0' />
       </q-card-section>
@@ -75,7 +72,7 @@
       </q-card-section>
       <q-card-section>
         <q-select
-          :options='goodbase.CancelModes'
+          :options='[goodbase.CancelMode.Uncancellable, goodbase.CancelMode.CancellableBeforeUsed]'
           v-model='target.CancelMode'
           :label='$t("MSG_CANCEL_MODE")'
         />
@@ -104,6 +101,64 @@ const selectedFee = computed(() => selectedFees.value[0])
 
 const appFees = sdk.appFees
 const selectedAppFees = ref([] as Array<appfee.AppFee>)
+
+const showing = ref(false)
+const updating = ref(false)
+const submitting = ref(false)
+const target = ref({} as appfee.AppFee)
+
+watch(selectedFee, () => {
+  target.value.GoodID = selectedFee.value?.GoodID
+})
+
+const onMenuHide = () => {
+  showing.value = false
+  submitting.value = false
+  target.value = {} as appfee.AppFee
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateAppFee() : createAppFee()
+}
+
+const createAppFee = () => {
+  target.value.GoodID = selectedFee.value.GoodID
+  sdk.adminCreateAppFee(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const updateAppFee = () => {
+  sdk.adminUpdateAppFee(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const onAuthorizeClick = () => {
+  showing.value = true
+  updating.value = false
+}
+
+const onRowClick = (row: appfee.AppFee) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
+}
+
+const onUnauthorize = () => {
+  sdk.adminDeleteAppFee(target.value, () => {
+    // NOTHING TODO
+  })
+}
 
 watch(sdk.AppID, () => {
   if (!appFees.value.length) {
@@ -191,58 +246,6 @@ const appFeesColumns = computed(() => [
   }
 ])
 
-const showing = ref(false)
-const updating = ref(false)
-const submitting = ref(false)
-const target = ref({} as appfee.AppFee)
-
-watch(selectedFee, () => {
-  target.value.GoodID = selectedFee.value?.GoodID
-})
-
-const onMenuHide = () => {
-  showing.value = false
-  submitting.value = false
-  target.value = {} as appfee.AppFee
-}
-
-const onCancel = () => {
-  onMenuHide()
-}
-
-const onSubmit = () => {
-  updating.value ? updateAppFee() : createAppFee()
-}
-
-const createAppFee = () => {
-  target.value.GoodID = selectedFee.value.GoodID
-  sdk.adminCreateAppFee(target.value, () => {
-    onMenuHide()
-  })
-}
-
-const updateAppFee = () => {
-  sdk.adminUpdateAppFee(target.value, () => {
-    onMenuHide()
-  })
-}
-
-const onAuthorizeClick = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (row: appfee.AppFee) => {
-  showing.value = true
-  updating.value = true
-  target.value = row
-}
-
-const onUnauthorize = () => {
-  sdk.adminDeleteAppFee(target.value, () => {
-    // NOTHING TODO
-  })
-}
 </script>
 <style lang='sass' scoped>
 .commission-percent
