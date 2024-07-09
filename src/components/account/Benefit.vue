@@ -29,12 +29,9 @@
     position='right'
   >
     <q-card class='popup-menu'>
-      <q-card-section>
-        <span>{{ $t('MSG_CREATE_GOOD_BENEFIT_ACCOUNT') }}</span>
-      </q-card-section>
       <q-card-section v-if='!updating'>
-        <PowerRentalSelector v-model:good-id='target.GoodID' />
-        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
+        <GoodSelector v-model:good-id='target.GoodID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :coin-type-ids='displayCoinTypeIds' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div><span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span></div>
@@ -65,10 +62,10 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { goodbenefitaccount, sdk } from 'src/npoolstore'
 
-const PowerRentalSelector = defineAsyncComponent(() => import('src/components/good/PowerRentalSelector.vue'))
+const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
@@ -95,6 +92,7 @@ const displayGbAccounts = computed(() => accounts.value.filter((el) => {
   }
   return flag
 }))
+
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
@@ -141,9 +139,25 @@ const updateGoodBenefitAccount = () => {
   })
 }
 
+const goodCoins = computed(() => sdk.goodCoins.value)
+
+const coinTypeIDs = computed(() => goodCoins.value?.filter((el) => el.GoodID === target.value?.GoodID)?.map((cl) => cl.CoinTypeID))
+const displayCoinTypeIds = ref(coinTypeIDs.value)
+
+watch(() => target.value?.GoodID, () => {
+  displayCoinTypeIds.value = coinTypeIDs.value
+})
+
+const coins = sdk.coins
 onMounted(() => {
   if (!accounts.value.length) {
     sdk.adminGetGoodBenefitAccounts(0, 0)
+  }
+  if (!goodCoins.value.length) {
+    sdk.getGoodCoins(0, 0)
+  }
+  if (!coins.value.length) {
+    sdk.getCoins(0, 0)
   }
 })
 </script>

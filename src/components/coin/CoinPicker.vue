@@ -48,7 +48,7 @@ const target = ref(coinTypeId.value)
 const coins = computed(() => Array.from(sdk.coins.value.filter((el) => coinTypeIds.value === undefined || coinTypeIds.value.includes(el.EntID))).map((el) => {
   return {
     value: el.EntID,
-    label: `${el.Name} | ${el.EntID}`
+    label: `${el.Name} | ${el.EntID} | ${el.ChainNickname}`
   }
 }))
 const displayCoins = ref(coins.value)
