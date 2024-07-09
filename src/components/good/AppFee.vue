@@ -155,7 +155,7 @@ const onRowClick = (row: appfee.AppFee) => {
 }
 
 const onUnauthorize = () => {
-  sdk.adminDeleteAppFee(target.value, () => {
+  sdk.adminDeleteAppFee(selectedAppFees.value?.[0], () => {
     // NOTHING TODO
   })
 }
