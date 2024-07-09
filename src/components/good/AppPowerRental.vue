@@ -44,6 +44,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='name'
+          :label='$t("MSG_GOOD_NAME")'
+        />
         <q-btn
           dense
           flat
@@ -62,7 +69,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-input v-model='target.GoodName' :label='$t("MSG_GOOD_NAME")' />
+        <q-input v-model='target.AppGoodName' :label='$t("MSG_GOOD_NAME")' />
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' type='number' :min='0' />
         <q-input v-model='target.MinOrderAmount' :label='$t("MSG_MIN_ORDER_AMOUNT")' type='number' :min='0' />
         <q-input v-model='target.MaxOrderAmount' :label='$t("MSG_MAX_ORDER_AMOUNT")' type='number' :min='0' />
@@ -76,6 +83,7 @@
           v-model='target.CancelMode'
           :label='$t("MSG_CANCEL_MODE")'
         />
+        <q-select :options='goodbase.GoodSaleModes' v-model='target.SaleMode' :label='$t("MSG_SALE_MODE")' />
         <q-input
           v-model.number='target.CancelableBeforeStartSeconds'
           :label='$t("MSG_CANCELLABLE_BEFORE_START")'
@@ -130,8 +138,66 @@ const goodName = ref('')
 const powerRentals = sdk.powerRentals
 const selectedPowerRentals = ref([] as powerrental.PowerRental[])
 
-const appPowerRentals = sdk.appPowerRentals
+const name = ref('')
+const appPowerRentals = computed(() => sdk.appPowerRentals.value.filter((el) => {
+  const _name = name.value?.toLowerCase()
+  return el.AppGoodName.toLowerCase()?.includes(_name) || el.AppGoodID.toLowerCase()?.includes(_name)
+}))
 const selectedAppPowerRentals = ref([] as Array<apppowerrental.AppPowerRental>)
+
+const showing = ref(false)
+const updating = ref(false)
+const submitting = ref(false)
+const target = ref({} as apppowerrental.AppPowerRental)
+
+const onMenuHide = () => {
+  showing.value = false
+  submitting.value = false
+  target.value = {} as apppowerrental.AppPowerRental
+}
+
+const onCancel = () => {
+  onMenuHide()
+}
+
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateAppPowerRental() : createAppPowerRental()
+}
+
+const updateAppPowerRental = () => {
+  sdk.adminUpdateAppPowerRental(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const createAppPowerRental = () => {
+  target.value.GoodID = selectedPowerRentals.value?.[0]?.GoodID
+  sdk.adminCreateAppPowerRental(target.value, (error:boolean) => {
+    submitting.value = false
+    if (error) return
+    onMenuHide()
+  })
+}
+
+const onAuthorizeClick = () => {
+  showing.value = true
+  updating.value = false
+}
+
+const onRowClick = (row: apppowerrental.AppPowerRental) => {
+  showing.value = true
+  updating.value = true
+  target.value = row
+}
+
+const onUnAuthorizeClick = () => {
+  sdk.adminDeleteAppPowerRental(selectedAppPowerRentals.value?.[0], () => {
+    // TODO
+  })
+}
 
 watch(sdk.AppID, () => {
   if (!appPowerRentals.value.length) {
@@ -163,6 +229,12 @@ const powerRentalColumns = computed(() => [
     label: t('MSG_ENT_ID'),
     sortable: true,
     field: (row: powerrental.PowerRental) => row.EntID
+  },
+  {
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.GoodID
   },
   {
     name: 'Title',
@@ -258,10 +330,16 @@ const appPowerRentalsColumns = computed(() => [
     field: (row: apppowerrental.AppPowerRental) => row.GoodID
   },
   {
-    name: 'GoodName',
-    label: t('MSG_GOOD_NAME'),
+    name: 'AppGoodID',
+    label: t('MSG_APP_GOOD_ID'),
     sortable: true,
-    field: (row: apppowerrental.AppPowerRental) => row.GoodName
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodID
+  },
+  {
+    name: 'AppGoodName',
+    label: t('MSG_APP_GOOD_NAME'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodName
   },
   {
     name: 'GoodType',
@@ -295,58 +373,6 @@ const appPowerRentalsColumns = computed(() => [
   }
 ])
 
-const showing = ref(false)
-const updating = ref(false)
-const submitting = ref(false)
-const target = ref({} as apppowerrental.AppPowerRental)
-
-const onMenuHide = () => {
-  showing.value = false
-  submitting.value = false
-  target.value = {} as apppowerrental.AppPowerRental
-}
-
-const onCancel = () => {
-  onMenuHide()
-}
-
-const onSubmit = () => {
-  submitting.value = true
-  updating.value ? updateAppPowerRental() : createAppPowerRental()
-}
-
-const updateAppPowerRental = () => {
-  sdk.adminUpdateAppPowerRental(target.value, (error:boolean) => {
-    submitting.value = false
-    if (error) return
-    onMenuHide()
-  })
-}
-
-const createAppPowerRental = () => {
-  sdk.adminCreateAppPowerRental(target.value, (error:boolean) => {
-    submitting.value = false
-    if (error) return
-    onMenuHide()
-  })
-}
-
-const onAuthorizeClick = () => {
-  showing.value = true
-  updating.value = false
-}
-
-const onRowClick = (row: apppowerrental.AppPowerRental) => {
-  showing.value = true
-  updating.value = true
-  target.value = row
-}
-
-const onUnAuthorizeClick = () => {
-  sdk.adminDeleteAppPowerRental(selectedAppPowerRentals.value?.[0], () => {
-    // TODO
-  })
-}
 </script>
 <style lang='sass' scoped>
 .commission-percent
