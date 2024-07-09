@@ -19,24 +19,29 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-select :options='_appFees' v-model='selectedAppFee' :label='$t("MSG_APP_FEE")' />
-        <OrderSelector v-model:order-id='parentOrderId' />
-        <q-select
-          :options='displayUsers'
-          use-input
-          v-model='selectedUser'
-          :label='$t("MSG_USER")'
-          @filter='filterUser'
+        <q-item-label>{{ $t('MSG_USER_EMAIL_ADDRESS') }}: {{ appOrder?.EmailAddress }}</q-item-label>
+      </q-card-section>
+      <q-card-section>
+        <OrderSelector
+          v-model:order-id='target.ParentOrderID'
+          :order-states='[order.OrderState.PAID, order.OrderState.IN_SERVICE]'
+          :good-types='[
+            goodbase.GoodType.PowerRental,
+            goodbase.GoodType.LegacyPowerRental
+          ]'
+        />
+        <AppGoodSelector
+          v-model:app-good-id='target.AppGoodID'
+          :required-app-good-ids='requiredAppGoodIds'
         />
         <q-input
-          :label='$t("MSG_DURATIONS")'
-          v-model='durations'
-          :suffix='durationUnit'
+          v-model='target.DurationSeconds' :label='$t("MSG_DURATIONS")' type='number' min='1'
+          :suffix='sdk.durationUnit(appFee?.DurationDisplayType as goodbase.GoodDurationType)'
         />
       </q-card-section>
       <q-card-section>
         <q-btn-toggle
-          v-model='orderType'
+          v-model='target.OrderType'
           rounded
           :options='[
             {label: order.OrderType.Offline, value: order.OrderType.Offline},
@@ -45,8 +50,8 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' @click='onSubmit' :label='$t("MSG_SUBMIT")' />
+        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -54,55 +59,13 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { appfee, order, user, sdk, goodbase } from 'src/npoolstore'
-
-const AppID = sdk.AppID
+import { order, sdk, goodbase, feeorder } from 'src/npoolstore'
 
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const OrderSelector = defineAsyncComponent(() => import('src/components/order/OrderSelector.vue'))
+const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 
-const appFees = sdk.appFees
-
-interface MyGood {
-  label: string
-  value: appfee.AppFee
-}
-const _appFees = computed(() => Array.from(appFees.value).map((el) => {
-  return {
-    label: `${el.GoodName} | ${el.ID} | ${el.GoodType}`,
-    value: el
-  } as MyGood
-}))
-
-interface MyUser {
-  label: string
-  value: user.User
-}
-
-const users = computed(() => Array.from(sdk.appUsers.value).map((el) => {
-  return {
-    label: el.EmailAddress?.length ? el.EmailAddress : el.PhoneNO,
-    value: el
-  } as MyUser
-}))
-
-const displayUsers = ref(users.value)
-const filterUser = (val: string, doneFn: (callbackFn: () => void) => void) => {
-  doneFn(() => {
-    displayUsers.value = users.value.filter((el) => {
-      return el.value.EmailAddress?.toLowerCase().includes(val.toLowerCase()) ||
-            el.value.PhoneNO?.toLowerCase().includes(val.toLowerCase())
-    })
-  })
-}
-
-const selectedAppFee = ref(undefined as unknown as MyGood)
-const selectedUser = ref(undefined as unknown as MyUser)
-const parentOrderId = ref('')
-const durations = ref(3)
-
-const durationUnit = computed(() => sdk.durationUnit(selectedAppFee.value?.value?.DurationDisplayType))
-const durationSeconds = computed(() => sdk.durationUnitSeconds(selectedAppFee.value?.value?.DurationDisplayType) * durations.value)
+const AppID = sdk.AppID
 
 const showing = ref(false)
 const submitting = ref(false)
@@ -117,43 +80,44 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  selectedAppFee.value = undefined as unknown as MyGood
-  selectedUser.value = undefined as unknown as MyUser
   submitting.value = false
 }
 
 const onSubmit = () => {
-  if (!selectedAppFee.value) {
-    return
-  }
-  if (!selectedUser.value) {
-    return
-  }
-  if (!parentOrderId.value.length) {
-    return
-  }
-  sdk.adminCreateFeeOrder({
-    TargetAppID: AppID.value,
-    TargetUserID: selectedUser.value.value.EntID,
-    ParentOrderID: parentOrderId.value,
-    DurationSeconds: durationSeconds.value,
-    AppGoodID: selectedAppFee.value.value.AppGoodID,
-    OrderType: orderType.value
-  }, (error:boolean) => {
+  submitting.value = true
+  target.value.TargetUserID = appOrder.value?.UserID as string
+  const durationSeconds = target.value.DurationSeconds * sdk.durationUnitSeconds(appFee?.value?.DurationDisplayType as goodbase.GoodDurationType)
+  sdk.adminCreateFeeOrder({ ...target.value, DurationSeconds: durationSeconds }, (error: boolean) => {
     submitting.value = false
     if (error) return
     onMenuHide()
   })
 }
 
-const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
+const target = ref({ OrderType: order.OrderType.Offline } as feeorder.AdminCreateFeeOrderRequest)
+
+const appFees = computed(() => sdk.appFees.value)
+const appFee = computed(() => sdk.appFee(target.value?.AppGoodID))
+const appOrder = computed(() => sdk.appOrder(target.value.ParentOrderID))
+
+const requireds = sdk.requiredAppGoods
+const requiredAppGoodIds = ref([] as Array<string>)
+
+watch(() => appOrder.value?.AppGoodID, () => {
+  requiredAppGoodIds.value = [] as Array<string>
+  requireds.value.forEach((el) => {
+    if (appOrder.value?.AppGoodID === el.MainAppGoodID) {
+      requiredAppGoodIds.value.push(el.RequiredAppGoodID)
+    }
+  })
+})
 
 const prepare = () => {
-  if (users.value.length === 0) {
-    sdk.adminGetUsers(0, 0)
-  }
   if (appFees.value?.length === 0) {
     sdk.adminGetAppFees(0, 0)
+  }
+  if (!requireds.value.length) {
+    sdk.adminGetRequiredAppGoods(0, 0)
   }
 }
 

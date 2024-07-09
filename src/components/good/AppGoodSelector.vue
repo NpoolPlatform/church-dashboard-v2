@@ -25,13 +25,23 @@ import { sdk } from 'src/npoolstore'
 
 interface Props {
   appGoodId: string | undefined
+  requiredAppGoodIds: Array<string>
 }
 
 const props = defineProps<Props>()
 const appGoodId = toRef(props, 'appGoodId')
+const requiredAppGoodIds = toRef(props, 'requiredAppGoodIds')
 const target = ref(appGoodId.value)
 
-const appGoods = sdk.appGoods
+const appGoods = computed(() => sdk.appGoods.value.filter((el) => {
+  let display = true
+  if (requiredAppGoodIds.value !== undefined) {
+    const index = requiredAppGoodIds.value.findIndex((gl) => gl === el.EntID)
+    display = display && (index > -1)
+  }
+  return display
+}))
+
 const goods = computed(() => Array.from(appGoods.value, (el) => {
   return {
     value: el.EntID,
@@ -52,6 +62,10 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
     })
   })
 }
+
+watch(requiredAppGoodIds, () => {
+  displayAppGoods.value = goods.value
+})
 
 watch(sdk.AppID, () => {
   prepare()
