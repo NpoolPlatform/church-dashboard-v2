@@ -30,14 +30,14 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useraccountbase, sdk } from 'src/npoolstore'
+import { useraccountbase, accountbase, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 
-const accounts = sdk.userBenefitAccounts
+const accounts = computed(() => sdk.userBenefitAccounts.value.filter((el) => el.UsedFor === accountbase.AccountUsedFor.UserDirectBenefit))
 
 const blocked = ref(null)
 const active = ref(null)
