@@ -77,6 +77,7 @@ const selectedAppGood = computed(() => sdk.appGood(target.value?.AppGoodID))
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value = {} as appgooddisplaycolor.DisplayColor
 }
 
 const onRowClick = (row: appgooddisplaycolor.DisplayColor) => {
