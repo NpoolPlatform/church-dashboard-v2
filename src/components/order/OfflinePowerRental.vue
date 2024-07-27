@@ -126,6 +126,7 @@ const onMenuHide = () => {
   submitting.value = false
 }
 
+const _order = order.useOrderStore()
 const onSubmit = () => {
   if (units.value > maxPurchaseUnits.value) {
     return
@@ -144,9 +145,12 @@ const onSubmit = () => {
     OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment,
     AppGoodStockID: selectedAppPowerRental.value.value.AppGoodStockID
+  }, (error: boolean) => {
+    if (error) return
+    onMenuHide()
+    _order.$reset()
+    sdk.adminGetOrders(0, 0)
   })
-
-  onMenuHide()
 }
 
 const coins = sdk.appCoins

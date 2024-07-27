@@ -456,9 +456,8 @@ const prepare = () => {
   if (!general.ledgers(AppID.value).length) {
     getAppGenerals(0, 100)
   }
-  console.log('accounts: ', depositAccounts.value)
   if (!depositAccounts.value.length) {
-    sdk.adminGetUserDepositAccounts(0, 0)
+    sdk.adminGetUserDepositAccounts(0, 100)
   }
   if (!simulateStatement.statements(AppID.value).length) {
     getAppSimulateDetails(0, 100)
