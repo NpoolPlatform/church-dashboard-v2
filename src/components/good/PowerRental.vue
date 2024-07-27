@@ -58,7 +58,7 @@
         <q-input v-model.number='target.Total' :label='$t("MSG_GOOD_TOTAL")' type='number' :min='1' />
       </q-card-section>
       <q-card-section>
-        <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' />
+        <!-- <q-select :options='goodbase.BenefitTypes' v-model='target.BenefitType' :label='$t("MSG_BENEFIT_TYPE")' /> -->
         <q-select :options='goodbase.GoodTypes' v-model='target.GoodType' :label='$t("MSG_GOOD_TYPE")' />
         <q-select :options='goodbase.StartModes' v-model='target.StartMode' :label='$t("MSG_START_MODE")' />
         <q-select :options='goodbase.GoodDurationTypes' v-model='target.DurationDisplayType' :label='$t("MSG_DURATION_DISPLAY_TYPE")' />
