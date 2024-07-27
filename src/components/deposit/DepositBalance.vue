@@ -275,6 +275,10 @@ const onSubmit = () => {
     if (error) {
       return
     }
+    statement.$reset()
+    general.$reset()
+    getAppDetails(0, 100)
+    getAppGenerals(0, 100)
     onMenuHide()
   })
 }
