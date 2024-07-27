@@ -35,7 +35,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <GoodSelector v-model:good-id='target.GoodID' />
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input v-model.number='target.UnitValue' :label='$t("MSG_UNIT_VALUE")' />
       </q-card-section>
@@ -56,7 +55,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { good, utils, sdk, fee, goodbase } from 'src/npoolstore'
-import GoodSelector from './GoodSelector.vue'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

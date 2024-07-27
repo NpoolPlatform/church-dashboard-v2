@@ -242,6 +242,7 @@ const target = ref({
 
 watch(AppID, () => {
   target.value.TargetAppID = AppID.value
+  prepare()
 })
 
 const statement = ledgerstatement.useStatementStore()
@@ -455,7 +456,8 @@ const prepare = () => {
   if (!general.ledgers(AppID.value).length) {
     getAppGenerals(0, 100)
   }
-  if (!accounts.value.length) {
+  console.log('accounts: ', depositAccounts.value)
+  if (!depositAccounts.value.length) {
     sdk.adminGetUserDepositAccounts(0, 0)
   }
   if (!simulateStatement.statements(AppID.value).length) {
