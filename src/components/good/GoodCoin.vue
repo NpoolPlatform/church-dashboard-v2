@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :rows='goodCoins'
+    :rows='displayGoodCoins'
     row-key='ID'
     selection='multiple'
     :title='$t("MSG_GOOD_COINS")'
@@ -13,6 +13,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='goodName'
+          :label='$t("MSG_GOOD_NAME")'
+        />
         <q-btn
           dense
           flat
@@ -68,7 +75,16 @@ const GoodSelector = defineAsyncComponent(() => import('src/components/good/Good
 
 const coins = sdk.coins
 const goods = sdk.goods
+const goodName = ref('')
 const goodCoins = sdk.goodCoins
+
+const displayGoodCoins = computed(() => {
+  const name = goodName.value.toLowerCase()
+  return goodCoins.value?.filter((el) => {
+    return el.GoodID.toLowerCase().includes(name) ||
+          el.GoodName.toLowerCase().includes(name)
+  })
+})
 
 const showing = ref(false)
 const updating = ref(false)
