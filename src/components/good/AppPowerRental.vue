@@ -83,6 +83,11 @@
           v-model='target.CancelMode'
           :label='$t("MSG_CANCEL_MODE")'
         />
+        <q-select
+          :options='goodbase.StartModes'
+          v-model='target.GoodStartMode'
+          :label='$t("MSG_GOOD_START_MODE")'
+        />
         <q-select :options='goodbase.GoodSaleModes' v-model='target.SaleMode' :label='$t("MSG_SALE_MODE")' />
         <q-input
           v-model.number='target.CancelableBeforeStartSeconds'
@@ -98,10 +103,10 @@
         <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
       </q-card-section>
       <q-card-section>
-        <div v-if='!updating'>
+        <div>
           <DateTimePicker v-model:date='target.SaleStartAt' label='MSG_SALE_START_AT' />
         </div>
-        <div v-if='!updating'>
+        <div>
           <DateTimePicker v-model:date='target.SaleEndAt' label='MSG_SALE_END_AT' />
         </div>
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
@@ -113,6 +118,7 @@
         <div><q-toggle dense v-model='target.Visible' :label='$t("MSG_VISIBLE")' /></div>
         <div><q-toggle dense v-model='target.AppGoodOnline' :label='$t("MSG_ONLINE")' /></div>
         <div><q-toggle dense v-model='target.PackageWithRequireds' :label='$t("MSG_PACKAGE_WITH_REQUIREDS")' /></div>
+        <div><q-toggle dense v-model='target.FixedDuration' :label='$t("MSG_FIXED_DURATION")' /></div>
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -132,6 +138,7 @@ import { apppowerrental, utils, sdk, goodbase, powerrental } from 'src/npoolstor
 const { t } = useI18n({ useScope: 'global' })
 
 const AppPowerRentalSimulate = defineAsyncComponent(() => import('src/components/good/AppPowerRentalSimulate.vue'))
+const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 
 const goodName = ref('')
 const powerRentals = sdk.powerRentals
