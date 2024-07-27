@@ -86,10 +86,9 @@
         <q-select :options='goodbase.GoodSaleModes' v-model='target.SaleMode' :label='$t("MSG_SALE_MODE")' />
         <q-input
           v-model.number='target.CancelableBeforeStartSeconds'
-          :label='$t("MSG_CANCELLABLE_BEFORE_START")'
+          :label='$t("MSG_CANCELLABLE_BEFORE_START_SECONDS")'
           type='number'
           :min='0'
-          suffix='h'
           :disable='!sdk.appPowerRentalCancelable(target.EntID)'
         />
       </q-card-section>
