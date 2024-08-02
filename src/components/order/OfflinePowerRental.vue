@@ -11,7 +11,7 @@
   </div>
   <OrderPage
     :good-types='[goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]'
-    :order-types='[OrderType.Offline]'
+    :order-types='[OrderType.Offline, OrderType.Airdrop]'
   />
   <q-dialog
     v-model='showing'
@@ -20,24 +20,17 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_CREATE_OFFLINE_POWERRENTAL_ORDER') }}</span>
-      </q-card-section>
-      <q-card-section>
-        <q-item-label>{{ $t('MSG_TOTAL') }}: {{ selectedAppPowerRental?.value?.GoodTotal }}</q-item-label>
-        <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedAppPowerRental?.value?.AppGoodLocked }}</q-item-label>
-        <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedAppPowerRental?.value?.AppGoodInService }}</q-item-label>
-        <q-select :options='_appPowerRentals' v-model='selectedAppPowerRental' :label='$t("MSG_APP_GOOD")' />
-        <q-select
-          :options='displayUsers'
-          use-input
-          v-model='selectedUser'
-          :label='$t("MSG_USER")'
-          @filter='filterUser'
+        <q-item-label>{{ $t('MSG_TOTAL') }}: {{ selectedAppPowerRental?.GoodTotal }}</q-item-label>
+        <q-item-label>{{ $t('MSG_LOCKED') }}: {{ selectedAppPowerRental?.AppGoodLocked }}</q-item-label>
+        <q-item-label>{{ $t('MSG_IN_SERVICE') }}: {{ selectedAppPowerRental?.AppGoodInService }}</q-item-label>
+        <AppGoodSelector
+          v-model:app-good-id='target.AppGoodID'
+          :good-types='[goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]'
         />
+        <AppUserSelector v-model:id='target.UserID' />
         <q-input
           v-model='units' :label='$t("MSG_PURCHASE_UNITS")' type='number' min='0'
           :max='maxPurchaseUnits'
-          :suffix='selectedAppPowerRental?.value?.QuantityUnit'
         />
       </q-card-section>
       <q-card-section>
@@ -60,53 +53,25 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, computed, ref, watch, onMounted } from 'vue'
-import { apppowerrental, order, user, sdk, goodbase } from 'src/npoolstore'
+import { order, sdk, goodbase, powerrentalorder } from 'src/npoolstore'
 import { OrderType } from 'src/npoolstore/order/const'
 
 const AppID = sdk.AppID
 
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
+const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+const AppUserSelector = defineAsyncComponent(() => import('src/components/user/AppUserSelector.vue'))
 
 const appPowerRentals = sdk.onlineAppPowerRentals
 
-interface MyGood {
-  label: string
-  value: apppowerrental.AppPowerRental
-}
-const _appPowerRentals = computed(() => Array.from(appPowerRentals.value).map((el) => {
-  return {
-    label: `${el.GoodName} | ${el.ID}`,
-    value: el
-  } as MyGood
-}))
-
-interface MyUser {
-  label: string
-  value: user.User
-}
-
-const users = computed(() => Array.from(sdk.appUsers.value).map((el) => {
-  return {
-    label: el.EmailAddress?.length ? el.EmailAddress : el.PhoneNO,
-    value: el
-  } as MyUser
-}))
-
-const displayUsers = ref(users.value)
-const filterUser = (val: string, doneFn: (callbackFn: () => void) => void) => {
-  doneFn(() => {
-    displayUsers.value = users.value.filter((el) => {
-      return el.value.EmailAddress?.toLowerCase().includes(val.toLowerCase()) ||
-            el.value.PhoneNO?.toLowerCase().includes(val.toLowerCase())
-    })
-  })
-}
-
-const selectedAppPowerRental = ref(undefined as unknown as MyGood)
-const selectedUser = ref(undefined as unknown as MyUser)
+const target = ref({} as powerrentalorder.PowerRentalOrder)
+const selectedAppPowerRental = computed(() => {
+  console.log(sdk.appPowerRental(target.value?.AppGoodID))
+  return sdk.appPowerRental(target.value?.AppGoodID)
+})
 
 const units = ref(1)
-const maxPurchaseUnits = computed(() => sdk.appPowerRentalMaxPurchasedUnits(selectedAppPowerRental.value?.value?.AppGoodID))
+const maxPurchaseUnits = computed(() => sdk.appPowerRentalMaxPurchasedUnits(target.value?.AppGoodID))
 
 const showing = ref(false)
 const submitting = ref(false)
@@ -121,30 +86,29 @@ const onCancel = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  selectedAppPowerRental.value = undefined as unknown as MyGood
-  selectedUser.value = undefined as unknown as MyUser
   submitting.value = false
 }
 
 const _order = order.useOrderStore()
 const onSubmit = () => {
   if (units.value > maxPurchaseUnits.value) {
+    console.log('max units: ', maxPurchaseUnits.value)
     return
   }
-  if (!selectedAppPowerRental.value) {
+  if (!target.value?.AppGoodID) {
     return
   }
-  if (!selectedUser.value) {
+  if (target.value?.UserID?.length <= 0) {
     return
   }
   sdk.adminCreatePowerRentalOrder({
     TargetAppID: AppID.value,
-    TargetUserID: selectedUser.value.value.EntID,
-    AppGoodID: selectedAppPowerRental.value.value.AppGoodID,
+    TargetUserID: target.value?.UserID,
+    AppGoodID: target.value?.AppGoodID,
     Units: `${units.value}`,
     OrderType: orderType.value,
     InvestmentType: order.InvestmentType.FullPayment,
-    AppGoodStockID: selectedAppPowerRental.value.value.AppGoodStockID
+    AppGoodStockID: selectedAppPowerRental.value?.AppGoodStockID as string
   }, (error: boolean) => {
     if (error) return
     onMenuHide()
@@ -153,16 +117,9 @@ const onSubmit = () => {
   })
 }
 
-const coins = sdk.appCoins
 const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order.OrderType.Offline)
 
 const prepare = () => {
-  if (users.value.length === 0) {
-    sdk.adminGetUsers(0, 0)
-  }
-  if (coins.value?.length === 0) {
-    sdk.adminGetAppCoins(0, 0)
-  }
   if (appPowerRentals.value?.length === 0) {
     sdk.adminGetAppPowerRentals(0, 0)
   }

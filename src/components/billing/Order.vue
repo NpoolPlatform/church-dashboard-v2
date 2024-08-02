@@ -72,7 +72,7 @@ const showSimulate = ref(false)
 
 const orders = sdk.orders
 const displayOrders = computed(() => orders.value.filter((el) => {
-  let display = el.GoodID.includes(goodID.value)
+  let display = el.GoodID.includes(goodID.value) || el.AppGoodID.includes(goodID.value)
   if (start.value.length) {
     display = display && (el.CreatedAt >= new Date(start.value).getTime() / 1000)
   }
@@ -139,6 +139,18 @@ const columns = computed(() => [
     label: t('MSG_GOOD_NAME'),
     sortable: true,
     field: (row: order.Order) => row.GoodName
+  },
+  {
+    name: 'AppGoodID',
+    label: t('MSG_APP_GOOD_ID'),
+    sortable: true,
+    field: (row: order.Order) => row.AppGoodID
+  },
+  {
+    name: 'AppGoodName',
+    label: t('MSG_APP_GOOD_NAME'),
+    sortable: true,
+    field: (row: order.Order) => row.AppGoodName
   },
   {
     name: 'GoodType',
