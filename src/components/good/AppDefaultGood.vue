@@ -77,7 +77,7 @@ const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/App
 
 const appGoods = computed(() => sdk.appGoodsWithGoodTypes([goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]))
 const appDefaultGoods = sdk.appDefaultGoods
-const appPowerRentals = sdk.appPowerRentals
+const appPowerRentals = sdk.appPowerRental.appPowerRentals
 
 const selectedAppGoods = ref([] as appgood.Good[])
 const selectedAppGood = computed(() => selectedAppGoods.value[0])
@@ -148,7 +148,7 @@ const onDelete = () => {
   })
 }
 
-const appCoins = computed(() => sdk.appCoins.value)
+const appCoins = computed(() => sdk.appCoin.appCoins.value)
 
 watch(sdk.AppID, () => {
   if (!appDefaultGoods.value.length) {
@@ -158,10 +158,10 @@ watch(sdk.AppID, () => {
     sdk.adminGetAppGoods(0, 0)
   }
   if (!appPowerRentals.value.length) {
-    sdk.adminGetAppPowerRentals(0, 0)
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
   }
   if (!appCoins.value.length) {
-    sdk.adminGetAppCoins(0, 0)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 
@@ -173,10 +173,10 @@ onMounted(() => {
     sdk.adminGetAppGoods(0, 0)
   }
   if (!appPowerRentals.value.length) {
-    sdk.adminGetAppPowerRentals(0, 0)
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
   }
   if (!appCoins.value.length) {
-    sdk.adminGetAppCoins(0, 0)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 

@@ -38,7 +38,7 @@ const coinTypeIds = toRef(props, 'coinTypeIds')
 const updating = toRef(props, 'updating')
 const target = ref(coinTypeId.value)
 
-const appCoins = sdk.appCoins
+const appCoins = sdk.appCoin.appCoins
 const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled || coinTypeIds.value === undefined || coinTypeIds.value.includes(el.CoinTypeID))).map((el) => {
   return {
     value: el.CoinTypeID,
@@ -62,13 +62,13 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (!appCoins.value.length) {
-    sdk.getAppCoins(0, 0)
+    sdk.appCoin.getAppCoins(0, 0)
   }
 })
 
 watch(AppID, () => {
   if (!appCoins.value.length) {
-    sdk.getAppCoins(0, 0)
+    sdk.appCoin.getAppCoins(0, 0)
   }
 })
 </script>

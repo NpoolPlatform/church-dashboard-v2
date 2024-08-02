@@ -191,7 +191,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
 
-const depositAccounts = sdk.userDepositAccounts
+const depositAccounts = sdk.userDepositAccount.userDepositAccounts
 const AppID = sdk.AppID
 
 const columns = computed(() => [
@@ -461,7 +461,7 @@ const prepare = () => {
     getAppGenerals(0, 100)
   }
   if (!depositAccounts.value.length) {
-    sdk.adminGetUserDepositAccounts(0, 100)
+    sdk.userDepositAccount.adminGetUserDepositAccounts(0, 100)
   }
   if (!simulateStatement.statements(AppID.value).length) {
     getAppSimulateDetails(0, 100)

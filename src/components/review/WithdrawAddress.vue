@@ -15,7 +15,7 @@ import { sdk } from 'src/npoolstore'
 
 const AppID = sdk.AppID
 
-const withdrawAddress = computed(() => sdk.userWithdrawAccounts(undefined, undefined))
+const withdrawAddress = computed(() => sdk.userWithdrawAccount.userWithdrawAccounts(undefined, undefined))
 
 watch(AppID, () => {
   prepare()
@@ -27,7 +27,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (withdrawAddress.value.length === 0) {
-    sdk.adminGetUserWithdrawAccounts(0, 0)
+    sdk.userWithdrawAccount.adminGetUserWithdrawAccounts(0, 0)
   }
 }
 

@@ -82,7 +82,7 @@ const { t } = useI18n({ useScope: 'global' })
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const coins = sdk.appCoins
+const coins = sdk.appCoin.appCoins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -120,7 +120,7 @@ const updateAppCoin = () => {
 }
 
 const createAppCoin = () => {
-  sdk.adminCreateAppCoin(target.value, (error: boolean) => {
+  sdk.appCoin.adminCreateAppCoin(target.value, (error: boolean) => {
     if (error) return
     onMenuHide()
   })
@@ -129,7 +129,7 @@ const createAppCoin = () => {
 const selectedCoin = ref([] as Array<appcoin.AppCoin>)
 const onDelete = () => {
   selectedCoin.value.forEach((el) => {
-    sdk.adminDeleteAppCoin(el)
+    sdk.appCoin.adminDeleteAppCoin(el)
   })
 }
 
@@ -144,13 +144,13 @@ watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
 
 watch(AppID, () => {
   if (coins.value?.length === 0) {
-    sdk.getAppCoins(0, 0)
+    sdk.appCoin.getAppCoins(0, 0)
   }
 })
 
 onMounted(() => {
   if (coins.value?.length === 0) {
-    sdk.getAppCoins(0, 0)
+    sdk.appCoin.getAppCoins(0, 0)
   }
 })
 

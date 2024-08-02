@@ -53,7 +53,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const { t } = useI18n({ useScope: 'global' })
 
 const coin = appcoin.useAppCoinStore()
-const coins = sdk.appCoins
+const coins = sdk.appCoin.appCoins
 
 const review = withdrawreview.useWithdrawReviewStore()
 const locale = _locale.useLocaleStore()
@@ -155,7 +155,7 @@ const prepare = () => {
   }
 
   if (coins.value.length === 0) {
-    sdk.getAppCoins(0, 0)
+    sdk.appCoin.getAppCoins(0, 0)
   }
 }
 

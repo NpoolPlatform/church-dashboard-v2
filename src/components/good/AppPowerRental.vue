@@ -94,7 +94,7 @@
           :label='$t("MSG_CANCELLABLE_BEFORE_START_SECONDS")'
           type='number'
           :min='0'
-          :disable='!sdk.appPowerRentalCancelable(target.EntID)'
+          :disable='!sdk.appPowerRental.cancelable(target.AppGoodID)'
         />
       </q-card-section>
       <q-card-section>
@@ -145,7 +145,7 @@ const powerRentals = sdk.powerRentals
 const selectedPowerRentals = ref([] as powerrental.PowerRental[])
 
 const name = ref('')
-const appPowerRentals = computed(() => sdk.appPowerRentals.value.filter((el) => {
+const appPowerRentals = computed(() => sdk.appPowerRental.appPowerRentals.value.filter((el) => {
   const _name = name.value?.toLowerCase()
   return el.AppGoodName.toLowerCase()?.includes(_name) || el.AppGoodID.toLowerCase()?.includes(_name)
 }))
@@ -172,7 +172,7 @@ const onSubmit = () => {
 }
 
 const updateAppPowerRental = () => {
-  sdk.adminUpdateAppPowerRental(target.value, (error:boolean) => {
+  sdk.appPowerRental.adminUpdateAppPowerRental(target.value, (error:boolean) => {
     submitting.value = false
     if (error) return
     onMenuHide()
@@ -181,7 +181,7 @@ const updateAppPowerRental = () => {
 
 const createAppPowerRental = () => {
   target.value.GoodID = selectedPowerRentals.value?.[0]?.GoodID
-  sdk.adminCreateAppPowerRental(target.value, (error:boolean) => {
+  sdk.appPowerRental.adminCreateAppPowerRental(target.value, (error:boolean) => {
     submitting.value = false
     if (error) return
     onMenuHide()
@@ -200,14 +200,14 @@ const onRowClick = (row: apppowerrental.AppPowerRental) => {
 }
 
 const onUnAuthorizeClick = () => {
-  sdk.adminDeleteAppPowerRental(selectedAppPowerRentals.value?.[0], () => {
+  sdk.appPowerRental.adminDeleteAppPowerRental(selectedAppPowerRentals.value?.[0], () => {
     // TODO
   })
 }
 
 watch(sdk.AppID, () => {
   if (!appPowerRentals.value.length) {
-    sdk.adminGetAppPowerRentals(0, 0)
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
   }
   if (!powerRentals.value.length) {
     sdk.getPowerRentals(0, 0)
@@ -216,7 +216,7 @@ watch(sdk.AppID, () => {
 
 onMounted(() => {
   if (!appPowerRentals.value.length) {
-    sdk.adminGetAppPowerRentals(0, 0)
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
   }
   if (!powerRentals.value.length) {
     sdk.getPowerRentals(0, 0)

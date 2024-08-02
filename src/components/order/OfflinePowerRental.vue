@@ -62,16 +62,16 @@ const OrderPage = defineAsyncComponent(() => import('src/components/billing/Orde
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const AppUserSelector = defineAsyncComponent(() => import('src/components/user/AppUserSelector.vue'))
 
-const appPowerRentals = sdk.onlineAppPowerRentals
+const appPowerRentals = sdk.appPowerRental.onlineAppPowerRentals
 
 const target = ref({} as powerrentalorder.PowerRentalOrder)
 const selectedAppPowerRental = computed(() => {
-  console.log(sdk.appPowerRental(target.value?.AppGoodID))
-  return sdk.appPowerRental(target.value?.AppGoodID)
+  console.log(sdk.appPowerRental.appPowerRental(target.value?.AppGoodID))
+  return sdk.appPowerRental.appPowerRental(target.value?.AppGoodID)
 })
 
 const units = ref(1)
-const maxPurchaseUnits = computed(() => sdk.appPowerRentalMaxPurchasedUnits(target.value?.AppGoodID))
+const maxPurchaseUnits = computed(() => sdk.appPowerRental.purchaseLimit(target.value?.AppGoodID))
 
 const showing = ref(false)
 const submitting = ref(false)
@@ -101,7 +101,7 @@ const onSubmit = () => {
   if (target.value?.UserID?.length <= 0) {
     return
   }
-  sdk.adminCreatePowerRentalOrder({
+  sdk.powerRentalOrder.adminCreatePowerRentalOrder({
     TargetAppID: AppID.value,
     TargetUserID: target.value?.UserID,
     AppGoodID: target.value?.AppGoodID,
@@ -121,7 +121,7 @@ const orderType = ref(order.OrderType.Offline as order.OrderType.Airdrop | order
 
 const prepare = () => {
   if (appPowerRentals.value?.length === 0) {
-    sdk.adminGetAppPowerRentals(0, 0)
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
   }
 }
 
