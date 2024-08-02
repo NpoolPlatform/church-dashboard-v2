@@ -83,6 +83,7 @@ const onMenuHide = () => {
   submitting.value = false
 }
 
+const _order = order.useOrderStore()
 const onSubmit = () => {
   submitting.value = true
   target.value.TargetUserID = appOrder.value?.UserID as string
@@ -90,6 +91,8 @@ const onSubmit = () => {
   sdk.adminCreateFeeOrder({ ...target.value, DurationSeconds: durationSeconds }, (error: boolean) => {
     submitting.value = false
     if (error) return
+    _order.$reset()
+    sdk.adminGetOrders(0, 0)
     onMenuHide()
   })
 }
