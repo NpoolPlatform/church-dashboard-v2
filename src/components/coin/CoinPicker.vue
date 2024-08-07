@@ -29,7 +29,6 @@ interface Props {
   coinTypeIds?: string[]
   updating?: boolean
   label?: string,
-  getData?: boolean
 }
 
 const props = defineProps<Props>()
@@ -37,7 +36,6 @@ const coinTypeId = toRef(props, 'coinTypeId')
 const coinTypeIds = toRef(props, 'coinTypeIds')
 const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
-const getData = toRef(props, 'getData')
 
 const myLabel = computed(() => {
   return !label.value ? 'MSG_COINS' : label.value
@@ -67,7 +65,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  if (!coins.value.length && (getData.value === undefined || getData.value === false)) {
+  if (!coins.value.length) {
     sdk.getCoins(0, 0)
   }
 })
