@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_APP_GOOD_DESCRIPTIONS")'
-    :rows='descriptions'
+    :rows='displayDescriptions'
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as appgooddescription.Description)'
@@ -12,6 +12,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='description'
+          :label='$t("MSG_DESCRIPTION")'
+        />
         <q-btn
           dense
           flat
@@ -64,7 +71,11 @@ const AppID = sdk.AppID
 
 const appGoods = sdk.appGoods
 const descriptions = sdk.goodDescriptions
-
+const description = ref('')
+const displayDescriptions = computed(() => {
+  const _description = description.value?.toLocaleLowerCase()
+  return descriptions.value?.filter((el) => el.Description?.toLowerCase().includes(_description))
+})
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)

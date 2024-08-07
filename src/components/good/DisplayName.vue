@@ -12,6 +12,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='name'
+          :label='$t("MSG_NAME")'
+        />
         <q-btn
           dense
           flat
@@ -60,7 +67,14 @@ import AppGoodSelector from './AppGoodSelector.vue'
 
 const AppID = sdk.AppID
 
-const displayNames = sdk.goodDisplayNames
+const _displayNames = sdk.goodDisplayNames
+const name = ref('')
+const displayNames = computed(() => {
+  const _name = name.value?.toLocaleLowerCase()
+  return _displayNames.value?.filter((el) => {
+    return el.Name?.toLocaleLowerCase().includes(_name)
+  })
+})
 
 const showing = ref(false)
 const updating = ref(false)

@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_FEES")'
-    :rows='fees'
+    :rows='displayFees'
     :columns='feeColumns'
     row-key='ID'
     selection='single'
@@ -96,7 +96,15 @@ const { t } = useI18n({ useScope: 'global' })
 const goodName = ref('')
 
 const fees = sdk.fees
+const displayFees = computed(() => {
+  const name = goodName.value.toLowerCase()
+  return fees.value?.filter((el) => {
+    return el.GoodID.toLowerCase().includes(name) ||
+          el.Name.toLowerCase().includes(name)
+  })
+})
 const selectedFees = ref([] as fee.Fee[])
+
 const selectedFee = computed(() => selectedFees.value[0])
 
 const appFees = sdk.appFees

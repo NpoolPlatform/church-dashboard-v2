@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_APP_GOOD_DISPLAY_COLORS")'
-    :rows='displaycolors'
+    :rows='displayColors'
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as appgooddisplaycolor.DisplayColor)'
@@ -12,6 +12,13 @@
   >
     <template #top-right>
       <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='color'
+          :label='$t("MSG_COLOR")'
+        />
         <q-btn
           dense
           flat
@@ -63,8 +70,12 @@ import AppGoodSelector from './AppGoodSelector.vue'
 const AppID = sdk.AppID
 
 const appGoods = sdk.appGoods
-const displaycolors = sdk.goodDisplayColors
-
+const goodDisplayColors = sdk.goodDisplayColors
+const color = ref('')
+const displayColors = computed(() => {
+  const _color = color.value?.toLowerCase()
+  return goodDisplayColors.value?.filter((el) => el.Color?.toLowerCase().includes(_color))
+})
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
@@ -125,7 +136,7 @@ const prepare = () => {
   if (!appGoods.value.length) {
     sdk.adminGetAppGoods(0, 0)
   }
-  if (!displaycolors.value.length) {
+  if (!goodDisplayColors.value.length) {
     sdk.adminGetGoodDisplayColors(0, 0)
   }
 }
