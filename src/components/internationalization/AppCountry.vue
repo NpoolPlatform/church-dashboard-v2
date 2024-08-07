@@ -42,7 +42,7 @@
         <CountryPicker v-model:id='target.CountryID' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -63,9 +63,11 @@ const selectedCountries = ref([] as Array<appcountry.Country>)
 
 const target = ref({} as appcountry.Country)
 const showing = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
+  submitting.value = false
   target.value = {} as appcountry.Country
 }
 
@@ -78,7 +80,9 @@ const onCancel = () => {
 }
 
 const onAuthorize = () => {
+  submitting.value = true
   sdk.adminCreateAppCountry(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
