@@ -27,7 +27,7 @@
           v-model:app-good-id='target.AppGoodID'
           :good-types='[goodbase.GoodType.PowerRental, goodbase.GoodType.LegacyPowerRental]'
         />
-        <AppUserSelector v-model:id='target.UserID' />
+        <AppUserSelector v-model:user-id='target.UserID' />
         <q-input
           v-model='units' :label='$t("MSG_PURCHASE_UNITS")' type='number' min='0'
           :max='maxPurchaseUnits'
@@ -91,6 +91,7 @@ const onMenuHide = () => {
 
 const _order = order.useOrderStore()
 const onSubmit = () => {
+  console.log('targetUserID: ', target.value?.UserID)
   if (units.value > maxPurchaseUnits.value) {
     console.log('max units: ', maxPurchaseUnits.value)
     return

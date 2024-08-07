@@ -32,7 +32,7 @@
       </q-card-section>
       <q-card-section>
         <!-- <AppGoodSelector v-model:id='target.AppGoodID' :label='$t("MSG_GOOD")' /> -->
-        <!-- <AppUserSelector v-model:id='target.UserID' /> -->
+        <!-- <AppUserSelector v-model:user-id='target.UserID' /> -->
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
         <q-select :disable='updating' :options='coupon.CouponTypes' v-model='target.CouponType' :label='$t("MSG_COUPON_TYPE")' />
