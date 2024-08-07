@@ -144,13 +144,13 @@ watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
 
 watch(AppID, () => {
   if (coins.value?.length === 0) {
-    sdk.appCoin.getAppCoins(0, 0)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 
 onMounted(() => {
   if (coins.value?.length === 0) {
-    sdk.appCoin.getAppCoins(0, 0)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 
