@@ -3,7 +3,7 @@
     dense
     flat
     :title='$t("MSG_POWER_RENTALS")'
-    :rows='powerRentals'
+    :rows='displayPowerRentals'
     :columns='powerRentalColumns'
     row-key='ID'
     selection='single'
@@ -143,6 +143,10 @@ const DateTimePicker = defineAsyncComponent(() => import('src/components/date/Da
 const goodName = ref('')
 const powerRentals = sdk.powerRentals
 const selectedPowerRentals = ref([] as powerrental.PowerRental[])
+const displayPowerRentals = computed(() => sdk.powerRentals?.value?.filter((el) => {
+  const _name = goodName.value?.toLowerCase()
+  return el.Name.toLowerCase()?.includes(_name) || el.GoodID.toLowerCase()?.includes(_name)
+}))
 
 const name = ref('')
 const appPowerRentals = computed(() => sdk.appPowerRental.appPowerRentals.value.filter((el) => {
