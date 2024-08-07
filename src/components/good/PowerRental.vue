@@ -67,7 +67,7 @@
       <q-card-section>
         <q-toggle dense v-model='target.TestOnly' :label='$t("MSG_TEST_ONLY")' />
         <div><q-toggle dense v-model='target.Online' :label='$t("MSG_ONLINE")' /></div>
-        <div><q-toggle dense v-model='target.Purchase' :label='$t("MSG_PURCHASEABLE")' /></div>
+        <div><q-toggle dense v-model='target.Purchasable' :label='$t("MSG_PURCHASEABLE")' /></div>
       </q-card-section>
       <q-item class='row'>
         <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -113,6 +113,8 @@ const target = ref({} as powerrental.PowerRental)
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  target.value.Total = '0'
+  target.value.UnitLockDeposit = '0'
 }
 
 const onRowClick = (row: powerrental.PowerRental) => {
