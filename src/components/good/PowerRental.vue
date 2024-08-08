@@ -192,6 +192,54 @@ const columns = computed(() => [
     field: (row: powerrental.PowerRental) => row.BenefitType
   },
   {
+    name: 'StockID',
+    label: t('MSG_STOCK_ID'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.StockID
+  },
+  {
+    name: 'SpotQuantity',
+    label: t('MSG_SPOT_QUANTITY'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.SpotQuantity
+  },
+  {
+    name: 'Total',
+    label: t('MSG_TOTAL'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Total
+  },
+  {
+    name: 'Locked',
+    label: t('MSG_LOCKED'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Locked
+  },
+  {
+    name: 'InService',
+    label: t('MSG_IN_SERVICE'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.InService
+  },
+  {
+    name: 'WaitStart',
+    label: t('MSG_WAIT_START'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.WaitStart
+  },
+  {
+    name: 'Sold',
+    label: t('MSG_SOLD'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.Sold
+  },
+  {
+    name: 'AppReserved',
+    label: t('MSG_APP_RESERVED'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.AppReserved
+  },
+  {
     name: 'StartAt',
     label: t('MSG_STARTAT'),
     sortable: true,

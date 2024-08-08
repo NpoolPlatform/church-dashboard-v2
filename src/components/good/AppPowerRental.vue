@@ -386,6 +386,66 @@ const appPowerRentalsColumns = computed(() => [
     label: t('MSG_START_AT'),
     sortable: true,
     field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row.ServiceStartAt)
+  },
+  {
+    name: 'GoodStockID',
+    label: t('MSG_GOOD_STOCK_ID'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodStockID
+  },
+  {
+    name: 'GoodTotal',
+    label: t('MSG_GOOD_TOTAL'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodTotal
+  },
+  {
+    name: 'GoodSpotQuantity',
+    label: t('MSG_GOOD_SPOT_QUANTITY'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodSpotQuantity
+  },
+  {
+    name: 'AppGoodStockID',
+    label: t('MSG_APP_GOOD_STOCK_ID'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodStockID
+  },
+  {
+    name: 'AppGoodSpotQuantity',
+    label: t('MSG_APP_GOOD_SPOT_QUANTITY'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodSpotQuantity
+  },
+  {
+    name: 'AppGoodSold',
+    label: t('MSG_APP_GOOD_SOLD'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodSold
+  },
+  {
+    name: 'AppGoodInService',
+    label: t('MSG_APP_GOOD_IN_SERVICE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodInService
+  },
+  {
+    name: 'AppGoodWaitStart',
+    label: t('MSG_APP_GOOD_WAIT_START'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodWaitStart
+  },
+  {
+    name: 'AppGoodLocked',
+    label: t('MSG_APP_GOOD_LOCKED'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodLocked
+  },
+  {
+    name: 'AppGoodReserved',
+    label: t('MSG_APP_GOOD_RESERVED'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodReserved
   }
 ])
 
