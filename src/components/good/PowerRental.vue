@@ -80,7 +80,7 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { good, utils, sdk, powerrental, goodbase } from 'src/npoolstore'
+import { utils, sdk, powerrental, goodbase } from 'src/npoolstore'
 import DeviceInfoPicker from './DeviceInfoPicker.vue'
 import VendorLocationPicker from './VendorLocationPicker.vue'
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -159,43 +159,49 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: good.Good) => row.ID
+    field: (row: powerrental.PowerRental) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
     sortable: true,
-    field: (row: good.Good) => row.EntID
+    field: (row: powerrental.PowerRental) => row.EntID
+  },
+  {
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
+    sortable: true,
+    field: (row: powerrental.PowerRental) => row.GoodID
   },
   {
     name: 'Name',
     label: t('MSG_GOOD_NAME'),
     sortable: true,
-    field: (row: good.Good) => row.Name
+    field: (row: powerrental.PowerRental) => row.Name
   },
   {
     name: 'GoodType',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
-    field: (row: good.Good) => row.GoodType
+    field: (row: powerrental.PowerRental) => row.GoodType
   },
   {
     name: 'BenefitType',
     label: t('MSG_BENEFITTYPE'),
     sortable: true,
-    field: (row: good.Good) => row.BenefitType
+    field: (row: powerrental.PowerRental) => row.BenefitType
   },
   {
     name: 'StartAt',
     label: t('MSG_STARTAT'),
     sortable: true,
-    field: (row: good.Good) => utils.formatTime(row.ServiceStartAt)
+    field: (row: powerrental.PowerRental) => utils.formatTime(row.ServiceStartAt)
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: good.Good) => utils.formatTime(row.CreatedAt)
+    field: (row: powerrental.PowerRental) => utils.formatTime(row.CreatedAt)
   }
 ])
 

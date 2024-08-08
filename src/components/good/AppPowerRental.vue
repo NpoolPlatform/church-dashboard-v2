@@ -358,10 +358,16 @@ const appPowerRentalsColumns = computed(() => [
     field: (row: apppowerrental.AppPowerRental) => row.GoodType
   },
   {
+    name: 'GoodOnline',
+    label: t('MSG_GOOD_ONLINE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.GoodOnline
+  },
+  {
     name: 'Online',
     label: t('MSG_ONLINE'),
     sortable: true,
-    field: (row: apppowerrental.AppPowerRental) => row.GoodOnline && row.AppGoodOnline
+    field: (row: apppowerrental.AppPowerRental) => row.AppGoodOnline
   },
   {
     name: 'Visible',

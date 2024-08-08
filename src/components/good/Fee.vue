@@ -54,24 +54,24 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { good, utils, sdk, fee, goodbase } from 'src/npoolstore'
+import { utils, sdk, fee, goodbase } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const goods = sdk.fees
+const fees = sdk.fees
 
 const goodName = ref('')
 const displayFees = computed(() => {
   const name = goodName.value.toLowerCase()
-  return goods.value?.filter((el) => {
+  return fees.value?.filter((el) => {
     return el.EntID.toLowerCase().includes(name) ||
           el.Name.toLowerCase().includes(name)
   })
 })
 
 onMounted(() => {
-  if (!goods.value.length) {
+  if (!fees.value.length) {
     sdk.getFees(0, 0)
   }
 })
@@ -81,43 +81,55 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: good.Good) => row.ID
+    field: (row: fee.Fee) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
     sortable: true,
-    field: (row: good.Good) => row.EntID
+    field: (row: fee.Fee) => row.EntID
+  },
+  {
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
+    sortable: true,
+    field: (row: fee.Fee) => row.GoodID
   },
   {
     name: 'Name',
     label: t('MSG_GOOD_NAME'),
     sortable: true,
-    field: (row: good.Good) => row.Name
+    field: (row: fee.Fee) => row.Name
   },
   {
     name: 'GoodType',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
-    field: (row: good.Good) => row.GoodType
+    field: (row: fee.Fee) => row.GoodType
   },
   {
-    name: 'BenefitType',
-    label: t('MSG_BENEFITTYPE'),
+    name: 'DurationDisplayType',
+    label: t('MSG_DURATION_DISPLAY_TYPE'),
     sortable: true,
-    field: (row: good.Good) => row.BenefitType
+    field: (row: fee.Fee) => row.DurationDisplayType
   },
   {
-    name: 'StartAt',
-    label: t('MSG_STARTAT'),
+    name: 'UnitValue',
+    label: t('MSG_UNIT_VALUE'),
     sortable: true,
-    field: (row: good.Good) => utils.formatTime(row.ServiceStartAt)
+    field: (row: fee.Fee) => row.UnitValue
   },
   {
     name: 'CreatedAt',
     label: t('MSG_CREATEDAT'),
     sortable: true,
-    field: (row: good.Good) => utils.formatTime(row.CreatedAt)
+    field: (row: fee.Fee) => utils.formatTime(row.CreatedAt)
+  },
+  {
+    name: 'UpdatedAt',
+    label: t('MSG_UPDATEDAT'),
+    sortable: true,
+    field: (row: fee.Fee) => utils.formatTime(row.UpdatedAt)
   }
 ])
 
