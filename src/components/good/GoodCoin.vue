@@ -45,8 +45,8 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :coin-type-ids='displayCoinTypeIds' />
         <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :coin-type-ids='displayCoinTypeIds' />
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.Index' type='number' :label='$t("MSG_DISPLAY_INDEX")' />
