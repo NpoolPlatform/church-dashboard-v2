@@ -72,7 +72,7 @@ const name = ref('')
 const displayNames = computed(() => {
   const _name = name.value?.toLocaleLowerCase()
   return _displayNames.value?.filter((el) => {
-    return el.Name?.toLocaleLowerCase().includes(_name)
+    return el.Name?.toLocaleLowerCase().includes(_name) || el.AppGoodID?.toLowerCase()?.includes(_name) || el.GoodID?.toLowerCase()?.includes(_name)
   })
 })
 

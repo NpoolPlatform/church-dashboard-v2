@@ -74,7 +74,7 @@ const descriptions = sdk.goodDescriptions
 const description = ref('')
 const displayDescriptions = computed(() => {
   const _description = description.value?.toLocaleLowerCase()
-  return descriptions.value?.filter((el) => el.Description?.toLowerCase().includes(_description))
+  return descriptions.value?.filter((el) => el.Description?.toLowerCase().includes(_description) || el.AppGoodID?.toLowerCase().includes(_description) || el.GoodID?.toLowerCase().includes(_description))
 })
 const showing = ref(false)
 const updating = ref(false)
