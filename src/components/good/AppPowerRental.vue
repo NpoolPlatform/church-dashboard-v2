@@ -319,7 +319,6 @@ const powerRentalColumns = computed(() => [
     field: (row: powerrental.PowerRental) => utils.formatTime(row.ServiceStartAt)
   }
 ])
-
 const appPowerRentalsColumns = computed(() => [
   {
     name: 'ID',
@@ -352,6 +351,18 @@ const appPowerRentalsColumns = computed(() => [
     field: (row: apppowerrental.AppPowerRental) => row.AppGoodName
   },
   {
+    name: 'UnitPrice',
+    label: t('MSG_UNIT_PRICE'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.UnitPrice
+  },
+  {
+    name: 'QuantityUnit',
+    label: t('MSG_QUANTITY_UNIT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.QuantityUnit
+  },
+  {
     name: 'GoodType',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
@@ -382,10 +393,22 @@ const appPowerRentalsColumns = computed(() => [
     field: (row: apppowerrental.AppPowerRental) => row.BenefitType
   },
   {
-    name: 'StartAt',
-    label: t('MSG_START_AT'),
+    name: 'MinOrderAmount',
+    label: t('MSG_MIN_ORDER_AMOUNT'),
     sortable: true,
-    field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row.ServiceStartAt)
+    field: (row: apppowerrental.AppPowerRental) => row.MinOrderAmount
+  },
+  {
+    name: 'MaxOrderAmount',
+    label: t('MSG_MAX_ORDER_AMOUNT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.MaxOrderAmount
+  },
+  {
+    name: 'MaxUserAmount',
+    label: t('MSG_MAX_USER_AMOUNT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => row.MaxUserAmount
   },
   {
     name: 'GoodStockID',
@@ -446,6 +469,30 @@ const appPowerRentalsColumns = computed(() => [
     label: t('MSG_APP_GOOD_RESERVED'),
     sortable: true,
     field: (row: apppowerrental.AppPowerRental) => row.AppGoodReserved
+  },
+  {
+    name: 'ServiceStartAt',
+    label: t('MSG_SERVICE_START_AT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row?.ServiceStartAt)
+  },
+  {
+    name: 'SaleStartAt',
+    label: t('MSG_SALE_START_AT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row?.SaleStartAt)
+  },
+  {
+    name: 'SaleEndAt',
+    label: t('MSG_SALE_END_AT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row?.SaleEndAt)
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATED_AT'),
+    sortable: true,
+    field: (row: apppowerrental.AppPowerRental) => utils.formatTime(row?.CreatedAt)
   }
 ])
 
