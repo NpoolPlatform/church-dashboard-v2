@@ -66,7 +66,8 @@ const displayFees = computed(() => {
   const name = goodName.value.toLowerCase()
   return fees.value?.filter((el) => {
     return el.EntID.toLowerCase().includes(name) ||
-          el.Name.toLowerCase().includes(name)
+          el.Name.toLowerCase().includes(name) ||
+          el.GoodID.toLowerCase().includes(name)
   })
 })
 

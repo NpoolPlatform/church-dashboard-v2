@@ -151,7 +151,7 @@ const displayPowerRentals = computed(() => sdk.powerRentals?.value?.filter((el) 
 const name = ref('')
 const appPowerRentals = computed(() => sdk.appPowerRental.appPowerRentals.value.filter((el) => {
   const _name = name.value?.toLowerCase()
-  return el.AppGoodName.toLowerCase()?.includes(_name) || el.AppGoodID.toLowerCase()?.includes(_name)
+  return el.AppGoodName.toLowerCase()?.includes(_name) || el.AppGoodID.toLowerCase()?.includes(_name) || el.GoodID.toLowerCase()?.includes(_name)
 }))
 const selectedAppPowerRentals = ref([] as Array<apppowerrental.AppPowerRental>)
 

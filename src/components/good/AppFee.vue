@@ -34,7 +34,7 @@
     dense
     flat
     :title='$t("MSG_APP_FEES")'
-    :rows='appFees'
+    :rows='displayAppFees'
     :columns='appFeesColumns'
     row-key='ID'
     selection='single'
@@ -44,6 +44,13 @@
   >
     <template #top-right>
       <div>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='appFeeName'
+          :label='$t("MSG_GOOD_NAME")'
+        />
         <q-btn
           dense
           flat
@@ -100,7 +107,8 @@ const displayFees = computed(() => {
   const name = goodName.value.toLowerCase()
   return fees.value?.filter((el) => {
     return el.GoodID.toLowerCase().includes(name) ||
-          el.Name.toLowerCase().includes(name)
+          el.Name.toLowerCase().includes(name) ||
+          el.EntID.toLowerCase().includes(name)
   })
 })
 const selectedFees = ref([] as fee.Fee[])
@@ -108,6 +116,16 @@ const selectedFees = ref([] as fee.Fee[])
 const selectedFee = computed(() => selectedFees.value[0])
 
 const appFees = sdk.appFees
+const appFeeName = ref('')
+const displayAppFees = computed(() => {
+  const name = appFeeName.value.toLowerCase()
+  return appFees.value?.filter((el) => {
+    return el.GoodID.toLowerCase().includes(name) ||
+          el.AppGoodID.toLowerCase().includes(name) ||
+          el.AppGoodName.toLowerCase().includes(name) ||
+          el.EntID.toLowerCase().includes(name)
+  })
+})
 const selectedAppFees = ref([] as Array<appfee.AppFee>)
 
 const showing = ref(false)

@@ -3,16 +3,28 @@
     dense
     flat
     :title='$t("MSG_APP_GOODS")'
-    :rows='appGoods'
+    :rows='displayAppGoods'
     :columns='appGoodsColumns'
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
-  />
+    >
+    <template #top-right>
+      <div class='row indent flat'>
+        <q-input
+          dense
+          flat
+          class='small'
+          v-model='name'
+          :label='$t("MSG_GOOD_NAME")'
+        />
+      </div>
+    </template>
+  </q-table>
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { appgood, utils, sdk } from 'src/npoolstore'
 
@@ -20,6 +32,11 @@ import { appgood, utils, sdk } from 'src/npoolstore'
 const { t } = useI18n({ useScope: 'global' })
 
 const appGoods = sdk.appGoods
+const name = ref('')
+const displayAppGoods = computed(() => appGoods.value.filter((el) => {
+  const _name = name.value?.toLowerCase()
+  return el.AppGoodName.toLowerCase()?.includes(_name) || el.EntID.toLowerCase()?.includes(_name) || el.GoodID.toLowerCase()?.includes(_name)
+}))
 
 watch(sdk.AppID, () => {
   if (!appGoods.value.length) {
@@ -45,6 +62,12 @@ const appGoodsColumns = computed(() => [
     label: t('MSG_ENT_ID'),
     sortable: true,
     field: (row: appgood.Good) => row.EntID
+  },
+  {
+    name: 'AppGoodName',
+    label: t('MSG_APP_GOOD_NAME'),
+    sortable: true,
+    field: (row: appgood.Good) => row.AppGoodName
   },
   {
     name: 'GoodID',
