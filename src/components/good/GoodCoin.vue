@@ -46,7 +46,7 @@
     <q-card class='popup-menu'>
       <q-card-section>
         <GoodSelector v-model:good-id='target.GoodID' label='MSG_GOOD_ID' />
-        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :coin-type-ids='displayCoinTypeIds' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.Index' type='number' :label='$t("MSG_DISPLAY_INDEX")' />
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
+import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { goodcoin, sdk } from 'src/npoolstore'
 
@@ -111,13 +111,6 @@ const onMenuHide = () => {
   submitting.value = false
   target.value = {} as goodcoin.GoodCoin
 }
-
-const coinTypeIds = computed(() => sdk.goodCoins.value?.filter((el) => el.GoodID === target.value?.GoodID).map((ml) => ml.CoinTypeID))
-const displayCoinTypeIds = ref(coinTypeIds.value)
-
-watch(() => target.value?.GoodID, () => {
-  displayCoinTypeIds.value = coinTypeIds.value
-})
 
 const onSubmit = () => {
   submitting.value = true
