@@ -25,12 +25,14 @@ import { sdk, goodbase } from 'src/npoolstore'
 
 interface Props {
   appGoodId: string | undefined
+  goodIds?: string[]
   requiredAppGoodIds: Array<string>
   goodTypes?: Array<goodbase.GoodType>
 }
 
 const props = defineProps<Props>()
 const appGoodId = toRef(props, 'appGoodId')
+const goodIds = toRef(props, 'goodIds')
 const requiredAppGoodIds = toRef(props, 'requiredAppGoodIds')
 const goodTypes = toRef(props, 'goodTypes')
 const target = ref(appGoodId.value)
@@ -45,7 +47,7 @@ const appGoods = computed(() => sdk.appGoods.value.filter((el) => {
     const index = goodTypes.value.findIndex((gl) => gl === el.GoodType)
     display = display && (index > -1)
   }
-  return display
+  return display && (!goodIds.value || goodIds.value?.includes(el.GoodID))
 }))
 
 const goods = computed(() => Array.from(appGoods.value, (el) => {
