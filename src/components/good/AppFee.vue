@@ -200,6 +200,12 @@ const feeColumns = computed(() => [
     field: (row: fee.Fee) => row.EntID
   },
   {
+    name: 'GoodID',
+    label: t('MSG_GOOD_ID'),
+    sortable: true,
+    field: (row: fee.Fee) => row.GoodID
+  },
+  {
     name: 'Title',
     label: t('MSG_GOOD_NAME'),
     sortable: true,
@@ -247,10 +253,46 @@ const appFeesColumns = computed(() => [
     field: (row: appfee.AppFee) => row.GoodName
   },
   {
+    name: 'AppGoodID',
+    label: t('MSG_APP_GOOD_ID'),
+    sortable: true,
+    field: (row: appfee.AppFee) => row.AppGoodID
+  },
+  {
+    name: 'AppGoodName',
+    label: t('MSG_APP_GOOD_NAME'),
+    sortable: true,
+    field: (row: appfee.AppFee) => row.AppGoodName
+  },
+  {
     name: 'GoodType',
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
     field: (row: appfee.AppFee) => row.GoodType
+  },
+  {
+    name: 'UnitValue',
+    label: t('MSG_UNIT_VALUE'),
+    sortable: true,
+    field: (row: appfee.AppFee) => row.UnitValue
+  },
+  {
+    name: 'DurationDisplayType',
+    label: t('MSG_DURATION_DISPLAY_TYPE'),
+    sortable: true,
+    field: (row: appfee.AppFee) => row.DurationDisplayType
+  },
+  {
+    name: 'CancelMode',
+    label: t('MSG_CANCEL_MODE'),
+    sortable: true,
+    field: (row: appfee.AppFee) => row.CancelMode
+  },
+  {
+    name: 'MinOrderDurationSeconds',
+    label: t('MSG_MIN_ORDER_DURATION_SECONDS'),
+    sortable: true,
+    field: (row: appfee.AppFee) => row.MinOrderDurationSeconds
   }
 ])
 
