@@ -989,6 +989,26 @@ const MainDrawerMenus = [
     ]
   } as MenuItem, {
     menuId: uid(),
+    label: '交易',
+    caption: '交易管理',
+    icon: 'reviews',
+    target: '/txs',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '交易列表',
+        caption: '',
+        icon: 'format_list_numbered',
+        target: '/txs',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  } as MenuItem, {
+    menuId: uid(),
     label: '矿池',
     caption: '授权矿池、管理矿池子账户等',
     icon: 'pending',

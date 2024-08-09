@@ -1021,6 +1021,18 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
+        path: 'txs',
+        component: () => import('src/pages/tx/Tx.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
         path: 'miningpool/pool',
         component: () => import('src/pages/miningpool/Pool.vue'),
         meta: {
