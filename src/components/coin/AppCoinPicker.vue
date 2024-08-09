@@ -39,7 +39,7 @@ const updating = toRef(props, 'updating')
 const target = ref(coinTypeId.value)
 
 const appCoins = sdk.appCoin.appCoins
-const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled || coinTypeIds.value === undefined || coinTypeIds.value.includes(el.CoinTypeID))).map((el) => {
+const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled && (!coinTypeIds.value || coinTypeIds.value?.includes(el.CoinTypeID)))).map((el) => {
   return {
     value: el.CoinTypeID,
     label: `${el.Name} | ${el.CoinTypeID}`
