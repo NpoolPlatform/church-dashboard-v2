@@ -8,7 +8,7 @@
     row-key='ID'
     selection='single'
     :rows-per-page-options='[20]'
-    >
+  >
     <template #top-right>
       <div class='row indent flat'>
         <q-input

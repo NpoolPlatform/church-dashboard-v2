@@ -27,6 +27,9 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
+        {{ target.State }}
+      </q-card-section>
+      <q-card-section>
         <q-select :options='[tx.TxState.StateTransferring]' v-model='state' :label='$t("MSG_TX_STATE")' />
       </q-card-section>
       <q-item class='row'>
@@ -57,8 +60,8 @@ const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
 
-const state = ref()
 const target = ref({} as tx.Tx)
+const state = ref('')
 
 const onRowClick = (row: tx.Tx) => {
   showing.value = true
@@ -77,6 +80,7 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
+  target.value.State = state.value as tx.TxState
   sdk.tx.updateTx(target.value, () => {
     showing.value = false
   })
