@@ -33,7 +33,7 @@
       </q-card-section>
       <q-card-section v-if='!updating'>
         <div>{{ $t('MSG_SELECT_REQUIRED_APP_GOOD') }}</div>
-        <AppGoodSelector v-model:app-good-id='target.RequiredAppGoodID' :good-ids='selectedGoodID' />
+        <AppGoodSelector v-model:app-good-id='target.RequiredAppGoodID' :good-ids='selectedGoodID' :exclude-app-good-ids='[target.MainAppGoodID]' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.Must' :label='$t("MSG_MUST")' /></div>
