@@ -95,7 +95,8 @@ const displayPowerRentals = computed(() => {
   const name = goodName.value.toLowerCase()
   return goods.value?.filter((el) => {
     return el.EntID.toLowerCase().includes(name) ||
-          el.Name.toLowerCase().includes(name)
+          el.Name.toLowerCase().includes(name) ||
+          el.GoodID.toLowerCase().includes(name)
   })
 })
 
