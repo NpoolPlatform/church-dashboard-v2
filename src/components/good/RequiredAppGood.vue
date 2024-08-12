@@ -59,7 +59,7 @@ const { t } = useI18n({ useScope: 'global' })
 const requireds = sdk.requiredAppGoods
 const target = ref({} as requiredappgood.Required)
 
-const selectedGoodID = computed(() => sdk.appGood(target.value?.MainAppGoodID) ? [] : [sdk.appGood(target.value?.MainAppGoodID)?.GoodID])
+const selectedGoodID = computed(() => sdk.appGood(target.value?.MainAppGoodID)?.GoodID ? [sdk.appGood(target.value?.MainAppGoodID)?.GoodID as string] : [])
 
 const showing = ref(false)
 const updating = ref(false)
