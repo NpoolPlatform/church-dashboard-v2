@@ -2,12 +2,14 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_DEVICES")'
-    :rows='devices'
+    :title='$t("MSG_DEVICE_TYPES")'
+    :rows='deviceTypes'
     :columns='columns'
     row-key='ID'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as deviceinfo.DeviceInfo)'
+    @row-click='(evt, row, index) => onRowClick(row as devicetype.DeviceType)'
+    selection='single'
+    v-model:selected='selectedDeviceTypes'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedDeviceType === undefined'
         />
       </div>
     </template>
@@ -31,7 +41,7 @@
         <span>{{ $t('MSG_DEVICE') }}</span>
       </q-card-section>
       <q-card-section>
-        <q-input v-model='target.Manufacturer' :label='$t("MSG_MANUFACTURER")' />
+        <DeviceManufacturerSelector v-model:device-manufacturer-id='target.ManufacturerID' />
         <q-input type='number' v-model='target.PowerConsumption' :label='$t("MSG_POWER_CONSUMPTION")' suffix='W' />
         <DatePicker v-model:date='target.ShipmentAt' :updating='updating' :label='$t("MSG_SHIPMENT_AT")' />
         <q-input v-model='target.Type' :label='$t("MSG_DEVICE_TYPE")' />
@@ -50,46 +60,49 @@
         />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { getDeviceInfos } from 'src/api/good'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { deviceinfo, notify, utils } from 'src/npoolstore'
+import { devicetype, utils, sdk } from 'src/npoolstore'
+
+import DeviceManufacturerSelector from './DeviceManufacturerSelector.vue'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const DatePicker = defineAsyncComponent(() => import('src/components/date/DatePicker.vue'))
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const deviceInfo = deviceinfo.useDeviceInfoStore()
-const devices = computed(() => deviceInfo.deviceInfos())
+const deviceTypes = sdk.deviceTypes
 
-const target = ref({} as deviceinfo.DeviceInfo)
+const target = ref({} as devicetype.DeviceType)
+const selectedDeviceTypes = ref([] as devicetype.DeviceType[])
+const selectedDeviceType = computed(() => selectedDeviceTypes.value[0])
+
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
   showing.value = true
 }
 
-const onRowClick = (row: deviceinfo.DeviceInfo) => {
+const onRowClick = (row: devicetype.DeviceType) => {
   updating.value = true
   showing.value = true
   target.value = { ...row }
 }
 
-const onSubmit = (done: () => void) => {
-  showing.value = false
-  updating.value ? updateDevice(done) : createDevice(done)
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateDevice() : createDevice()
 }
 
 const onCancel = () => {
@@ -97,65 +110,32 @@ const onCancel = () => {
 }
 
 const onMenuHide = () => {
-  target.value = {} as deviceinfo.DeviceInfo
+  target.value = {} as devicetype.DeviceType
   showing.value = false
+  submitting.value = false
 }
 
-const updateDevice = (done: () => void) => {
-  deviceInfo.updateDeviceInfo({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_UPDATE_DEVICE'),
-        Message: t('MSG_UPDATE_DEVICE_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_UPDATE_DEVICE'),
-        Message: t('MSG_UPDATE_DEVICE_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateDevice = () => {
+  sdk.adminUpdateDeviceType(target.value, () => {
     onMenuHide()
   })
 }
 
-const createDevice = (done: () => void) => {
-  deviceInfo.createDeviceInfo({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_CREATE_DEVICE'),
-        Message: t('MSG_CREATE_DEVICE_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_CREATE_DEVICE'),
-        Message: t('MSG_CREATE_DEVICE_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createDevice = () => {
+  sdk.adminCreateDeviceType(target.value, () => {
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteDeviceType(selectedDeviceType.value, () => {
+    selectedDeviceTypes.value = []
   })
 }
 
 onMounted(() => {
-  if (!devices.value.length) {
-    getDeviceInfos(0, 100)
+  if (!deviceTypes.value.length) {
+    sdk.getDeviceTypes(0, 0)
   }
 })
 
@@ -164,55 +144,55 @@ const columns = computed(() => [
     name: 'ID',
     label: t('MSG_ID'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.ID
+    field: (row: devicetype.DeviceType) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.EntID
+    field: (row: devicetype.DeviceType) => row.EntID
   },
   {
-    name: 'MANUFACTURER',
+    name: 'ManufacturerID',
     label: t('MSG_MANUFACTURER'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.Manufacturer
+    field: (row: devicetype.DeviceType) => row.ManufacturerID
   },
   {
     name: 'PowerConsumption',
     label: t('MSG_PowerConsumption'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.PowerConsumption
+    field: (row: devicetype.DeviceType) => row.PowerConsumption
   },
   {
-    name: 'SHIPMENTAT',
+    name: 'ShipmentAt',
     label: t('MSG_SHIPMENT_AT'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => utils.formatTime(row.ShipmentAt)
+    field: (row: devicetype.DeviceType) => utils.formatTime(row.ShipmentAt)
   },
   {
     name: 'Type',
     label: t('MSG_TYPE'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.Type
+    field: (row: devicetype.DeviceType) => row.Type
   },
   {
     name: 'Posters',
     label: t('MSG_POSTERS'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => row.Posters?.join(',')
+    field: (row: devicetype.DeviceType) => row.Posters?.join(',')
   },
   {
-    name: 'CREATED_AT',
+    name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => utils.formatTime(row.CreatedAt)
+    field: (row: devicetype.DeviceType) => utils.formatTime(row.CreatedAt)
   },
   {
-    name: 'UPDATED_AT',
+    name: 'UpdatedAt',
     label: t('MSG_UPDATED_AT'),
     sortable: true,
-    field: (row: deviceinfo.DeviceInfo) => utils.formatTime(row.UpdatedAt)
+    field: (row: devicetype.DeviceType) => utils.formatTime(row.UpdatedAt)
   }
 ])
 </script>

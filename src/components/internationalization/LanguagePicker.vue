@@ -21,9 +21,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getLangs } from 'src/api/g11n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { language } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
   id: string
@@ -42,8 +41,7 @@ const myLabel = computed(() => {
 
 const target = ref(id.value)
 
-const lang = language.useLangStore()
-const langs = computed(() => Array.from(lang.langs()).map((el) => {
+const langs = computed(() => Array.from(sdk.languages.value).map((el) => {
   return {
     value: el.EntID,
     label: `${el.Lang} | ${el.Short}`
@@ -66,7 +64,7 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (!langs.value.length) {
-    getLangs(0, 100)
+    sdk.adminGetLangs(0, 0)
   }
 })
 </script>

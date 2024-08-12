@@ -32,18 +32,16 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, ref, defineProps, toRef, defineEmits } from 'vue'
+import { computed, ref, defineProps, toRef, defineEmits } from 'vue'
 import { useraccount, useraccountbase, notify } from 'src/npoolstore'
-
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 interface Props {
   visible: boolean
@@ -62,9 +60,11 @@ const target = computed(() => account.value)
 
 const showing = ref(visible)
 const updating = ref(update)
+const submitting = ref(false)
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   emit('update:visible', false)
 }
 
@@ -72,8 +72,8 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  updateUserAccount(done)
+const onSubmit = () => {
+  updateUserAccount()
 }
 
 const _useraccount = useraccount.useUserAccountStore()
@@ -89,7 +89,7 @@ const updateTarget = computed(() => {
   }
 })
 // Withdraw & DirectBenefit
-const updateUserAccount = (done: () => void) => {
+const updateUserAccount = () => {
   _useraccount.updateAppUserAccount({
     ...updateTarget.value,
     Message: {
@@ -105,7 +105,6 @@ const updateUserAccount = (done: () => void) => {
       }
     }
   }, (error: boolean) => {
-    done()
     if (error) {
       return
     }

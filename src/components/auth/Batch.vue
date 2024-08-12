@@ -69,9 +69,10 @@
 
 <script setup lang='ts'>
 import { saveAs } from 'file-saver'
-import { AppID } from 'src/api/app'
-import { app, authing, notify, utils } from 'src/npoolstore'
+import { app, authing, notify, utils, sdk } from 'src/npoolstore'
 import { computed, onMounted, ref, watch } from 'vue'
+
+const AppID = sdk.AppID
 
 const application = app.useApplicationStore()
 

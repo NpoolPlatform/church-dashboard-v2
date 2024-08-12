@@ -8,6 +8,8 @@
     :columns='columns'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as topmostgood.TopMostGood)'
+    selection='single'
+    v-model:selected='selectedTopMostGoods'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedTopMostGood === undefined'
         />
       </div>
     </template>
@@ -31,29 +41,16 @@
         <span>{{ $t('MSG_TOPMOST_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector :label='$t("MSG_APP_GOOD")' v-model:id='target.AppGoodID' />
-        <TopMostSelector :label='$t("MSG_TOP_MOST")' v-model:id='target.TopMostID' />
+        <AppGoodSelector :label='$t("MSG_APP_GOOD")' v-model:app-good-id='target.AppGoodID' />
+        <TopMostSelector :label='$t("MSG_TOP_MOST")' v-model:top-most-id='target.TopMostID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.UnitPrice' :label='$t("MSG_UNIT_PRICE")' />
-        <q-input v-model='target.PackagePrice' :label='$t("MSG_PACKAGE_PRICE")' />
-      </q-card-section>
-      <q-card-section>
-        <q-select
-          label='MSG_POSTERS'
-          filled
-          v-model='target.Posters'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
+        <q-input v-model='target.DisplayIndex' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -62,17 +59,20 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmostgood, sdk, utils } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const AppID = sdk.AppID
+
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const TopMostSelector = defineAsyncComponent(() => import('src/components/good/TopMostSelector.vue'))
 
-const topMostGoods = computed(() => sdk.topMostGoods.value)
+const topMostGoods = sdk.topMostGoods
 const target = ref({} as topmostgood.TopMostGood)
+const selectedTopMostGoods = ref([] as topmostgood.TopMostGood[])
+const selectedTopMostGood = computed(() => selectedTopMostGoods.value[0])
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -94,35 +94,33 @@ const onCancel = () => {
   showing.value = false
 }
 
-const onSubmit = (done: () => void) => {
+const onSubmit = () => {
   if (updating.value) {
-    sdk.updateNTopMostGood(target.value, (error: boolean) => {
-      done()
-      if (error) {
-        return
-      }
+    sdk.adminUpdateTopMostGood(target.value, (error: boolean) => {
+      if (error) return
       onMenuHide()
     })
   } else {
-    sdk.createNTopMostGood(target.value, (error: boolean) => {
-      done()
-      if (error) {
-        return
-      }
+    sdk.adminCreateTopMostGood(target.value, (error: boolean) => {
+      if (error) return
       onMenuHide()
     })
   }
 }
 
+const onDelete = () => {
+  sdk.adminDeleteTopMostGood(selectedTopMostGood.value)
+}
+
 watch(AppID, () => {
   if (!topMostGoods.value?.length) {
-    sdk.getNTopMostGoods(0, 0)
+    sdk.adminGetTopMostGoods(0, 0)
   }
 })
 
 onMounted(() => {
   if (!topMostGoods.value?.length) {
-    sdk.getNTopMostGoods(0, 0)
+    sdk.adminGetTopMostGoods(0, 0)
   }
 })
 
@@ -158,24 +156,6 @@ const columns = computed(() => [
     field: (row: topmostgood.TopMostGood) => row.AppGoodName
   },
   {
-    name: 'CoinTypeID',
-    label: 'MSG_COINTYPEID',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.CoinTypeID
-  },
-  {
-    name: 'CoinName',
-    label: 'MSG_COIN_NAME',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.CoinName
-  },
-  {
-    name: 'CoinUnit',
-    label: 'MSG_COIN_UNIT',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.CoinUnit
-  },
-  {
     name: 'TopMostID',
     label: 'MSG_TOP_MOST_ID',
     sortable: true,
@@ -198,12 +178,6 @@ const columns = computed(() => [
     label: 'MSG_UNIT_PRICE',
     sortable: true,
     field: (row: topmostgood.TopMostGood) => row.UnitPrice
-  },
-  {
-    name: 'PackagePrice',
-    label: 'MSG_PACKAGE_PRICE',
-    sortable: true,
-    field: (row: topmostgood.TopMostGood) => row.PackagePrice
   },
   {
     name: 'Posters',

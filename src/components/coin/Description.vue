@@ -29,7 +29,7 @@
         <span>{{ $t('MSG_CREATE_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
@@ -39,7 +39,7 @@
         <q-select dense :options='appcoindescription.CoinDescriptionUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -47,92 +47,39 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
-import { getAppCoinDescriptions } from 'src/api/coin'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
-import { notify, appcoindescription } from 'src/npoolstore'
+import { appcoindescription, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
 const description = appcoindescription.useCoinDescriptionStore()
 const descriptions = computed(() => description.descriptions(AppID.value))
 
 const showing = ref(false)
-const updating = ref(false)
 const target = ref({} as appcoindescription.CoinDescription)
 
 const onCreate = () => {
   showing.value = true
-  updating.value = false
 }
 
 const onCancel = () => {
   onMenuHide()
 }
 
-// const onRowClick = (row: CoinDescription) => {
-//   target.value = { ...row }
-//   showing.value = true
-//   updating.value = true
-// }
-
 const onMenuHide = () => {
   showing.value = false
   target.value = {} as appcoindescription.CoinDescription
 }
 
-const onSubmit = (done: () => void) => {
-  createCoinDescription(done)
+const onSubmit = () => {
+  createCoinDescription()
 }
 
-// const updateTarget = computed(() => {
-//   return {
-//     TargetAppID: target.value?.AppID,
-//     ID: target.value?.ID,
-//     AppID: target.value?.AppID,
-//     Title: target.value?.Title,
-//     Message: target.value?.Message
-//   }
-// })
-
-// const updateCoinDescription = () => {
-// description.updateAppCoinDescription({
-//   ...updateTarget.value,
-//   NotifyMessage: {
-//     Error: {
-//       Title: 'MSG_UPDATE_DESCRIPTION',
-//       Message: 'MSG_UPDATE_DESCRIPTION_FAIL',
-//       Popup: true,
-//       Type: NotifyType.Error
-//     }
-//   }
-// }, (error: boolean) => {
-//   done()
-//   if (error) {
-//     return
-//   }
-//   onMenuHide()
-// })
-// }
-
-const createCoinDescription = (done: () => void) => {
-  description.createAppCoinDescription({
-    TargetAppID: AppID.value,
-    ...target.value,
-    NotifyMessage: {
-      Error: {
-        Title: 'MSG_CREATE_DESCRIPTION',
-        Message: 'MSG_CREATE_DESCRIPTION_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createCoinDescription = () => {
+  sdk.adminCreateAppCoinDescription(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
@@ -147,7 +94,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (!descriptions.value?.length) {
-    getAppCoinDescriptions(0, 100)
+    sdk.adminGetAppCoinDescriptions(0, 0)
   }
 }
 

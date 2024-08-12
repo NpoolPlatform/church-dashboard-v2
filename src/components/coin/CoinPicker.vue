@@ -21,34 +21,32 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { coin } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
-  id: string
+  coinTypeId: string
+  coinTypeIds?: string[]
   updating?: boolean
   label?: string,
-  getData?: boolean
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const coinTypeId = toRef(props, 'coinTypeId')
+const coinTypeIds = toRef(props, 'coinTypeIds')
 const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
-const getData = toRef(props, 'getData')
 
 const myLabel = computed(() => {
   return !label.value ? 'MSG_COINS' : label.value
 })
 
-const target = ref(id.value)
+const target = ref(coinTypeId.value)
 
-const _coin = coin.useCoinStore()
-const coins = computed(() => Array.from(_coin.coins()).map((el) => {
+const coins = computed(() => Array.from(sdk.coins.value.filter((el) => coinTypeIds.value === undefined || coinTypeIds.value.includes(el.EntID))).map((el) => {
   return {
     value: el.EntID,
-    label: `${el.Name} | ${el.EntID}`
+    label: `${el.Name} | ${el.EntID} | ${el.ChainNickname}`
   }
 }))
 const displayCoins = ref(coins.value)
@@ -61,14 +59,14 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:coinTypeId', coinTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:coinTypeId', target.value)
 }
 
 onMounted(() => {
-  if (!coins.value.length && (getData.value === undefined || getData.value === false)) {
-    getCoins(0, 100)
+  if (!coins.value.length) {
+    sdk.getCoins(0, 0)
   }
 })
 </script>

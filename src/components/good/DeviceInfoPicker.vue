@@ -1,12 +1,13 @@
 <template>
   <q-select
-    :disable='!updating ? false : true'
     v-model='target'
-    :options='devices'
+    :options='_deviceTypes'
     options-selected-class='text-deep-orange'
     emit-value
     map-options
     label='MSG_DEVICE'
+    use-input
+    @filter='onFilter'
     @update:model-value='onUpdate'
   >
     <template #option='scope'>
@@ -20,57 +21,42 @@
 </template>
 <script setup lang='ts'>
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { deviceinfo, notify } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
 interface Props {
-  device: string
-  updating?: boolean
+  deviceTypeId: string
 }
 
 const props = defineProps<Props>()
-const device = toRef(props, 'device')
-const updating = toRef(props, 'updating')
-const target = ref(device.value)
-const deviceInfo = deviceinfo.useDeviceInfoStore()
+const deviceTypeId = toRef(props, 'deviceTypeId')
+const target = ref(deviceTypeId.value)
 
-const devices = computed(() => Array.from(deviceInfo.deviceInfos()).map((el) => {
+const deviceTypes = sdk.deviceTypes
+const _deviceTypes = computed(() => Array.from(deviceTypes.value).map((el) => {
   return {
     value: el.EntID,
-    label: el.Type
+    label: `${el.EntID} | ${el.Type} | ${el.ManufacturerName}| ${el.PowerConsumption}`
   }
 }))
 
-const emit = defineEmits<{(e: 'update:device', device: string): void}>()
+const displayDeviceTypes = ref(_deviceTypes.value)
+
+const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
+  doneFn(() => {
+    displayDeviceTypes.value = _deviceTypes.value.filter((el) => {
+      return el.label.toLowerCase().includes(val.toLowerCase())
+    })
+  })
+}
+
+const emit = defineEmits<{(e: 'update:deviceTypeId', deviceTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:device', target.value)
+  emit('update:deviceTypeId', target.value)
 }
 
 onMounted(() => {
-  if (!deviceInfo.deviceInfos().length) {
-    getDeviceInfos(0, 500)
+  if (!deviceTypes.value.length) {
+    sdk.getDeviceTypes(0, 0)
   }
 })
-
-const getDeviceInfos = (offset: number, limit: number) => {
-  deviceInfo.getDeviceInfos({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_DEVICES'),
-        Message: t('MSG_GET_DEVICES_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, devices?: Array<deviceinfo.DeviceInfo>) => {
-    if (error || !devices?.length) {
-      return
-    }
-    getDeviceInfos(offset + limit, limit)
-  })
-}
 </script>

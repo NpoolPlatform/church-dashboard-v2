@@ -7,7 +7,7 @@
     :title='$t("MSG_COINS")'
     selection='multiple'
     v-model:selected='selectedCoins'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -26,16 +26,14 @@
   <FiatCurrencyHistory />
 </template>
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { defineAsyncComponent, computed, ref, onMounted } from 'vue'
-import { coin } from 'src/npoolstore'
+import { sdk, coin } from 'src/npoolstore'
 
 const CoinCurrencyHistory = defineAsyncComponent(() => import('src/components/coin/CoinCurrencyHistory.vue'))
 const FiatCurrencyHistory = defineAsyncComponent(() => import('src/components/coin/FiatCurrencyHistory.vue'))
 const CoinFiatCurrencyHistory = defineAsyncComponent(() => import('src/components/coin/CoinFiatCurrencyHistory.vue'))
 
-const _coin = coin.useCoinStore()
-const coins = computed(() => _coin.coins())
+const coins = sdk.coins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -52,7 +50,7 @@ const ids = computed(() => {
 
 onMounted(() => {
   if (!coins.value.length) {
-    getCoins(0, 100)
+    sdk.getCoins(0, 0)
   }
 })
 </script>

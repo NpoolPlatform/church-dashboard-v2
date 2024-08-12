@@ -31,7 +31,7 @@
         <span>{{ $t('MSG_MININGPOOL_FRACTIONRULE') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-if='!updating' v-model:id='target.PoolCoinTypeID' :label='$t("MSG_POOLCOINTYPEID")' />
+        <CoinPicker v-if='!updating' v-model:mining-pool-coin-type-id='target.PoolCoinTypeID' :label='$t("MSG_POOLCOINTYPEID")' />
         <q-input type='number' v-model='target.WithdrawInterval' :label='$t("MSG_WITHDRAWINTERVAL")' />
         <q-input v-model='target.MinAmount' :label='$t("MSG_MINAMOUNT")' />
         <q-input v-model='target.WithdrawRate' :label='$t("MSG_WITHDRAWRATE")' />

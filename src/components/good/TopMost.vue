@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_TOPMOST")'
+    :title='$t("MSG_TOPMOSTS")'
     :rows='topMosts'
     row-key='ID'
     :columns='columns'
@@ -33,11 +33,7 @@
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
-        <q-select :options='goodbase.GoodTypeMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
-        <q-input v-model='target.ThresholdCredits' :label='$t("MSG_THRESHOLD_PAYMENT_CREDITS")' />
-        <q-input v-model='target.ThresholdPaymentAmount' :label='$t("MSG_THRESHOLD_PAYMENT_AMOUNT")' />
-        <q-input v-model.number='target.RegisterElapsedSeconds' :label='$t("MSG_REGISTER_ELAPSED_SECONDS")' />
-        <q-input v-model.number='target.ThresholdPurchases' :label='$t("MSG_THRESHOLD_PURCHASES")' />
+        <q-select :options='goodbase.GoodTopMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
       </q-card-section>
       <q-card-section>
         <q-select
@@ -56,34 +52,28 @@
         <div> <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' /></div>
         <div> <DateTimePicker v-model:date='target.EndAt' label='MSG_END_AT' /></div>
       </q-card-section>
-      <q-card-section>
-        <div>
-          <q-toggle dense v-model='target.KycMust' :label='$t("MSG_KYC_MUST")' />
-        </div>
-      </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
-  <TopMostGood />
 </template>
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { topmost, sdk, utils, goodbase } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const AppID = sdk.AppID
+
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
-const TopMostGood = defineAsyncComponent(() => import('src/components/good/TopMostGood.vue'))
 
-const topMosts = computed(() => sdk.topMosts.value)
+const topMosts = sdk.topMosts
 const target = ref({} as topmost.TopMost)
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -99,23 +89,21 @@ const onRowClick = (row: topmost.TopMost) => {
 const onMenuHide = () => {
   target.value = {} as topmost.TopMost
   showing.value = false
+  submitting.value = false
 }
 
 const onCancel = () => {
   showing.value = false
 }
 
-const onSubmit = (done: () => void) => {
+const onSubmit = () => {
+  submitting.value = true
   if (updating.value) {
-    sdk.updateNTopMost(target.value, (error: boolean) => {
-      done()
-      if (error) return
+    sdk.adminUpdateTopMost(target.value, () => {
       onMenuHide()
     })
   } else {
-    sdk.createNTopMost(target.value, (error: boolean) => {
-      done()
-      if (error) return
+    sdk.adminCreateTopMost(target.value, () => {
       onMenuHide()
     })
   }
@@ -123,13 +111,13 @@ const onSubmit = (done: () => void) => {
 
 watch(AppID, () => {
   if (!topMosts.value?.length) {
-    sdk.getNTopMosts(0, 0)
+    sdk.adminGetTopMosts(0, 0)
   }
 })
 
 onMounted(() => {
   if (!topMosts.value?.length) {
-    sdk.getNTopMosts(0, 0)
+    sdk.adminGetTopMosts(0, 0)
   }
 })
 
@@ -181,36 +169,6 @@ const columns = computed(() => [
     label: 'MSG_END_AT',
     sortable: true,
     field: (row: topmost.TopMost) => utils.formatTime(row.EndAt, undefined)
-  },
-  {
-    name: 'ThresholdCredits',
-    label: 'MSG_CREDIT',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.ThresholdCredits
-  },
-  {
-    name: 'RegisterElapsedSeconds',
-    label: 'MSG_REGISTER_ELAPSED_SECONDS',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.RegisterElapsedSeconds
-  },
-  {
-    name: 'ThresholdPurchases',
-    label: 'MSG_THRESHOLD_PURCHASES',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.ThresholdPurchases
-  },
-  {
-    name: 'ThresholdPaymentAmount',
-    label: 'MSG_PAYMENT_AMOUNT',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.ThresholdPaymentAmount
-  },
-  {
-    name: 'KycMust',
-    label: 'MSG_KYC_MUST',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.KycMust
   },
   {
     name: 'Posters',

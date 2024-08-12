@@ -31,8 +31,8 @@
         <span>{{ $t('MSG_MININGPOOL_COIN') }}</span>
       </q-card-section>
       <q-card-section>
-        <PoolPicker v-if='!updating' v-model:id='target.PoolID' :label='$t("MSG_POOLID")' />
-        <CoinPicker v-if='!updating' v-model:id='target.CoinTypeID' :label='$t("MSG_COINTYPEID")' />
+        <PoolPicker v-if='!updating' v-model:mining-pool-id='target.PoolID' :label='$t("MSG_POOLID")' />
+        <CoinPicker v-if='!updating' v-model:coin-type-id='target.CoinTypeID' :label='$t("MSG_COINTYPEID")' />
         <q-select :options='miningpoolbase.CoinTypes' v-if='!updating' v-model='target.CoinType' :label='$t("MSG_COINTYPE")' />
         <q-select :options='miningpoolbase.RevenueTypes' v-model='target.RevenueType' :label='$t("MSG_REVENUETYPE")' />
         <q-input type='number' v-model='target.FeeRatio' :label='$t("MSG_FEERATIO")' />

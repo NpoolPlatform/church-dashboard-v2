@@ -6,7 +6,7 @@
     row-key='ID'
     selection='multiple'
     :title='$t("MSG_APP_COINS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     v-model:selected='selectedCoin'
     :columns='coinColumns'
   >
@@ -44,7 +44,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' :get-data='false' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <q-input v-model='target.Name' :label='$t("MSG_COIN_NAME")' />
@@ -70,11 +70,11 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
-import { getAppCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appcoin, notify } from 'src/npoolstore'
+import { appcoin, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -82,8 +82,7 @@ const { t } = useI18n({ useScope: 'global' })
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
-const coin = appcoin.useAppCoinStore()
-const coins = computed(() => coin.coins(AppID.value))
+const coins = sdk.appCoin.appCoins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -112,33 +111,17 @@ const onMenuHide = () => {
   target.value = {} as appcoin.AppCoin
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppCoin(done) : createAppCoin(done)
+const onSubmit = () => {
+  updating.value ? updateAppCoin() : createAppCoin()
 }
 
-const updateAppCoin = (done: () => void) => {
+const updateAppCoin = () => {
   // TODO
-  done()
 }
 
-const createAppCoin = (done: () => void) => {
-  coin.createAppCoin({
-    TargetAppID: AppID.value,
-    ...target.value,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_APP_COIN',
-        Message: 'MSG_CREATE_APP_COIN_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createAppCoin = () => {
+  sdk.appCoin.adminCreateAppCoin(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
@@ -146,20 +129,7 @@ const createAppCoin = (done: () => void) => {
 const selectedCoin = ref([] as Array<appcoin.AppCoin>)
 const onDelete = () => {
   selectedCoin.value.forEach((el) => {
-    coin.deleteAppCoin({
-      ID: el.ID,
-      TargetAppID: el.AppID,
-      Message: {
-        Error: {
-          Title: 'MSG_DELETE_APP_COIN',
-          Message: 'MSG_DELETE_COIN_FAIL',
-          Popup: true,
-          Type: notify.NotifyType.Error
-        }
-      }
-    }, () => {
-      // TODO
-    })
+    sdk.appCoin.adminDeleteAppCoin(el)
   })
 }
 
@@ -174,13 +144,13 @@ watch([() => target.value?.Disabled, () => target.value?.ForPay], () => {
 
 watch(AppID, () => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 100)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 
 onMounted(() => {
   if (coins.value?.length === 0) {
-    getAppCoins(0, 100)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 

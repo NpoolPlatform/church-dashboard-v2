@@ -30,7 +30,7 @@
         <span>{{ $t('MSG_MININGPOOL_GOODUSER') }}</span>
       </q-card-section>
       <q-card-section>
-        <CoinPicker v-model:id='target.PoolCoinTypeID' :label='$t("MSG_POOLCOINTYPEID")' />
+        <CoinPicker v-model:mining-pool-coin-type-id='target.PoolCoinTypeID' :label='$t("MSG_POOLCOINTYPEID")' />
         <RootUserPicker v-model:id='target.RootUserID' :label='$t("MSG_ROOTUSERID")' />
       </q-card-section>
       <q-item class='row'>

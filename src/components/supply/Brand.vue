@@ -7,6 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as vendorbrand.VendorBrand)'
+    selection='single'
+    v-model:selected='selectedBrands'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -16,6 +18,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
+          :disable='selectedBrand === undefined'
         />
       </div>
     </template>
@@ -34,30 +44,26 @@
         <q-input v-model='target.Logo' :label='$t("MSG_LOGO")' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { vendorbrand, notify } from 'src/npoolstore'
+import { computed, onMounted, ref } from 'vue'
+import { vendorbrand, sdk } from 'src/npoolstore'
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t } = useI18n({ useScope: 'global' })
-
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-
-const vendor = vendorbrand.useVendorBrandStore()
-const brands = computed(() => vendor.vendorBrands())
+const brands = sdk.vendorBrands
 
 const target = ref({} as vendorbrand.VendorBrand)
+const selectedBrands = ref([] as vendorbrand.VendorBrand[])
+const selectedBrand = computed(() => selectedBrands.value[0])
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   updating.value = false
@@ -73,92 +79,39 @@ const onRowClick = (row: vendorbrand.VendorBrand) => {
 const onMenuHide = () => {
   target.value = {} as vendorbrand.VendorBrand
   showing.value = false
+  submitting.value = false
 }
 
 const onCancel = () => {
-  showing.value = false
+  onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  showing.value = false
-  updating.value ? updateVendorBrand(done) : createVendorBrand(done)
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateVendorBrand() : createVendorBrand()
 }
 
-const createVendorBrand = (done: () => void) => {
-  vendor.createVendorBrand({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_CREATE_VENDOR_BRAND'),
-        Message: t('MSG_CREATE_VENDOR_BRAND_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_CREATE_VENDOR_BRAND'),
-        Message: t('MSG_CREATE_VENDOR_BRAND_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createVendorBrand = () => {
+  sdk.adminCreateVendorBrand(target.value, () => {
     onMenuHide()
   })
 }
 
-const updateVendorBrand = (done: () => void) => {
-  vendor.updateVendorBrand({
-    ...target.value,
-    Message: {
-      Error: {
-        Title: t('MSG_UPDATE_VENDOR_BRAND'),
-        Message: t('MSG_UPDATE_VENDOR_BRAND_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: t('MSG_UPDATE_VENDOR_BRAND'),
-        Message: t('MSG_UPDATE_VENDOR_BRAND_SUCCESS'),
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const updateVendorBrand = () => {
+  sdk.adminUpdateVendorBrand(target.value, () => {
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteVendorBrand(selectedBrand.value, () => {
+    selectedBrands.value = []
   })
 }
 
 onMounted(() => {
   if (!brands.value.length) {
-    getVendorBrands(0, 100)
+    sdk.getVendorBrands(0, 0)
   }
 })
-
-const getVendorBrands = (offset: number, limit: number) => {
-  vendor.getVendorBrands({
-    Offset: offset,
-    Limit: limit,
-    Message: {
-      Error: {
-        Title: t('MSG_GET_BRAND'),
-        Message: t('MSG_GET_BRAND_FAIL'),
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean, vendorbrands?: Array<vendorbrand.VendorBrand>) => {
-    if (error || !vendorbrands?.length) {
-      return
-    }
-    getVendorBrands(offset + limit, limit)
-  })
-}
 </script>

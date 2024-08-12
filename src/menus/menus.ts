@@ -340,27 +340,72 @@ const MainDrawerMenus = [
     children: [{
       menuId: uid(),
       label: '商品管理',
-      caption: '添加与编辑商品',
+      caption: '查看所有商品',
       icon: 'perm_identity',
-      target: '/app/good/goods',
+      target: '/goods',
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, /* {
+    } as MenuItem, {
       menuId: uid(),
-      label: '库存',
-      caption: '管理与展示商品库存',
+      label: '商品币种管理',
+      caption: '添加与编辑商品币种',
       icon: 'perm_identity',
-      target: '/stock',
+      target: '/good/goodcoins',
       level: 1,
       sectionBegin: false,
       children: []
-    } as MenuItem, */ {
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品故障管理',
+      caption: '添加与编辑商品故障记录',
+      icon: 'perm_identity',
+      target: '/good/malfunctions',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '算力租赁',
+      caption: '添加与编辑算力租赁商品',
+      icon: 'perm_identity',
+      target: '/good/powerrentals',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '电费/服务费',
+      caption: '添加与编辑电费/服务费商品',
+      icon: 'perm_identity',
+      target: '/good/fees',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
       menuId: uid(),
       label: 'APP商品管理',
+      caption: '查看商品',
+      icon: 'perm_identity',
+      target: '/good/appgoods',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'APP算力租赁管理',
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',
-      target: '/app/good/appgoods',
+      target: '/good/apppowerrentals',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'APP电费/服务费管理',
+      caption: '授权、价格与上下架管理',
+      icon: 'perm_identity',
+      target: '/good/appfees',
       level: 1,
       sectionBegin: false,
       children: []
@@ -375,19 +420,136 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: '促销',
-      caption: '管理促销信息',
+      label: '置顶类别',
+      caption: '管理商品置顶类别',
       icon: 'perm_identity',
-      target: '/app/good/promotions',
+      target: '/app/good/topmosts',
       level: 1,
       sectionBegin: false,
       children: []
     } as MenuItem, {
       menuId: uid(),
-      label: 'TopMost',
-      caption: 'TopMost',
+      label: '置顶购买约束',
+      caption: '管理置顶购买约束',
       icon: 'perm_identity',
-      target: '/app/good/topmosts',
+      target: '/app/good/topmost/constraints',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '置顶类别海报',
+      caption: '管理置顶类别海报',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/posters',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '置顶商品',
+      caption: '管理置顶商品',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/goods',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '置顶商品购买约束',
+      caption: '管理置顶商品购买约束',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/good/constraints',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '置顶商品海报',
+      caption: '管理置顶商品海报',
+      icon: 'perm_identity',
+      target: '/app/good/topmost/good/posters',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '评论',
+      caption: '管理商品评论',
+      icon: 'perm_identity',
+      target: '/app/good/comments',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '默认商品',
+      caption: '设置币种默认商品',
+      icon: 'perm_identity',
+      target: '/app/good/defaults',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品描述',
+      caption: '创建和编辑商品描述',
+      icon: 'perm_identity',
+      target: '/app/good/descriptions',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品展示颜色',
+      caption: '创建和编辑商品展示颜色',
+      icon: 'perm_identity',
+      target: '/app/good/displaycolors',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品展示名称',
+      caption: '创建和编辑商品展示名称',
+      icon: 'perm_identity',
+      target: '/app/good/displaynames',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品标签',
+      caption: '管理商品标签',
+      icon: 'perm_identity',
+      target: '/app/good/labels',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品海报',
+      caption: '管理商品海报',
+      icon: 'perm_identity',
+      target: '/app/good/posters',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '商品依赖',
+      caption: '管理商品依赖关系',
+      icon: 'perm_identity',
+      target: '/good/requireds',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'APP商品依赖',
+      caption: '管理APP商品依赖关系',
+      icon: 'perm_identity',
+      target: '/app/good/requireds',
       level: 1,
       sectionBegin: false,
       children: []
@@ -406,7 +568,25 @@ const MainDrawerMenus = [
         label: '设备',
         caption: '管理设备型号',
         icon: 'perm_identity',
-        target: '/supply/devices',
+        target: '/supply/devicetypes',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '设备供应商',
+        caption: '管理设备供应商',
+        icon: 'perm_identity',
+        target: '/supply/device/manufacturers',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '设备海报',
+        caption: '管理设备海报',
+        icon: 'perm_identity',
+        target: '/supply/device/posters',
         level: 1,
         sectionBegin: false,
         children: []
@@ -760,10 +940,19 @@ const MainDrawerMenus = [
         children: []
       } as MenuItem, {
         menuId: uid(),
-        label: '离线订单',
-        caption: '创建离线订单',
+        label: '离线电费/服务费订单',
+        caption: '创建离线电费/服务费订单',
         icon: 'format_list_numbered',
-        target: '/order/offline',
+        target: '/order/offline/fee',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '离线算力订单',
+        caption: '创建离线算力订单',
+        icon: 'format_list_numbered',
+        target: '/order/offline/powerrental',
         level: 1,
         sectionBegin: false,
         children: []
@@ -772,7 +961,7 @@ const MainDrawerMenus = [
         label: '模拟订单配置',
         caption: '模拟订单配置',
         icon: 'format_list_numbered',
-        target: '/order/simulateconfig',
+        target: '/order/appconfig',
         level: 1,
         sectionBegin: false,
         children: []
@@ -793,6 +982,26 @@ const MainDrawerMenus = [
         caption: '余额充值列表',
         icon: 'format_list_numbered',
         target: '/deposit/balance',
+        level: 1,
+        sectionBegin: false,
+        children: []
+      } as MenuItem
+    ]
+  } as MenuItem, {
+    menuId: uid(),
+    label: '交易',
+    caption: '交易管理',
+    icon: 'reviews',
+    target: '/txs',
+    level: 0,
+    sectionBegin: false,
+    children: [
+      {
+        menuId: uid(),
+        label: '交易列表',
+        caption: '',
+        icon: 'format_list_numbered',
+        target: '/txs',
         level: 1,
         sectionBegin: false,
         children: []

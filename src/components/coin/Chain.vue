@@ -5,7 +5,7 @@
     :rows='displayChains'
     row-key='ID'
     :title='$t("MSG_CHAINS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     :columns='columns'
   >
     <template #top-right>

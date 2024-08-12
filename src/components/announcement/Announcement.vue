@@ -8,15 +8,14 @@
 <script setup lang='ts'>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { announcement, notify, user } from 'src/npoolstore'
-import { MyAppID } from 'src/api/app'
+import { announcement, notify, user, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 const mailbox = announcement.useAnnouncementStore()
 const _announcement = ref('')
-const announcements = computed(() => mailbox.announcements(MyAppID.value))
+const announcements = computed(() => mailbox.announcements(sdk.MyAppID.value))
 const index = ref(0)
 const logined = user.useLocalUserStore()
 

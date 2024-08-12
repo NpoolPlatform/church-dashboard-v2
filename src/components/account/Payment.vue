@@ -5,7 +5,7 @@
     :title='$t("MSG_GOOD_PAYMENT_ADDRESSES")'
     :rows='displayAccounts'
     row-key='ID'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     @row-click='(evt, row, index) => onRowClick(row as paymentaccount.Account)'
   >
     <template #top>
@@ -54,23 +54,20 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { getPaymentAccounts } from 'src/api/account'
 import { computed, onMounted, ref, defineAsyncComponent } from 'vue'
-import { paymentaccount, notify } from 'src/npoolstore'
+import { paymentaccount, sdk } from 'src/npoolstore'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const payment = paymentaccount.usePaymentAccountStore()
-const accounts = computed(() => payment.accounts())
+const accounts = sdk.paymentAccounts
 
 const address = ref('')
 const blocked = ref(null)
@@ -93,10 +90,12 @@ const displayAccounts = computed(() => accounts.value.filter((el) => {
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 const target = ref({} as paymentaccount.Account)
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as paymentaccount.Account
 }
 
@@ -110,43 +109,17 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const updateTarget = computed(() => {
-  return {
-    ID: target.value.ID,
-    EntID: target.value.EntID,
-    Active: target.value.Active,
-    Blocked: target.value.Blocked,
-    Locked: target.value.Locked
-  }
-})
-
-const onSubmit = (done: () => void) => {
-  payment.updatePaymentAccount({
-    ...updateTarget.value,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_PAYMENT_ACCOUNT',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const onSubmit = () => {
+  submitting.value = true
+  sdk.adminUpdatePaymentAccount(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 onMounted(() => {
   if (!accounts.value.length) {
-    getPaymentAccounts(0, 500)
+    sdk.adminGetPaymentAccounts(0, 0)
   }
 })
 </script>

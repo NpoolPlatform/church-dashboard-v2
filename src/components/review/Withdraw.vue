@@ -41,11 +41,11 @@
 </template>
 
 <script setup lang='ts'>
-import { getAppCoins } from 'src/api/coin'
-import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appcoin, _locale, withdrawreview, user, reviewbase, notify, utils } from 'src/npoolstore'
+import { appcoin, _locale, withdrawreview, user, reviewbase, notify, utils, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 
@@ -53,7 +53,7 @@ const LoadingButton = defineAsyncComponent(() => import('src/components/button/L
 const { t } = useI18n({ useScope: 'global' })
 
 const coin = appcoin.useAppCoinStore()
-const coins = computed(() => coin.coins(AppID.value))
+const coins = sdk.appCoin.appCoins
 
 const review = withdrawreview.useWithdrawReviewStore()
 const locale = _locale.useLocaleStore()
@@ -155,7 +155,7 @@ const prepare = () => {
   }
 
   if (coins.value.length === 0) {
-    getAppCoins(0, 500)
+    sdk.appCoin.getAppCoins(0, 0)
   }
 }
 

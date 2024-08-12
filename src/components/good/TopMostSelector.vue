@@ -4,11 +4,12 @@
     :options='displayTopMosts'
     options-selected-class='text-deep-orange'
     emit-value
-    :label='label'
+    :label='$t(label)'
     map-options
     @update:model-value='onUpdate'
     use-input
     @filter='onFilter'
+    :disable='readOnly'
   >
     <template #option='scope'>
       <q-item v-bind='scope.itemProps'>
@@ -21,19 +22,24 @@
 </template>
 <script setup lang='ts'>
 import { sdk } from 'src/npoolstore'
-import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
+import { computed, defineEmits, defineProps, toRef, ref, onMounted, withDefaults } from 'vue'
 
-  interface Props {
-    id: string
-    label?: string
-  }
+interface Props {
+  topMostId: string
+  label?: string
+  readOnly?: boolean
+}
 
-const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const props = withDefaults(defineProps<Props>(), {
+  label: 'MSG_SELECT_TOPMOST',
+  readOnly: false
+})
+const topMostId = toRef(props, 'topMostId')
 const label = toRef(props, 'label')
-const target = ref(id.value)
+const readOnly = toRef(props, 'readOnly')
+const target = ref(topMostId.value)
 
-const _topMosts = computed(() => sdk.topMosts.value)
+const _topMosts = sdk.topMosts
 const topMosts = computed(() => Array.from(_topMosts.value, (el) => {
   return {
     value: el.EntID,
@@ -50,14 +56,14 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:topMostId', topMostId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:topMostId', target.value)
 }
 
 onMounted(() => {
   if (!topMosts.value?.length) {
-    sdk.getTopMosts(0, 0)
+    sdk.adminGetTopMosts(0, 0)
   }
 })
 </script>

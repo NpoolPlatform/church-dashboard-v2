@@ -25,22 +25,22 @@ import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
 import { fiat } from 'src/npoolstore'
 
 interface Props {
-  id: string
+  fiatId: string
   updating?: boolean
   label?: string,
   getData?: boolean
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const fiatId = toRef(props, 'fiatId')
 const updating = toRef(props, 'updating')
 const label = toRef(props, 'label')
 
 const myLabel = computed(() => {
-  return !label.value ? 'MSG_FiatS' : label.value
+  return !label.value ? 'MSG_FIATS' : label.value
 })
 
-const target = ref(id.value)
+const target = ref(fiatId.value)
 
 const _fiat = fiat.useFiatStore()
 const fiats = computed(() => Array.from(_fiat.fiats()).map((el) => {
@@ -59,9 +59,9 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:fiatId', fiatId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:fiatId', target.value)
 }
 
 onMounted(() => {

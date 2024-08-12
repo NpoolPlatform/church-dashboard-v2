@@ -79,11 +79,11 @@
 </template>
 
 <script setup lang='ts'>
-import { getPools } from 'src/api/miningpool'
-import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
-import { miningpoolapppool, miningpoolpool, notify } from 'src/npoolstore'
+import { miningpoolapppool, miningpoolpool, notify, sdk } from 'src/npoolstore'
 import { computed, onMounted, ref, watch } from 'vue'
+
+const AppID = sdk.AppID
 
 const apppoolInfo = miningpoolapppool.useMiningpoolAppPoolStore()
 const appPools = computed(() => apppoolInfo.pools(AppID.value))
@@ -91,8 +91,7 @@ const selectedAppPool = ref([] as Array<miningpoolapppool.Pool>)
 const apppoolName = ref('')
 const displayAppPools = computed(() => appPools.value.filter((pool) => pool.Name.includes(apppoolName.value)))
 
-const poolInfo = miningpoolpool.useMiningpoolPoolStore()
-const pools = computed(() => poolInfo.Pools)
+const pools = sdk.miningPools
 const displayPools = computed(() => pools.value?.filter((pool) => pool.Name.includes(poolName.value)))
 const poolName = ref('')
 const selectedPool = ref([] as Array<miningpoolpool.Pool>)
@@ -133,7 +132,7 @@ watch(AppID, () => {
 
 onMounted(() => {
   if (pools.value.length === 0) {
-    getPools(0, 500)
+    sdk.getMiningPools(0, 0)
   }
   prepare()
 })

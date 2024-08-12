@@ -95,7 +95,7 @@
         <span>{{ updating2 ? $t('MSG_UPDATE_APP_GOOD_COMMISSION_SETTING') : $t('MSG_CREATE_APP_GOOD_COMMISSION_SETTING') }}</span>
       </q-card-section>
       <q-card-section v-if='!updating2'>
-        <AppGoodSelector v-model:id='target2.AppGoodID' />
+        <AppGoodSelector v-model:app-good-id='target2.AppGoodID' />
       </q-card-section>
       <q-card-section v-if='!updating2'>
         <q-select :options='appcommissionconfig.SettleTypes' v-model='target2.SettleType' :label='$t("MSG_COMMISSION_SETTLE_TYPE")' />
@@ -118,9 +118,10 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { AppID } from 'src/api/app'
 import { useI18n } from 'vue-i18n'
-import { appcommissionconfig, appgoodcommissionconfig, notify, utils } from 'src/npoolstore'
+import { appcommissionconfig, appgoodcommissionconfig, notify, utils, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

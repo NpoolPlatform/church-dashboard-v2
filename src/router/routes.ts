@@ -121,7 +121,7 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/good/appgoods',
+        path: 'good/appgoods',
         component: () => import('pages/good/AppGood.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
@@ -133,8 +133,20 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/good/promotions',
-        component: () => import('pages/good/Promotion.vue'),
+        path: 'good/apppowerrentals',
+        component: () => import('pages/good/AppPowerRental.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/appfees',
+        component: () => import('pages/good/AppFee.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -159,6 +171,174 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'app/good/topmosts',
         component: () => import('pages/good/TopMost.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/topmost/constraints',
+        component: () => import('pages/good/TopMostConstraint.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/topmost/posters',
+        component: () => import('pages/good/TopMostPoster.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/topmost/goods',
+        component: () => import('pages/good/TopMostGood.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/topmost/good/constraints',
+        component: () => import('pages/good/TopMostGoodConstraint.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/topmost/good/posters',
+        component: () => import('pages/good/TopMostGoodPoster.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/comments',
+        component: () => import('pages/good/Comment.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/defaults',
+        component: () => import('pages/good/AppDefaultGood.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/descriptions',
+        component: () => import('pages/good/Description.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/displaycolors',
+        component: () => import('pages/good/DisplayColor.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/displaynames',
+        component: () => import('pages/good/DisplayName.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/labels',
+        component: () => import('pages/good/Label.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/posters',
+        component: () => import('pages/good/Poster.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/requireds',
+        component: () => import('pages/good/Required.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'app/good/requireds',
+        component: () => import('pages/good/RequiredAppGood.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -409,8 +589,32 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'supply/devices',
+        path: 'supply/devicetypes',
         component: () => import('pages/supply/Device.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'supply/device/manufacturers',
+        component: () => import('pages/supply/DeviceManufacturer.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'supply/device/posters',
+        component: () => import('pages/supply/DevicePoster.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -445,8 +649,56 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'app/good/goods',
+        path: 'goods',
         component: () => import('pages/good/Good.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/goodcoins',
+        component: () => import('pages/good/GoodCoin.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/malfunctions',
+        component: () => import('pages/good/Malfunction.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/powerrentals',
+        component: () => import('pages/good/PowerRental.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'good/fees',
+        component: () => import('pages/good/Fee.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -697,8 +949,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'order/offline',
-        component: () => import('src/pages/order/Offline.vue'),
+        path: 'order/offline/fee',
+        component: () => import('src/pages/order/OfflineFee.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -709,8 +961,20 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'order/simulateconfig',
-        component: () => import('src/pages/order/SimulateConfig.vue'),
+        path: 'order/offline/powerrental',
+        component: () => import('src/pages/order/OfflinePowerRental.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'order/appconfig',
+        component: () => import('src/pages/order/AppConfig.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -747,6 +1011,18 @@ const routes: RouteRecordRaw[] = [
       }, {
         path: 'inspire/commissionconfig',
         component: () => import('src/pages/inspire/CommissionConfig.vue'),
+        meta: {
+          ShowHeaderAnnouncement: true,
+          ShowMainHeader: false,
+          ShowBigLogo: true,
+          ShowFooterTop: true,
+          ShowSignHelper: true,
+          ShowTopTip: false,
+          NeedLogined: true
+        }
+      }, {
+        path: 'txs',
+        component: () => import('src/pages/tx/Tx.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

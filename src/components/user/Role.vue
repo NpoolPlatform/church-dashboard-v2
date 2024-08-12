@@ -44,9 +44,10 @@
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
 import { computed, onMounted, ref, watch } from 'vue'
-import { role, user, notify } from 'src/npoolstore'
+import { role, user, notify, sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 const _role = role.useRoleStore()
 const roles = computed(() => _role.roles(AppID.value))

@@ -21,52 +21,54 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
-import { getAppCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
-import { appcoin } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 interface Props {
-  id: string
+  coinTypeId: string
   updating?: boolean
+  coinTypeIds?: string[]
 }
 
 const props = defineProps<Props>()
-const id = toRef(props, 'id')
+const coinTypeId = toRef(props, 'coinTypeId')
+const coinTypeIds = toRef(props, 'coinTypeIds')
 const updating = toRef(props, 'updating')
-const target = ref(id.value)
+const target = ref(coinTypeId.value)
 
-const coin = appcoin.useAppCoinStore()
-const coins = computed(() => Array.from(coin.coins(AppID.value).filter((el) => !el.Disabled)).map((el) => {
+const appCoins = sdk.appCoin.appCoins
+const _appCoins = computed(() => Array.from(appCoins.value.filter((el) => !el.Disabled && (!coinTypeIds.value || coinTypeIds.value?.includes(el.CoinTypeID)))).map((el) => {
   return {
     value: el.CoinTypeID,
     label: `${el.Name} | ${el.CoinTypeID}`
   }
 }))
-const displayCoins = ref(coins.value)
+const displayCoins = ref(_appCoins.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayCoins.value = coins.value.filter((el) => {
+    displayCoins.value = _appCoins.value.filter((el) => {
       return el?.label?.toLowerCase().includes(val.toLowerCase())
     })
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string): void}>()
+const emit = defineEmits<{(e: 'update:coinTypeId', coinTypeId: string): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:coinTypeId', target.value)
 }
 
 onMounted(() => {
-  if (!coin.coins(AppID.value).length) {
-    getAppCoins(0, 100)
+  if (!appCoins.value.length) {
+    sdk.appCoin.getAppCoins(0, 0)
   }
 })
 
 watch(AppID, () => {
-  if (!coin.coins(AppID.value).length) {
-    getAppCoins(0, 100)
+  if (!appCoins.value.length) {
+    sdk.appCoin.getAppCoins(0, 0)
   }
 })
 </script>

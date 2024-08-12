@@ -3,12 +3,13 @@
     dense
     flat
     :title='$t("MSG_APP_DEFAULT_GOODS")'
-    :rows='sdk.defaultGoods.value'
+    :rows='appDefaultGoods'
     row-key='ID'
     selection='single'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     :columns='appDefaultGoodsColumns'
     @row-click='(evt, row, index) => onRowClick(row as appdefaultgood.Default)'
+    v-model:selected='selectedAppDefaultGoods'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -18,6 +19,13 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -32,11 +40,12 @@
         <span>{{ $t('MSG_APP_DEFAULT_GOOD') }}</span>
       </q-card-section>
       <q-card-section>
-        <AppGoodSelector v-model:id='target.AppGoodID' />
+        <AppGoodSelector v-model:app-good-id='target.AppGoodID' />
+        <AppCoinPicker v-model:coin-type-id='target.CoinTypeID' :coin-type-ids='coinTypeIds' />
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
@@ -45,27 +54,35 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppID } from 'src/api/app'
 import { appdefaultgood, utils, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
+
+const appDefaultGoods = sdk.appDefaultGoods
+const appPowerRentals = sdk.appPowerRental.appPowerRentals
+
+const selectedAppDefaultGoods = ref([] as appdefaultgood.Default[])
+const selectedAppDefaultGood = computed(() => selectedAppDefaultGoods.value[0])
 
 const target = ref({} as appdefaultgood.Default)
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onMenuHide = () => {
   target.value = {} as appdefaultgood.Default
   showing.value = false
+  submitting.value = false
 }
 
 const onCreate = () => {
   showing.value = true
   updating.value = false
+  submitting.value = false
 }
 
 const onCancel = () => {
@@ -78,35 +95,62 @@ const onRowClick = (row: appdefaultgood.Default) => {
   showing.value = true
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateAppDefaultGood(done) : createAppDefaultGood(done)
+const onSubmit = () => {
+  submitting.value = true
+  updating.value ? updateAppDefaultGood() : createAppDefaultGood()
 }
 
-const createAppDefaultGood = (done: () => void) => {
-  done()
-  sdk.createNDefaultGood(target.value)
-  onMenuHide()
+const createAppDefaultGood = () => {
+  sdk.adminCreateAppDefaultGood(target.value, () => {
+    onMenuHide()
+  })
 }
 
-const updateAppDefaultGood = (done: () => void) => {
-  done()
-  sdk.updateNDefaultGood(target.value)
-  onMenuHide()
+const updateAppDefaultGood = () => {
+  sdk.adminUpdateAppDefaultGood(target.value, () => {
+    onMenuHide()
+  })
 }
 
-watch(AppID, () => {
-  prepare()
+const onDelete = () => {
+  sdk.adminDeleteAppDefaultGood(selectedAppDefaultGood.value, () => {
+    selectedAppDefaultGoods.value = []
+  })
+}
+
+const coinTypeIds = computed(() => {
+  const appPowerRental = sdk.appPowerRental.appPowerRental(target.value.AppGoodID)
+  if (appPowerRental) {
+    return appPowerRental.GoodCoins.map((el) => el.CoinTypeID)
+  }
+  return []
+})
+
+const appCoins = computed(() => sdk.appCoin.appCoins.value)
+
+watch(sdk.AppID, () => {
+  if (!appDefaultGoods.value.length) {
+    sdk.adminGetAppDefaultGoods(0, 0)
+  }
+  if (!appPowerRentals.value.length) {
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
+  }
+  if (!appCoins.value.length) {
+    sdk.appCoin.adminGetAppCoins(0, 0)
+  }
 })
 
 onMounted(() => {
-  prepare()
-})
-
-const prepare = () => {
-  if (!sdk.defaultGoods.value.length) {
-    sdk.getNDefaultGoods(0, 0)
+  if (!appDefaultGoods.value.length) {
+    sdk.adminGetAppDefaultGoods(0, 0)
   }
-}
+  if (!appPowerRentals.value.length) {
+    sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
+  }
+  if (!appCoins.value.length) {
+    sdk.appCoin.adminGetAppCoins(0, 0)
+  }
+})
 
 const appDefaultGoodsColumns = computed(() => [
   {

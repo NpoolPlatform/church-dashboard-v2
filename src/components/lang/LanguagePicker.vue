@@ -21,10 +21,10 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
-import { getAppLangs } from 'src/api/g11n'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted, watch } from 'vue'
-import { applang } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
+
+const AppID = sdk.AppID
 
 interface Props {
   language: string
@@ -37,8 +37,7 @@ const updating = toRef(props, 'updating')
 
 const lang = ref(language.value)
 
-const _lang = applang.useAppLangStore()
-const langs = computed(() => _lang.langs(AppID.value))
+const langs = sdk.appLanguages
 const languages = computed(() => Array.from(langs.value).map((el) => {
   return {
     value: el.LangID,
@@ -54,7 +53,7 @@ const onUpdate = () => {
 
 watch(AppID, () => {
   if (langs.value.length === 0) {
-    getAppLangs(0, 100)
+    sdk.getAppLangs(0, 0)
   }
 })
 
@@ -64,7 +63,7 @@ onMounted(() => {
   }
 
   if (langs.value.length === 0) {
-    getAppLangs(0, 100)
+    sdk.getAppLangs(0, 0)
   }
 })
 </script>

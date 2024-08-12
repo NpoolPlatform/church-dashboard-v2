@@ -7,7 +7,7 @@
     :title='$t("MSG_COINS")'
     selection='multiple'
     v-model:selected='selectedCoins'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -16,7 +16,7 @@
           flat
           class='small'
           v-model='name'
-          :label='$t("MSG_COINNAME")'
+          :label='$t("MSG_COIN_NAME")'
         />
       </div>
     </template>
@@ -27,7 +27,7 @@
     :rows='displayCoinFiats'
     row-key='ID'
     :title='$t("MSG_COIN_FIATS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -55,8 +55,9 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
-        <FiatPicker v-model:id='target.FiatID' label='MSG_FIAT_ID' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' label='MSG_COIN_TYPE_ID' />
+        <FiatPicker v-model:fiat-id='target.FiatID' label='MSG_FIAT_ID' />
+        <q-select :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEE_TYPE")' />
       </q-card-section>
       <q-item class='row'>
         <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
@@ -67,16 +68,15 @@
 </template>
 
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { computed, onMounted, ref, defineAsyncComponent, watch } from 'vue'
-import { coinfiat, notify, coin } from 'src/npoolstore'
+import { coinfiat, notify, coin, sdk, chainbase } from 'src/npoolstore'
 
 const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 const FiatPicker = defineAsyncComponent(() => import('src/components/coin/FiatPicker.vue'))
 
-const _coinfiat = coinfiat.useCoinFiatStore()
-const coinFiats = computed(() => _coinfiat.coinfiats())
+const _coinFiat = coinfiat.useCoinFiatStore()
+const coinFiats = computed(() => _coinFiat.coinfiats())
 
 const name1 = ref('')
 const displayCoinFiats = computed(() => {
@@ -109,12 +109,12 @@ const onSubmit = (done: () => void) => {
 }
 
 const createCoinFiat = (done: () => void) => {
-  _coinfiat.createCoinFiat({
+  _coinFiat.createCoinFiat({
     ...target.value,
     Message: {
       Error: {
-        Title: 'MSG_CREATE_COIN_CoinFiat',
-        Message: 'MSG_CREATE_COIN_CoinFiat_FAIL',
+        Title: 'MSG_CREATE_COIN_FIAT',
+        Message: 'MSG_CREATE_COIN_FIAT_FAIL',
         Popup: true,
         Type: notify.NotifyType.Error
       }
@@ -129,7 +129,7 @@ const createCoinFiat = (done: () => void) => {
 }
 
 const deleteCoinFiat = (done: () => void) => {
-  _coinfiat.deleteCoinFiat({
+  _coinFiat.deleteCoinFiat({
     ID: target.value?.ID,
     Message: {
       Error: {
@@ -148,8 +148,7 @@ const deleteCoinFiat = (done: () => void) => {
   })
 }
 
-const _coin = coin.useCoinStore()
-const coins = computed(() => _coin.coins())
+const coins = sdk.coins
 
 const name = ref('')
 const displayCoins = computed(() => {
@@ -169,19 +168,19 @@ const ids = computed(() => {
 
 onMounted(() => {
   if (!coins.value.length) {
-    getCoins(0, 100)
+    sdk.getCoins(0, 0)
   }
 })
 
 watch(ids, () => {
   if (selectedCoins.value?.length > 0) {
-    _coinfiat.$reset()
+    _coinFiat.$reset()
     getCoinFiats(0, 100)
   }
 })
 
 const getCoinFiats = (offset: number, limit: number) => {
-  _coinfiat.getCoinFiats({
+  _coinFiat.getCoinFiats({
     CoinTypeIDs: ids.value,
     Offset: offset,
     Limit: limit,

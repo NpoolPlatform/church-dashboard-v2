@@ -20,43 +20,42 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getGoods } from 'src/api/good'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { good } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
-  id: string | undefined
+  goodId: string | undefined
 }
 
 const props = defineProps<Props>()
-const goodID = toRef(props, 'id')
-const target = ref(goodID.value)
+const goodId = toRef(props, 'goodId')
+const target = ref(goodId.value)
 
-const _good = good.useGoodStore()
-const goods = computed(() => Array.from(_good.goods(), (el) => {
+const goods = sdk.goods
+const _goods = computed(() => Array.from(goods.value, (el) => {
   return {
     value: el.EntID,
-    label: `${el.EntID} | ${el.Title} | ${el.QuantityUnit} | ${el.UnitPrice}`
+    label: `${el.EntID} | ${el.Name} | ${el.GoodType}`
   }
 }))
-const displayGoods = ref(goods.value)
+const displayGoods = ref(_goods.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   doneFn(() => {
-    displayGoods.value = goods.value.filter((el) => {
+    displayGoods.value = _goods.value.filter((el) => {
       return el.label.toLowerCase().includes(val.toLowerCase())
     })
   })
 }
 
-const emit = defineEmits<{(e: 'update:id', id: string | undefined): void}>()
+const emit = defineEmits<{(e: 'update:goodId', goodId: string | undefined): void}>()
 const onUpdate = () => {
-  emit('update:id', target.value)
+  emit('update:goodId', target.value)
 }
 
 onMounted(() => {
   if (goods.value.length === 0) {
-    getGoods(0, 500)
+    sdk.getGoods(0, 0)
   }
 })
 </script>

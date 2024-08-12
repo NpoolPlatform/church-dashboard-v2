@@ -39,8 +39,7 @@
 
 <script setup lang='ts'>
 import { ref, computed, defineProps, withDefaults, toRef, defineEmits, onMounted } from 'vue'
-import { applang, _locale, g11nbase } from 'src/npoolstore'
-import { AppID } from 'src/api/app'
+import { _locale, g11nbase, sdk } from 'src/npoolstore'
 
 interface Props {
   language?: g11nbase.AppLang
@@ -63,8 +62,7 @@ const internet = ref('img: icons/Internet.svg')
 
 const locale = _locale.useLocaleStore()
 
-const lang = applang.useAppLangStore()
-const langs = computed(() => lang.langs(AppID.value))
+const langs = sdk.appLanguages
 
 const langLabel = computed(() => {
   if (language.value) {

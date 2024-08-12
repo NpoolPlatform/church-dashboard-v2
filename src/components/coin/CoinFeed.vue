@@ -5,7 +5,7 @@
     :rows='displayFeeds'
     row-key='ID'
     :title='$t("MSG_COIN_FEEDS")'
-    :rows-per-page-options='[100]'
+    :rows-per-page-options='[20]'
     :columns='columns'
     @row-click='(evt, row, index) => onRowClick(row as coincurrencyfeed.CoinFeed)'
   >
@@ -35,7 +35,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <CoinPicker v-model:id='target.CoinTypeID' :updating='updating' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' />
         <q-input v-model='target.FeedCoinName' :label='$t("MSG_FEED_COIN_NAME")' />
         <q-select :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>

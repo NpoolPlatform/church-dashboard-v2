@@ -27,15 +27,13 @@
 </template>
 
 <script setup lang='ts'>
-import { getPlatformAccounts } from 'src/api/account'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { platformaccount, accountbase } from 'src/npoolstore'
+import { platformaccount, accountbase, sdk } from 'src/npoolstore'
 
 const UsedFor = defineAsyncComponent(() => import('src/components/account/AccountUsedFor.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const platform = platformaccount.usePlatformAccountStore()
-const accounts = computed(() => platform.accounts(accountbase.AccountUsedFor.GasProvider))
+const accounts = computed(() => sdk.platformAccounts(accountbase.AccountUsedFor.GasProvider))
 
 const backup = ref(null)
 const blocked = ref(null)
@@ -77,7 +75,7 @@ const onRowClick = (row: platformaccount.Account) => {
 
 onMounted(() => {
   if (!accounts.value.length) {
-    getPlatformAccounts(0, 100)
+    sdk.adminGetPlatformAccounts(0, 0)
   }
 })
 

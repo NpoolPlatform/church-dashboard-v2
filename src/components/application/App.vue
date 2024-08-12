@@ -8,7 +8,7 @@
     :loading='appLoading'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as app.App)'
-    :columns='columns'
+    :columns='columns as never'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -34,10 +34,9 @@
       <q-card-section>
         <q-input v-if='updating' disable v-model='target.EntID' :label='$t("MSG_ENT_ID")' />
         <q-input v-if='updating' v-model='newEntID' :label='$t("MSG_NEW_ENT_ID")' />
-        <q-input v-model='target.Name' :label='$t("MSG_APPLICATION_NAME")' />
+        <q-input v-model='newName' :label='$t("MSG_APPLICATION_NAME")' />
         <q-input v-model='target.Logo' :label='$t("MSG_APPLICATION_LOGO")' />
         <q-input v-model='target.Description' :label='$t("MSG_APPLICATION_DESCRIPTION")' type='textarea' />
-        <q-input v-model.number='target.MaxTypedCouponsPerOrder' :label='$t("MSG_MAX_TYPED_COUPONS_PER_ORDER")' />
         <q-input v-model='commitButtonTargets' :label='$t("MSG_COMMIT_BUTTON_TARGETS")' />
         <q-select :options='appuserbase.RecaptchaTypes' v-model='target.RecaptchaMethod' :label='$t("MSG_RECAPTCHA_METHOD")' />
         <q-select :options='appuserbase.CreateInvitationCodeWhens' v-model='target.CreateInvitationCodeWhen' :label='$t("MSG_CREATE_INVITATION_CODE_WHEN")' />
@@ -61,33 +60,39 @@
         </div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_AUTHORIZE")' @click='onSubmit' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { user, notify, app, appuserbase } from 'src/npoolstore'
+import { user, app, appuserbase, sdk } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
-
-const _app = app.useApplicationStore()
-const apps = computed(() => _app.apps())
+const apps = sdk.applications
 const appLoading = ref(false)
 
 const logined = user.useLocalUserStore()
 
-const target = ref({} as app.App)
+const target = ref({
+  CreatedBy: logined.User?.EntID
+} as app.App)
+
 const newEntID = ref(undefined as unknown as string)
+const newName = ref(undefined as unknown as string)
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
+
+watch(newName, () => {
+  target.value.Name = newName.value
+})
 
 const onRowClick = (row: app.App) => {
   target.value = { ...row }
@@ -105,97 +110,50 @@ const onCreate = () => {
 
 const onMenuHide = () => {
   showing.value = false
-  target.value = {} as app.App
+  target.value = {
+    CreatedBy: logined.User?.EntID
+  } as app.App
 }
 
 const onCancel = () => {
   onMenuHide()
 }
 
-const onSubmit = (done: () => void) => {
-  updating.value ? updateApp(done) : createApp(done)
+const onSubmit = () => {
+  updating.value ? updateApp() : createApp()
 }
 
-const createApp = (done: () => void) => {
-  _app.createApp({
-    ...target.value,
-    CreatedBy: logined.User?.EntID,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_APP',
-        Message: 'MSG_CREATE_APP_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const createApp = () => {
+  sdk.adminCreateApplication(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 const commitButtonTargets = ref('')
-const updateApp = (done: () => void) => {
-  const request = {
-    ID: target.value.ID,
-    EntID: target.value.EntID,
-    NewEntID: target.value?.EntID === newEntID.value ? undefined as unknown as string : newEntID.value,
-    Logo: target.value.Logo,
-    Description: target.value.Description,
-    SignupMethods: target.value.SignupMethods,
-    ExtSigninMethods: target.value.ExtSigninMethods,
-    RecaptchaMethod: target.value.RecaptchaMethod,
-    KycEnable: target.value.KycEnable,
-    Maintaining: target.value.Maintaining,
-    CouponWithdrawEnable: target.value.CouponWithdrawEnable,
-    CommitButtonTargets: commitButtonTargets.value?.split(','),
-    SigninVerifyEnable: target.value.SigninVerifyEnable,
-    InvitationCodeMust: target.value.InvitationCodeMust,
-    CreateInvitationCodeWhen: target.value?.CreateInvitationCodeWhen,
-    MaxTypedCouponsPerOrder: target.value?.MaxTypedCouponsPerOrder,
-    ResetUserMethod: target.value?.ResetUserMethod,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_APP',
-        Message: 'MSG_UPDATE_APP_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_APP',
-        Message: 'MSG_UPDATE_APP_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  } as app.UpdateAppRequest
-  const origin = _app.app(target.value.EntID)
-  if (origin?.Name !== target.value.Name) { // don't send app name if not change
-    request.Name = target.value.Name
-  }
-  _app.updateApp(request, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+watch(commitButtonTargets, () => {
+  target.value.CommitButtonTargets = commitButtonTargets.value?.split(',')
+})
+
+const updateApp = () => {
+  sdk.adminUpdateApplication(target.value, newEntID.value, newName.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
+onMounted(() => {
+  if (!apps.value.length) {
+    sdk.getApplications(0, 0)
+  }
+})
+
 const columns = computed(() => [
-  {
-    name: 'ID',
-    label: t('MSG_ID'),
-    sortable: true,
-    field: (row: app.App) => row.ID
-  },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
     sortable: true,
+    align: 'left',
     field: (row: app.App) => row.EntID
   },
   {
@@ -212,7 +170,7 @@ const columns = computed(() => [
   },
   {
     name: 'InvitationCodeMust',
-    label: t('MSG_INVITATIONCODEMUST'),
+    label: t('MSG_INVITATION_CODE_MUST'),
     sortable: true,
     field: (row: app.App) => row.InvitationCodeMust
   },

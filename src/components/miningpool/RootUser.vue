@@ -31,7 +31,7 @@
         <span>{{ $t('MSG_MININGPOOL_ROOTUSER') }}</span>
       </q-card-section>
       <q-card-section>
-        <PoolPicker v-if='!updating' v-model:id='target.PoolID' :label='$t("MSG_POOLID")' />
+        <PoolPicker v-if='!updating' v-model:mining-pool-id='target.PoolID' :label='$t("MSG_POOLID")' />
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input v-model='target.Email' :label='$t("MSG_EMAIL")' />
         <q-input v-model='target.AuthToken' :label='$t("MSG_AUTHTOKEN")' />

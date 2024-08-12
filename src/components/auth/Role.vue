@@ -99,12 +99,12 @@
 </template>
 
 <script setup lang='ts'>
-import { getAPIs } from 'src/api/apis'
-import { AppID } from 'src/api/app'
-import { npoolapi, user, role, authing, notify, utils } from 'src/npoolstore'
+import { npoolapi, user, role, authing, notify, utils, sdk } from 'src/npoolstore'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIL as NIL_UUID } from 'uuid'
+
+const AppID = sdk.AppID
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -130,8 +130,7 @@ const displayUsers = computed(() => users.value.filter((user) => {
   return index >= 0
 }))
 
-const api = npoolapi.useNpoolAPIStore()
-const apis = computed(() => api.APIs)
+const apis = sdk.apis
 const selectedApi = ref([] as Array<npoolapi.API>)
 const apiPath = ref('')
 const displayApis = computed(() => apis.value.filter((api) => api.Path.includes(apiPath.value) || api.PathPrefix.includes(apiPath.value)))
@@ -226,7 +225,7 @@ watch(AppID, () => {
 
 onMounted(() => {
   if (apis.value.length === 0) {
-    getAPIs(0, 500)
+    sdk.getApis(0, 0)
   }
   prepare()
 })
@@ -251,28 +250,8 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
-  api.updateAPI({
-    ID: target.value.ID,
-    EntID: target.value.EntID,
-    Deprecated: target.value.Deprecated,
-    Message: {
-      Error: {
-        Title: 'MSG_UPDATE_API',
-        Message: 'MSG_UPDATE_API_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_UPDATE_API',
-        Message: 'MSG_UPDATE_API_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    if (error) {
-      return
-    }
+  sdk.updateApi(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }

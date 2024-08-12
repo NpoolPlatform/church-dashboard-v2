@@ -45,30 +45,29 @@
         <div><q-toggle dense v-model='target.Main' :label='$t("MSG_MAIN_LANGUAGE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
-        <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_AUTHORIZE")' @click='onAuthorize' />
+        <q-btn class='btn alt round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang='ts'>
-import { AppID } from 'src/api/app'
-import { getAppLangs } from 'src/api/g11n'
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { applang, notify, g11nbase } from 'src/npoolstore'
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { g11nbase, sdk } from 'src/npoolstore'
 
-const LoadingButton = defineAsyncComponent(() => import('src/components/button/LoadingButton.vue'))
+const AppID = sdk.AppID
+
 const LanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/LanguagePicker.vue'))
 
-const lang = applang.useAppLangStore()
-const langs = computed(() => lang.langs())
+const langs = sdk.appLanguages
 
 const selectedAppLangs = ref([] as Array<g11nbase.AppLang>)
 const target = ref({} as g11nbase.AppLang)
 
 const showing = ref(false)
 const updating = ref(false)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -78,6 +77,7 @@ const onCreate = () => {
 
 const onMenuHide = () => {
   showing.value = false
+  submitting.value = false
   target.value = {} as g11nbase.AppLang
 }
 
@@ -85,69 +85,29 @@ const onCancel = () => {
   onMenuHide()
 }
 
-const onAuthorize = (done: () => void) => {
-  lang.createAppLang({
-    TargetAppID: AppID.value,
-    TargetLangID: target.value?.LangID,
-    Main: target.value?.Main,
-    Message: {
-      Error: {
-        Title: 'MSG_CREATE_APP_LANGUAGE',
-        Message: 'MSG_CREATE_APP_LANGUAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_CREATE_APP_LANGUAGE',
-        Message: 'MSG_CREATE_APP_LANGUAGE_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    done()
-    if (error) {
-      return
-    }
+const onAuthorize = () => {
+  submitting.value = true
+  sdk.adminCreateAppLang(target.value, (error: boolean) => {
+    if (error) return
     onMenuHide()
   })
 }
 
 const onDelete = () => {
-  lang.deleteAppLang({
-    ID: selectedAppLangs.value[0]?.ID,
-    TargetAppID: selectedAppLangs.value[0]?.AppID,
-    Message: {
-      Error: {
-        Title: 'MSG_DELETE_APP_LANGUAGE',
-        Message: 'MSG_DELETE_APP_LANGUAGE_FAIL',
-        Popup: true,
-        Type: notify.NotifyType.Error
-      },
-      Info: {
-        Title: 'MSG_DELETE_APP_LANGUAGE',
-        Message: 'MSG_DELETE_APP_LANGUAGE_SUCCESS',
-        Popup: true,
-        Type: notify.NotifyType.Success
-      }
-    }
-  }, (error: boolean) => {
-    if (error) {
-      return
-    }
-    onMenuHide()
+  selectedAppLangs.value.forEach((el) => {
+    sdk.adminDeleteAppLang(el)
   })
 }
 
 watch(AppID, () => {
   if (langs.value.length === 0) {
-    getAppLangs(0, 100)
+    sdk.adminGetAppLangs(0, 0)
   }
 })
 
 onMounted(() => {
   if (langs.value.length === 0) {
-    getAppLangs(0, 100)
+    sdk.adminGetAppLangs(0, 0)
   }
 })
 </script>

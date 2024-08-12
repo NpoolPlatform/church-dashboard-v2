@@ -20,9 +20,8 @@
   </q-select>
 </template>
 <script setup lang='ts'>
-import { getCoins } from 'src/api/coin'
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { coin } from 'src/npoolstore'
+import { sdk } from 'src/npoolstore'
 
 interface Props {
   ids: string[]
@@ -33,9 +32,8 @@ const props = defineProps<Props>()
 const ids = toRef(props, 'ids')
 const updating = toRef(props, 'updating')
 const target = ref(ids.value)
-const _coin = coin.useCoinStore()
 
-const coins = computed(() => Array.from(_coin.coins()).map((el) => {
+const coins = computed(() => Array.from(sdk.coins.value).map((el) => {
   return {
     value: el.EntID,
     label: `${el.Name} | ${el.EntID} | ${el.ID} `
@@ -49,7 +47,7 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (!coins.value.length) {
-    getCoins(0, 100)
+    sdk.getCoins(0, 0)
   }
 })
 </script>

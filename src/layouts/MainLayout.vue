@@ -17,9 +17,11 @@
 
 <script setup lang='ts'>
 import { defineAsyncComponent, onMounted, watch, computed } from 'vue'
-import { notify, requesterror, user } from 'src/npoolstore'
+import { notify, requesterror, user, sdk } from 'src/npoolstore'
 import { useRouter } from 'vue-router'
-import 'src/api/app'
+import { AppID } from 'src/const/const'
+
+sdk.MyAppID.value = AppID
 
 const MainHeader = defineAsyncComponent(() => import('src/components/header/MainHeader.vue'))
 const Footer = defineAsyncComponent(() => import('src/components/footer/Footer.vue'))
