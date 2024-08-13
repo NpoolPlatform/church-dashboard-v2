@@ -37,7 +37,7 @@
       <q-card-section>
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' :updating='updating' />
         <q-input v-model='target.FeedCoinName' :label='$t("MSG_FEED_COIN_NAME")' />
-        <q-select :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
+        <q-select v-if='!updating' :options='chainbase.CurrencyFeedTypes' v-model='target.FeedType' :label='$t("MSG_FEED_TYPE")' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div>
