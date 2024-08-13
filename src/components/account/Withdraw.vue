@@ -40,7 +40,7 @@ const { t } = useI18n({ useScope: 'global' })
 const WithdrawDirectUpdate = defineAsyncComponent(() => import('src/components/account/WithdrawDirectUpdate.vue'))
 const TableHeaderFilter = defineAsyncComponent(() => import('src/components/account/TableHeaderFilter.vue'))
 
-const accounts = computed(() => sdk.userWithdrawAccount.userWithdrawAccounts(undefined, undefined).filter((el) => el.UsedFor === accountbase.AccountUsedFor.UserWithdraw))
+const accounts = computed(() => sdk.userAccounts(undefined, undefined, accountbase.AccountUsedFor.UserWithdraw))
 
 const blocked = ref(null)
 const active = ref(null)
@@ -78,7 +78,7 @@ onMounted(() => {
 
 const prepare = () => {
   if (!accounts.value.length) {
-    sdk.userWithdrawAccount.adminGetUserWithdrawAccounts(0, 0)
+    sdk.adminGetUserAccounts(0, 0)
   }
 }
 
