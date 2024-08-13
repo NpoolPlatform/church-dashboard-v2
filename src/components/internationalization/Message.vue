@@ -67,7 +67,7 @@
         <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -133,9 +133,8 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { message, utils, _locale, g11nbase, sdk } from 'src/npoolstore'
 import saveAs from 'file-saver'
 
-const AppID = sdk.AppID
-
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
+const AppID = sdk.AppID
 
 const locale = _locale.useLocaleStore()
 const _langID = computed(() => locale?.AppLang?.LangID)
@@ -153,6 +152,8 @@ const displayAppMsgs = computed(() => messages.value.filter((msg) => {
 const target = ref({} as g11nbase.Message)
 const showing = ref(false)
 const updating = ref(false)
+
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -196,11 +197,13 @@ const onExport = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateAppMessage() : createAppMessage()
 }
 
 const createAppMessage = () => {
   sdk.adminCreateMessage(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
@@ -208,6 +211,7 @@ const createAppMessage = () => {
 
 const updateAppMessage = () => {
   sdk.adminUpdateMessage(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
@@ -263,7 +267,7 @@ const onBatchSubmit = () => {
 
 const prepare = () => {
   if (!messages.value?.length) {
-    sdk.getMessages(0, 0)
+    sdk.adminGetMessages(0, 0)
   }
 }
 
