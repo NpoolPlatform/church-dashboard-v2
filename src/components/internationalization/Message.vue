@@ -121,7 +121,7 @@
         <AppLanguagePicker v-model:app-lang-id='langID' label='MSG_CURRENT_MESSAGES_LANGUAGE' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
+        <q-btn :loading='submitting2' :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onBatchCancel' />
       </q-item>
     </q-card>
@@ -154,6 +154,7 @@ const showing = ref(false)
 const updating = ref(false)
 
 const submitting = ref(false)
+const submitting2 = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -262,7 +263,9 @@ const onBatchCancel = () => {
 }
 
 const onBatchSubmit = () => {
-  sdk.adminCreateMessages(langID.value, importMessages.value)
+  sdk.adminCreateMessages(langID.value, importMessages.value, () => {
+    submitting2.value = false
+  })
 }
 
 const prepare = () => {
