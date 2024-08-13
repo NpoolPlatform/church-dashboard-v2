@@ -83,6 +83,7 @@ const _templates = computed(() => Array.from(templates.value).map((el) => {
   return {
     ID: el.ID,
     EntID: el.EntID,
+    AppID: el.AppID,
     LangID: el.LangID,
     DefaultToUsername: el.DefaultToUsername,
     UsedFor: el.UsedFor,
@@ -90,7 +91,9 @@ const _templates = computed(() => Array.from(templates.value).map((el) => {
     ReplyTos: el.ReplyTos.join(','),
     CCTos: el.CCTos.join(','),
     Subject: el.Subject,
-    Body: el.Body
+    Body: el.Body,
+    CreatedAt: el.CreatedAt,
+    UpdatedAt: el.UpdatedAt
   } as MyEmailTemplate
 }))
 const emailLoading = ref(false)

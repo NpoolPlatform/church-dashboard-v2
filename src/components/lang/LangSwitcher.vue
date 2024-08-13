@@ -38,56 +38,40 @@
 </template>
 
 <script setup lang='ts'>
-import { ref, computed, defineProps, withDefaults, toRef, defineEmits, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { _locale, g11nbase, sdk } from 'src/npoolstore'
-
-interface Props {
-  language?: g11nbase.AppLang
-  emitResult?: boolean
-  setLang?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  language: undefined,
-  emitResult: false,
-  setLang: true
-})
-
-const emitResult = toRef(props, 'emitResult')
-const setLang = toRef(props, 'setLang')
-const language = toRef(props, 'language')
 
 const downArrow = ref('img: icons/DownArrow.svg')
 const internet = ref('img: icons/Internet.svg')
 
 const locale = _locale.useLocaleStore()
 
-const langs = sdk.appLanguages
-
 const langLabel = computed(() => {
-  if (language.value) {
-    return language.value.Short
+  if (locale.lang()) {
+    return locale.locale()
   }
   return locale.AppLang?.Short !== '' ? locale.AppLang?.Short : locale.AppLang.Lang
 })
 
-const emit = defineEmits<{(e: 'update:language', language: g11nbase.AppLang): void}>()
+const langs = computed(() => sdk.appLanguages.value)
 
 const onLangItemClick = (language: g11nbase.AppLang) => {
-  if (emitResult.value) {
-    emit('update:language', language)
-  }
-  if (setLang.value) {
-    locale.setLang(language)
-  }
+  console.log('LangID: ', language.LangID)
+  locale.setLang(language)
 }
 
-onMounted(() => {
-  if (emitResult.value) {
-    emit('update:language', locale.AppLang as g11nbase.AppLang)
+const AppID = sdk.AppID
+watch(AppID, () => {
+  if (!langs.value?.length) {
+    sdk.adminGetAppLangs(0, 0)
   }
 })
 
+onMounted(() => {
+  if (!langs.value?.length) {
+    sdk.adminGetAppLangs(0, 0)
+  }
+})
 </script>
 
 <style lang='sass' scoped>

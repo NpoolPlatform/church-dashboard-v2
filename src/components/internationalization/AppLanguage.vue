@@ -53,10 +53,8 @@
 </template>
 
 <script setup lang='ts'>
-import { defineAsyncComponent, onMounted, ref, watch } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { g11nbase, sdk } from 'src/npoolstore'
-
-const AppID = sdk.AppID
 
 const LanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/LanguagePicker.vue'))
 
@@ -98,16 +96,4 @@ const onDelete = () => {
     sdk.adminDeleteAppLang(el)
   })
 }
-
-watch(AppID, () => {
-  if (langs.value.length === 0) {
-    sdk.adminGetAppLangs(0, 0)
-  }
-})
-
-onMounted(() => {
-  if (langs.value.length === 0) {
-    sdk.adminGetAppLangs(0, 0)
-  }
-})
 </script>
