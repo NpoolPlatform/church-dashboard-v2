@@ -83,11 +83,13 @@ const onSubmit = () => {
   submitting.value = true
   if (updating.value) {
     sdk.adminUpdateTopMostPoster(target.value, (error: boolean) => {
+      submitting.value = false
       if (error) return
       onMenuHide()
     })
   } else {
     sdk.adminCreateTopMostPoster(target.value, (error: boolean) => {
+      submitting.value = false
       if (error) return
       onMenuHide()
     })
