@@ -29,7 +29,7 @@
     <q-card class='popup-menu'>
       <q-card-section>
         <TopMostSelector v-model:top-most-id='target.TopMostID' :read-only='updating' />
-        <q-select :options='goodbase.GoodTopMostConstraints' :disable='updating' v-model='target.Constraint' :label='$t("MSG_TOPMOST_TYPE")' />
+        <q-select :options='goodbase.GoodTopMostConstraints' :disable='updating' v-model='target.Constraint' :label='$t("MSG_TOPMOST_CONSTRAINT")' />
         <q-input v-model='target.TargetValue' :label='$t("MSG_TARGET_VALUE")' />
         <q-input v-model='target.Index' :label='$t("MSG_DISPLAY_INDEX")' type='number' />
       </q-card-section>
@@ -124,10 +124,28 @@ const columns = computed(() => [
     field: (row: topmostconstraint.TopMostConstraint) => row.AppID
   },
   {
-    name: 'TopMostType',
-    label: 'MSG_TOPMOST_TYPE',
+    name: 'Constraint',
+    label: 'MSG_CONSTRAINT',
     sortable: true,
-    field: (row: topmostconstraint.TopMostConstraint) => row.TopMostType
+    field: (row: topmostconstraint.TopMostConstraint) => row.Constraint
+  },
+  {
+    name: 'TargetValue',
+    label: 'MSG_TARGET_VALUE',
+    sortable: true,
+    field: (row: topmostconstraint.TopMostConstraint) => row.TargetValue
+  },
+  {
+    name: 'Index',
+    label: 'MSG_INDEX',
+    sortable: true,
+    field: (row: topmostconstraint.TopMostConstraint) => row.Index
+  },
+  {
+    name: 'TopMostID',
+    label: 'MSG_TOPMOST_ID',
+    sortable: true,
+    field: (row: topmostconstraint.TopMostConstraint) => row.TopMostID
   },
   {
     name: 'Title',
@@ -140,6 +158,12 @@ const columns = computed(() => [
     label: 'MSG_TOPMOST_MESSAGE',
     sortable: true,
     field: (row: topmostconstraint.TopMostConstraint) => row.TopMostMessage
+  },
+  {
+    name: 'TopMostType',
+    label: 'MSG_TOPMOST_TYPE',
+    sortable: true,
+    field: (row: topmostconstraint.TopMostConstraint) => row.TopMostType
   },
   {
     name: 'CreatedAt',
