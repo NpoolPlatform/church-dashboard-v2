@@ -128,10 +128,22 @@ const columns = computed(() => [
     field: (row: topmostposter.Poster) => row.AppID
   },
   {
-    name: 'TopMostType',
-    label: 'MSG_TOPMOST_TYPE',
+    name: 'Poster',
+    label: 'MSG_POSTER',
     sortable: true,
-    field: (row: topmostposter.Poster) => row.TopMostType
+    field: (row: topmostposter.Poster) => row.Poster
+  },
+  {
+    name: 'Index',
+    label: 'MSG_INDEX',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.Index
+  },
+  {
+    name: 'TopMostID',
+    label: 'MSG_TOPMOST_ID',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.TopMostID
   },
   {
     name: 'Title',
@@ -144,6 +156,18 @@ const columns = computed(() => [
     label: 'MSG_TOPMOST_MESSAGE',
     sortable: true,
     field: (row: topmostposter.Poster) => row.TopMostMessage
+  },
+  {
+    name: 'TopMostTargetUrl',
+    label: 'MSG_TOPMOST_TARGET_URL',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.TopMostTargetUrl
+  },
+  {
+    name: 'TopMostType',
+    label: 'MSG_TOPMOST_TYPE',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.TopMostType
   },
   {
     name: 'CreatedAt',
