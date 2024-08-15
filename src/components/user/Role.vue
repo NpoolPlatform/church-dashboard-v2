@@ -107,9 +107,14 @@ const onCreate = () => {
 const onSubmit = () => {
   showing.value = false
 
-  if (updating.value) { // NEED UPDATE ROLE API
-    _role.updateRole({
-      Info: target.value,
+  if (updating.value) {
+    _role.updateAppRole({
+      ID: target.value?.ID,
+      EntID: target.value?.EntID,
+      TargetAppID: target.value.AppID,
+      RoleName: target.value.Role,
+      Default: target.value?.Default,
+      Description: target.value?.Description,
       Message: {
         Error: {
           Title: 'MSG_UPDATE_ROLE',
