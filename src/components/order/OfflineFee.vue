@@ -19,11 +19,12 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <q-item-label>{{ $t('MSG_USER_EMAIL_ADDRESS') }}: {{ appOrder?.EmailAddress }}</q-item-label>
-      </q-card-section>
-      <q-card-section>
+        <AppUserSelector
+          v-model:user-id='target.TargetUserID'
+        />
         <OrderSelector
           v-model:order-id='target.ParentOrderID'
+          :user-ids='selectedUserID'
           :order-states='[order.OrderState.PAID, order.OrderState.IN_SERVICE]'
           :good-types='[
             goodbase.GoodType.PowerRental,
@@ -64,8 +65,11 @@ import { order, sdk, goodbase, feeorder } from 'src/npoolstore'
 const OrderPage = defineAsyncComponent(() => import('src/components/billing/Order.vue'))
 const OrderSelector = defineAsyncComponent(() => import('src/components/order/OrderSelector.vue'))
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
+const AppUserSelector = defineAsyncComponent(() => import('src/components/user/AppUserSelector.vue'))
 
 const AppID = sdk.AppID
+
+const selectedUserID = computed(() => [target.value.TargetUserID])
 
 const showing = ref(false)
 const submitting = ref(false)
