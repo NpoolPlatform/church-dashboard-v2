@@ -30,7 +30,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_DELETE")'
-          :disable='selectedMessages.length === 0'
+          :disable='!selectedMessages.length'
           @click='onDelete'
         />
         <q-btn
@@ -219,6 +219,7 @@ const updateAppMessage = () => {
 }
 
 const onDelete = () => {
+  target.value = selectedMessages.value?.[0]
   sdk.adminDeleteMessage(target.value)
 }
 
