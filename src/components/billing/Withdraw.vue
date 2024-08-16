@@ -37,6 +37,36 @@ onMounted(() => {
 
 const withdrawColumns = computed(() => [
   {
+    name: 'ID',
+    label: t('MSG_ID'),
+    sortable: true,
+    field: (row: ledgerwithdraw.Withdraw) => row.ID
+  },
+  {
+    name: 'EntID',
+    label: t('MSG_ENT_ID'),
+    sortable: true,
+    field: (row: ledgerwithdraw.Withdraw) => row.EntID
+  },
+  {
+    name: 'AppID',
+    label: t('MSG_APP_ID'),
+    sortable: true,
+    field: (row: ledgerwithdraw.Withdraw) => row.AppID
+  },
+  {
+    name: 'UserID',
+    label: t('MSG_USER_ID'),
+    sortable: true,
+    field: (row: ledgerwithdraw.Withdraw) => row.UserID
+  },
+  {
+    name: 'CoinTypeID',
+    label: t('MSG_COINTYPE_ID'),
+    sortable: true,
+    field: (row: ledgerwithdraw.Withdraw) => row.CoinTypeID
+  },
+  {
     name: 'Address',
     label: t('MSG_ADDRESS'),
     sortable: true,
@@ -67,18 +97,6 @@ const withdrawColumns = computed(() => [
     field: (row: ledgerwithdraw.Withdraw) => row.Amount
   },
   {
-    name: 'CoinTypeID',
-    label: t('MSG_COINTYPE_ID'),
-    sortable: true,
-    field: (row: ledgerwithdraw.Withdraw) => row.CoinTypeID
-  },
-  {
-    name: 'CreatedAt',
-    label: t('MSG_CREATEDAT'),
-    sortable: true,
-    field: (row: ledgerwithdraw.Withdraw) => utils.formatTime(row.CreatedAt)
-  },
-  {
     name: 'Message',
     label: t('MSG_MESSAGE'),
     sortable: true,
@@ -89,6 +107,12 @@ const withdrawColumns = computed(() => [
     label: t('MSG_COIN_LOGO'),
     sortable: true,
     field: (row: ledgerwithdraw.Withdraw) => row.CoinLogo
+  },
+  {
+    name: 'CreatedAt',
+    label: t('MSG_CREATEDAT'),
+    sortable: true,
+    field: (row: ledgerwithdraw.Withdraw) => utils.formatTime(row.CreatedAt)
   }
 ])
 
