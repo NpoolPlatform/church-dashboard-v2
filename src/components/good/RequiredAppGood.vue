@@ -7,6 +7,8 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     :columns='columns'
+    selection='single'
+    v-model:selected='selectedRequiredAppGood'
     @row-click='(evt, row, index) => onRowClick(row as requiredappgood.Required)'
   >
     <template #top-right>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreateClick'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedRequiredAppGood?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -66,6 +76,7 @@ const requiredGoodID = computed(() => {
   const required = requireds.value.find((el) => el.MainGoodID === selectedGoodID.value)
   return required ? [required.RequiredGoodID] : []
 })
+const selectedRequiredAppGood = ref([] as Array<requiredappgood.Required>)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -95,6 +106,12 @@ const updateRequiredGood = () => {
   sdk.adminUpdateRequiredAppGood(target.value, (error) => {
     if (error) return
     onMenuHide()
+  })
+}
+
+const onDelete = () => {
+  sdk.adminDeleteRequiredAppGood(selectedRequiredAppGood?.value?.[0], () => {
+    // TODO
   })
 }
 

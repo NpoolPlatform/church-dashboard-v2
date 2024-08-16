@@ -6,6 +6,8 @@
     :rows='topMostConstraints'
     row-key='ID'
     :columns='columns'
+    selection='single'
+    v-model:selected='selectedTopmostConstraint'
     :rows-per-page-options='[100]'
     @row-click='(evt, row, index) => onRowClick(row as topmostconstraint.TopMostConstraint)'
   >
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedTopmostConstraint?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -51,6 +61,7 @@ const AppID = sdk.AppID
 
 const topMostConstraints = sdk.topMostConstraints
 const target = ref({} as topmostconstraint.TopMostConstraint)
+const selectedTopmostConstraint = ref([] as Array<topmostconstraint.TopMostConstraint>)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -90,6 +101,12 @@ const onSubmit = () => {
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMostConstraint(selectedTopmostConstraint.value?.[0], () => {
+    // TODO
+  })
 }
 
 watch(AppID, () => {

@@ -7,6 +7,8 @@
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
+    selection='single'
+    v-model:selected='selectedTopmostPoster'
     @row-click='(evt, row, index) => onRowClick(row as topmostposter.Poster)'
   >
     <template #top-right>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedTopmostPoster?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -53,6 +63,8 @@ const AppID = sdk.AppID
 
 const topMostPosters = sdk.topMostPosters
 const target = ref({} as topmostposter.Poster)
+
+const selectedTopmostPoster = ref([] as Array<topmostposter.Poster>)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -94,6 +106,12 @@ const onSubmit = () => {
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMostPoster(selectedTopmostPoster.value?.[0], () => {
+    // TODO
+  })
 }
 
 watch(AppID, () => {

@@ -7,6 +7,8 @@
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
+    selection='single'
+    v-model:selected='selectedTopMost'
     @row-click='(evt, row, index) => onRowClick(row as topmost.TopMost)'
   >
     <template #top-right>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedTopMost?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -58,6 +68,7 @@ const DateTimePicker = defineAsyncComponent(() => import('src/components/date/Da
 
 const topMosts = sdk.topMosts
 const target = ref({} as topmost.TopMost)
+const selectedTopMost = ref([] as Array<topmost.TopMost>)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -95,6 +106,12 @@ const onSubmit = () => {
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMost(selectedTopMost.value?.[0], () => {
+    // TODO
+  })
 }
 
 watch(AppID, () => {
