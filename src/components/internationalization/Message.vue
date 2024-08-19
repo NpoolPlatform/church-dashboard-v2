@@ -30,7 +30,7 @@
           flat
           class='btn flat'
           :label='$t("MSG_DELETE")'
-          :disable='selectedMessages.length === 0'
+          :disable='!selectedMessages.length'
           @click='onDelete'
         />
         <q-btn
@@ -67,7 +67,7 @@
         <div><q-toggle dense v-model='target.Disabled' :label='$t("MSG_DISABLE")' /></div>
       </q-card-section>
       <q-item class='row'>
-        <LoadingButton loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -121,7 +121,7 @@
         <AppLanguagePicker v-model:app-lang-id='langID' label='MSG_CURRENT_MESSAGES_LANGUAGE' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
+        <q-btn :loading='submitting2' :label='$t("MSG_SUBMIT")' @click='onBatchSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onBatchCancel' />
       </q-item>
     </q-card>
@@ -133,9 +133,8 @@ import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { message, utils, _locale, g11nbase, sdk } from 'src/npoolstore'
 import saveAs from 'file-saver'
 
-const AppID = sdk.AppID
-
 const AppLanguagePicker = defineAsyncComponent(() => import('src/components/internationalization/AppLanguagePicker.vue'))
+const AppID = sdk.AppID
 
 const locale = _locale.useLocaleStore()
 const _langID = computed(() => locale?.AppLang?.LangID)
@@ -153,6 +152,9 @@ const displayAppMsgs = computed(() => messages.value.filter((msg) => {
 const target = ref({} as g11nbase.Message)
 const showing = ref(false)
 const updating = ref(false)
+
+const submitting = ref(false)
+const submitting2 = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -196,11 +198,13 @@ const onExport = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   updating.value ? updateAppMessage() : createAppMessage()
 }
 
 const createAppMessage = () => {
   sdk.adminCreateMessage(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
@@ -208,12 +212,14 @@ const createAppMessage = () => {
 
 const updateAppMessage = () => {
   sdk.adminUpdateMessage(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
 }
 
 const onDelete = () => {
+  target.value = selectedMessages.value?.[0]
   sdk.adminDeleteMessage(target.value)
 }
 
@@ -258,12 +264,14 @@ const onBatchCancel = () => {
 }
 
 const onBatchSubmit = () => {
-  sdk.adminCreateMessages(langID.value, importMessages.value)
+  sdk.adminCreateMessages(langID.value, importMessages.value, () => {
+    submitting2.value = false
+  })
 }
 
 const prepare = () => {
   if (!messages.value?.length) {
-    sdk.getMessages(0, 0)
+    sdk.adminGetMessages(0, 0)
   }
 }
 

@@ -7,6 +7,8 @@
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
+    selection='single'
+    v-model:selected='selectedTopMost'
     @row-click='(evt, row, index) => onRowClick(row as topmost.TopMost)'
   >
     <template #top-right>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedTopMost?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -33,20 +43,8 @@
       <q-card-section>
         <q-input v-model='target.Title' :label='$t("MSG_TITLE")' />
         <q-input v-model='target.Message' :label='$t("MSG_MESSAGE")' />
+        <q-input v-model='target.TargetUrl' :label='$t("MSG_TARGET_URL")' />
         <q-select :options='goodbase.GoodTopMostTypes' :disable='updating' v-model='target.TopMostType' :label='$t("MSG_TOPMOST_TYPE")' />
-      </q-card-section>
-      <q-card-section>
-        <q-select
-          label='MSG_POSTERS'
-          filled
-          v-model='target.Posters'
-          use-input
-          use-chips
-          multiple
-          hide-dropdown-icon
-          input-debounce='0'
-          new-value-mode='add'
-        />
       </q-card-section>
       <q-card-section>
         <div> <DateTimePicker v-model:date='target.StartAt' label='MSG_START_AT' /></div>
@@ -70,6 +68,7 @@ const DateTimePicker = defineAsyncComponent(() => import('src/components/date/Da
 
 const topMosts = sdk.topMosts
 const target = ref({} as topmost.TopMost)
+const selectedTopMost = ref([] as Array<topmost.TopMost>)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -109,6 +108,12 @@ const onSubmit = () => {
   }
 }
 
+const onDelete = () => {
+  sdk.adminDeleteTopMost(selectedTopMost.value?.[0], () => {
+    // TODO
+  })
+}
+
 watch(AppID, () => {
   if (!topMosts.value?.length) {
     sdk.adminGetTopMosts(0, 0)
@@ -140,12 +145,7 @@ const columns = computed(() => [
     sortable: true,
     field: (row: topmost.TopMost) => row.AppID
   },
-  {
-    name: 'TopMostType',
-    label: 'MSG_TOP_MOST_TYPE',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.TopMostType
-  },
+
   {
     name: 'Title',
     label: 'MSG_TITLE',
@@ -159,6 +159,18 @@ const columns = computed(() => [
     field: (row: topmost.TopMost) => row.Message
   },
   {
+    name: 'TargetUrl',
+    label: 'MSG_TARGET_URL',
+    sortable: true,
+    field: (row: topmost.TopMost) => row.TargetUrl
+  },
+  {
+    name: 'TopMostType',
+    label: 'MSG_TOP_MOST_TYPE',
+    sortable: true,
+    field: (row: topmost.TopMost) => row.TopMostType
+  },
+  {
     name: 'StartAt',
     label: 'MSG_START_AT',
     sortable: true,
@@ -169,12 +181,6 @@ const columns = computed(() => [
     label: 'MSG_END_AT',
     sortable: true,
     field: (row: topmost.TopMost) => utils.formatTime(row.EndAt, undefined)
-  },
-  {
-    name: 'Posters',
-    label: 'MSG_POSTERS',
-    sortable: true,
-    field: (row: topmost.TopMost) => row.Posters?.join(',')
   },
   {
     name: 'CreatedAt',

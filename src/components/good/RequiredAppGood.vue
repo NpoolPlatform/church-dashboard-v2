@@ -3,10 +3,12 @@
     dense
     flat
     :title='$t("MSG_REQUIRED_APP_GOODS")'
-    :rows='requireds'
+    :rows='requiredAppGoods'
     row-key='ID'
     :rows-per-page-options='[100]'
     :columns='columns'
+    selection='single'
+    v-model:selected='selectedRequiredAppGood'
     @row-click='(evt, row, index) => onRowClick(row as requiredappgood.Required)'
   >
     <template #top-right>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreateClick'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedRequiredAppGood?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -33,7 +43,7 @@
       </q-card-section>
       <q-card-section v-if='!updating'>
         <div>{{ $t('MSG_SELECT_REQUIRED_APP_GOOD') }}</div>
-        <AppGoodSelector v-model:app-good-id='target.RequiredAppGoodID' :good-ids='selectedGoodID' :exclude-app-good-ids='[target.MainAppGoodID]' />
+        <AppGoodSelector v-model:app-good-id='target.RequiredAppGoodID' :good-ids='requiredGoodID' :exclude-app-good-ids='[target.MainAppGoodID]' />
       </q-card-section>
       <q-card-section>
         <div><q-toggle dense v-model='target.Must' :label='$t("MSG_MUST")' /></div>
@@ -56,10 +66,17 @@ const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/A
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const requireds = sdk.requiredAppGoods
+const requiredAppGoods = sdk.requiredAppGoods
 const target = ref({} as requiredappgood.Required)
 
-const selectedGoodID = computed(() => sdk.appGood(target.value?.MainAppGoodID)?.GoodID ? [sdk.appGood(target.value?.MainAppGoodID)?.GoodID as string] : [])
+const requireds = sdk.requiredGoods
+
+const selectedGoodID = computed(() => sdk.appGood(target.value?.MainAppGoodID)?.GoodID)
+const requiredGoodID = computed(() => {
+  const required = requireds.value.find((el) => el.MainGoodID === selectedGoodID.value)
+  return required ? [required.RequiredGoodID] : []
+})
+const selectedRequiredAppGood = ref([] as Array<requiredappgood.Required>)
 
 const showing = ref(false)
 const updating = ref(false)
@@ -92,6 +109,12 @@ const updateRequiredGood = () => {
   })
 }
 
+const onDelete = () => {
+  sdk.adminDeleteRequiredAppGood(selectedRequiredAppGood?.value?.[0], () => {
+    // TODO
+  })
+}
+
 const onRowClick = (required: requiredappgood.Required) => {
   showing.value = true
   updating.value = true
@@ -105,14 +128,20 @@ const onMenuHide = () => {
 }
 
 watch(sdk.AppID, () => {
-  if (!requireds.value.length) {
+  if (!requiredAppGoods.value.length) {
     sdk.adminGetRequiredAppGoods(0, 0)
+  }
+  if (!requireds.value.length) {
+    sdk.getRequiredGoods(0, 0)
   }
 })
 
 onMounted(() => {
-  if (!requireds.value.length) {
+  if (!requiredAppGoods.value.length) {
     sdk.adminGetRequiredAppGoods(0, 0)
+  }
+  if (!requireds.value.length) {
+    sdk.getRequiredGoods(0, 0)
   }
 })
 

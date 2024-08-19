@@ -38,9 +38,6 @@
   >
     <q-card class='popup-menu'>
       <q-card-section>
-        <span>{{ $t('MSG_DEVICE_POSTER') }}</span>
-      </q-card-section>
-      <q-card-section>
         <DeviceSelector v-if='!updating' v-model:device-type-id='target.DeviceTypeID' />
         <q-input v-model='target.Poster' :label='$t("MSG_POSTER")' />
         <q-input v-model.number='target.Index' :label='$t("MSG_INDEX")' />
@@ -137,10 +134,34 @@ const columns = computed(() => [
     field: (row: deviceposter.DevicePoster) => row.EntID
   },
   {
+    name: 'DeviceTypeID',
+    label: t('MSG_DEVICE_TYPE_ID'),
+    sortable: true,
+    field: (row: deviceposter.DevicePoster) => row.DeviceTypeID
+  },
+  {
+    name: 'DeviceType',
+    label: t('MSG_DEVICE_TYPE'),
+    sortable: true,
+    field: (row: deviceposter.DevicePoster) => row.DeviceType
+  },
+  {
     name: 'Poster',
-    label: t('MSG_NAME'),
+    label: t('MSG_POSTER'),
     sortable: true,
     field: (row: deviceposter.DevicePoster) => row.Poster
+  },
+  {
+    name: 'Index',
+    label: t('MSG_INDEX'),
+    sortable: true,
+    field: (row: deviceposter.DevicePoster) => row.Index
+  },
+  {
+    name: 'Manufacturer',
+    label: t('MSG_MANUFACTURER'),
+    sortable: true,
+    field: (row: deviceposter.DevicePoster) => row.Manufacturer
   },
   {
     name: 'CreatedAt',

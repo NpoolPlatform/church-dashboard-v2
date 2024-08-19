@@ -27,6 +27,8 @@
     :rows='requireds'
     row-key='ID'
     :rows-per-page-options='[20]'
+    selection='single'
+    v-model:selected='selectedRequired'
     @row-click='(evt, row, index) => onRowClick(row as requiredgood.Required)'
   >
     <template #top-right>
@@ -37,6 +39,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreateClick'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedRequired?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -78,6 +88,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 const goods = sdk.goods
 const requireds = sdk.requiredGoods
+const selectedRequired = ref([] as Array<requiredgood.Required>)
 
 const goodName = ref('')
 const displayGoods = computed(() => {
@@ -87,6 +98,12 @@ const displayGoods = computed(() => {
           el.Name.toLowerCase().includes(name)
   })
 })
+
+const onDelete = () => {
+  sdk.adminDeleteRequiredGood(selectedRequired?.value?.[0], () => {
+    // TODO
+  })
+}
 
 onMounted(() => {
   if (!goods.value.length) {

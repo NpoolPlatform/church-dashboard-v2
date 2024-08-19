@@ -49,6 +49,7 @@
           :options='goodbase.GoodTopMostConstraints'
           v-model='target.Constraint'
           :label='$t("MSG_CONSTRAINT")'
+          :disable='updating'
         />
       </q-card-section>
       <q-item class='row'>
@@ -159,6 +160,24 @@ const columns = computed(() => [
     field: (row: topmostgoodconstraint.TopMostGoodConstraint) => row.AppGoodName
   },
   {
+    name: 'Constraint',
+    label: 'MSG_CONSTRAINT',
+    sortable: true,
+    field: (row: topmostgoodconstraint.TopMostGoodConstraint) => row.Constraint
+  },
+  {
+    name: 'TargetValue',
+    label: 'MSG_TARGET_VALUE',
+    sortable: true,
+    field: (row: topmostgoodconstraint.TopMostGoodConstraint) => row.TargetValue
+  },
+  {
+    name: 'Index',
+    label: 'MSG_INDEX',
+    sortable: true,
+    field: (row: topmostgoodconstraint.TopMostGoodConstraint) => row.Index
+  },
+  {
     name: 'TopMostID',
     label: 'MSG_TOP_MOST_ID',
     sortable: true,
@@ -175,12 +194,6 @@ const columns = computed(() => [
     label: 'MSG_TOP_MOST_TYPE',
     sortable: true,
     field: (row: topmostgoodconstraint.TopMostGoodConstraint) => row.TopMostType
-  },
-  {
-    name: 'TargetValue',
-    label: 'MSG_TARGET_VALUE',
-    sortable: true,
-    field: (row: topmostgoodconstraint.TopMostGoodConstraint) => row.TargetValue
   },
   {
     name: 'CreatedAt',

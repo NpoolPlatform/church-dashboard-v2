@@ -7,6 +7,8 @@
     row-key='ID'
     :columns='columns'
     :rows-per-page-options='[100]'
+    selection='single'
+    v-model:selected='selectedTopmostPoster'
     @row-click='(evt, row, index) => onRowClick(row as topmostposter.Poster)'
   >
     <template #top-right>
@@ -17,6 +19,14 @@
           class='btn flat'
           :label='$t("MSG_CREATE")'
           @click='onCreate'
+        />
+        <q-btn
+          dense
+          flat
+          class='btn flat'
+          :label='$t("MSG_DELETE")'
+          :disable='!selectedTopmostPoster?.length'
+          @click='onDelete'
         />
       </div>
     </template>
@@ -54,6 +64,8 @@ const AppID = sdk.AppID
 const topMostPosters = sdk.topMostPosters
 const target = ref({} as topmostposter.Poster)
 
+const selectedTopmostPoster = ref([] as Array<topmostposter.Poster>)
+
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
@@ -83,15 +95,23 @@ const onSubmit = () => {
   submitting.value = true
   if (updating.value) {
     sdk.adminUpdateTopMostPoster(target.value, (error: boolean) => {
+      submitting.value = false
       if (error) return
       onMenuHide()
     })
   } else {
     sdk.adminCreateTopMostPoster(target.value, (error: boolean) => {
+      submitting.value = false
       if (error) return
       onMenuHide()
     })
   }
+}
+
+const onDelete = () => {
+  sdk.adminDeleteTopMostPoster(selectedTopmostPoster.value?.[0], () => {
+    // TODO
+  })
 }
 
 watch(AppID, () => {
@@ -126,10 +146,22 @@ const columns = computed(() => [
     field: (row: topmostposter.Poster) => row.AppID
   },
   {
-    name: 'TopMostType',
-    label: 'MSG_TOPMOST_TYPE',
+    name: 'Poster',
+    label: 'MSG_POSTER',
     sortable: true,
-    field: (row: topmostposter.Poster) => row.TopMostType
+    field: (row: topmostposter.Poster) => row.Poster
+  },
+  {
+    name: 'Index',
+    label: 'MSG_INDEX',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.Index
+  },
+  {
+    name: 'TopMostID',
+    label: 'MSG_TOPMOST_ID',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.TopMostID
   },
   {
     name: 'Title',
@@ -142,6 +174,18 @@ const columns = computed(() => [
     label: 'MSG_TOPMOST_MESSAGE',
     sortable: true,
     field: (row: topmostposter.Poster) => row.TopMostMessage
+  },
+  {
+    name: 'TopMostTargetUrl',
+    label: 'MSG_TOPMOST_TARGET_URL',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.TopMostTargetUrl
+  },
+  {
+    name: 'TopMostType',
+    label: 'MSG_TOPMOST_TYPE',
+    sortable: true,
+    field: (row: topmostposter.Poster) => row.TopMostType
   },
   {
     name: 'CreatedAt',

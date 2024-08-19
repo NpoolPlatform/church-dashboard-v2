@@ -43,7 +43,7 @@
         <AppGoodSelector v-if='!updating' v-model:app-good-id='target.AppGoodID' />
         <q-input v-model='target.Icon' :label='$t("MSG_LABEL_ICON")' />
         <q-input v-model='target.IconBgColor' :label='$t("MSG_LABEL_ICON_BG_COLOR")' />
-        <q-select :options='goodbase.GoodLabels' v-model='target.Label' :label='$t("MSG_LABEL")' />
+        <q-select :disable='updating' :options='goodbase.GoodLabels' v-model='target.Label' :label='$t("MSG_LABEL")' />
         <q-input v-model='target.LabelBgColor' :label='$t("MSG_LABEL_BG_COLOR")' />
         <q-input v-model.number='target.Index' :label='$t("MSG_INDEX")' />
       </q-card-section>

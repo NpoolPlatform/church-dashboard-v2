@@ -39,7 +39,7 @@
         <q-select dense :options='appcoindescription.CoinDescriptionUsedFors' v-model='target.UsedFor' :label='$t("MSG_USED_FOR")' />
       </q-card-section>
       <q-item class='row'>
-        <q-btn loading :label='$t("MSG_SUBMIT")' @click='onSubmit' />
+        <q-btn class='btn round' :loading='submitting' :label='$t("MSG_SUBMIT")' @click='onSubmit' />
         <q-btn class='btn round' :label='$t("MSG_CANCEL")' @click='onCancel' />
       </q-item>
     </q-card>
@@ -59,6 +59,7 @@ const descriptions = computed(() => description.descriptions(AppID.value))
 
 const showing = ref(false)
 const target = ref({} as appcoindescription.CoinDescription)
+const submitting = ref(false)
 
 const onCreate = () => {
   showing.value = true
@@ -74,11 +75,13 @@ const onMenuHide = () => {
 }
 
 const onSubmit = () => {
+  submitting.value = true
   createCoinDescription()
 }
 
 const createCoinDescription = () => {
   sdk.adminCreateAppCoinDescription(target.value, (error: boolean) => {
+    submitting.value = false
     if (error) return
     onMenuHide()
   })
