@@ -85,18 +85,19 @@ const target = ref({
 } as app.App)
 
 const newEntID = ref(undefined as unknown as string)
-const newName = ref(undefined as unknown as string)
+const newName = ref(undefined as unknown as string | undefined)
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
 
 watch(newName, () => {
-  target.value.Name = newName.value
+  target.value.Name = newName.value || target.value.Name
 })
 
 const onRowClick = (row: app.App) => {
   target.value = { ...row }
   commitButtonTargets.value = row.CommitButtonTargets?.join(',')
+  newName.value = target.value?.Name
   newEntID.value = target.value?.EntID
   showing.value = true
   updating.value = true
@@ -136,6 +137,7 @@ watch(commitButtonTargets, () => {
 })
 
 const updateApp = () => {
+  newName.value = newName.value === target.value?.Name ? undefined : newName.value
   sdk.adminUpdateApplication(target.value, newEntID.value, newName.value, (error: boolean) => {
     if (error) return
     onMenuHide()
