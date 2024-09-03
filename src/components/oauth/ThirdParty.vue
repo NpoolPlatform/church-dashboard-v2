@@ -6,7 +6,7 @@
     row-key='ID'
     :title='$t("MSG_OAUTH_THIRD_PARTIES")'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as oauthbase.OAuthThirdParty)'
+    @row-click='(evt: any, row: oauthbase.OAuthThirdParty, index: any) => onRowClick(row as oauthbase.OAuthThirdParty)'
   >
     <template #top-right>
       <div class='row indent flat'>

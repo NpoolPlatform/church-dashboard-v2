@@ -7,7 +7,7 @@
     row-key='ID'
     :loading='appLoading'
     :rows-per-page-options='[100]'
-    @row-click='(evt, row, index) => onRowClick(row as app.App)'
+    @row-click='(evt: any, row: app.App, index: any) => onRowClick(row as app.App)'
     :columns='columns as never'
   >
     <template #top-right>
@@ -89,10 +89,6 @@ const newName = ref(undefined as unknown as string | undefined)
 const showing = ref(false)
 const updating = ref(false)
 const submitting = ref(false)
-
-watch(newName, () => {
-  target.value.Name = newName.value || target.value.Name
-})
 
 const onRowClick = (row: app.App) => {
   target.value = { ...row }
