@@ -107,7 +107,7 @@ const appFees = computed(() => sdk.appFees.value)
 const appFee = computed(() => sdk.appFee(target.value?.AppGoodID))
 const appOrder = computed(() => sdk.appOrder(target.value.ParentOrderID))
 
-const requireds = sdk.requiredAppGoods
+const requireds = sdk.requiredAppGood.requiredAppGoods
 const requiredAppGoodIds = ref([] as Array<string>)
 
 watch(() => appOrder.value?.AppGoodID, () => {
@@ -124,7 +124,7 @@ const prepare = () => {
     sdk.adminGetAppFees(0, 0)
   }
   if (!requireds.value.length) {
-    sdk.adminGetRequiredAppGoods(0, 0)
+    sdk.requiredAppGood.adminGetRequiredAppGoods(0, 0)
   }
 }
 

@@ -26,7 +26,7 @@ import { sdk, goodbase } from 'src/npoolstore'
 interface Props {
   appGoodId: string | undefined
   goodIds?: string[]
-  requiredAppGoodIds: Array<string>
+  requiredAppGoodIds?: Array<string>
   goodTypes?: Array<goodbase.GoodType>
   excludeAppGoodIds?: string[]
 }

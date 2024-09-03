@@ -62,7 +62,7 @@ const { t } = useI18n({ useScope: 'global' })
 const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/AppGoodSelector.vue'))
 const AppCoinPicker = defineAsyncComponent(() => import('src/components/coin/AppCoinPicker.vue'))
 
-const appDefaultGoods = sdk.appDefaultGoods
+const appDefaultGoods = sdk.appDefaultGood.appDefaultGoods
 const appPowerRentals = sdk.appPowerRental.appPowerRentals
 
 const selectedAppDefaultGoods = ref([] as appdefaultgood.Default[])
@@ -101,19 +101,19 @@ const onSubmit = () => {
 }
 
 const createAppDefaultGood = () => {
-  sdk.adminCreateAppDefaultGood(target.value, () => {
+  sdk.appDefaultGood.adminCreateAppDefaultGood(target.value, () => {
     onMenuHide()
   })
 }
 
 const updateAppDefaultGood = () => {
-  sdk.adminUpdateAppDefaultGood(target.value, () => {
+  sdk.appDefaultGood.adminUpdateAppDefaultGood(target.value, () => {
     onMenuHide()
   })
 }
 
 const onDelete = () => {
-  sdk.adminDeleteAppDefaultGood(selectedAppDefaultGood.value, () => {
+  sdk.appDefaultGood.adminDeleteAppDefaultGood(selectedAppDefaultGood.value, () => {
     selectedAppDefaultGoods.value = []
   })
 }
@@ -130,7 +130,7 @@ const appCoins = computed(() => sdk.appCoin.appCoins.value)
 
 watch(sdk.AppID, () => {
   if (!appDefaultGoods.value.length) {
-    sdk.adminGetAppDefaultGoods(0, 0)
+    sdk.appDefaultGood.adminGetAppDefaultGoods(0, 0)
   }
   if (!appPowerRentals.value.length) {
     sdk.appPowerRental.adminGetAppPowerRentals(0, 0)
@@ -142,7 +142,7 @@ watch(sdk.AppID, () => {
 
 onMounted(() => {
   if (!appDefaultGoods.value.length) {
-    sdk.adminGetAppDefaultGoods(0, 0)
+    sdk.appDefaultGood.adminGetAppDefaultGoods(0, 0)
   }
   if (!appPowerRentals.value.length) {
     sdk.appPowerRental.adminGetAppPowerRentals(0, 0)

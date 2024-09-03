@@ -66,7 +66,7 @@ const AppGoodSelector = defineAsyncComponent(() => import('src/components/good/A
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-const requiredAppGoods = sdk.requiredAppGoods
+const requiredAppGoods = sdk.requiredAppGood.requiredAppGoods
 const target = ref({} as requiredappgood.Required)
 
 const requireds = sdk.requiredGoods
@@ -96,21 +96,21 @@ const onCancel = () => {
 }
 
 const createRequiredGood = () => {
-  sdk.adminCreateRequiredAppGood(target.value, (error) => {
+  sdk.requiredAppGood.adminCreateRequiredAppGood(target.value, (error) => {
     if (error) return
     onMenuHide()
   })
 }
 
 const updateRequiredGood = () => {
-  sdk.adminUpdateRequiredAppGood(target.value, (error) => {
+  sdk.requiredAppGood.adminUpdateRequiredAppGood(target.value, (error) => {
     if (error) return
     onMenuHide()
   })
 }
 
 const onDelete = () => {
-  sdk.adminDeleteRequiredAppGood(selectedRequiredAppGood?.value?.[0], () => {
+  sdk.requiredAppGood.adminDeleteRequiredAppGood(selectedRequiredAppGood?.value?.[0], () => {
     // TODO
   })
 }
@@ -129,7 +129,7 @@ const onMenuHide = () => {
 
 watch(sdk.AppID, () => {
   if (!requiredAppGoods.value.length) {
-    sdk.adminGetRequiredAppGoods(0, 0)
+    sdk.requiredAppGood.adminGetRequiredAppGoods(0, 0)
   }
   if (!requireds.value.length) {
     sdk.getRequiredGoods(0, 0)
@@ -138,7 +138,7 @@ watch(sdk.AppID, () => {
 
 onMounted(() => {
   if (!requiredAppGoods.value.length) {
-    sdk.adminGetRequiredAppGoods(0, 0)
+    sdk.requiredAppGood.adminGetRequiredAppGoods(0, 0)
   }
   if (!requireds.value.length) {
     sdk.getRequiredGoods(0, 0)
