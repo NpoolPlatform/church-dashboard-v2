@@ -707,7 +707,7 @@ const eventCoinColumns = computed(() => [
   {
     name: 'DisplayNames',
     label: t('MSG_DISPLAY_NAMES'),
-    field: (row: eventcoininspire.EventCoin) => row.DisplayNames.join(",")
+    field: (row: eventcoininspire.EventCoin) => row.DisplayNames.join(',')
   },
   {
     name: 'CoinLogo',
