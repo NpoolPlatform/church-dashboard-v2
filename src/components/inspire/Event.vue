@@ -100,7 +100,7 @@
   </q-dialog>
   <q-table
     :title='$t("MSG_EVENT_COINS")'
-    v-if='true'
+    v-if='false'
     dense
     :rows='displayEventCoins'
     row-key='ID'
@@ -156,7 +156,7 @@
   <q-table
     :title='$t("MSG_EVENT_COUPONS")'
     dense
-    v-if='false'
+    v-if='true'
     :rows='displayEventCoupons'
     row-key='ID'
     :rows-per-page-options='[100]'
