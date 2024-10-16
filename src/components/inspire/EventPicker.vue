@@ -56,7 +56,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  const targetAppID = AppID.value;
+  const targetAppID = AppID.value
   if (!eventInspires.value.length) {
     sdk.getEventInspires(targetAppID, 0, 0)
   }

@@ -56,7 +56,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  const targetAppID = AppID.value;
+  const targetAppID = AppID.value
   if (!taskConfigs.value.length) {
     sdk.getTaskConfigs(targetAppID, 0, 0)
   }

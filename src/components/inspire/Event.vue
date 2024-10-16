@@ -105,6 +105,8 @@
     :rows-per-page-options='[100]'
     selection='single'
     v-model:selected='selectedEventCoins'
+    :columns='eventCoinColumns'
+    @row-click='(evt, row, index) => onEventCoinRowClick(row as eventcoininspire.EventCoin)'
   >
     <template #top-right>
       <div class='row indent flat'>
@@ -156,6 +158,7 @@
     row-key='ID'
     :rows-per-page-options='[100]'
     selection='single'
+    :columns='eventCouponColumns'
     v-model:selected='selectedEventCoupons'
   >
     <template #top-right>
@@ -300,10 +303,7 @@ const onEventCouponCreate = () => {
   eventCouponTarget.value = {} as eventcouponinspire.EventCoupon
   eventCouponShowing.value = true
 }
-const onEventCouponRowClick = (row: eventcouponinspire.EventCoupon) => {
-  eventCouponTarget.value = { ...row }
-  eventCouponShowing.value = true
-}
+
 const onEventCouponMenuHide = () => {
   eventCouponShowing.value = false
   eventCouponTarget.value = {} as eventcouponinspire.EventCoupon

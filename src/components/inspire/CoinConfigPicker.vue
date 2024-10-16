@@ -56,7 +56,7 @@ const onUpdate = () => {
 }
 
 onMounted(() => {
-  const targetAppID = AppID.value;
+  const targetAppID = AppID.value
   if (!coinConfigs.value.length) {
     sdk.getCoinConfigs(targetAppID, 0, 0)
   }
