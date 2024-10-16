@@ -1,6 +1,6 @@
 <template>
   <q-table
-    v-if='false'
+    v-if='true'
     dense
     flat
     :title='$t("MSG_EVENT_INSPIRE")'
