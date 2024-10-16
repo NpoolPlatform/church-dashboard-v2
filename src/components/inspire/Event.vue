@@ -1,5 +1,6 @@
 <template>
   <q-table
+    v-if='false'
     dense
     flat
     :title='$t("MSG_EVENT_INSPIRE")'
@@ -99,6 +100,7 @@
   </q-dialog>
   <q-table
     :title='$t("MSG_EVENT_COINS")'
+    v-if='false'
     dense
     :rows='displayEventCoins'
     row-key='ID'
@@ -154,6 +156,7 @@
   <q-table
     :title='$t("MSG_EVENT_COUPONS")'
     dense
+    v-if='false'
     :rows='displayEventCoupons'
     row-key='ID'
     :rows-per-page-options='[100]'
