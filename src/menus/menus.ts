@@ -854,6 +854,51 @@ const MainDrawerMenus = [
       level: 1,
       sectionBegin: false,
       children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '事件配置',
+      caption: '查看事件配置',
+      icon: 'format_list_numbered',
+      target: '/inspire/event',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '激励币种配置',
+      caption: '查看激励币种配置',
+      icon: 'format_list_numbered',
+      target: '/inspire/coinconfig',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '激励任务配置',
+      caption: '查看激励任务配置',
+      icon: 'format_list_numbered',
+      target: '/inspire/taskconfig',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '用户激励记录',
+      caption: '查看用户激励记录',
+      icon: 'format_list_numbered',
+      target: '/inspire/userreward',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: '用户任务记录',
+      caption: '查看用户任务记录',
+      icon: 'format_list_numbered',
+      target: '/inspire/usertask',
+      level: 1,
+      sectionBegin: false,
+      children: []
     } as MenuItem]
   } as MenuItem, {
     menuId: uid(),
