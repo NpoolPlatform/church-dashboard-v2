@@ -2,7 +2,7 @@
   <q-table
     dense
     flat
-    :title='$t("MSG_COIN_CONFIG")'
+    :title='$t("MSG_TASK_CONFIG")'
     :rows='displayTaskConfigs'
     row-key='ID'
     :rows-per-page-options='[100]'
