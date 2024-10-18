@@ -317,6 +317,9 @@ const onEventCouponSubmit = (done: () => void) => {
 }
 
 const updateEvent = (done: () => void) => {
+  if (target.value.AppGoodID === '') {
+    target.value.AppGoodID = undefined
+  }
   event.adminUpdateEvent({
     TargetAppID: AppID.value,
     ...target.value,
