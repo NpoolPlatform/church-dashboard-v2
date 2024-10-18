@@ -110,10 +110,10 @@ const coinallocateds = computed(() => _coinallocated.coinAllocateds())
 const coinallocatedcointypeid = ref('')
 const coinallocateduserid = ref('')
 const displayCoinAllocateds = computed(() => coinallocateds.value.filter((el) => {
-  return el.CoinTypeID?.includes(coinallocatedcointypeid.value) &&
-  (el.UserID?.includes(coinallocateduserid.value) ||
-  el.EmailAddress?.includes(coinallocateduserid.value) ||
-  el.PhoneNO?.includes(coinallocateduserid.value))
+  return (el.CoinTypeID?.includes(coinallocatedcointypeid.value) || el.CoinName?.toLowerCase()?.includes(coinallocatedcointypeid.value?.toLowerCase())) &&
+  (el.UserID?.toLowerCase()?.includes(coinallocateduserid.value?.toLowerCase()) ||
+  el.EmailAddress?.toLowerCase()?.includes(coinallocateduserid.value?.toLowerCase()) ||
+  el.PhoneNO?.toLowerCase()?.includes(coinallocateduserid.value?.toLowerCase()))
 }))
 
 const _creditallocated = inspirecreditallocated.useCreditAllocatedStore()
@@ -122,8 +122,8 @@ const creditallocateds = computed(() => _creditallocated.creditAllocateds())
 const creditallocateduserid = ref('')
 const displayCreditAllocateds = computed(() => creditallocateds.value.filter((el) => {
   return el.UserID?.includes(creditallocateduserid.value) ||
-  el.EmailAddress?.includes(creditallocateduserid.value) ||
-  el.PhoneNO?.includes(creditallocateduserid.value)
+  el.EmailAddress?.toLowerCase()?.includes(creditallocateduserid.value?.toLowerCase()) ||
+  el.PhoneNO?.toLowerCase()?.includes(creditallocateduserid.value?.toLowerCase())
 }))
 
 const rewarduserid = ref('')
@@ -134,7 +134,7 @@ const displayUserRewards = computed(() => userrewards.value.filter((el) => {
 const cointypeid = ref('')
 const userid = ref('')
 const displayUserCoinRewards = computed(() => usercoinrewards.value.filter((el) => {
-  return el.CoinTypeID?.includes(cointypeid.value) && el.UserID?.includes(userid.value)
+  return (el.CoinTypeID?.includes(cointypeid.value) || el.CoinName?.toLowerCase()?.includes(cointypeid.value?.toLowerCase())) && el.UserID?.includes(userid.value)
 }))
 
 const loading = ref(false)
