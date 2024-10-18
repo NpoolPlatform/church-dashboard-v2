@@ -92,7 +92,7 @@
 <script setup lang='ts'>
 import { AppID } from 'src/npoolstore/sdk'
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { inspireuserreward, inspireusercoinreward, inspirecoinallocated, inspirecreditallocated, notify, utils } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -110,7 +110,10 @@ const coinallocateds = computed(() => _coinallocated.coinAllocateds())
 const coinallocatedcointypeid = ref('')
 const coinallocateduserid = ref('')
 const displayCoinAllocateds = computed(() => coinallocateds.value.filter((el) => {
-  return el.CoinTypeID?.includes(coinallocatedcointypeid.value) && el.UserID?.includes(coinallocateduserid.value)
+  return el.CoinTypeID?.includes(coinallocatedcointypeid.value) &&
+  (el.UserID?.includes(coinallocateduserid.value) ||
+  el.EmailAddress?.includes(coinallocateduserid.value) ||
+  el.PhoneNO?.includes(coinallocateduserid.value))
 }))
 
 const _creditallocated = inspirecreditallocated.useCreditAllocatedStore()
@@ -118,7 +121,9 @@ const creditallocateds = computed(() => _creditallocated.creditAllocateds())
 
 const creditallocateduserid = ref('')
 const displayCreditAllocateds = computed(() => creditallocateds.value.filter((el) => {
-  return el.UserID?.includes(creditallocateduserid.value)
+  return el.UserID?.includes(creditallocateduserid.value) ||
+  el.EmailAddress?.includes(creditallocateduserid.value) ||
+  el.PhoneNO?.includes(creditallocateduserid.value)
 }))
 
 const rewarduserid = ref('')
@@ -133,6 +138,17 @@ const displayUserCoinRewards = computed(() => usercoinrewards.value.filter((el) 
 }))
 
 const loading = ref(false)
+
+const prepare = () => {
+  getUserRewards(0, 100)
+  getUserCoinRewards(0, 100)
+  getCoinAllocateds(0, 100)
+  getCreditAllocateds(0, 100)
+}
+
+watch(AppID, () => {
+  prepare()
+})
 
 onMounted(() => {
   if (userrewards.value.length === 0) {
