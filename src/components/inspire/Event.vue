@@ -43,14 +43,9 @@
         <q-select
           :disable='updating'
           :options='[
-            basetypes.EventType.AffiliatePurchase,
-            basetypes.EventType.Purchase,
             basetypes.EventType.Signup,
-            basetypes.EventType.AffiliateSignup,
+            basetypes.EventType.Purchase,
             basetypes.EventType.SimulateOrderProfit,
-            basetypes.EventType.SetWithdrawAddress,
-            basetypes.EventType.ConsecutiveLogin,
-            basetypes.EventType.GoodSocialSharing,
             basetypes.EventType.FirstOrderCompleted,
             basetypes.EventType.SetAddress,
             basetypes.EventType.Set2FA,
@@ -58,10 +53,6 @@
             basetypes.EventType.WriteComment,
             basetypes.EventType.WriteRecommend,
             basetypes.EventType.GoodScoring,
-            basetypes.EventType.SubmitTicket,
-            basetypes.EventType.IntallApp,
-            basetypes.EventType.SetNFTAvatar,
-            basetypes.EventType.SetPersonalImage,
             basetypes.EventType.Signin,
             basetypes.EventType.KYCApproved,
             basetypes.EventType.OrderCompleted,
@@ -70,6 +61,8 @@
             basetypes.EventType.UpdatePassword,
             basetypes.EventType.ResetPassword,
             basetypes.EventType.InternalTransfer,
+            basetypes.EventType.AffiliateSignup,
+            basetypes.EventType.AffiliatePurchase
           ]'
           v-model='target.EventType'
           :label='$t("MSG_EVENT_TYPE")'
@@ -77,11 +70,9 @@
       </q-card-section>
       <q-card-section
         v-if='target.EventType === basetypes.EventType.AffiliatePurchase ||
-          target.EventType === basetypes.EventType.Purchase ||
-          target.EventType === basetypes.EventType.Signup ||
-          target.EventType === basetypes.EventType.AffiliateSignup'
+          target.EventType === basetypes.EventType.Purchase'
       >
-        <AppGoodSelector v-model:app-good-id='target.AppGoodID' v-if='!updating' :label='$t("MSG_GOOD")' />
+        <AppGoodSelector v-model:app-good-id='target.AppGoodID' :label='$t("MSG_GOOD")' />
       </q-card-section>
       <q-card-section>
         <q-input type='number' v-model='target.Credits' :label='$t("MSG_CREDIT")' />
