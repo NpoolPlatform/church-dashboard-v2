@@ -208,7 +208,7 @@
 <script setup lang='ts'>
 import { AppID } from 'src/npoolstore/sdk'
 import { basetypes, eventinspire, eventcoininspire, eventcouponinspire, utils, notify } from 'src/npoolstore'
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -370,12 +370,23 @@ const createEvent = (done: () => void) => {
   })
 }
 
+const prepare = () => {
+  getEvents(0, 100)
+  getEventCoins(0, 100)
+  getEventCoupons(0, 100)
+}
+
 onMounted(() => {
   if (event.events()?.length === 0) {
-    getEvents(0, 500)
-    getEventCoins(0, 500)
-    getEventCoupons(0, 500)
+    getEvents(0, 100)
+    getEventCoins(0, 100)
+    getEventCoupons(0, 100)
   }
+})
+
+watch(AppID, () => {
+  target.value.AppID = AppID.value
+  prepare()
 })
 
 const getEvents = (offset: number, limit: number) => {
