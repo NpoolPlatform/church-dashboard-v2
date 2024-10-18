@@ -48,6 +48,9 @@
         <q-input type='number' v-model.number='target.Index' :label='$t("MSG_INDEX")' />
         <q-input type='number' v-model.number='target.MaxRewardCount' :label='$t("MSG_MAX_REWARD_COUNT")' />
         <q-input type='number' v-model.number='target.CooldownSecond' :label='$t("MSG_COOLDOWN_SECOND")' />
+        <q-toggle dense v-model='target.IntervalReset' :label='$t("MSG_INTERVAL_RESET")' />
+        <q-input type='number' v-model.number='target.MaxIntervalRewardCount' :label='$t("MSG_MAX_INTERVAL_REWARD_COUNT")' />
+        <q-input type='number' v-model.number='target.IntervalResetSecond' :label='$t("MSG_INTERVAL_RESET_SECOND")' />
         <q-input type='text' v-model='target.TaskDesc' :label='$t("MSG_TASK_DESC")' />
         <q-input v-model='target.StepGuide' :label='$t("MSG_STEP_GUIDE")' />
         <q-input v-model='target.RecommendMessage' :label='$t("MSG_RECOMMEND_MESSAGE")' />
