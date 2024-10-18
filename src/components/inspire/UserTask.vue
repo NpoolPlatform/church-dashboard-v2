@@ -244,10 +244,10 @@ const userTaskColumns = computed(() => [
     field: (row: inspiretask.UserTask) => row.MaxRewardCount
   },
   {
-    name: 'CooldownSecord',
-    label: t('MSG_COOLDOWN_SECORD'),
+    name: 'CooldownSecond',
+    label: t('MSG_COOLDOWN_SECOND'),
     sortable: true,
-    field: (row: inspiretask.UserTask) => row.CooldownSecord
+    field: (row: inspiretask.UserTask) => row.CooldownSecond
   },
   {
     name: 'CompletionTimes',
