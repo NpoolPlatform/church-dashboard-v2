@@ -251,7 +251,7 @@ const userTaskColumns = computed(() => [
     name: 'NextStartAt',
     label: t('MSG_NEXT_START_AT'),
     sortable: true,
-    field: (row: inspiretask.UserTask) => utils.formatTime(row.NextStartAt)
+    field: (row: inspiretask.UserTask) => row.NextStartAt === 0 ? row.NextStartAt : utils.formatTime(row.NextStartAt)
   },
   {
     name: 'LastTaskID',
