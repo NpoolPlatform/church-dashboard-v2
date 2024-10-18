@@ -47,7 +47,7 @@
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
         <q-input type='number' v-model.number='target.Index' :label='$t("MSG_INDEX")' />
         <q-input type='number' v-model.number='target.MaxRewardCount' :label='$t("MSG_MAX_REWARD_COUNT")' />
-        <q-input type='number' v-model.number='target.CooldownSecord' :label='$t("MSG_COOLDOWN_SECORD")' />
+        <q-input type='number' v-model.number='target.CooldownSecond' :label='$t("MSG_COOLDOWN_SECOND")' />
         <q-input type='text' v-model='target.TaskDesc' :label='$t("MSG_TASK_DESC")' />
         <q-input v-model='target.StepGuide' :label='$t("MSG_STEP_GUIDE")' />
         <q-input v-model='target.RecommendMessage' :label='$t("MSG_RECOMMEND_MESSAGE")' />
@@ -107,10 +107,12 @@ const onCancel = () => {
 }
 
 const onSubmit = (done: () => void) => {
+  console.log('1target: ', target.value)
   updating.value ? updateTaskConfig(done) : createTaskConfig(done)
 }
 
 const updateTaskConfig = (done: () => void) => {
+  console.log('target: ', target.value)
   _taskconfig.adminUpdateTaskConfig({
     TargetAppID: AppID.value,
     ...target.value,
@@ -303,10 +305,10 @@ const columns = computed(() => [
     field: (row: inspiretaskconfig.TaskConfig) => row.MaxRewardCount
   },
   {
-    name: 'CooldownSecord',
-    label: t('MSG_COOLDOWN_SECORD'),
+    name: 'CooldownSecond',
+    label: t('MSG_COOLDOWN_SECOND'),
     sortable: true,
-    field: (row: inspiretaskconfig.TaskConfig) => row.CooldownSecord
+    field: (row: inspiretaskconfig.TaskConfig) => row.CooldownSecond
   },
   {
     name: 'CreatedAt',
