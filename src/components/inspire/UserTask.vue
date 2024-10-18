@@ -55,7 +55,7 @@ const { t } = useI18n({ useScope: 'global' })
 const _user = user.useUserStore()
 const users = computed(() => _user.appUsers(AppID.value))
 const username = ref('')
-const displayUsers = computed(() => users.value.filter((el) => el.EmailAddress?.includes(username.value) || el.PhoneNO?.includes(username.value)))
+const displayUsers = computed(() => users.value.filter((el) => el.EmailAddress?.toLowerCase()?.includes(username.value?.toLowerCase()) || el.PhoneNO?.toLowerCase()?.includes(username.value?.toLowerCase())))
 const selectedUser = ref([] as Array<user.User>)
 const userLoading = ref(false)
 
@@ -64,7 +64,7 @@ const _usertasks = computed(() => _usertask.userTasks())
 
 const taskname = ref('')
 const displayUserTasks = computed(() => _usertasks.value.filter((el) => {
-  return el.Name?.includes(taskname.value)
+  return el.Name?.toLowerCase()?.includes(taskname.value?.toLowerCase())
 }))
 
 const loading = ref(false)
