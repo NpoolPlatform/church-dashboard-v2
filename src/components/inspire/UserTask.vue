@@ -69,6 +69,14 @@ const displayUserTasks = computed(() => _usertasks.value.filter((el) => {
 
 const loading = ref(false)
 
+const prepare = () => {
+  getAppUsers(0, 100)
+}
+
+watch(AppID, () => {
+  prepare()
+})
+
 onMounted(() => {
   if (users.value.length === 0) {
     getAppUsers(0, 100)
