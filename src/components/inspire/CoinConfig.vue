@@ -76,7 +76,7 @@ const coinconfigs = computed(() => _coinconfig.coinConfigs())
 
 const cointypeid = ref('')
 const displayCoinConfigs = computed(() => coinconfigs.value.filter((el) => {
-  return el.CoinTypeID?.includes(cointypeid.value)
+  return el.CoinTypeID?.includes(cointypeid.value) || el.CoinName?.includes(cointypeid.value)
 }))
 
 const target = ref({} as inspirecoinconfig.CoinConfig)
