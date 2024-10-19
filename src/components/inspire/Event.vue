@@ -599,21 +599,25 @@ const columns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.EntID
   },
   {
     name: 'AppName',
     label: t('MSG_APP_NAME'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.AppName
   },
   {
     name: 'EventType',
     label: t('MSG_EVENT_TYPE'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.EventType
   },
   {
@@ -624,26 +628,31 @@ const columns = computed(() => [
   {
     name: 'CreditsPerUSD',
     label: t('MSG_CREDITS_PERUSD'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.CreditsPerUSD
   },
   {
     name: 'MaxConsecutive',
     label: t('MSG_MAX_CONSECUTIVE'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.MaxConsecutive
   },
   {
     name: 'GoodID',
     label: t('MSG_GOOD_ID'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.GoodID
   },
   {
     name: 'GoodName',
     label: t('MSG_GOOD_NAME'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.GoodName
   },
   {
     name: 'InviterLayers',
     label: t('MSG_INVITER_LAYERS'),
+    sortable: true,
     field: (row: eventinspire.Event) => row.InviterLayers
   },
   {
@@ -664,61 +673,73 @@ const eventCoinColumns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.EntID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.AppID
   },
   {
     name: 'EventID',
     label: t('MSG_EVENT_ID'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.EventID
   },
   {
     name: 'CoinConfigID',
     label: t('MSG_COIN_CONFIG_ID'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinConfigID
   },
   {
     name: 'CoinTypeID',
     label: t('MSG_COIN_TYPE_ID'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinTypeID
   },
   {
     name: 'CoinValue',
     label: t('MSG_COIN_VALUE'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinValue
   },
   {
     name: 'CoinPerUSD',
     label: t('MSG_COIN_PER_USD'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinPerUSD
   },
   {
     name: 'CoinName',
     label: t('MSG_COIN_NAME'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinName
   },
   {
     name: 'DisplayNames',
     label: t('MSG_DISPLAY_NAMES'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.DisplayNames.join(',')
   },
   {
     name: 'CoinLogo',
     label: t('MSG_COIN_LOGO'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinLogo
   },
   {
     name: 'CoinUnit',
     label: t('MSG_COIN_UNIT'),
+    sortable: true,
     field: (row: eventcoininspire.EventCoin) => row.CoinUnit
   }
 ])
@@ -727,56 +748,67 @@ const eventCouponColumns = computed(() => [
   {
     name: 'ID',
     label: t('MSG_ID'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.ID
   },
   {
     name: 'EntID',
     label: t('MSG_ENT_ID'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.EntID
   },
   {
     name: 'AppID',
     label: t('MSG_APP_ID'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.AppID
   },
   {
     name: 'EventID',
     label: t('MSG_EVENT_ID'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.EventID
   },
   {
     name: 'CouponID',
     label: t('MSG_COUPON_ID'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.CouponID
   },
   {
     name: 'CouponType',
     label: t('MSG_COUPON_TYPE'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.CouponType
   },
   {
     name: 'Denomination',
     label: t('MSG_DENOMINATION'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.Denomination
   },
   {
     name: 'StartAt',
     label: t('MSG_START_AT'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => utils.formatTime(row.StartAt)
   },
   {
     name: 'EndAt',
     label: t('MSG_END_AT'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => utils.formatTime(row.EndAt)
   },
   {
     name: 'DurationDays',
     label: t('MSG_DURATION_DAYS'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.DurationDays
   },
   {
     name: 'Name',
     label: t('MSG_NAME'),
+    sortable: true,
     field: (row: eventcouponinspire.EventCoupon) => row.Name
   }
 ])
