@@ -314,6 +314,24 @@ const columns = computed(() => [
     field: (row: inspiretaskconfig.TaskConfig) => row.CooldownSecond
   },
   {
+    name: 'IntervalReset',
+    label: t('MSG_INTERVAL_RESET'),
+    sortable: true,
+    field: (row: inspiretaskconfig.TaskConfig) => row.IntervalReset
+  },
+  {
+    name: 'MaxIntervalRewardCount',
+    label: t('MSG_MAX_INTERVAL_REWARD_COUNT'),
+    sortable: true,
+    field: (row: inspiretaskconfig.TaskConfig) => row.MaxIntervalRewardCount
+  },
+  {
+    name: 'IntervalResetSecond',
+    label: t('MSG_INTERVAL_RESET_SECOND'),
+    sortable: true,
+    field: (row: inspiretaskconfig.TaskConfig) => row.IntervalResetSecond
+  },
+  {
     name: 'CreatedAt',
     label: t('MSG_CREATED_AT'),
     sortable: true,
