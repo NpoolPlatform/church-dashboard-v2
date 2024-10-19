@@ -50,9 +50,9 @@ const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {
   })
 }
 
-const emit = defineEmits<{(e: 'update:taskConfigId', taskConfigId: string): void}>()
+const emit = defineEmits<{(e: 'update:id', id: string): void}>()
 const onUpdate = () => {
-  emit('update:taskConfigId', target.value)
+  emit('update:id', target.value)
 }
 
 onMounted(() => {
