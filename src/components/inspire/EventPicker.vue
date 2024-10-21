@@ -1,7 +1,7 @@
 <template>
   <q-select
     v-model='target'
-    :options='_eventInspires'
+    :options='displayEvents'
     options-selected-class='text-deep-orange'
     emit-value
     map-options

@@ -1,7 +1,7 @@
 <template>
   <q-select
     v-model='target'
-    :options='_taskConfigs'
+    :options='displayTaskConfigs'
     options-selected-class='text-deep-orange'
     emit-value
     map-options
