@@ -311,6 +311,7 @@ const updateEvent = (done: () => void) => {
   if (target.value.AppGoodID === '') {
     target.value.AppGoodID = undefined
   }
+  checkOptionValue()
   event.adminUpdateEvent({
     TargetAppID: AppID.value,
     ...target.value,
@@ -337,7 +338,14 @@ const updateEvent = (done: () => void) => {
   })
 }
 
+const checkOptionValue = () => {
+  if (target.value.EventType != basetypes.EventType.AffiliatePurchase && target.value.EventType != basetypes.EventType.Purchase) {
+    target.value.AppGoodID = undefined  
+  }
+}
+
 const createEvent = (done: () => void) => {
+  checkOptionValue()
   event.adminCreateEvent({
     TargetAppID: AppID.value,
     ...target.value,
