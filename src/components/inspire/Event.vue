@@ -650,6 +650,18 @@ const columns = computed(() => [
     field: (row: eventinspire.Event) => row.GoodName
   },
   {
+    name: 'AppGoodID',
+    label: t('MSG_APP_GOOD_ID'),
+    sortable: true,
+    field: (row: eventinspire.Event) => row.AppGoodID
+  },
+  {
+    name: 'AppGoodName',
+    label: t('MSG_APP_GOOD_NAME'),
+    sortable: true,
+    field: (row: eventinspire.Event) => row.AppGoodName
+  },
+  {
     name: 'InviterLayers',
     label: t('MSG_INVITER_LAYERS'),
     sortable: true,
