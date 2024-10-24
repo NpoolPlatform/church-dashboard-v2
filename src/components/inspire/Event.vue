@@ -339,8 +339,8 @@ const updateEvent = (done: () => void) => {
 }
 
 const checkOptionValue = () => {
-  if (target.value.EventType != basetypes.EventType.AffiliatePurchase && target.value.EventType != basetypes.EventType.Purchase) {
-    target.value.AppGoodID = undefined  
+  if (target.value.EventType !== basetypes.EventType.AffiliatePurchase && target.value.EventType !== basetypes.EventType.Purchase) {
+    target.value.AppGoodID = undefined
   }
 }
 
