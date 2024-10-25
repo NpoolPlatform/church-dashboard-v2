@@ -58,12 +58,12 @@ const onUpdate = () => {
 
 watch(sdk.AppID, () => {
   if (!users.value?.length) {
-    sdk.adminGetUsers(0, 0)
+    sdk.appUser.adminGetUsers(0, 0)
   }
 })
 onMounted(() => {
   if (!users.value?.length) {
-    sdk.adminGetUsers(0, 0)
+    sdk.appUser.adminGetUsers(0, 0)
   }
 })
 </script>
