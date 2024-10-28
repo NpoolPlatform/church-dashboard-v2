@@ -62,13 +62,13 @@ const onUpdate = () => {
 
 onMounted(() => {
   if (!appCoins.value.length) {
-    sdk.appCoin.getAppCoins(0, 0)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 
 watch(AppID, () => {
   if (!appCoins.value.length) {
-    sdk.appCoin.getAppCoins(0, 0)
+    sdk.appCoin.adminGetAppCoins(0, 0)
   }
 })
 </script>
