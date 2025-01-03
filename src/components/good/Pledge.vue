@@ -42,7 +42,7 @@
       <q-card-section>
         <q-input v-model.number='target.BenefitIntervalHours' :label='$t("MSG_BENEFIT_INTERVAL_HOURS")' type='number' :min='1' />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-show='!updating'>
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section>
@@ -76,7 +76,7 @@ const { t } = useI18n({ useScope: 'global' })
 const DateTimePicker = defineAsyncComponent(() => import('src/components/date/DateTimePicker.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
 
-const goods = sdk.powerRentals
+const goods = sdk.pledges
 
 const goodName = ref('')
 const displayPledges = computed(() => {
@@ -171,12 +171,6 @@ const columns = computed(() => [
     label: t('MSG_GOOD_TYPE'),
     sortable: true,
     field: (row: pledge.Pledge) => row.GoodType
-  },
-  {
-    name: 'CoinTypeID',
-    label: t('MSG_COINTYPEID'),
-    sortable: true,
-    field: (row: pledge.Pledge) => row.CoinTypeID
   },
   {
     name: 'ContractDeploymentAddress',
