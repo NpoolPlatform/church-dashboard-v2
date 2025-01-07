@@ -233,6 +233,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '合约管理地址',
+        caption: '管理和部署合约的地址',
+        icon: 'perm_identity',
+        target: '/account/contract',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
