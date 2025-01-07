@@ -77,6 +77,11 @@
         <q-input v-model='target.ProductPage' :label='$t("MSG_PRODUCT_PAGE")' />
       </q-card-section>
       <q-card-section>
+        <q-select
+          :options='goodbase.StartModes'
+          v-model='target.GoodStartMode'
+          :label='$t("MSG_GOOD_START_MODE")'
+        />
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
       </q-card-section>
       <q-card-section>
@@ -97,7 +102,7 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { apppledge, utils, sdk, pledge } from 'src/npoolstore'
+import { apppledge, utils, sdk, goodbase, pledge } from 'src/npoolstore'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
