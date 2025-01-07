@@ -31,7 +31,7 @@
     <q-card class='popup-menu'>
       <q-card-section v-if='!updating'>
         <GoodSelector v-model:good-id='target.GoodID' />
-        <CoinPicker v-model:coin-type-id='target.CoinTypeID' :coin-type-ids='displayCoinTypeIds' />
+        <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section v-if='updating'>
         <div><span>{{ $t("MSG_ID") }}: {{ target?.ID }}</span></div>
@@ -63,7 +63,7 @@
 
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
-import { goodbenefitaccount, sdk } from 'src/npoolstore'
+import { goodbenefitaccount, sdk, goodbase } from 'src/npoolstore'
 
 const GoodSelector = defineAsyncComponent(() => import('src/components/good/GoodSelector.vue'))
 const CoinPicker = defineAsyncComponent(() => import('src/components/coin/CoinPicker.vue'))
@@ -139,11 +139,10 @@ const updateGoodBenefitAccount = () => {
   })
 }
 
-const goodCoins = computed(() => sdk.goodCoins.value)
+const goodCoins = computed(() => sdk.goodCoins.value.filter((el) => el.GoodType !== goodbase.GoodType.Pledge))
 
 const coinTypeIDs = computed(() => goodCoins.value?.filter((el) => el.GoodID === target.value?.GoodID)?.map((cl) => cl.CoinTypeID))
 const displayCoinTypeIds = ref(coinTypeIDs.value)
-
 watch(() => target.value?.GoodID, () => {
   displayCoinTypeIds.value = coinTypeIDs.value
 })
