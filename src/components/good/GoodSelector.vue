@@ -21,23 +21,34 @@
 </template>
 <script setup lang='ts'>
 import { computed, defineEmits, defineProps, toRef, ref, onMounted } from 'vue'
-import { sdk } from 'src/npoolstore'
+import { goodbase, sdk } from 'src/npoolstore'
 
 interface Props {
-  goodId: string | undefined
+  goodId: string | undefined,
+  ignoreGoodTypes?: Array<goodbase.GoodType>
 }
 
 const props = defineProps<Props>()
 const goodId = toRef(props, 'goodId')
+const ignoreGoodTypes = toRef(props, 'ignoreGoodTypes')
 const target = ref(goodId.value)
 
 const goods = sdk.goods
-const _goods = computed(() => Array.from(goods.value, (el) => {
+const showGoods = computed(() => goods.value.filter((el) => {
+  if (ignoreGoodTypes.value !== undefined && ignoreGoodTypes.value?.length > 0) {
+    const index = ignoreGoodTypes.value.findIndex((gl) => gl === el.GoodType)
+    return index === -1
+  }
+  return true
+}))
+
+const _goods = computed(() => Array.from(showGoods.value, (el) => {
   return {
     value: el.EntID,
     label: `${el.EntID} | ${el.Name} | ${el.GoodType}`
   }
 }))
+
 const displayGoods = ref(_goods.value)
 
 const onFilter = (val: string, doneFn: (callbackFn: () => void) => void) => {

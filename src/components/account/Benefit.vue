@@ -30,7 +30,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section v-if='!updating'>
-        <GoodSelector v-model:good-id='target.GoodID' />
+        <GoodSelector v-model:good-id='target.GoodID' :ignore-good-types='[goodbase.GoodType.Pledge]' />
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section v-if='updating'>
