@@ -79,7 +79,7 @@
       <q-card-section>
         <q-select
           :options='goodbase.StartModes'
-          v-model='target.GoodStartMode'
+          v-model='target.AppGoodStartMode'
           :label='$t("MSG_GOOD_START_MODE")'
         />
         <DateTimePicker v-model:date='target.ServiceStartAt' label='MSG_SERVICE_START_AT' />
