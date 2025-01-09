@@ -36,8 +36,8 @@
     <q-card class='popup-menu'>
       <q-card-section>
         <q-input v-model='target.Name' :label='$t("MSG_NAME")' />
-        <q-input v-model='target.ContractCodeURL' :label='$t("MSG_QUANTITY_UNIT")' />
-        <q-input v-model='target.ContractCodeBranch' :label='$t("MSG_QUANTITY_UNIT_AMOUNT")' />
+        <q-input v-model='target.ContractCodeURL' :label='$t("MSG_CONTRACT_CODE_URL")' />
+        <q-input v-model='target.ContractCodeBranch' :label='$t("MSG_CONTRACT_CODE_BRANCH")' />
       </q-card-section>
       <q-card-section>
         <q-input v-model.number='target.BenefitIntervalHours' :label='$t("MSG_BENEFIT_INTERVAL_HOURS")' type='number' :min='1' />
