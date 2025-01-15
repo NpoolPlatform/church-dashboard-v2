@@ -30,7 +30,7 @@
   >
     <q-card class='popup-menu'>
       <q-card-section v-if='!updating'>
-        <GoodSelector v-model:good-id='target.GoodID' :ignore-good-types='[goodbase.GoodType.Pledge]' />
+        <GoodSelector v-model:good-id='target.GoodID' :ignore-good-types='[goodbase.GoodType.DelegatedStaking]' />
         <CoinPicker v-model:coin-type-id='target.CoinTypeID' />
       </q-card-section>
       <q-card-section v-if='updating'>
@@ -139,7 +139,7 @@ const updateGoodBenefitAccount = () => {
   })
 }
 
-const goodCoins = computed(() => sdk.goodCoins.value.filter((el) => el.GoodType !== goodbase.GoodType.Pledge))
+const goodCoins = computed(() => sdk.goodCoins.value.filter((el) => el.GoodType !== goodbase.GoodType.DelegatedStaking))
 
 const coinTypeIDs = computed(() => goodCoins.value?.filter((el) => el.GoodID === target.value?.GoodID)?.map((cl) => cl.CoinTypeID))
 const displayCoinTypeIds = ref(coinTypeIDs.value)

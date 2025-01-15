@@ -1165,8 +1165,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'good/pledges',
-        component: () => import('pages/good/Pledge.vue'),
+        path: 'good/delegatedstakings',
+        component: () => import('pages/good/DelegatedStaking.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,
@@ -1177,8 +1177,8 @@ const routes: RouteRecordRaw[] = [
           NeedLogined: true
         }
       }, {
-        path: 'good/apppledges',
-        component: () => import('pages/good/AppPledge.vue'),
+        path: 'good/appdelegatedstakings',
+        component: () => import('pages/good/AppDelegatedStaking.vue'),
         meta: {
           ShowHeaderAnnouncement: true,
           ShowMainHeader: false,

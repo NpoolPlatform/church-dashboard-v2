@@ -387,7 +387,7 @@ const MainDrawerMenus = [
       label: '委托质押',
       caption: '添加与编辑委托质押商品',
       icon: 'perm_identity',
-      target: '/good/pledges',
+      target: '/good/delegatedstakings',
       level: 1,
       sectionBegin: false,
       children: []
@@ -423,7 +423,7 @@ const MainDrawerMenus = [
       label: 'APP委托质押管理',
       caption: '授权上下架管理',
       icon: 'perm_identity',
-      target: '/good/apppledges',
+      target: '/good/appdelegatedstakings',
       level: 1,
       sectionBegin: false,
       children: []
