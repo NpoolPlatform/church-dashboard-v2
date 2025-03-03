@@ -233,6 +233,15 @@ const MainDrawerMenus = [
         level: 1,
         sectionBegin: false,
         children: []
+      } as MenuItem, {
+        menuId: uid(),
+        label: '合约管理地址',
+        caption: '管理和部署合约的地址',
+        icon: 'perm_identity',
+        target: '/account/contract',
+        level: 1,
+        sectionBegin: false,
+        children: []
       } as MenuItem
     ]
   } as MenuItem, {
@@ -375,6 +384,15 @@ const MainDrawerMenus = [
       children: []
     } as MenuItem, {
       menuId: uid(),
+      label: '委托质押',
+      caption: '添加与编辑委托质押商品',
+      icon: 'perm_identity',
+      target: '/good/delegatedstakings',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
       label: '电费/服务费',
       caption: '添加与编辑电费/服务费商品',
       icon: 'perm_identity',
@@ -397,6 +415,15 @@ const MainDrawerMenus = [
       caption: '授权、价格与上下架管理',
       icon: 'perm_identity',
       target: '/good/apppowerrentals',
+      level: 1,
+      sectionBegin: false,
+      children: []
+    } as MenuItem, {
+      menuId: uid(),
+      label: 'APP委托质押管理',
+      caption: '授权上下架管理',
+      icon: 'perm_identity',
+      target: '/good/appdelegatedstakings',
       level: 1,
       sectionBegin: false,
       children: []
